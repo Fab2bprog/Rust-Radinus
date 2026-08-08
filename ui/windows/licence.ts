@@ -23,6 +23,7 @@ const element = <T extends HTMLElement>(id: string): T =>
 
 function dress(): void {
   document.documentElement.lang = t("ui-language-tag");
+  element<HTMLElement>("heading").textContent = t("licence-heading");
   element<HTMLImageElement>("logo").alt = t("licence-logo-alt");
   element<HTMLElement>("name").textContent = t("licence-name");
   element<HTMLElement>("intro").textContent = t("licence-intro");

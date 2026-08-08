@@ -284,6 +284,14 @@ menu-misc = Varie
 menu-misc-calculator = Calcolatrice
 menu-misc-website = Andare sul sito di Radinus
 menu-misc-database-folder = Accesso alla cartella contenente la base di dati
+
+# L'avertissement posé devant ce dossier (Fabrice, 08/08/2026) : « un
+# utilisateur ignorant peut faire des bêtises ». La question est posée
+# avant l'ouverture, jamais après.
+database-folder-warning-title = Aprire la cartella del database
+database-folder-warning =
+    Questa cartella contiene tutti i vostri dati. Rinominare, spostare o eliminare un file può farvi perdere i conti, danneggiarli o impedire a Radinus di funzionare.
+    Volete davvero aprirla?
 menu-misc-application-folder = Accesso alla cartella contenente l'applicazione
 
 # ---------------------------------------------------------------------
@@ -1807,6 +1815,7 @@ about-radinus-licence = Software libero, con licenza GNU GPL v3.
 # button opens the official page, published and maintained by the Free
 # Software Foundation, which knows its own wording better than we do.
 window-licence-title = Licenza d'uso
+licence-heading = LICENZA D'USO DEL SOFTWARE RADINUS
 licence-logo-alt = Il logo della GNU General Public License versione 3
 licence-name = GNU GPL v3 o successiva
 licence-intro = Radinus è software libero.

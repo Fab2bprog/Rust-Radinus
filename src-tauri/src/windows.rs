@@ -282,7 +282,7 @@ pub fn licence_window(language: Language) -> WindowSpec {
         url: "ui/windows/licence.html".to_string(),
         title: i18n::text(language, "window-licence-title"),
         width: 560.0,
-        height: 580.0,
+        height: 620.0,
         closable: false,
         resizable_chrome: false,
         parent: None,

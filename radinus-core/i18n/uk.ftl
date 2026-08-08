@@ -296,6 +296,14 @@ menu-misc = Різне
 menu-misc-calculator = Калькулятор
 menu-misc-website = Перейти на сайт Radinus
 menu-misc-database-folder = Доступ до теки з базою даних
+
+# L'avertissement posé devant ce dossier (Fabrice, 08/08/2026) : « un
+# utilisateur ignorant peut faire des bêtises ». La question est posée
+# avant l'ouverture, jamais après.
+database-folder-warning-title = Відкрити теку бази даних
+database-folder-warning =
+    У цій теці зберігаються всі ваші дані. Перейменування, переміщення або вилучення файлу може призвести до втрати рахунків, їх пошкодження або до непрацездатності Radinus.
+    Sправді відкрити її?
 menu-misc-application-folder = Доступ до теки з програмою
 
 # ---------------------------------------------------------------------
@@ -1863,6 +1871,7 @@ about-radinus-licence = Вільне програмне забезпечення
 # button opens the official page, published and maintained by the Free
 # Software Foundation, which knows its own wording better than we do.
 window-licence-title = Ліцензія
+licence-heading = ЛІЦЕНЗІЯ НА ВИКОРИСТАННЯ ПРОГРАМИ RADINUS
 licence-logo-alt = Логотип GNU General Public License версії 3
 licence-name = GNU GPL v3 або новіша
 licence-intro = Radinus — вільна програма.

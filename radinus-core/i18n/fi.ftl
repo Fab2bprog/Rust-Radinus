@@ -285,6 +285,14 @@ menu-misc = Muut
 menu-misc-calculator = Laskin
 menu-misc-website = Siirry Radinuksen sivustolle
 menu-misc-database-folder = Avaa tietokannan sisältävä kansio
+
+# L'avertissement posé devant ce dossier (Fabrice, 08/08/2026) : « un
+# utilisateur ignorant peut faire des bêtises ». La question est posée
+# avant l'ouverture, jamais après.
+database-folder-warning-title = Avaa tietokannan kansio
+database-folder-warning =
+    Tämä kansio sisältää kaikki tietosi. Tiedoston uudelleennimeäminen, siirtäminen tai poistaminen voi hukata tilisi, vioittaa niitä tai estää Radinusta toimimasta.
+    Haluatko varmasti avata sen?
 menu-misc-application-folder = Avaa sovelluksen sisältävä kansio
 
 # ---------------------------------------------------------------------
@@ -1806,6 +1814,7 @@ about-radinus-licence = Vapaa ohjelmisto, GNU GPL v3 -lisenssillä.
 # button opens the official page, published and maintained by the Free
 # Software Foundation, which knows its own wording better than we do.
 window-licence-title = Käyttöoikeus
+licence-heading = RADINUS-OHJELMISTON KÄYTTÖOIKEUS
 licence-logo-alt = GNU General Public License version 3 logo
 licence-name = GNU GPL v3 tai uudempi
 licence-intro = Radinus on vapaa ohjelmisto.

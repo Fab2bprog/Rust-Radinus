@@ -109,6 +109,7 @@ const ABOUT_AUTHOR_KEYS: &[&str] = &[
 
 /// Ce que dit « Licence d'utilisation » (08/08/2026).
 const LICENCE_KEYS: &[&str] = &[
+    "licence-heading",
     "licence-logo-alt",
     "licence-name",
     "licence-intro",

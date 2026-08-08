@@ -288,6 +288,14 @@ menu-misc = Διάφορα
 menu-misc-calculator = Αριθμομηχανή
 menu-misc-website = Μετάβαση στον ιστότοπο του Radinus
 menu-misc-database-folder = Πρόσβαση στον φάκελο που περιέχει τη βάση δεδομένων
+
+# L'avertissement posé devant ce dossier (Fabrice, 08/08/2026) : « un
+# utilisateur ignorant peut faire des bêtises ». La question est posée
+# avant l'ouverture, jamais après.
+database-folder-warning-title = Άνοιγμα του φακέλου της βάσης δεδομένων
+database-folder-warning =
+    Αυτός ο φάκελος περιέχει όλα τα δεδομένα σας. Η μετονομασία, η μετακίνηση ή η διαγραφή ενός αρχείου μπορεί να χάσει τους λογαριασμούς σας, να τους αλλοιώσει ή να εμποδίσει το Radinus να λειτουργήσει.
+    Θέλετε πραγματικά να τον ανοίξετε;
 menu-misc-application-folder = Πρόσβαση στον φάκελο που περιέχει την εφαρμογή
 
 # ---------------------------------------------------------------------
@@ -1821,6 +1829,7 @@ about-radinus-licence = Ελεύθερο λογισμικό, με άδεια GNU
 # button opens the official page, published and maintained by the Free
 # Software Foundation, which knows its own wording better than we do.
 window-licence-title = Άδεια χρήσης
+licence-heading = ΑΔΕΙΑ ΧΡΗΣΗΣ ΤΟΥ ΛΟΓΙΣΜΙΚΟΥ RADINUS
 licence-logo-alt = Το λογότυπο της GNU General Public License έκδοση 3
 licence-name = GNU GPL v3 ή νεότερη
 licence-intro = Το Radinus είναι ελεύθερο λογισμικό.

@@ -503,6 +503,7 @@ const UI_TEXTS = {
   // quelque chose ne verrait pas la fenêtre habillée avec le vocabulaire
   // d'une autre.
   "licence-logo-alt": "Le logo de la GNU General Public License version 3",
+  "licence-heading": "LICENCE D'UTILISATION DU LOGICIEL RADINUS",
   "licence-name": "GNU GPL v3 ou ultérieure",
   "licence-intro": "Radinus est un logiciel libre.",
   "licence-freedoms-title": "Sa licence vous donne quatre libertés :",
@@ -9410,19 +9411,36 @@ for (const [window, size] of [
   // Chaque phrase vient du noyau. `t` rend la clef quand elle manque, donc
   // une phrase égale à sa clef est une phrase que personne n'a traduite.
   const said = await page.evaluate(() =>
-    ["name", "intro", "freedoms-title", "freedom-use", "freedom-study",
+    ["heading", "name", "intro", "freedoms-title", "freedom-use", "freedom-study",
      "freedom-share", "freedom-improve", "copyright", "no-warranty", "info-bar"]
       .map((id) => document.getElementById(id).textContent),
   );
   check(
-    "licence : les dix phrases arrivent entières du noyau",
+    "licence : les onze phrases arrivent entières du noyau",
     said.every((text) => text && !text.startsWith("licence-")),
     said.join(" | "),
   );
+  // Le titre est en capitales et il est au-dessus du logo : les deux comptent,
+  // et c'est l'ordre dans le document qui le prouve, pas la feuille de style.
+  check(
+    "licence : le titre est écrit en capitales",
+    said[0] === said[0].toUpperCase() && said[0].includes("RADINUS"),
+    said[0],
+  );
+  check(
+    "licence : et il est au-dessus du logo",
+    await page.evaluate(() => {
+      const heading = document.getElementById("heading");
+      const logo = document.getElementById("logo");
+      return Boolean(
+        heading.compareDocumentPosition(logo) & Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    }),
+  );
   check(
     "licence : elle nomme la licence, version comprise",
-    said[0] === "GNU GPL v3 ou ultérieure",
-    said[0],
+    said[1] === "GNU GPL v3 ou ultérieure",
+    said[1],
   );
 
   // Les quatre libertés sont une liste, et une liste à puces — demande de

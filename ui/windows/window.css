@@ -112,6 +112,19 @@ body {
   line-height: 1.5;
 }
 
+/* Le titre de la fenêtre de licence : le seul de Radinus posé dans le corps
+   d'une fenêtre plutôt que dans sa barre de titre. Il y est parce qu'un
+   document juridique se nomme sur lui-même, et qu'une barre de titre ne
+   s'imprime ni ne se photographie. */
+.about__licence-heading {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #1a2b3c;
+  text-align: center;
+}
+
 /* --- « Licence d'utilisation » (08/08/2026) --------------------------
    The GPLv3 logo at its own ratio (1920 x 955), never cropped -- the same
    rule as the Corsican flag next door. The width is fixed and the height

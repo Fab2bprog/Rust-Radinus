@@ -283,6 +283,14 @@ menu-misc = Ýmislegt
 menu-misc-calculator = Reiknivél
 menu-misc-website = Fara á vefsíðu Radinus
 menu-misc-database-folder = Opna möppuna sem inniheldur gagnagrunninn
+
+# L'avertissement posé devant ce dossier (Fabrice, 08/08/2026) : « un
+# utilisateur ignorant peut faire des bêtises ». La question est posée
+# avant l'ouverture, jamais après.
+database-folder-warning-title = Opna möppu gagnagrunnsins
+database-folder-warning =
+    Þessi mappa geymir öll gögnin þín. Að endurnefna, færa eða eyða skrá getur glatað reikningunum þínum, skemmt þá eða komið í veg fyrir að Radinus virki.
+    Viltu í alvöru opna hana?
 menu-misc-application-folder = Opna möppuna sem inniheldur forritið
 
 # ---------------------------------------------------------------------
@@ -1802,6 +1810,7 @@ about-radinus-licence = Frjáls hugbúnaður, með GNU GPL v3-leyfi.
 # button opens the official page, published and maintained by the Free
 # Software Foundation, which knows its own wording better than we do.
 window-licence-title = Notkunarleyfi
+licence-heading = NOTKUNARLEYFI HUGBÚNAÐARINS RADINUS
 licence-logo-alt = Merki GNU General Public License útgáfu 3
 licence-name = GNU GPL v3 eða síðari
 licence-intro = Radinus er frjáls hugbúnaður.

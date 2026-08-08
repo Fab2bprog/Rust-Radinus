@@ -285,6 +285,14 @@ menu-misc = שונות
 menu-misc-calculator = מחשבון
 menu-misc-website = מעבר לאתר של Radinus
 menu-misc-database-folder = גישה לתיקייה המכילה את מסד הנתונים
+
+# L'avertissement posé devant ce dossier (Fabrice, 08/08/2026) : « un
+# utilisateur ignorant peut faire des bêtises ». La question est posée
+# avant l'ouverture, jamais après.
+database-folder-warning-title = פתיחת התיקייה של מסד הנתונים
+database-folder-warning =
+    תיקייה זו מכילה את כל הנתונים שלך. שינוי שם, העברה או מחיקה של קובץ עלולים לאבד את החשבונות שלך, לפגוע בהם או למנוע מ-Radinus לפעול.
+    לפתוח אותה?
 menu-misc-application-folder = גישה לתיקייה המכילה את היישום
 
 # ---------------------------------------------------------------------
@@ -1823,6 +1831,7 @@ about-radinus-licence = תוכנה חופשית, ברישיון GNU GPL v3.
 # button opens the official page, published and maintained by the Free
 # Software Foundation, which knows its own wording better than we do.
 window-licence-title = רישיון שימוש
+licence-heading = רישיון השימוש בתוכנת RADINUS
 licence-logo-alt = הלוגו של GNU General Public License גרסה 3
 licence-name = GNU GPL v3 או מאוחר יותר
 licence-intro = Radinus היא תוכנה חופשית.

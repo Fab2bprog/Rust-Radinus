@@ -283,6 +283,14 @@ menu-misc = Diverse
 menu-misc-calculator = Kalkulator
 menu-misc-website = Gå til nettstedet til Radinus
 menu-misc-database-folder = Åpne mappen som inneholder databasen
+
+# L'avertissement posé devant ce dossier (Fabrice, 08/08/2026) : « un
+# utilisateur ignorant peut faire des bêtises ». La question est posée
+# avant l'ouverture, jamais après.
+database-folder-warning-title = Åpne databasens mappe
+database-folder-warning =
+    Denne mappen inneholder alle dataene dine. Å gi nytt navn til, flytte eller slette en fil kan miste kontoene dine, ødelegge dem eller hindre Radinus i å virke.
+    Vil du virkelig åpne den?
 menu-misc-application-folder = Åpne mappen som inneholder programmet
 
 # ---------------------------------------------------------------------
@@ -1800,6 +1808,7 @@ about-radinus-licence = Fri programvare, under GNU GPL v3-lisens.
 # button opens the official page, published and maintained by the Free
 # Software Foundation, which knows its own wording better than we do.
 window-licence-title = Lisens
+licence-heading = BRUKSLISENS FOR PROGRAMMET RADINUS
 licence-logo-alt = Logoen til GNU General Public License versjon 3
 licence-name = GNU GPL v3 eller senere
 licence-intro = Radinus er fri programvare.

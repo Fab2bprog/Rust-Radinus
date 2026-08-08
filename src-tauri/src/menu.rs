@@ -25,6 +25,7 @@ use radinus_core::nomenclatures::{Nomenclature, ALL};
 use radinus_core::statistics::{Axis, AXES};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::{AppHandle, Emitter, Manager, Runtime};
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 /// Menu id of a nomenclature entry: its key, prefixed so nothing else can
 /// collide with it.
@@ -771,35 +772,69 @@ pub fn on_event<R: Runtime>(app: &AppHandle<R>, event: tauri::menu::MenuEvent) {
         }
         return;
     }
-    if event.id() == DATABASE_FOLDER_ITEM_ID || event.id() == APPLICATION_FOLDER_ITEM_ID {
-        let state = app.state::<crate::state::AppState>();
-        let folder = if event.id() == APPLICATION_FOLDER_ITEM_ID {
-            // **The folder the application sits in — what the label says.**
-            //
-            // It used to be the same as the data root, and this line read
-            // `data_root` for that reason. The installed mode split the two on
-            // 05/08/2026, and this entry silently started opening the data
-            // folder instead. Reported by Fabrice the same day.
-            state.application_root.clone()
-        } else {
-            // **Le dossier autonome de la base ouverte** (choix de Fabrice) :
-            // il porte le `.sqlite` et son `attachments/`, si bien que le
-            // copier emporte la base sans la séparer de ses pièces jointes.
-            //
-            // `attachments_dir` vaut `…/Radinus_NNNNN/attachments`, son père
-            // est le dossier cherché. Sans base ouverte il est vide, et l'on
-            // montre alors `databases/`, qui existe toujours — plutôt que de
-            // ne rien faire sans rien dire.
-            let attachments = state.attachments_dir();
-            attachments
-                .parent()
-                .map(std::path::Path::to_path_buf)
-                .filter(|slot| slot.is_dir())
-                .unwrap_or_else(|| state.data_root.join("databases"))
-        };
+    if event.id() == APPLICATION_FOLDER_ITEM_ID {
+        // **The folder the application sits in — what the label says.**
+        //
+        // It used to be the same as the data root, and this line read
+        // `data_root` for that reason. The installed mode split the two on
+        // 05/08/2026, and this entry silently started opening the data folder
+        // instead. Reported by Fabrice the same day.
+        //
+        // **No warning here**, unlike its neighbour: nothing of the user's is
+        // in this folder. Warning about everything is warning about nothing.
+        let folder = app.state::<crate::state::AppState>().application_root.clone();
         if let Err(error) = crate::system::open_with_desktop(&folder) {
             eprintln!("[radinus] Could not open {}: {error}", folder.display());
         }
+        return;
+    }
+
+    // **Le dossier des données ne s'ouvre plus sans un avertissement**
+    // (Fabrice, 08/08/2026 : « un utilisateur ignorant peut faire des
+    // bêtises »). Ce qu'il y a derrière cette porte n'est pas réparable par
+    // le logiciel : un fichier renommé, déplacé ou jeté, et les comptes sont
+    // perdus ou la base illisible. La question est donc posée **avant**
+    // l'ouverture, à chaque fois, et le défaut n'est pas d'ouvrir.
+    //
+    // La boîte est celle du système et non celle de Radinus : c'est le menu
+    // natif qui l'appelle, et une fenêtre web n'a rien à voir dans ce
+    // chemin-là. Elle est demandée sans bloquer — `show` et non
+    // `blocking_show` — parce que ce code tourne sur le fil principal, celui
+    // qui dessine, et l'y arrêter fige le logiciel entier le temps de la
+    // question.
+    if event.id() == DATABASE_FOLDER_ITEM_ID {
+        // **Le dossier autonome de la base ouverte** (choix de Fabrice) : il
+        // porte le `.sqlite` et son `attachments/`, si bien que le copier
+        // emporte la base sans la séparer de ses pièces jointes.
+        //
+        // `attachments_dir` vaut `…/Radinus_NNNNN/attachments`, son père est
+        // le dossier cherché. Sans base ouverte il est vide, et l'on montre
+        // alors `databases/`, qui existe toujours — plutôt que de ne rien
+        // faire sans rien dire.
+        let state = app.state::<crate::state::AppState>();
+        let attachments = state.attachments_dir();
+        let folder = attachments
+            .parent()
+            .map(std::path::Path::to_path_buf)
+            .filter(|slot| slot.is_dir())
+            .unwrap_or_else(|| state.data_root.join("databases"));
+
+        app.dialog()
+            .message(i18n::text(language, "database-folder-warning"))
+            .title(i18n::text(language, "database-folder-warning-title"))
+            .kind(MessageDialogKind::Warning)
+            .buttons(MessageDialogButtons::OkCancelCustom(
+                i18n::text(language, "ui-yes"),
+                i18n::text(language, "ui-no"),
+            ))
+            .show(move |accepted| {
+                if !accepted {
+                    return;
+                }
+                if let Err(error) = crate::system::open_with_desktop(&folder) {
+                    eprintln!("[radinus] Could not open {}: {error}", folder.display());
+                }
+            });
         return;
     }
 

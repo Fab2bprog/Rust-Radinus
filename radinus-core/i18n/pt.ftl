@@ -255,6 +255,14 @@ menu-misc = Diversos
 menu-misc-calculator = Calculadora
 menu-misc-website = Ir ao sítio do Radinus
 menu-misc-database-folder = Aceder à pasta que contém a base de dados
+
+# L'avertissement posé devant ce dossier (Fabrice, 08/08/2026) : « un
+# utilisateur ignorant peut faire des bêtises ». La question est posée
+# avant l'ouverture, jamais après.
+database-folder-warning-title = Abrir a pasta da base de dados
+database-folder-warning =
+    Esta pasta contém todos os seus dados. Renomear, mover ou eliminar um ficheiro pode fazer perder as suas contas, danificá-las ou impedir o Radinus de funcionar.
+    Deseja realmente abri-la?
 menu-misc-application-folder = Aceder à pasta que contém a aplicação
 
 # ---------------------------------------------------------------------
@@ -1626,6 +1634,7 @@ about-radinus-licence = Software livre, sob licença GNU GPL v3.
 # button opens the official page, published and maintained by the Free
 # Software Foundation, which knows its own wording better than we do.
 window-licence-title = Licença de utilização
+licence-heading = LICENÇA DE UTILIZAÇÃO DO PROGRAMA RADINUS
 licence-logo-alt = O logótipo da GNU General Public License versão 3
 licence-name = GNU GPL v3 ou posterior
 licence-intro = O Radinus é software livre.

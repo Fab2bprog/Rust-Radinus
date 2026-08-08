@@ -288,6 +288,14 @@ menu-misc = Diversen
 menu-misc-calculator = Rekenmachine
 menu-misc-website = Naar de website van Radinus gaan
 menu-misc-database-folder = Toegang tot de map met de database
+
+# L'avertissement posé devant ce dossier (Fabrice, 08/08/2026) : « un
+# utilisateur ignorant peut faire des bêtises ». La question est posée
+# avant l'ouverture, jamais après.
+database-folder-warning-title = De map van de database openen
+database-folder-warning =
+    Deze map bevat al uw gegevens. Een bestand hernoemen, verplaatsen of verwijderen kan uw rekeningen doen verliezen, beschadigen of Radinus onbruikbaar maken.
+    Wilt u de map echt openen?
 menu-misc-application-folder = Toegang tot de map met de toepassing
 
 # ---------------------------------------------------------------------
@@ -1819,6 +1827,7 @@ about-radinus-licence = Vrije software, onder GNU GPL v3-licentie.
 # button opens the official page, published and maintained by the Free
 # Software Foundation, which knows its own wording better than we do.
 window-licence-title = Gebruikslicentie
+licence-heading = GEBRUIKSLICENTIE VAN DE SOFTWARE RADINUS
 licence-logo-alt = Het logo van de GNU General Public License versie 3
 licence-name = GNU GPL v3 of later
 licence-intro = Radinus is vrije software.
