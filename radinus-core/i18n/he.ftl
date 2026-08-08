@@ -237,6 +237,7 @@ menu-file-backup = גיבוי
 menu-file-restore = שחזור
 menu-file-repair = תיקון ואופטימיזציה של מסד הנתונים
 menu-file-log = הצגת הלוג
+menu-tools-password = הגנה על מסד הנתונים בסיסמה
 menu-file-disconnect = התנתק ממסד הנתונים הנוכחי
 menu-file-quit = יציאה
 

@@ -864,6 +864,7 @@ const CHEQUE_KEYS: &[&str] = &[
     "menu-file-restore",
     "menu-file-repair",
     "menu-file-log",
+    "menu-tools-password",
     "menu-file-disconnect",
     "databases-title-open",
     "databases-title-delete",

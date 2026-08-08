@@ -203,8 +203,16 @@ function chosen(): Row | null {
   return rows.find((candidate) => candidate.index === selected[0]) ?? null;
 }
 
-/// **Le menu Outils.** Les quatre opérations techniques, venues du menu général
-/// le 04/08/2026, et qui visent désormais la ligne sélectionnée.
+/// **Le menu Outils.** Les quatre opérations techniques venues du menu général
+/// le 04/08/2026, et qui visent la ligne sélectionnée, plus la protection par
+/// mot de passe depuis le 08/08/2026.
+///
+/// Cette dernière existait déjà au clic droit sur une ligne. Fabrice l'a
+/// voulue ici aussi — *« cela est plus facilement trouvable que le menu
+/// contextuel »* — et il a raison : un menu contextuel ne se découvre que si
+/// l'on pense à l'essayer. Les deux chemins mènent à la même fiche ; on ne
+/// retire pas celui que l'habitué connaît pour ouvrir celui que le nouveau
+/// venu trouvera.
 ///
 /// Trois d'entre elles ont une cible et la réclament : sans ligne choisie,
 /// elles refusent en le disant plutôt que d'agir sur une base au hasard. **Le
@@ -223,6 +231,7 @@ function toolsMenu(entry: HTMLElement): HTMLElement {
     [t("menu-file-backup"), "backup_database"],
     [t("menu-file-restore"), "restore_database"],
     [t("menu-file-repair"), "repair_database"],
+    [t("menu-tools-password"), "open_password_form"],
     [t("menu-file-log"), null],
   ];
   for (const [label, command] of entries) {
@@ -243,6 +252,18 @@ function toolsMenu(entry: HTMLElement): HTMLElement {
         say(t("databases-select"), true);
         return;
       }
+      // **La protection ne demande pas la clé, elle la change.** Les trois
+      // opérations qui suivent lisent la base et ont donc besoin d'entrer ;
+      // celle-ci ouvre une fiche qui réclame elle-même l'ancien mot de passe.
+      // La demander ici la ferait taper deux fois, et surtout : on doit
+      // pouvoir *poser* un mot de passe sur une base qui n'en a pas.
+      if (command === "open_password_form") {
+        void invoke(command, { path: row.path, label: row.label }).catch((error) =>
+          say(tError("ui-open-failed", error), true),
+        );
+        return;
+      }
+
       // La base visée n'est pas forcément celle qui est ouverte : si elle est
       // protégée, l'opération a besoin de sa clé pour la lire.
       void (async () => {

@@ -235,6 +235,7 @@ menu-file-backup = Sikkerhetskopiering
 menu-file-restore = Gjenoppretting
 menu-file-repair = Reparasjon og optimalisering av databasen
 menu-file-log = Vis loggen
+menu-tools-password = Beskytt databasen med et passord
 menu-file-disconnect = Koble fra gjeldende database
 menu-file-quit = Avslutt
 

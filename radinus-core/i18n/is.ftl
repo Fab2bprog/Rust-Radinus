@@ -235,6 +235,7 @@ menu-file-backup = Öryggisafrit
 menu-file-restore = Endurheimt
 menu-file-repair = Viðgerð og bestun gagnagrunnsins
 menu-file-log = Sýna atburðaskrána
+menu-tools-password = Verja gagnagrunninn með lykilorði
 menu-file-disconnect = Aftengjast núverandi gagnagrunni
 menu-file-quit = Hætta
 

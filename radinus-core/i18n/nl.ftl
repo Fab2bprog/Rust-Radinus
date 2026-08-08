@@ -240,6 +240,7 @@ menu-file-backup = Back-up
 menu-file-restore = Terugzetten
 menu-file-repair = Reparatie en optimalisatie van de database
 menu-file-log = Log tonen
+menu-tools-password = De database met een wachtwoord beveiligen
 menu-file-disconnect = Verbinding met de huidige database verbreken
 menu-file-quit = Afsluiten
 

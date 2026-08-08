@@ -516,6 +516,13 @@ const UI_TEXTS = {
   // n'avaient aucune vérification jusque-là ; elles portent désormais les deux
   // mentions de la GPL, et une mention qu'on ne regarde jamais est une mention
   // qui disparaît sans bruit.
+  // Le menu Outils du sélecteur de bases (08/08/2026).
+  "menu-file-backup": "Sauvegarde de la base de données",
+  "menu-file-restore": "Restauration de la base de données",
+  "menu-file-repair": "Réparation et optimisation de la base de données",
+  "menu-tools-password": "Protection de la base par mot de passe",
+  "menu-file-log": "Afficher le log",
+  "databases-select": "Veuillez sélectionner une base de données",
   "about-author-name": "Auteur : Fabrice Garcia",
   "about-author-place": "20290 Borgo, Corsica, France",
   "about-author-flag-alt": "Drapeau de la Corse — la tête de Maure",
@@ -9300,6 +9307,44 @@ async function openWindow(page, url, options) {
         ([command, args]) => command === "open_operations_list" && args.accountId === 2,
       ),
     ),
+  );
+  await page.close();
+}
+
+// --- Le menu Outils du sélecteur de bases (08/08/2026) ------------------
+//
+// « Protection de la base par mot de passe » y est entrée le 08/08/2026 sur
+// demande de Fabrice : *« cela est plus facilement trouvable que le menu
+// contextuel »*. Le clic droit sur la ligne reste ; ce qui est vérifié ici,
+// c'est que le second chemin existe, qu'il est écrit dans la langue en cours
+// et qu'il est rangé au bon endroit.
+{
+  const page = await browser.newPage();
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/database-selector.html");
+  check("bases : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" | "));
+
+  const tools = await page.evaluate(() =>
+    [...document.querySelectorAll('[data-menu="tools"] .window-menu__choice')].map(
+      (choice) => choice.textContent,
+    ),
+  );
+  check(
+    "bases : le menu Outils porte la protection par mot de passe",
+    tools.includes("Protection de la base par mot de passe"),
+    tools.join(" | "),
+  );
+  check(
+    "bases : elle est rangée entre la réparation et le journal",
+    tools.indexOf("Protection de la base par mot de passe") ===
+      tools.findIndex((label) => label.startsWith("Réparation")) + 1 &&
+      tools.indexOf("Protection de la base par mot de passe") ===
+        tools.indexOf("Afficher le log") - 1,
+    tools.join(" | "),
+  );
+  check(
+    "bases : sa phrase vient du noyau, pas de sa clef",
+    !tools.some((label) => label.startsWith("menu-")),
+    tools.join(" | "),
   );
   await page.close();
 }

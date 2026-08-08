@@ -207,6 +207,7 @@ menu-file-backup = Cópia de segurança
 menu-file-restore = Restauro
 menu-file-repair = Reparação e otimização da base de dados
 menu-file-log = Mostrar o registo
+menu-tools-password = Proteger a base de dados com uma palavra-passe
 menu-file-disconnect = Desligar-se da base atual
 menu-file-quit = Sair
 

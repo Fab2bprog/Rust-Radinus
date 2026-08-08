@@ -258,6 +258,7 @@ menu-file-backup = نسخة احتياطية
 menu-file-restore = الاستعادة
 menu-file-repair = إصلاح قاعدة البيانات وتحسينها
 menu-file-log = عرض السجل
+menu-tools-password = حماية قاعدة البيانات بكلمة مرور
 menu-file-disconnect = قطع الاتصال بقاعدة البيانات الحالية
 menu-file-quit = خروج
 

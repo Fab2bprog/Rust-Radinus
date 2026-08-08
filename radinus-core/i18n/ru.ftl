@@ -249,6 +249,7 @@ menu-file-backup = Резервная копия
 menu-file-restore = Восстановление
 menu-file-repair = Восстановление целостности и оптимизация базы данных
 menu-file-log = Показать журнал
+menu-tools-password = Защитить базу данных паролем
 menu-file-disconnect = Отключиться от текущей базы
 menu-file-quit = Выход
 

@@ -240,6 +240,7 @@ menu-file-backup = Αντίγραφο ασφαλείας
 menu-file-restore = Επαναφορά
 menu-file-repair = Επιδιόρθωση και βελτιστοποίηση της βάσης δεδομένων
 menu-file-log = Εμφάνιση του αρχείου καταγραφής
+menu-tools-password = Προστασία της βάσης δεδομένων με κωδικό
 menu-file-disconnect = Αποσύνδεση από την τρέχουσα βάση
 menu-file-quit = Έξοδος
 

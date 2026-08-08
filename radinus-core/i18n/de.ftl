@@ -238,6 +238,7 @@ menu-file-backup = Datensicherung
 menu-file-restore = Wiederherstellung
 menu-file-repair = Reparatur und Optimierung der Datenbank
 menu-file-log = Log anzeigen
+menu-tools-password = Datenbank mit einem Passwort schützen
 menu-file-disconnect = Von der aktuellen Datenbank trennen
 menu-file-quit = Beenden
 

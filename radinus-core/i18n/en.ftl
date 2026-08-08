@@ -208,6 +208,7 @@ menu-file-backup = Backup
 menu-file-restore = Restore
 menu-file-repair = Repair and optimise the database
 menu-file-log = Show the log
+menu-tools-password = Protect the database with a password
 menu-file-disconnect = Disconnect from the current database
 menu-file-quit = Quit
 

@@ -243,6 +243,7 @@ menu-file-backup = Copie de siguranță
 menu-file-restore = Restaurare
 menu-file-repair = Reparare și optimizare a bazei de date
 menu-file-log = Afișare jurnal
+menu-tools-password = Protejați baza de date cu o parolă
 menu-file-disconnect = Deconectare de la baza curentă
 menu-file-quit = Ieșire
 

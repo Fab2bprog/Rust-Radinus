@@ -237,6 +237,7 @@ menu-file-backup = Varmuuskopiointi
 menu-file-restore = Palautus
 menu-file-repair = Tietokannan korjaus ja optimointi
 menu-file-log = Näytä loki
+menu-tools-password = Suojaa tietokanta salasanalla
 menu-file-disconnect = Katkaise yhteys nykyiseen tietokantaan
 menu-file-quit = Lopeta
 
