@@ -1,0 +1,57 @@
+/* Design tokens — colors measured on the original Radinus 1.9.3 screenshots.
+ * Source: 03_CHARTE_GRAPHIQUE.md §1. Do not hand-tune these values; if a
+ * color looks wrong, re-check the dossier and correct it there first. */
+:root {
+  /* Main window banner (wood-brown, old 1.4.x banner — kept for reference) */
+  --radinus-banner-bg: #742b00;
+
+  /* Fill color behind the current (1.9.x) banner image, NewRadinus.png —
+     sampled from the image's own edge pixels so the image blends in with no
+     visible seam, whatever height it's shown at. Not from the charter
+     document (that one only covers the old solid-brown banner); measured
+     directly the same way the charter's own colors were. */
+  --radinus-banner-image-bg: #7a6f5c;
+
+  /* Main window client area (Windows MDI background; simple welcome
+     background on 2.0.0) */
+  --radinus-main-bg: #c7c7c7;
+
+  /* Main window menu bar background (native on macOS, kept for reference) */
+  --radinus-menubar-bg: #bcbcbc;
+
+  /* Child windows / record forms background */
+  --radinus-window-bg: #f3f3f3;
+
+  /* Form section banners ("Identification de l'opération"...) */
+  --radinus-section-bg: #dcdcdc;
+
+  /* Right-hand button panel (slate blue-gray) */
+  --radinus-panel-bg: #658092;
+
+  /* Table header */
+  --radinus-table-header-bg: #6f95ae;
+  --radinus-table-header-fg: #ffffff;
+
+  /* Table rows */
+  --radinus-row-odd-bg: #f3f3f3;
+  --radinus-row-even-bg: #e5e5e5;
+  --radinus-row-selected-bg: #9eafba;
+
+  /* Statistics matrix cells */
+  --radinus-cell-negative-bg: #ff9999;
+  --radinus-cell-positive-bg: #9999ff;
+  --radinus-cell-cancelling-bg: #99ff99;
+
+  /* Text colors */
+  --radinus-negative-amount-fg: #8b0000;
+  --radinus-total-somme-fg: #000080;
+  --radinus-total-cumul-fg: #8b0000;
+  --radinus-info-bar-help-fg: #0000c0;
+  --radinus-info-bar-alert-fg: #cc0000;
+  --radinus-banner-title-fg: #fdf6ec;
+
+  /* Typography */
+  --radinus-font-family: -apple-system, "San Francisco", "Segoe UI",
+    sans-serif;
+  --radinus-font-size-base: 13px;
+}

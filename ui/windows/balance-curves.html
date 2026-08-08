@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Evolution du solde</title>
+    <script type="module" src="/ui/windows/balance-curves.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F25 — « Evolution du solde » (04_SPECIFICATIONS_FENETRES.md F25,
+         capture « graphique evolution solde.png »).
+
+         La structure est celle de l'original : titre, légende horizontale
+         dessous, le tracé, et le panneau bleu avec le millésime, les deux
+         horloges et la porte.
+
+         **Le graphique lui-même est refait** : Fabrice a explicitement rendu
+         la main dessus le 26/07/2026 (« tu n'es pas obligé de reprendre le
+         même thème graphique, que je trouve moche et vieillot »). Il n'y a
+         donc plus de filigrane de ville derrière les courbes, la grille est
+         discrète, les traits sont fins, et les couleurs ont été validées pour
+         rester distinctes y compris pour un œil daltonien. -->
+    <div class="window window--curves">
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <main class="window__content window__content--chart">
+        <h1 class="chart__heading" id="heading"></h1>
+        <div class="chart__legend" id="legend"></div>
+        <div class="chart__period">
+          <span id="from-label"></span>
+          <strong id="from"></strong>
+          <span id="to-label"></span>
+          <strong id="to"></strong>
+        </div>
+        <div class="chart__plot" id="plot"></div>
+      </main>
+
+      <aside class="panel panel--curves">
+        <button class="panel__year" id="year" type="button"></button>
+        <button class="panel__button" id="next-year" type="button">
+          <img src="/ui/assets/icons/Temps_Plus.png" alt="" />
+        </button>
+        <button class="panel__button" id="previous-year" type="button">
+          <img src="/ui/assets/icons/Temps_Moins.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

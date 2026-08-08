@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Importation de feuille excel [ Étape 1/3 ]</title>
+    <script type="module" src="/ui/windows/excel-import.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F34 — « Importation de feuille excel [ Étape 1/3 ] : définition de la
+         zone de capture » (captures « POINT13 ETAPE 1 Import Excel.png » et
+         « ImportExcel1.png »).
+
+         **Les groupes numérotés sont une marche à suivre, pas une mise en
+         page** : on descend 1, 2, 3, 4, 5 dans l'ordre, et le rendu test du
+         cinquième valide ce qu'on a réglé aux trois précédents.
+
+         Le quatrième groupe est le seul que l'original n'a pas : Fabrice l'a
+         demandé le 29/07/2026, parce que certains fichiers portent une colonne
+         de montants signés et d'autres deux colonnes Débit et Crédit, et qu'il
+         faut le savoir avant de proposer les rubriques.
+
+         **On ne détecte rien, on fait déclarer.** C'est la ruse de l'original,
+         gardée sur sa recommandation : une devinette qui se trompe ne se voit
+         pas, une déclaration qui se trompe se voit dans le rendu test. -->
+    <div class="window window--excel">
+      <main class="window__content window__content--scroll">
+        <section class="band">
+          <h2 class="band__title" id="group-file"></h2>
+          <div class="excel-file">
+            <button class="csv-test" id="pick" type="button"></button>
+            <p class="excel-path" id="path"></p>
+            <div class="excel-settings">
+              <label class="excel-settings__label" for="sheet" id="sheet-label"></label>
+              <select
+                class="excel-settings__field excel-settings__field--wide"
+                id="sheet"
+              ></select>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-header"></h2>
+          <div class="excel-settings">
+            <label class="excel-settings__label" for="header-row" id="header-row-label"></label>
+            <input class="excel-settings__field" id="header-row" type="number" min="1" max="99999" />
+
+            <label class="excel-settings__label" for="first-column" id="first-column-label"></label>
+            <select class="excel-settings__field" id="first-column"></select>
+
+            <label class="excel-settings__label" for="column-count" id="column-count-label"></label>
+            <input class="excel-settings__field" id="column-count" type="number" min="1" max="256" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-rows"></h2>
+          <div class="excel-settings">
+            <label class="excel-settings__label" for="first-data-row" id="first-data-row-label"></label>
+            <input class="excel-settings__field" id="first-data-row" type="number" min="1" max="1048576" />
+
+            <label class="excel-settings__label" for="last-data-row" id="last-data-row-label"></label>
+            <input class="excel-settings__field" id="last-data-row" type="number" min="1" max="1048576" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-shape"></h2>
+          <div class="excel-choice">
+            <label class="excel-choice__line">
+              <input type="radio" name="shape" id="shape-single" value="single" checked />
+              <span id="shape-single-label"></span>
+            </label>
+            <label class="excel-choice__line">
+              <input type="radio" name="shape" id="shape-debit-credit" value="debit-credit" />
+              <span id="shape-debit-credit-label"></span>
+            </label>
+            <p class="excel-note" id="shape-note"></p>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-test"></h2>
+          <div class="csv-extraction-head">
+            <button class="csv-test" id="test" type="button"></button>
+            <p class="excel-note" id="test-note"></p>
+          </div>
+          <section class="list list--excel">
+            <header class="list__header" id="preview-header"></header>
+            <div class="list__filter" id="preview-filter"></div>
+            <div class="list__rows" id="preview-rows" role="listbox"></div>
+          </section>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="validate" type="button">
+          <img src="/ui/assets/icons/Base_valid.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Fiche Modele Operation</title>
+    <script type="module" src="/ui/windows/operation-template-form.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F36 — « Fiche Modele Operation » (capture « Fiche modele
+         operation.png »).
+
+         Bande d'ardoise à gauche avec l'icône documents + $. L'identifiant en
+         lecture seule, puis les quatre bandeaux gris de sa capture, dans son
+         ordre et avec ses intitulés exacts : le nom par défaut, le montant, le
+         statut, et le classement pour les statistiques.
+
+         **Ni compte, ni date** : les deux ne prennent leur sens qu'au moment de
+         la saisie, et un modèle sert justement à traverser plusieurs saisies. -->
+    <div class="window window--operation-template">
+      <aside class="panel panel--left">
+        <img class="panel__image" src="/ui/assets/icons/Modele.png" alt="" />
+      </aside>
+
+      <main class="window__content window__content--scroll">
+        <div class="form form--wide">
+          <label class="form__label" for="id" id="id-label"></label>
+          <input class="form__field form__field--medium" id="id" type="text" readonly />
+        </div>
+
+        <section class="band">
+          <h2 class="band__title" id="group-name"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="label" id="label-label"></label>
+            <input class="form__field" id="label" type="text" maxlength="100" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-amount"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="direction" id="direction-label"></label>
+            <select class="form__field form__field--medium" id="direction"></select>
+
+            <label class="form__label" for="amount" id="amount-label"></label>
+            <input class="form__field form__field--medium" id="amount" type="text" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-status"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="status" id="status-label"></label>
+            <select class="form__field form__field--medium" id="status"></select>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-classification"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="category" id="category-label"></label>
+            <select class="form__field form__field--medium" id="category"></select>
+
+            <label class="form__label" for="assignment" id="assignment-label"></label>
+            <select class="form__field form__field--medium" id="assignment"></select>
+
+            <label class="form__label" for="payment-mode" id="payment-mode-label"></label>
+            <select class="form__field form__field--medium" id="payment-mode"></select>
+
+            <label class="form__label" for="payee" id="payee-label"></label>
+            <select class="form__field form__field--medium" id="payee"></select>
+
+            <label class="form__label" for="project" id="project-label"></label>
+            <select class="form__field form__field--medium" id="project"></select>
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="save" type="button">
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

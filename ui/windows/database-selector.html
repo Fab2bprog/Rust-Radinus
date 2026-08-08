@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Bases de données</title>
+    <script type="module" src="/ui/windows/database-selector.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- Le sélecteur de base (décision de Fabrice, 02/08/2026).
+
+         Il montre **ce que `databases/` contient vraiment** : est une base
+         tout dossier qui contient un `radinus.sqlite`, quel que soit son nom.
+         L'utilisateur a le droit de renommer, copier et effacer ses dossiers
+         hors du logiciel ; ce qui est sur le disque fait foi, et jamais la
+         liste mémorisée dans la configuration.
+
+         Ouvrir une base **relance Radinus** : une fenêtre de Radinus est bâtie
+         une fois et jamais détruite, et rebrancher la base sous des fenêtres
+         ouvertes les laisserait montrer les données de l'ancienne. -->
+    <div class="window window--databases">
+      <!-- Le menu Outils (Fabrice, 04/08/2026) : sauvegarde, restauration,
+           réparation et journal, venus du menu général. Ils visent **la ligne
+           sélectionnée**, ouverte ou non — c'est ce qui justifiait le
+           déplacement : un geste qui a une cible appartient à la fenêtre qui
+           montre les cibles. -->
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <main class="window__content">
+        <section class="list">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox"></div>
+        </section>
+
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="open" type="button">
+          <img src="/ui/assets/icons/Base_valid.png" alt="" />
+        </button>
+        <button class="panel__button" id="create" type="button">
+          <img src="/ui/assets/icons/Base_create.png" alt="" />
+        </button>
+        <button class="panel__button" id="delete" type="button">
+          <img src="/ui/assets/icons/Base_delete.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <!-- Trois points, écrits en dur, dans aucune langue. Le script les
+           remplace dès qu'il tourne : les voir subsister veut dire qu'il n'a
+           jamais tourné, et c'est un renseignement qu'une fenêtre vide ne
+           donnait pas. -->
+      <footer class="info-bar" id="info-bar">…</footer>
+    </div>
+  </body>
+</html>

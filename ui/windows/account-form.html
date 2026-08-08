@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Fiche compte</title>
+    <script type="module" src="/ui/windows/account-form.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F08 — « Fiche compte » (04_SPECIFICATIONS_FENETRES.md, capture
+         « Fiche compte bancaire.png »). Slate strips on both sides; the left
+         one is bare, unlike the nomenclature fiche. Five framed groups, and
+         the blue control line at the bottom. Every label comes from Fluent. -->
+    <div class="window window--account">
+      <!-- Le menu « Outils » : trois portages du WLangage de Fabrice, qui
+           n'agissent qu'en modification (arbitrage du 02/08/2026). -->
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <aside class="panel panel--left"></aside>
+
+      <main class="window__content window__content--scroll">
+        <fieldset class="group">
+          <legend id="group-bank"></legend>
+          <div class="form form--wide">
+            <label class="form__label" for="label" id="label-label"></label>
+            <input class="form__field" id="label" type="text" maxlength="50" />
+
+            <label class="form__label" for="bank" id="bank-label"></label>
+            <select class="form__field" id="bank"></select>
+
+            <label class="form__label" for="account-type" id="type-label"></label>
+            <select class="form__field" id="account-type"></select>
+
+            <label class="form__label" for="branch-address" id="branch-address-label"></label>
+            <textarea class="form__field" id="branch-address" rows="3"></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend id="group-holder"></legend>
+          <div class="form form--wide">
+            <label class="form__label" for="holder-name" id="holder-name-label"></label>
+            <input class="form__field" id="holder-name" type="text" maxlength="100" />
+
+            <label class="form__label" for="holder-address" id="holder-address-label"></label>
+            <textarea class="form__field" id="holder-address" rows="3"></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend id="group-rib"></legend>
+          <div class="rib">
+            <label class="rib__label" for="rib-bank" id="rib-bank-label"></label>
+            <label class="rib__label" for="rib-branch" id="rib-branch-label"></label>
+            <label class="rib__label" for="rib-number" id="rib-number-label"></label>
+            <label class="rib__label" for="rib-key" id="rib-key-label"></label>
+            <label class="rib__label" for="bic" id="bic-label"></label>
+
+            <input class="form__field" id="rib-bank" type="text" maxlength="5" />
+            <input class="form__field" id="rib-branch" type="text" maxlength="5" />
+            <input class="form__field" id="rib-number" type="text" maxlength="11" />
+            <input class="form__field" id="rib-key" type="text" maxlength="2" />
+            <input class="form__field" id="bic" type="text" maxlength="11" />
+          </div>
+          <div class="iban">
+            <label class="form__label" for="iban" id="iban-label"></label>
+            <input class="form__field" id="iban" type="text" maxlength="42" />
+          </div>
+        </fieldset>
+
+        <div class="group-row">
+          <fieldset class="group">
+            <legend id="group-activity"></legend>
+            <div class="form">
+              <label class="form__label" for="opening-date" id="opening-date-label"></label>
+              <input class="form__field" id="opening-date" type="date" />
+
+              <label class="form__label" for="closing-date" id="closing-date-label"></label>
+              <input class="form__field" id="closing-date" type="date" />
+
+              <span></span>
+              <label class="form__check">
+                <input id="is-closed" type="checkbox" />
+                <span id="is-closed-label"></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend id="group-balances"></legend>
+            <div class="form">
+              <label class="form__label" for="opening-pointed" id="opening-pointed-label"></label>
+              <input class="form__field form__field--amount" id="opening-pointed" type="text" />
+
+              <label class="form__label" for="opening-committed" id="opening-committed-label"></label>
+              <input class="form__field form__field--amount" id="opening-committed" type="text" />
+
+              <label class="form__label" for="opening-planned" id="opening-planned-label"></label>
+              <input class="form__field form__field--amount" id="opening-planned" type="text" />
+            </div>
+          </fieldset>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="save" type="button">
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar info-bar--control" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

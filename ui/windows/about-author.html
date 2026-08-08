@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Radinus</title>
+    <script type="module" src="/ui/windows/about-author.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- « À propos de l'auteur » (menu Paramètres), demandée par Fabrice le
+         03/08/2026 : « ultra simple », comme la fenêtre du choix de la langue.
+
+         Trois choses et rien d'autre : le drapeau corse, le nom de l'auteur en
+         gros, et l'endroit d'où il écrit. Le panneau ardoise ne porte que la
+         porte : il n'y a rien à faire dans cette fenêtre, seulement à lire.
+
+         Le drapeau vient de `ImagesIconesRadinus/DrapeauCorse.png`, comme
+         toutes les images de Radinus. Le dossier de rétro-ingénierie le disait
+         « décoratif, projet de langue corse non abouti » : il ne l'est plus,
+         il dit d'où vient l'auteur. -->
+    <div class="window">
+      <main class="window__content">
+        <div class="about">
+          <img class="about__flag" src="/ui/assets/about/DrapeauCorse.png" id="flag" alt="" />
+          <p class="about__name" id="name"></p>
+          <p class="about__place" id="place"></p>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

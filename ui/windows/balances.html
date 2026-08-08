@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Soldes</title>
+    <script type="module" src="/ui/windows/balances.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F07 — « Soldes de vos comptes ». Compte / En Banque / Réel / Final,
+         a bold TOTAL line, and nothing to do but read and leave: the right
+         panel holds the door alone (04_SPECIFICATIONS_FENETRES.md). -->
+    <div class="window">
+      <main class="window__content">
+        <section class="list">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox"></div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

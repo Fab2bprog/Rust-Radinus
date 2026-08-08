@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Radinus</title>
+    <script type="module" src="/ui/windows/licence.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- « Licence d'utilisation » (Settings menu), asked for by Fabrice on
+         08/08/2026, right after Radinus left the MIT licence for the GNU GPL
+         v3 (ruling P-37).
+
+         Built on the skeleton of « À propos de l'auteur »: something to read,
+         a door to leave by, and nothing to do.
+
+         **It says what the licence gives, not what it says.** The four
+         freedoms in four lines; the legal text stays where it belongs, on
+         gnu.org.
+
+         **The logo is the button.** It first sat in the slate panel, as a
+         folder icon -- « pas adapté », Fabrice, 08/08/2026, and he was right
+         twice over: a yellow folder announces a folder, and the thing one
+         wants to click on to read the licence is the licence's own emblem,
+         which is already there and already means it. -->
+    <div class="window">
+      <main class="window__content">
+        <div class="about">
+          <button class="about__licence-link" id="read" type="button">
+            <img
+              class="about__licence-logo"
+              src="/ui/assets/about/GPLv3_Logo.png"
+              id="logo"
+              alt=""
+            />
+          </button>
+
+          <p class="about__licence-name" id="name"></p>
+
+          <div class="about__freedoms">
+            <p class="about__built" id="intro"></p>
+            <p class="about__freedoms-title" id="freedoms-title"></p>
+            <ul class="about__freedoms-list">
+              <li id="freedom-use"></li>
+              <li id="freedom-study"></li>
+              <li id="freedom-share"></li>
+              <li id="freedom-improve"></li>
+            </ul>
+          </div>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

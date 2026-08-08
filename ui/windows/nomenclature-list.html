@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Liste</title>
+    <script type="module" src="/ui/windows/nomenclature-list.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F11 — the list of a nomenclature (04_SPECIFICATIONS_FENETRES.md,
+         03_CHARTE_GRAPHIQUE.md §3.2). Single LIBELLE column, sortable by its
+         header, funnel filter, multiple selection with Cmd/Ctrl.
+
+         One page for the seven nomenclatures: the dossier says "gabarit
+         identique pour les listes Affectations, Modes, Tiers, Projets, Postes
+         budgétaires, Banques". Which one it is showing arrives in the address
+         (?kind=…) and the wording of the buttons follows. -->
+    <div class="window">
+      <main class="window__content">
+        <section class="list">
+          <!-- Header and filters are built by table.ts: one cell, one sort
+               marker and one funnel per column, all translated. -->
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+
+          <div class="list__rows" id="rows" role="listbox" aria-multiselectable="true"></div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="create" type="button">
+          <img src="/ui/assets/icons/Base_create.png" alt="" />
+        </button>
+        <button class="panel__button" id="update" type="button">
+          <img src="/ui/assets/icons/Base_update.png" alt="" />
+        </button>
+        <button class="panel__button" id="delete" type="button">
+          <img src="/ui/assets/icons/Base_delete.png" alt="" />
+        </button>
+        <button class="panel__button" id="read" type="button">
+          <img src="/ui/assets/icons/Base_read.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

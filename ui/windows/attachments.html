@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Pièces jointes</title>
+    <script type="module" src="/ui/windows/attachments.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- « Liste des pieces jointes » — d'après la capture
+         « POINT 005 Piece jointes.png ».
+
+         Une fenêtre liste de sa grammaire, comme ses listes de nomenclatures :
+         deux colonnes, LIBELLE et Identifiant, et le panneau à quatre
+         cylindres plus la porte. Les trois premiers sont groupés, l'œil est
+         détaché, la porte est au bas — ses blancs sont dans sa capture.
+
+         Quatre gestes (Fabrice, 01/08/2026) : en ajouter une — une opération
+         peut en porter autant qu'on veut —, **remplacer** le document par un
+         autre, la supprimer avec demande de confirmation, et l'ouvrir avec
+         l'application par défaut du système.
+
+         Le retrait envoie le fichier à la corbeille, comme le
+         `frVersCorbeille` de l'original : une pièce supprimée par erreur se
+         récupère d'un clic droit. -->
+    <div class="window window--attachments">
+      <main class="window__content">
+        <section class="list">
+          <div class="list__header" id="header"></div>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox"></div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="add" type="button">
+          <img src="/ui/assets/icons/Base_create.png" alt="" />
+        </button>
+        <button class="panel__button" id="replace" type="button">
+          <img src="/ui/assets/icons/Base_update.png" alt="" />
+        </button>
+        <button class="panel__button" id="remove" type="button">
+          <img src="/ui/assets/icons/Base_delete.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="open" type="button">
+          <img src="/ui/assets/icons/Base_read.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

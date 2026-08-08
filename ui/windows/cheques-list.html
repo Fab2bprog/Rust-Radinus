@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Composition du chéquier</title>
+    <script type="module" src="/ui/windows/cheques-list.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F14 — « Composition du chéquier : liste des chèques. » (capture
+         « Liste des cheques d'un chequier.png »).
+
+         Huit colonnes : Num. Chèque, Date, Lieu, Bénéficiaire, Montant,
+         Statut, Commentaires, Nbr. Opération Associées. **Le statut se change
+         dans la case** (arbitrage de Fabrice, 28/07/2026), comme dans la
+         classification rapide.
+
+         Panneau de droite, quatre icônes et pas cinq : modifier (la fiche
+         chèque), la loupe (voir les opérations déjà associées), le maillon
+         (associer une opération), et la porte. **Aucun bouton ne supprime un
+         chèque** : un carnet de quarante a quarante chèques, même annulés — la
+         capture montre deux « Annulé / Détruit », pas deux trous. -->
+    <div class="window">
+      <main class="window__content">
+        <h1 class="window__question" id="question" hidden></h1>
+        <section class="list">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox" aria-multiselectable="true"></div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="update" type="button">
+          <img src="/ui/assets/icons/Base_update.png" alt="" />
+        </button>
+        <button class="panel__button" id="linked" type="button">
+          <img src="/ui/assets/icons/Base_search.png" alt="" />
+        </button>
+        <button class="panel__button" id="link" type="button">
+          <img src="/ui/assets/icons/Base_link.png" alt="" />
+        </button>
+        <button class="panel__button" id="select" type="button" hidden>
+          <img src="/ui/assets/icons/Base_select.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

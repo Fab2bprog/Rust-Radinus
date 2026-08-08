@@ -1,0 +1,56 @@
+# Ce que Fabrice vérifie à la main avant chaque livraison, vérifié tout seul.
+#
+# Sur macOS, et sur macOS seulement : c'est le système que Radinus vise
+# d'abord, et Tauri n'y demande aucune bibliothèque à installer — sous Linux
+# il faudrait WebKitGTK et ses voisines, pour vérifier le même code deux fois.
+#
+# L'ordre compte : `npm run build` doit passer avant `cargo`, parce que la
+# construction de Tauri lit `dist/` et refuse de compiler s'il n'existe pas.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Compile, tests, clippy
+    runs-on: macos-latest
+
+    steps:
+      # v6 pour les deux : tout ce qui est resté en v4 tourne sur Node 20, que
+      # GitHub a déprécié et qu'il force déjà sur Node 24 en le disant à chaque
+      # exécution. v5 suffirait à faire taire l'avertissement ; v6 est la
+      # version courante des deux, et autant ne pas y revenir dans six mois.
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      # Compiler du Rust est long ; le cache rend les envois suivants courts.
+      # **La première exécution après le 05/08/2026 sera très longue** : depuis
+      # ce jour-là Radinus compile SQLCipher et sa bibliothèque de
+      # cryptographie depuis leurs sources. Le cache absorbe les suivantes.
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install the frontend dependencies
+        run: npm ci
+
+      # `tsc` puis `vite` : les deux sont dans le script `build`.
+      - name: Build the frontend
+        run: npm run build
+
+      - name: Tests
+        run: cargo test --workspace --all-targets
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings

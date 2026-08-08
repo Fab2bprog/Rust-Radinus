@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Tableau de bord</title>
+    <script type="module" src="/ui/windows/dashboard.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F19 — « Tableau de bord » (04_SPECIFICATIONS_FENETRES.md F19, capture
+         « Tableau de bord.png »).
+
+         Une période, trois interrupteurs, et cinq cartes blanches : deux
+         anneaux qui se creusent, deux tuiles à gros chiffres, et la balance en
+         pleine largeur.
+
+         **Les anneaux sont en relief et se creusent depuis le 04/08/2026**,
+         comme ceux de l'accueil : postes budgétaires, puis catégories, puis la
+         courbe du cumul d'une catégorie.
+
+         **Les cinq chiffres se contrôlent l'un l'autre** : la somme des
+         secteurs de chaque anneau vaut sa tuile, et la balance vaut les deux
+         tuiles ensemble. C'est le noyau qui le garantit, et un test qui le
+         vérifie.
+
+         Le menu « Divers » et le picto « ouvrir en grand » sont là, inertes :
+         Fabrice ne m'a pas encore dit ce qu'ils font (26/07/2026). -->
+    <div class="window window--dashboard">
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <section class="dashboard-bar">
+        <div class="dashboard-bar__dates">
+          <label id="from-label" for="from"></label>
+          <input type="date" id="from" />
+          <label id="to-label" for="to"></label>
+          <input type="date" id="to" />
+        </div>
+        <nav class="switches switches--inline" id="switches"></nav>
+      </section>
+
+      <main class="window__content window__content--cards">
+        <section class="card card--ring">
+          <header class="card__title">
+            <span id="spending-title"></span>
+            <button class="card__enlarge" id="spending-enlarge" type="button" disabled>⇱</button>
+          </header>
+          <div class="card__body" id="spending"></div>
+        </section>
+
+        <section class="card card--ring">
+          <header class="card__title">
+            <span id="earning-title"></span>
+            <button class="card__enlarge" id="earning-enlarge" type="button" disabled>⇱</button>
+          </header>
+          <div class="card__body" id="earning"></div>
+        </section>
+
+        <section class="card card--figure">
+          <h2 class="card__heading" id="debits-title"></h2>
+          <p class="card__figure" id="debits"></p>
+        </section>
+
+        <section class="card card--figure">
+          <h2 class="card__heading" id="credits-title"></h2>
+          <p class="card__figure" id="credits"></p>
+        </section>
+
+        <section class="card card--figure card--wide">
+          <h2 class="card__heading" id="balance-title"></h2>
+          <p class="card__figure" id="balance"></p>
+        </section>
+      </main>
+
+      <aside class="panel panel--dashboard">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

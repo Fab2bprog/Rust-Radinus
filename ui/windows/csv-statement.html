@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Importation de données provenant d'un fichier csv</title>
+    <script type="module" src="/ui/windows/csv-statement.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- La fenêtre de découpage d'un relevé CSV (capture « Point 14 Import
+         CSV.png »), en trois temps de haut en bas :
+
+           1. **l'aperçu du fichier**, ligne par ligne, tel qu'il est — rien
+              n'y est interprété, on regarde ;
+           2. **les paramètres de découpage** : combien de lignes d'entête
+              sauter, quel séparateur, et où sont les quatre champs ;
+           3. **la visualisation**, et le bouton qui la recalcule.
+
+         C'est une boucle : on règle, on teste, on regarde, on recorrige. La
+         fenêtre ne prétend pas deviner — elle montre ce que le réglage produit
+         et laisse l'œil juger. Mais la porte est sévère : seules les lignes
+         portant une date et un montant lisibles basculeront vers la fenêtre
+         d'intégration (règle de Fabrice, 27/07/2026). -->
+    <div class="window window--csv">
+      <main class="window__content window__content--scroll">
+        <h2 class="band__title" id="preview-title"></h2>
+        <section class="list list--csv-source">
+          <header class="list__header" id="source-header"></header>
+          <div class="list__filter" id="source-filter"></div>
+          <div class="list__rows" id="source-rows" role="listbox"></div>
+        </section>
+
+        <h2 class="band__title" id="settings-title"></h2>
+        <div class="csv-settings">
+          <label class="csv-settings__label" for="header-lines" id="header-lines-label"></label>
+          <input class="csv-settings__field" id="header-lines" type="number" min="0" max="999" />
+
+          <label class="csv-settings__label" for="separator" id="separator-label"></label>
+          <select class="csv-settings__field csv-settings__field--wide" id="separator"></select>
+
+          <label class="csv-settings__label" for="date-at" id="date-at-label"></label>
+          <input class="csv-settings__field" id="date-at" type="number" min="0" max="99" />
+
+          <label class="csv-settings__label" for="debit-at" id="debit-at-label"></label>
+          <input class="csv-settings__field" id="debit-at" type="number" min="0" max="99" />
+
+          <label class="csv-settings__label" for="label-at" id="label-at-label"></label>
+          <input class="csv-settings__field" id="label-at" type="number" min="0" max="99" />
+
+          <label class="csv-settings__label" for="credit-at" id="credit-at-label"></label>
+          <input class="csv-settings__field" id="credit-at" type="number" min="0" max="99" />
+        </div>
+
+        <div class="csv-extraction-head">
+          <h2 class="band__title band__title--flush" id="extraction-title"></h2>
+          <button class="csv-test" id="test" type="button"></button>
+        </div>
+        <section class="list list--csv-result">
+          <header class="list__header" id="result-header"></header>
+          <div class="list__filter" id="result-filter"></div>
+          <div class="list__rows" id="result-rows" role="listbox"></div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="validate" type="button">
+          <img src="/ui/assets/icons/Base_valid.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

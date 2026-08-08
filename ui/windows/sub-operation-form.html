@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Fiche sous-opération</title>
+    <script type="module" src="/ui/windows/sub-operation-form.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F04 — « Fiche Sous-Operation » (04_SPECIFICATIONS_FENETRES.md, capture
+         « Fiche sous operation.png »). Une F03 réduite : trois bandeaux, et un
+         classement à quatre listes.
+
+         **Ni Mode, ni Statut, ni Date** : une sous-opération les tient de sa
+         mère (`Maj_ProprieteSousOp`). Fabrice, 26/07/2026 : « dans une
+         sous-opération, comme est le complément, on ne peut pas toucher au
+         mode de paiement, cela serait illogique ». -->
+    <div class="window window--operation">
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <main class="window__content window__content--scroll">
+        <section class="band">
+          <h2 class="band__title" id="group-identification"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="label" id="label-label"></label>
+            <input class="form__field" id="label" type="text" maxlength="100" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-amount"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="direction" id="direction-label"></label>
+            <select class="form__field form__field--medium" id="direction"></select>
+
+            <label class="form__label" for="amount" id="amount-label"></label>
+            <input class="form__field form__field--medium" id="amount" type="text" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-classification"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="category" id="category-label"></label>
+            <select class="form__field form__field--medium" id="category"></select>
+
+            <label class="form__label" for="assignment" id="assignment-label"></label>
+            <select class="form__field form__field--medium" id="assignment"></select>
+
+            <label class="form__label" for="payee" id="payee-label"></label>
+            <select class="form__field form__field--medium" id="payee"></select>
+
+            <label class="form__label" for="project" id="project-label"></label>
+            <select class="form__field form__field--medium" id="project"></select>
+          </div>
+        </section>
+
+        <section class="band" id="comment-section" hidden>
+          <h2 class="band__title" id="group-comment"></h2>
+          <div class="form form--wide">
+            <textarea class="form__field" id="comment" rows="4"></textarea>
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="comment-button" type="button">
+          <img src="/ui/assets/icons/postit.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="save" type="button">
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <!-- À gauche, ce que l'on ventile ; à droite, ce que la fenêtre dit. -->
+      <footer class="info-bar info-bar--split" id="info-bar">
+        <span id="info-message"></span>
+        <span id="parent-line"></span>
+      </footer>
+    </div>
+  </body>
+</html>

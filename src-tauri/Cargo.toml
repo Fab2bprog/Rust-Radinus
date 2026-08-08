@@ -1,0 +1,31 @@
+[package]
+name = "radinus"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Radinus 2.0.1 — personal finance manager. Tauri controller (thin bridge, no business logic — see 08_ARCHITECTURE.md §2.2)."
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix avoids a name clash with the binary crate on Windows.
+name = "radinus_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+radinus-core = { path = "../radinus-core" }
+time_compute = "1.0.0"
+tauri-plugin-dialog = "2.7.2"
+# La corbeille du système, pour les pièces jointes supprimées : ce que fait le
+# `frVersCorbeille` de l'original partout où il efface. Trois corbeilles très
+# différentes derrière une seule fonction — la Corbeille de macOS, celle de
+# Windows, le dossier normalisé de freedesktop sous Linux. Licence MIT,
+# autorisée par Fabrice le 01/08/2026.
+trash = "5.2"

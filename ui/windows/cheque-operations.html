@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Liste des opérations</title>
+    <script type="module" src="/ui/windows/cheque-operations.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- « Liste des opérations. » — **une page, deux visages**, selon le
+         `gChequeAsso` de son original (captures « Liste operations deja
+         associées.png » et « Liste Choisir operation a associer a cheque.png »).
+
+         Visage « déjà associées » : le crayon ouvre la fiche de l'opération, la
+         croix rouge **détache** le chèque — l'opération reste, le chèque reste,
+         seul le lien s'en va (arbitrage de Fabrice, 28/07/2026).
+
+         Visage « choisissez » : la main désigne l'opération à associer. Les
+         lignes en gras portent déjà un chèque ; on peut quand même les
+         choisir, et leur chèque précédent les perd sans un mot. C'est son
+         original : le gras **est** l'avertissement.
+
+         La barre de menu porte un seul mot, « Filtre ». Il est là, visible, et
+         inactif : Fabrice le renseignera. -->
+    <div class="window window--cheque-operations">
+      <main class="window__content">
+        <nav class="window-menu">
+          <!-- Inactif, et il le dit : désactivé, il ne s'ouvre pas et ne
+               prétend pas s'ouvrir. -->
+          <button class="window-menu__entry" id="filter-menu" type="button" disabled></button>
+        </nav>
+
+        <h1 class="window__question" id="question"></h1>
+
+        <section class="list">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox" aria-multiselectable="false"></div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="open" type="button">
+          <img src="/ui/assets/icons/Base_update.png" alt="" />
+        </button>
+        <button class="panel__button" id="dissociate" type="button">
+          <img src="/ui/assets/icons/Base_unlink.png" alt="" />
+        </button>
+        <button class="panel__button" id="associate" type="button">
+          <img src="/ui/assets/icons/Base_select.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,315 @@
+/* La carte blanche, l'anneau et sa légende.
+ *
+ * **Sorti de `window.css` le 03/08/2026**, quand la fenêtre d'accueil a eu
+ * besoin des mêmes cartes que F19 (phase 17 bis). L'accueil n'est pas une
+ * fenêtre à gabarit — il n'a ni panneau de boutons, ni barre de menus — donc
+ * il ne charge pas `window.css` ; sans cette sortie, il aurait fallu recopier
+ * la carte et l'anneau, et les deux se seraient éloignés à la première
+ * retouche.
+ *
+ * Les mesures et les couleurs sont celles de F19, validées par Fabrice le
+ * 26/07/2026 : rien n'a bougé en sortant d'ici. */
+
+@import "./tokens.css";
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid #d8dee3;
+  padding: 10px 14px;
+}
+
+.card--wide {
+  grid-column: 1 / 3;
+}
+
+/* L'anneau et sa légende occupent la carte et se tiennent en son milieu. */
+.card--ring {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.card__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a2b3c;
+  border-bottom: 1px solid #e2e8ec;
+  padding-bottom: 6px;
+}
+
+.card__enlarge {
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 18px;
+  color: #6b7a88;
+  cursor: pointer;
+}
+
+.card__enlarge:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* **Un dessin ne sort jamais de sa carte** (Fabrice, 04/08/2026).
+ *
+ * En rétrécissant la fenêtre, l'anneau et la courbe débordaient : ils
+ * passaient par-dessus la carte voisine, par-dessus le bord de la fenêtre, et
+ * par-dessus les chevrons ‹ › qui deviennent alors incliquables — c'est le
+ * dessin qui reçoit le clic. Le corps de la carte tient donc son contenu, et
+ * **quand la place manque, il défile** plutôt que de laisser filer.
+ *
+ * `safe center` et non `center` : un contenu plus large que son cadre, centré,
+ * déborde des DEUX côtés, et le côté gauche d'une zone qui défile est
+ * inatteignable. `safe` fait qu'un contenu trop grand se range au début au lieu
+ * de se centrer — on peut alors tout atteindre à l'ascenseur. */
+.card__body {
+  flex: 1;
+  display: flex;
+  align-items: safe center;
+  justify-content: safe center;
+  gap: 18px;
+  min-height: 280px;
+  padding-top: 10px;
+  flex-wrap: wrap;
+  overflow: auto;
+}
+
+.card__empty {
+  color: #6b7a88;
+  font-style: italic;
+}
+
+.card__heading {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 400;
+  text-align: center;
+  color: #4a7a99;
+}
+
+/* Le gros chiffre : ~48 pt gris-bleu (charte §2), rouge foncé quand la
+   balance est négative. */
+.card__figure {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 48px;
+  color: #7a8fa6;
+}
+
+.card__figure--negative {
+  color: #8b1a1a;
+}
+
+/* L'anneau garde sa taille tant qu'il y a la place, et **se réduit plutôt que
+   de déborder** quand il n'y en a plus. `height: auto` avec un `viewBox` : le
+   dessin garde ses proportions tout seul, il ne s'écrase pas. */
+.ring {
+  flex: 0 0 auto;
+  max-width: 100%;
+  min-width: 180px;
+  height: auto;
+}
+
+/* La valeur écrite sur son secteur. En blanc avec un liseré sombre : elle doit
+   rester lisible sur les huit couleurs de l'original, dont certaines sont
+   claires. */
+.ring__value {
+  font-size: 15px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: #ffffff;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.45);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #d8dee3;
+  min-width: 230px;
+}
+
+/* L'en-tête de la légende : « Postes budgétaires » ou « Catégories ».
+   Depuis que les titres de carte ont été raccourcis (03/08/2026), c'est lui
+   qui dit à quel niveau on est — il porte une information, il n'est pas là
+   pour décorer. */
+.legend__title {
+  font-weight: 600;
+  color: #1f3550;
+  padding: 0 0 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e2e6ea;
+}
+
+.legend__entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+/* Ce qui se clique le dit. Le secteur d'un anneau est un tracé SVG, pas un
+   bouton : sans cette règle, rien ne distinguerait à l'œil un anneau qui se
+   creuse d'un dessin inerte. F19 ne pose jamais cette classe — son anneau ne
+   se creuse pas, et un dessin qui a l'air cliquable sans l'être est pire
+   qu'un dessin franchement immobile. */
+.is-pickable {
+  cursor: pointer;
+}
+
+.legend__entry.is-pickable:hover,
+.legend__entry.is-pickable:focus-visible {
+  background-color: #eef3f7;
+}
+
+.ring .is-pickable:hover,
+.ring.is-pickable:hover {
+  filter: brightness(1.08);
+}
+
+/* Les trois étages d'une carte qui se creuse (03/08/2026) : le nom du niveau,
+   le dessin, le lien qui remonte.
+
+   **`.card__body` est une rangée** — l'anneau et sa légende s'y posent côte à
+   côte — et F19 s'en sert aussi. Un titre au-dessus et un lien en dessous
+   demandent une colonne : on la pose DANS le corps de la carte plutôt que de
+   retourner une règle que deux fenêtres partagent. Rien ne bouge en F19. */
+.card__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* L'étage du milieu : c'est lui qui reprend la rangée d'origine, pour que
+   l'anneau et sa légende restent côte à côte comme avant. */
+.card__drawing {
+  display: flex;
+  align-items: safe center;
+  justify-content: safe center;
+  gap: 18px;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+/* Le nom du niveau regardé, au-dessus du dessin. À la courbe, c'est **la seule
+   chose à l'écran qui nomme la catégorie regardée** : le titre de la carte ne
+   dit que « Dépenses — août 2026 ».
+
+   Classe à elle : `.card__heading` est déjà le titre des trois cartes de
+   soldes, en F01 comme en F19, et lui ajouter une graisse les aurait changées
+   toutes les six. */
+.card__subject {
+  margin: 0 0 6px;
+  font-weight: 600;
+  color: #1f3550;
+}
+
+/* Le lien de l'accueil vide (04/08/2026) : « Créez-en un en cliquant ici ».
+   Un bouton habillé en lien, comme celui qui remonte d'un niveau — il agit
+   dans la page, il ne mène nulle part, et le rendre `<a>` mentirait au clavier
+   comme au lecteur d'écran. */
+.card__link {
+  display: block;
+  margin: 6px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: #2b82c9;
+  cursor: pointer;
+}
+
+.card__link:hover,
+.card__link:focus-visible {
+  text-decoration: underline;
+}
+
+/* Le lien qui remonte d'un niveau, sous le dessin (03/08/2026). Un bouton
+   habillé en lien : il agit dans la page, il ne mène nulle part, et le rendre
+   `<a>` mentirait au clavier comme au lecteur d'écran. */
+.card__back {
+  margin-top: 10px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: #2b82c9;
+  cursor: pointer;
+}
+
+.card__back:hover,
+.card__back:focus-visible {
+  text-decoration: underline;
+}
+
+/* La courbe, comme l'anneau : elle se réduit plutôt que de sortir de la carte.
+   Le plancher est celui de la LISIBILITÉ, pas celui de la place : le dessin
+   porte des nombres, et un `viewBox` qui rétrécit les rétrécit avec lui. À 360
+   px les quantièmes sont à 8 px et se lisent encore ; en dessous, c'est
+   l'ascenseur qui prend la suite plutôt qu'un axe illisible. */
+.curve {
+  width: 480px;
+  min-width: 360px;
+  max-width: 100%;
+  height: auto;
+}
+
+/* La courbe du cumul. Les nombres en chiffres tabulaires, pour que les
+   quantièmes de l'axe s'alignent au lieu de danser. */
+.curve__day {
+  font-size: 11px;
+  text-anchor: middle;
+  fill: #6b7a88;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Les deux étiquettes des bords, rangées vers l'intérieur : centrées, elles
+   sortaient du dessin dès que l'axe portait des noms de mois (04/08/2026). */
+.curve__day--first {
+  text-anchor: start;
+}
+
+.curve__day--last {
+  text-anchor: end;
+}
+
+.curve__total {
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: end;
+  fill: #1f3550;
+  font-variant-numeric: tabular-nums;
+}
+
+/* L'anneau d'un mois sans opération : la carte garde sa forme et sa place —
+   un mois vide ne fait pas sauter la mise en page — et l'anneau reste
+   cliquable, ce qui est la seule façon de sortir d'un poste creusé dont le
+   mois regardé ne contient rien (décision de Fabrice, 03/08/2026). */
+.ring--empty path {
+  fill: #e9edf1;
+}
+
+.legend__square {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+}
+
+.legend__label {
+  flex: 1 1 auto;
+  color: #1f3550;
+}
+
+.legend__amount {
+  color: #6b7a88;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Impression de RIB</title>
+    <script type="module" src="/ui/windows/rib.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F32 — « Impression de RIB ( Relevé d'Identité Bancaire ) », d'après la
+         capture « Impression de RIB.png ».
+
+         **Rien ne se saisit ici.** Les coordonnées viennent de la fiche du
+         compte et n'y retournent pas : la fenêtre les montre pour qu'on les
+         vérifie avant d'imprimer, et les corrections se font là où elles sont
+         nées (arbitrage de Fabrice, 01/08/2026). Les champs sont donc en
+         lecture seule — c'est ce qui distingue cette fenêtre de la fiche
+         compte, qui a exactement les mêmes rubriques.
+
+         **La déclaration sur l'honneur n'est pas décorative** : tant que la
+         case n'est pas cochée, les deux boutons du panneau sont éteints. On
+         n'imprime pas un document bancaire par inadvertance. -->
+    <div class="window window--rib">
+      <main class="window__content window__content--scroll">
+        <section class="band">
+          <h2 class="band__title" id="group-bank"></h2>
+          <div class="rib-grid">
+            <label class="rib-label" for="bank" id="bank-label"></label>
+            <input class="rib-field" id="bank" type="text" readonly />
+            <label class="rib-label" for="domiciliation" id="domiciliation-label"></label>
+            <textarea class="rib-field rib-field--area" id="domiciliation" rows="3" readonly></textarea>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-holder"></h2>
+          <div class="rib-grid">
+            <label class="rib-label" for="holder" id="holder-label"></label>
+            <input class="rib-field" id="holder" type="text" readonly />
+            <label class="rib-label" for="address" id="address-label"></label>
+            <textarea class="rib-field rib-field--area" id="address" rows="3" readonly></textarea>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-details"></h2>
+          <div class="rib-details">
+            <div class="rib-details__cell">
+              <label class="rib-label" for="establishment" id="establishment-label"></label>
+              <input class="rib-field rib-field--code" id="establishment" type="text" readonly />
+            </div>
+            <div class="rib-details__cell">
+              <label class="rib-label" for="branch" id="branch-label"></label>
+              <input class="rib-field rib-field--code" id="branch" type="text" readonly />
+            </div>
+            <div class="rib-details__cell">
+              <label class="rib-label" for="number" id="number-label"></label>
+              <input class="rib-field rib-field--number" id="number" type="text" readonly />
+            </div>
+            <div class="rib-details__cell">
+              <label class="rib-label" for="key" id="key-label"></label>
+              <input class="rib-field rib-field--key" id="key" type="text" readonly />
+            </div>
+            <div class="rib-details__cell">
+              <label class="rib-label" for="bic" id="bic-label"></label>
+              <input class="rib-field rib-field--bic" id="bic" type="text" readonly />
+            </div>
+          </div>
+          <div class="rib-details__iban">
+            <label class="rib-label" for="iban" id="iban-label"></label>
+            <input class="rib-field rib-field--iban" id="iban" type="text" readonly />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-conditions"></h2>
+          <div class="rib-declaration">
+            <label class="rib-declaration__line">
+              <input id="declared" type="checkbox" />
+              <span id="declaration-label"></span>
+            </label>
+            <p class="rib-declaration__text" id="declaration-first"></p>
+            <p class="rib-declaration__text" id="declaration-second"></p>
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="print" type="button" disabled>
+          <img src="/ui/assets/icons/imprimante.png" alt="" />
+        </button>
+        <button class="panel__button" id="pdf" type="button" disabled>
+          <img src="/ui/assets/icons/pdf.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Radinus</title>
+    <script type="module" src="/ui/windows/about-radinus.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- « À propos de Radinus » (menu Paramètres), demandée par Fabrice le
+         03/08/2026, sur le modèle de « À propos de l'auteur ».
+
+         Le nom, la version, les deux logos, une phrase. Rien d'autre.
+
+         **La version n'est écrite nulle part dans cette page.** Elle est
+         demandée au binaire qui tourne : une version recopiée à la main
+         finirait par annoncer autre chose que ce qu'on exécute, et c'est
+         précisément la seule chose qu'une fenêtre « à propos » doive dire
+         juste. -->
+    <div class="window">
+      <main class="window__content">
+        <div class="about">
+          <p class="about__name" id="name"></p>
+          <p class="about__place" id="version"></p>
+
+          <div class="about__technologies">
+            <img class="about__logo" src="/ui/assets/about/rustlogo.png" id="rust" alt="" />
+            <img class="about__logo" src="/ui/assets/about/taurilogo.png" id="tauri" alt="" />
+          </div>
+
+          <p class="about__built" id="built"></p>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

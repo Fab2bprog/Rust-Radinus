@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Liste des modeles d'operations</title>
+    <script type="module" src="/ui/windows/operation-templates-list.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F37 — « Liste des modeles d'operations » (capture « Liste Model
+         operation.png »).
+
+         Strictement le gabarit des listes de nomenclature : une seule colonne
+         LIBELLE avec son entonnoir, et le panneau à quatre icônes — créer,
+         modifier, supprimer, consulter — puis la porte.
+
+         **Deux usages**, comme la liste des chéquiers : la gestion, par le menu
+         Nomenclatures ; et le mode « choisir », d'où la fiche opération vient
+         prendre un modèle à appliquer. Les boutons de gestion s'effacent alors
+         et la main paraît. -->
+    <div class="window">
+      <main class="window__content">
+        <h1 class="window__question" id="question" hidden></h1>
+        <section class="list">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox" aria-multiselectable="true"></div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="create" type="button">
+          <img src="/ui/assets/icons/Base_create.png" alt="" />
+        </button>
+        <button class="panel__button" id="update" type="button">
+          <img src="/ui/assets/icons/Base_update.png" alt="" />
+        </button>
+        <button class="panel__button" id="delete" type="button">
+          <img src="/ui/assets/icons/Base_delete.png" alt="" />
+        </button>
+        <button class="panel__button" id="read" type="button">
+          <img src="/ui/assets/icons/Base_read.png" alt="" />
+        </button>
+        <!-- Le bouton de validation du mode « choisir » : on valide le modèle
+             que l'on veut appliquer (Fabrice, 29/07/2026). -->
+        <button class="panel__button" id="select" type="button" hidden>
+          <img src="/ui/assets/icons/Base_valid.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

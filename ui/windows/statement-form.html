@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Rapprocher une transaction</title>
+    <script type="module" src="/ui/windows/statement-form.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F18 — « Rapprocher une transaction (Intègre une opération dans
+         l'historique de votre compte) » (capture « importation operation unique
+         depuis releve bancaire vers compte.png »).
+
+         Quatre bandeaux gris, comme la fiche opération : l'identification, le
+         montant, le classement pour les statistiques, et le statut. À droite,
+         deux icônes seulement — valider, et la porte. En bas, l'avertissement
+         rouge quand le FITID de la ligne est déjà en base.
+
+         **Tout y est modifiable**, y compris la date, le libellé, le sens et
+         le montant : chez Fabrice la fiche reçoit la transaction et la **rend
+         modifiée**, et la liste se rafraîchit avec ce qui revient. Je les
+         avais mis en lecture seule en me disant que c'étaient les mots de la
+         banque — c'était mon invention, pas sa règle. -->
+    <div class="window window--statement-form">
+      <!-- La bande d'ardoise de gauche, nue : c'est ce que montre la capture
+           de l'original, et elle n'y porte aucune image. -->
+      <aside class="panel panel--left"></aside>
+
+      <main class="window__content window__content--scroll">
+        <section class="band">
+          <h2 class="band__title" id="group-identification"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="date" id="date-label"></label>
+            <input class="form__field form__field--medium" id="date" type="date" />
+
+            <label class="form__label" for="label" id="label-label"></label>
+            <input class="form__field" id="label" type="text" maxlength="100" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-amount"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="direction" id="direction-label"></label>
+            <select class="form__field form__field--medium" id="direction"></select>
+
+            <label class="form__label" for="amount" id="amount-label"></label>
+            <input class="form__field form__field--medium" id="amount" type="text" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-classification"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="payment-mode" id="payment-mode-label"></label>
+            <select class="form__field form__field--medium" id="payment-mode"></select>
+
+            <label class="form__label" for="category" id="category-label"></label>
+            <select class="form__field form__field--medium" id="category"></select>
+
+            <label class="form__label" for="assignment" id="assignment-label"></label>
+            <select class="form__field form__field--medium" id="assignment"></select>
+
+            <label class="form__label" for="payee" id="payee-label"></label>
+            <select class="form__field form__field--medium" id="payee"></select>
+
+            <label class="form__label" for="project" id="project-label"></label>
+            <select class="form__field form__field--medium" id="project"></select>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-status"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="status" id="status-label"></label>
+            <select class="form__field form__field--medium" id="status"></select>
+
+            <label class="form__label" for="clearing-date" id="clearing-date-label"></label>
+            <input class="form__field form__field--medium" id="clearing-date" type="date" />
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="validate" type="button">
+          <img src="/ui/assets/icons/Base_valid.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

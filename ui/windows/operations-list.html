@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Opérations</title>
+    <script type="module" src="/ui/windows/operations-list.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F02 — « Liste opérations du compte : <compte> », the middle of the
+         application (04_SPECIFICATIONS_FENETRES.md).
+
+         **The table is a tree.** An operation carrying sub-operations shows a
+         « + »; unfolding it inserts its children under it, before the next
+         top-level operation (Fabrice, 25/07/2026). -->
+    <div class="window window--operations">
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <div class="period">
+        <label for="from" id="from-label"></label>
+        <input id="from" type="date" />
+        <label for="to" id="to-label"></label>
+        <input id="to" type="date" />
+      </div>
+
+      <main class="window__content">
+        <section class="list">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox" aria-multiselectable="true"></div>
+        </section>
+
+        <footer class="totals">
+          <span class="totals__label" id="foot-debit-label"></span>
+          <span class="totals__value totals__value--debit" id="foot-debit"></span>
+          <span class="totals__label" id="foot-credit-label"></span>
+          <span class="totals__value" id="foot-credit"></span>
+          <span class="totals__label" id="foot-total-label"></span>
+          <span class="totals__value" id="foot-total"></span>
+
+          <span class="totals__label" id="foot-bank-label"></span>
+          <span class="totals__value" id="foot-bank"></span>
+          <span class="totals__label" id="foot-real-label"></span>
+          <span class="totals__value" id="foot-real"></span>
+          <span class="totals__label" id="foot-final-label"></span>
+          <span class="totals__value" id="foot-final"></span>
+        </footer>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="create" type="button">
+          <img src="/ui/assets/icons/Base_create.png" alt="" />
+        </button>
+        <button class="panel__button" id="update" type="button">
+          <img src="/ui/assets/icons/Base_update.png" alt="" />
+        </button>
+        <button class="panel__button" id="delete" type="button">
+          <img src="/ui/assets/icons/Base_delete.png" alt="" />
+        </button>
+        <button class="panel__button" id="point" type="button">
+          <img src="/ui/assets/icons/Base_point.png" alt="" />
+        </button>
+        <button class="panel__button" id="sub" type="button">
+          <img src="/ui/assets/icons/Base_createinside.png" alt="" />
+        </button>
+        <button class="panel__button" id="duplicate" type="button">
+          <img src="/ui/assets/icons/Base_duplicate.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

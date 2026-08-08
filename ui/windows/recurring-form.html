@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Fiche définissant la règle de génération d'opération periodique</title>
+    <script type="module" src="/ui/windows/recurring-form.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F15 — « Fiche définissant la règle de génération d'opération
+         periodique » (capture du dossier « Information Operations
+         Periodiques »).
+
+         Cinq bandeaux gris, dans son ordre : l'identification et le compte, la
+         nomenclature, le montant, la période, les conditions de fin. Puis un
+         sixième, **en lecture seule** : ce que cette règle a déjà produit.
+
+         Ce dernier n'est pas décoratif. « Cela permet de savoir visuellement si
+         des opérations ont déjà été renseignées » (Fabrice, 31/07/2026) — et
+         c'est aussi ce que la corbeille du panneau s'apprête à effacer.
+
+         Le panneau porte trois icônes, dans son ordre : la corbeille qui efface
+         les opérations produites, l'enregistrement, et la porte. -->
+    <div class="window">
+      <main class="window__content window__content--scroll">
+        <div class="form form--wide">
+          <label class="form__label form__label--readonly" for="id" id="id-label"></label>
+          <input class="form__field form__field--medium" id="id" type="text" readonly />
+        </div>
+
+        <section class="band">
+          <h2 class="band__title" id="group-identity"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="account" id="account-label"></label>
+            <select class="form__field" id="account"></select>
+
+            <label class="form__label" for="label" id="label-label"></label>
+            <input class="form__field" id="label" type="text" maxlength="100" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-nomenclature"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="category" id="category-label"></label>
+            <select class="form__field" id="category"></select>
+
+            <label class="form__label" for="payment-mode" id="payment-mode-label"></label>
+            <select class="form__field" id="payment-mode"></select>
+
+            <label class="form__label" for="assignment" id="assignment-label"></label>
+            <select class="form__field" id="assignment"></select>
+
+            <label class="form__label" for="payee" id="payee-label"></label>
+            <select class="form__field" id="payee"></select>
+
+            <label class="form__label" for="project" id="project-label"></label>
+            <select class="form__field" id="project"></select>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-amount"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="direction" id="direction-label"></label>
+            <select class="form__field form__field--medium" id="direction"></select>
+
+            <label class="form__label" for="amount" id="amount-label"></label>
+            <input class="form__field form__field--medium" id="amount" type="text" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-period"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="next-date" id="next-date-label"></label>
+            <input class="form__field form__field--medium" id="next-date" type="date" />
+
+            <label class="form__label" for="frequency" id="frequency-label"></label>
+            <div class="recurring-period">
+              <input class="form__field form__field--tiny" id="frequency" type="number" min="1" max="999" />
+              <select class="form__field" id="unit"></select>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-ending"></h2>
+          <div class="recurring-endings">
+            <label class="recurring-ending">
+              <input type="radio" name="ending" id="ending-no-limit" value="no-limit" checked />
+              <span id="ending-no-limit-label"></span>
+            </label>
+            <label class="recurring-ending">
+              <input type="radio" name="ending" id="ending-until-date" value="until-date" />
+              <span id="ending-until-date-label"></span>
+            </label>
+            <div class="recurring-ending__field">
+              <label class="form__label" for="end-date" id="end-date-label"></label>
+              <input class="form__field form__field--medium" id="end-date" type="date" disabled />
+            </div>
+            <label class="recurring-ending">
+              <input type="radio" name="ending" id="ending-repeat-count" value="repeat-count" />
+              <span id="ending-repeat-count-label"></span>
+            </label>
+            <div class="recurring-ending__field">
+              <label class="form__label" for="repeat-count" id="repeat-count-label"></label>
+              <input class="form__field form__field--medium" id="repeat-count" type="number" min="1" max="100" disabled />
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-produced"></h2>
+          <div class="form form--wide">
+            <label class="form__label form__label--readonly" for="guid" id="guid-label"></label>
+            <input class="form__field" id="guid" type="text" readonly />
+
+            <label class="form__label form__label--readonly" for="produced-count" id="produced-count-label"></label>
+            <input class="form__field form__field--medium" id="produced-count" type="text" readonly />
+
+            <label class="form__label form__label--readonly" for="produced-last" id="produced-last-label"></label>
+            <input class="form__field form__field--medium" id="produced-last" type="text" readonly />
+
+            <label class="form__label form__label--readonly" for="produced-total" id="produced-total-label"></label>
+            <input class="form__field form__field--medium" id="produced-total" type="text" readonly />
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="erase" type="button">
+          <img src="/ui/assets/icons/calendrierpoubelle.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="save" type="button">
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

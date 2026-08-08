@@ -1,0 +1,357 @@
+@import "./tokens.css";
+/* La carte blanche, l'anneau et sa légende, partagés avec F19. */
+@import "./cards.css";
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: var(--radinus-font-family);
+  font-size: var(--radinus-font-size-base);
+  color: #0f0f0f;
+}
+
+/* La fenêtre d'accueil est une colonne : le bandeau, les trois bandes qui
+   prennent la place restante, la barre d'état en bas. La barre était en
+   `position: fixed` du temps où la page était vide ; elle recouvrirait
+   maintenant la dernière bande. */
+body {
+  margin: 0;
+  /* `height` et non `min-height` : une colonne dont la hauteur n'est pas bornée
+     ne demande à personne de se serrer, et la barre d'état sortait donc de la
+     fenêtre dès que les cartes dépassaient — de 19 px avec quatre comptes, de
+     139 px avec huit. Bornée, la zone d'accueil prend ce qui reste et défile
+     en son sein. Mesuré au navigateur sur les deux cas. */
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--radinus-main-bg);
+}
+
+/* --- F01 main window banner (03_CHARTE_GRAPHIQUE.md §3.1) ---
+   Fabrice's 2nd remark: side-by-side layout — mascot at its native
+   proportions on the left, a blue-gray band carrying the title and slogan
+   filling the rest of the width, both the same height. Not stacked. */
+
+.banner {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  /* **La moitié de ce qu'il faisait** (Fabrice, 04/08/2026 : « réduis l'image
+     en gardant ses proportions, et diminue la hauteur du bandeau bleu, cette
+     zone doit perdre environ 50 % »). Il était à 190.
+
+     **Un seul nombre commande les deux.** L'image et la bande bleue sont côte
+     à côte et prennent la hauteur de la ligne ; la mascotte ne porte aucune
+     dimension à elle — `height: 100%` et son `aspect-ratio` d'origine — donc
+     elle se réduit en proportion toute seule, de 285 × 190 à 143 × 95, sans
+     recadrage.
+
+     Mesuré au navigateur avant d'y toucher : le titre et les deux devises font
+     74 points de haut. Il reste donc 10 points au-dessus et 10 en dessous, et
+     rien n'est à l'étroit. La place gagnée va aux cartes, comme celle des 150
+     px de marge supprimés le 03/08. */
+  height: 95px;
+  /* **Collé au haut de la fenêtre** (Fabrice, 03/08/2026). Il y avait ici
+     150 px de marge, demandés par sa 3e remarque de la phase 0 — « il veut de
+     l'air au-dessus ». Cette décision est révisée : la place va aux
+     statistiques. La décision révisée fait foi (00_LISEZMOI, 3e session). */
+  flex: 0 0 auto;
+}
+
+.banner__mascot {
+  display: block;
+  height: 100%;
+  width: auto;
+  flex-shrink: 0;
+  /* Matches the source image's own aspect ratio (800x533), so the full
+     mascot shows with no crop and no visible letterbox edge. */
+  aspect-ratio: 800 / 533;
+  object-fit: contain;
+  background-color: var(--radinus-banner-image-bg);
+}
+
+.banner__slogan-band {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5em;
+  background-color: var(--radinus-panel-bg);
+  color: var(--radinus-banner-title-fg);
+  padding: 0 2em;
+}
+
+.banner__title {
+  margin: 0;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 2.2em;
+}
+
+.banner__slogan {
+  margin: 0;
+  font-style: italic;
+  font-size: 0.95em;
+  opacity: 0.9;
+}
+
+/* --- F01 la zone d'accueil (04_SPECIFICATIONS_FENETRES.md F01) ------------
+   Trois bandes de cartes blanches sur le fond gris de la charte. Les cartes
+   elles-mêmes viennent de `cards.css`, partagées avec F19 : l'accueil ne
+   redéfinit ni leur fond, ni leur bordure, ni le gros chiffre. */
+
+.welcome {
+  flex: 1;
+  /* **`min-height: 0` n'est pas une décoration.** Sans lui, un élément flexible
+     refuse de descendre sous la hauteur de son contenu : la zone d'accueil
+     poussait la barre d'état hors de la fenêtre de 19 px, et il aurait suffi
+     de deux comptes de plus pour que ce soit 200. Avec lui, l'accueil prend la
+     place qui reste, défile en son sein si le foyer a beaucoup de comptes, et
+     **la barre d'état est toujours à l'écran**. Mesuré au navigateur, pas
+     supposé. */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  overflow: auto;
+}
+
+.welcome__band {
+  display: flex;
+  gap: 10px;
+}
+
+/* La bande des anneaux prend la hauteur qui reste : c'est la dernière, et sans
+   cela une fenêtre agrandie laisserait une plage de gris nu sous elle. Les
+   anneaux se tiennent au milieu de leur carte, quelle qu'en soit la hauteur. */
+.welcome__band--rings {
+  flex: 1;
+  min-height: 0;
+}
+
+.welcome__band > .card {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Les trois cartes de soldes. **Un tiers plus courtes depuis le 04/08/2026**
+   (Fabrice : « elles prennent trop de place en hauteur, environ 30 %, et
+   l'écriture moins grosse ») : 127 points mesurés au départ, 90 à l'arrivée,
+   soit 29 % de moins.
+
+   **Toutes les règles sont accrochées à `.welcome__figure`**, et c'est ce qui
+   compte : `.card__heading` et `.card__figure` sont partagées avec F19, qui
+   porte les mêmes trois cartes et a été validée le 26/07/2026. Sans cette
+   accroche, alléger l'accueil aurait rapetissé six cartes au lieu de trois.
+
+   La hauteur ne vient pas d'un seul endroit : le chiffre passe de 48 à 34, le
+   titre de 17 à 15, et le reste est de la marge — c'est en la reprenant
+   qu'on gagne les douze derniers points sans rendre les nombres illisibles. */
+.welcome__figure {
+  text-align: center;
+  padding: 7px 14px;
+}
+
+.welcome__figure .card__heading {
+  font-size: 15px;
+}
+
+.welcome__figure .card__figure {
+  margin-top: 4px;
+  font-size: 34px;
+}
+
+/* Le rappel sous le gros chiffre : ce qu'il contient, ou le nombre de comptes
+   qu'il additionne. */
+.welcome__detail {
+  margin: 2px 0 0;
+  color: #6b7a88;
+  font-size: 0.85em;
+}
+
+.welcome__accounts {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Autant de tuiles que de comptes ouverts, sur une seule ligne tant qu'elles
+   tiennent. `auto-fit` plutôt qu'un nombre fixe de colonnes : Radinus ne sait
+   pas combien de comptes a le foyer, et un utilisateur en a quatre quand un
+   autre en a onze. */
+.welcome__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 9px;
+  padding-top: 9px;
+}
+
+/* Une tuile est un bouton : elle ouvre la liste des opérations de son compte,
+   donc elle se clique, se tabule et s'annonce comme telle. */
+.tile {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background-color: var(--radinus-window-bg);
+  border: 1px solid #c2c2c2;
+  padding: 7px 10px 8px;
+  cursor: pointer;
+}
+
+.tile:hover,
+.tile:focus-visible {
+  background-color: #e8eef2;
+  border-color: var(--radinus-table-header-bg);
+}
+
+.tile__name {
+  font-weight: 700;
+  font-size: 1.02em;
+  color: #1d2b34;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile__bank {
+  color: #6a6a6a;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.tile__row > span:first-child {
+  color: #6a6a6a;
+}
+
+.tile__row--strong {
+  font-weight: 700;
+}
+
+.tile__row--strong > span:first-child {
+  color: inherit;
+}
+
+.tile__amount--negative {
+  color: var(--radinus-negative-amount-fg);
+}
+
+/* Les chevrons de mois et le bouton de relecture. Des caractères et non des
+   images (choix de Fabrice, 03/08/2026) : deux horloges de 60 px lui ont été
+   proposées, il les a trouvées trop lourdes pour un entête de carte.
+
+   Un bouton éteint reste visible mais pâle : au bord du calendrier, la flèche
+   dit qu'elle ne peut plus rien plutôt que de ne rien faire en silence. */
+
+.card__action {
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 1.25em;
+  line-height: 1;
+  padding: 0 0.35em;
+  color: #4a7a99;
+  cursor: pointer;
+}
+
+.card__action:hover:not(:disabled),
+.card__action:focus-visible:not(:disabled) {
+  color: #1a2b3c;
+}
+
+.card__action:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Le titre porte le mois, donc il s'allonge — « Dépenses par postes
+   budgétaires — septembre 2026 ». Sans quoi il pousserait les chevrons hors de
+   la carte au lieu de se laisser tronquer. */
+.card__title > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card__months {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 2px;
+}
+
+/* --- Les deux anneaux, à l'échelle de l'accueil -------------------------
+   Les cartes de F19 occupent une fenêtre entière ; ici elles sont deux dans
+   1060 px. À la taille de F19, l'anneau (260) et sa légende (230 au minimum)
+   ne tiennent plus côte à côte : la légende passait dessous et la barre
+   d'état sortait de la fenêtre. **Vu en regardant le rendu, et par rien
+   d'autre** — aucune vérification ne mesure une largeur.
+
+   Le dessin, lui, n'est pas retouché : le SVG porte son `viewBox`, donc lui
+   donner une largeur le met à l'échelle, valeurs écrites comprises. F19 garde
+   ses mesures d'origine, validées le 26/07/2026. */
+
+.welcome .card__body {
+  min-height: 0;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+/* L'étage du dessin reprend l'écart serré de l'accueil : c'est lui qui porte
+   l'anneau et sa légende depuis que la carte se creuse. */
+.welcome .card__drawing {
+  gap: 12px;
+}
+
+/* L'anneau de l'accueil est un peu plus petit que celui de F19. **Pas de
+   hauteur écrite ici** (04/08/2026) : elle empêchait `height: auto` de faire
+   son travail, et un anneau réduit en largeur serait resté haut de 232 px,
+   flottant au milieu d'un vide. */
+.welcome .ring {
+  width: 232px;
+}
+
+.welcome .legend {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* --- F01 status bar (bottom, "Version : x.y.z") --- */
+
+.status-bar {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  background-color: var(--radinus-menubar-bg);
+  padding: 0.3em 0.8em;
+  font-size: 0.85em;
+}
+
+/* Bleu italique pour l'aide, rouge pour l'alerte : la barre d'information de
+   toutes les fenêtres de Radinus (charte §1). */
+.status-bar__info {
+  color: var(--radinus-info-bar-help-fg);
+  font-style: italic;
+}
+
+.status-bar__info--alert {
+  color: var(--radinus-info-bar-alert-fg);
+  font-style: normal;
+  font-weight: 600;
+  white-space: pre-line;
+}

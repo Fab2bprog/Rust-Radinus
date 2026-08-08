@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Importation de feuille excel [ Étape 2/3 ]</title>
+    <script type="module" src="/ui/windows/excel-fields.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F35 — « Importation de feuille excel [ Étape 2/3 ] : association des
+         champs » (captures « POINT13 ETAPE 2A / 2B » et « ImportExcel2.png »).
+
+         Deux onglets, comme l'original : les liens entre champs, puis les
+         paramètres d'importation. Un troisième apparaît après coup — le
+         compte-rendu — parce que Fabrice a demandé que **ce qui n'est pas
+         passé se voie** (29/07/2026), là où son code sautait les lignes
+         fautives en silence.
+
+         La combo de droite ne propose que les rubriques compatibles avec la
+         forme de montant déclarée à l'étape 1 : une incohérence entre les deux
+         n'est plus seulement refusée, elle n'est plus offerte. -->
+    <div class="window window--excel">
+      <main class="window__content window__content--scroll">
+        <nav class="excel-tabs" id="tabs">
+          <button class="excel-tab" id="tab-links" type="button" aria-pressed="true"></button>
+          <button class="excel-tab" id="tab-settings" type="button" aria-pressed="false"></button>
+          <button class="excel-tab" id="tab-report" type="button" aria-pressed="false" hidden></button>
+        </nav>
+
+        <section class="excel-page" id="page-links">
+          <p class="excel-note" id="links-help"></p>
+          <section class="list list--excel">
+            <header class="list__header" id="links-header"></header>
+            <div class="list__filter" id="links-filter"></div>
+            <div class="list__rows" id="links-rows" role="listbox"></div>
+          </section>
+        </section>
+
+        <section class="excel-page" id="page-settings" hidden>
+          <div id="policies"></div>
+        </section>
+
+        <section class="excel-page" id="page-report" hidden>
+          <h2 class="band__title" id="report-title"></h2>
+          <section class="list list--excel">
+            <header class="list__header" id="report-header"></header>
+            <div class="list__filter" id="report-filter"></div>
+            <div class="list__rows" id="report-rows" role="listbox"></div>
+          </section>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="validate" type="button">
+          <img src="/ui/assets/icons/Base_valid.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

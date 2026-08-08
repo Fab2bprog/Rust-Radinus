@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/ui/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Radinus</title>
+    <script type="module" src="/ui/main.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F01 — main window (01_CAHIER_DES_CHARGES.md §5.1, 03_CHARTE_GRAPHIQUE.md
+         §3.1, 04_SPECIFICATIONS_FENETRES.md F01). Menu bar is native (macOS
+         system menu bar, built in src-tauri/src/menu.rs), not part of this page.
+
+         **The banner is no longer alone** (Fabrice, 03/08/2026): the welcome
+         window carries the totals, the accounts and the two budget-line rings.
+         It is the first thing 2.0.0 has that 1.9.3 did not, and the divergence
+         is deliberate — see docs/Decisions.md, P-8.
+
+         The rule that governs what may be added here, and it is a short one:
+         **the welcome window is the no-click view, and anything that needs a
+         setting does not belong on it.** No year picker, no period menu, no
+         drill-down. The day one of them is missed is the day F19 should have
+         been opened instead. -->
+    <header class="banner">
+      <!-- Vides : **la vue ne contient aucune phrase** (règle de Fabrice,
+           25/07/2026). Ces trois-là y étaient restées depuis la phase 0, et
+           ne se traduisaient donc pas — relevé par lui le 03/08/2026. L'alt
+           de la mascotte compte autant que le reste : c'est ce que lit un
+           lecteur d'écran. -->
+      <img class="banner__mascot" src="/ui/assets/banner/NewRadinus.png" id="mascot" alt="" />
+      <div class="banner__slogan-band">
+        <h1 class="banner__title" id="banner-title"></h1>
+        <p class="banner__slogan" id="slogan-one"></p>
+        <p class="banner__slogan" id="slogan-two"></p>
+      </div>
+    </header>
+
+    <!-- The three bands. Hidden until the first read succeeds: empty cards
+         flashing at launch would look like a fault. -->
+    <main class="welcome" id="welcome" hidden>
+      <section class="welcome__band welcome__band--figures">
+        <article class="card welcome__figure">
+          <h2 class="card__heading" id="total-bank-title"></h2>
+          <p class="card__figure" id="total-bank"></p>
+          <p class="welcome__detail" id="total-bank-detail"></p>
+        </article>
+        <article class="card welcome__figure">
+          <h2 class="card__heading" id="total-real-title"></h2>
+          <p class="card__figure" id="total-real"></p>
+          <p class="welcome__detail" id="total-real-detail"></p>
+        </article>
+        <article class="card welcome__figure">
+          <h2 class="card__heading" id="total-final-title"></h2>
+          <p class="card__figure" id="total-final"></p>
+          <p class="welcome__detail" id="total-final-detail"></p>
+        </article>
+      </section>
+
+      <section class="welcome__band">
+        <article class="card welcome__accounts">
+          <header class="card__title">
+            <span id="accounts-title"></span>
+            <!-- Relit toute la fenêtre, en gardant le mois regardé : rafraîchir
+                 n'est pas revenir à aujourd'hui. -->
+            <button class="card__action" id="refresh" type="button">⟳</button>
+          </header>
+          <div class="welcome__tiles" id="tiles"></div>
+        </article>
+      </section>
+
+      <section class="welcome__band welcome__band--rings">
+        <article class="card card--ring">
+          <header class="card__title">
+            <span id="spending-title"></span>
+            <span class="card__months">
+              <button class="card__action" id="spending-previous" type="button">‹</button>
+              <button class="card__action" id="spending-next" type="button">›</button>
+            </span>
+          </header>
+          <div class="card__body" id="spending"></div>
+        </article>
+        <article class="card card--ring">
+          <header class="card__title">
+            <span id="earning-title"></span>
+            <span class="card__months">
+              <button class="card__action" id="earning-previous" type="button">‹</button>
+              <button class="card__action" id="earning-next" type="button">›</button>
+            </span>
+          </header>
+          <div class="card__body" id="earning"></div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="status-bar">
+      <span class="status-bar__info" id="info-bar"></span>
+      <span id="version"></span>
+    </footer>
+  </body>
+</html>

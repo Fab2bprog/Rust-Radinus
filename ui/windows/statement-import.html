@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Importation de relevés de comptes bancaires</title>
+    <script type="module" src="/ui/windows/statement-import.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F17 — « Importation de relevés de comptes bancaires »
+         (04_SPECIFICATIONS_FENETRES.md F17, capture « Importation releves de
+         comptes bancaires.png »).
+
+         La marche à suivre est de Fabrice (27/07/2026) : on a déjà choisi
+         **un** compte ; le dossier jaune ouvre un fichier OFX, qui est lu **en
+         RAM et pas en base** ; les lignes que Radinus connaît déjà s'affichent
+         en pastel, reconnues par leur FITID ; et le troisième icône les
+         intègre — en masse si plusieurs lignes sont choisies, par la fiche de
+         rapprochement s'il n'y en a qu'une.
+
+         Le pied porte les trois montants de l'original : ce que Radinus dit,
+         ce que le fichier dit, et l'écart — qui est la vraie information. -->
+    <div class="window window--statement">
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <main class="window__content">
+        <section class="list">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox" aria-multiselectable="true"></div>
+        </section>
+
+        <footer class="totals totals--statement">
+          <span class="totals__label" id="account-label"></span>
+          <span class="totals__value" id="account-balance"></span>
+          <span class="totals__label" id="file-label"></span>
+          <span class="totals__value" id="file-balance"></span>
+          <span class="totals__label" id="difference-label"></span>
+          <span class="totals__value" id="difference"></span>
+        </footer>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="open" type="button">
+          <img src="/ui/assets/icons/Fichier_ouvrir.png" alt="" />
+        </button>
+        <button class="panel__button" id="info" type="button" disabled>
+          <img src="/ui/assets/icons/Fichier_info.png" alt="" />
+        </button>
+        <button class="panel__button" id="integrate" type="button" disabled>
+          <img src="/ui/assets/icons/Base_integrefich.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

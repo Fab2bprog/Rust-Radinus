@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Radinus</title>
+    <script type="module" src="/ui/windows/language-choice.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- Le choix de la langue, au tout premier lancement (décision de
+         Fabrice, 02/08/2026 : « si Radinus démarre sans base, on demande
+         avant tout le choix de la langue »).
+
+         **Cette page ne porte aucune phrase, et ce n'est pas un oubli.** À ce
+         moment-là aucune langue n'est choisie : il n'y a pas de langue dans
+         laquelle écrire un titre ou une consigne. Elle n'en a pas besoin —
+         une liste où chaque ligne est écrite dans sa propre langue se comprend
+         sans qu'on sache déjà laquelle l'utilisateur parle. Les noms viennent
+         du noyau, chacun de son propre fichier de langue. -->
+    <div class="window">
+      <main class="window__content">
+        <div class="language-choice">
+          <img
+            class="language-choice__mark"
+            src="/ui/assets/banner/NewRadinus.png"
+            alt="Radinus"
+          />
+          <div
+            class="language-choice__list"
+            id="languages"
+            role="listbox"
+            aria-label="Radinus"
+          ></div>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="validate" type="button">
+          <img src="/ui/assets/icons/Base_valid.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <!-- Trois points, écrits en dur, dans aucune langue : le script les
+           remplace dès qu'il tourne. -->
+      <footer class="info-bar" id="info-bar">…</footer>
+    </div>
+  </body>
+</html>

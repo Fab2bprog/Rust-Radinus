@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Transférer un montant entre deux comptes</title>
+    <script type="module" src="/ui/windows/transfer.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F09 — « Transférer un montant entre deux comptes » (capture
+         « Transferer montant entre 2 comptes.png »).
+
+         Cinq bandeaux gris, dans son ordre : le compte source, le compte
+         destination, la description, les nomenclatures, et le montant.
+
+         **Une seule description pour les deux écritures** : le libellé, la
+         référence, les deux dates, le statut et les cinq nomenclatures sont
+         saisis une fois et vont sur le débit comme sur le crédit ; seuls le
+         compte et le signe les distinguent.
+
+         Le montant est écrit en très gros — c'est le seul chiffre de l'écran,
+         et c'est lui qu'on relit avant de valider. -->
+    <div class="window window--transfer">
+      <main class="window__content window__content--scroll">
+        <section class="band">
+          <h2 class="band__title" id="group-source"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="source" id="source-label"></label>
+            <select class="form__field" id="source"></select>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-target"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="target" id="target-label"></label>
+            <select class="form__field" id="target"></select>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-description"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="label" id="label-label"></label>
+            <input class="form__field" id="label" type="text" maxlength="100" />
+
+            <label class="form__label" for="reference" id="reference-label"></label>
+            <input class="form__field" id="reference" type="text" maxlength="50" />
+
+            <label class="form__label" for="date" id="date-label"></label>
+            <input class="form__field form__field--medium" id="date" type="date" />
+
+            <label class="form__label" for="status" id="status-label"></label>
+            <select class="form__field form__field--medium" id="status"></select>
+
+            <label class="form__label" for="clearing-date" id="clearing-date-label"></label>
+            <input class="form__field form__field--medium" id="clearing-date" type="date" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-nomenclature"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="category" id="category-label"></label>
+            <select class="form__field" id="category"></select>
+
+            <label class="form__label" for="payment-mode" id="payment-mode-label"></label>
+            <select class="form__field" id="payment-mode"></select>
+
+            <label class="form__label" for="assignment" id="assignment-label"></label>
+            <select class="form__field" id="assignment"></select>
+
+            <label class="form__label" for="payee" id="payee-label"></label>
+            <select class="form__field" id="payee"></select>
+
+            <label class="form__label" for="project" id="project-label"></label>
+            <select class="form__field" id="project"></select>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-amount"></h2>
+          <div class="form form--wide form--giant">
+            <label class="form__label" for="amount" id="amount-label"></label>
+            <input class="form__field form__field--giant" id="amount" type="text" />
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="validate" type="button">
+          <img src="/ui/assets/icons/Base_valid.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

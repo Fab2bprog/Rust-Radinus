@@ -1,0 +1,2678 @@
+/* Shared layout of the two reusable window templates (03_CHARTE_GRAPHIQUE.md
+   §3.2 "fenêtres liste" and §3.3 "fenêtres fiche").
+
+   Built to exactly what the Categories window needs and no further: the
+   author limited Phase 3 to that single window on purpose, so that his
+   remarks land before these templates are duplicated six times. Every colour
+   comes from tokens.css, i.e. from the measured charter — none is invented
+   here. */
+
+@import "../tokens.css";
+/* La carte, l'anneau et la légende, partagés avec la fenêtre d'accueil. */
+@import "../cards.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--radinus-font-family);
+  font-size: var(--radinus-font-size-base);
+  color: #0f0f0f;
+  background-color: var(--radinus-window-bg);
+  /* A window is a frame, never a scrolling page: the table scrolls inside. */
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ */
+/* Window frame: content in the middle, slate side panels, info bar.   */
+/* ------------------------------------------------------------------ */
+
+.window {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 1fr auto;
+  height: 100%;
+}
+
+.window__content {
+  grid-row: 1;
+  grid-column: 2;
+  min-width: 0;
+  min-height: 0;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- « À propos de l'auteur » -----------------------------------------
+   Trois éléments centrés, rien autour. Même esprit que la fenêtre du choix de
+   la langue : ce qu'il y a à lire tient en trois lignes. */
+
+.about {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  text-align: center;
+}
+
+/* Le drapeau à son ratio d'origine (480 × 288), sans recadrage — la même
+   règle que la mascotte du bandeau. Le filet gris le détache du fond clair :
+   le blanc du drapeau et le fond de la fenêtre sont presque la même couleur. */
+.about__flag {
+  width: 200px;
+  height: auto;
+  aspect-ratio: 480 / 288;
+  border: 1px solid #c8d0d6;
+}
+
+.about__name {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a2b3c;
+}
+
+.about__place {
+  margin: 0;
+  font-size: 15px;
+  color: #4a5a66;
+}
+
+/* Les deux logos des technologies, côte à côte et à la même hauteur d'œil.
+   Ils n'ont pas le même ratio — Rust est presque carré, Tauri très large —
+   donc c'est la hauteur qui est fixée, jamais la largeur. */
+
+.about__technologies {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  margin-top: 6px;
+}
+
+.about__logo {
+  height: 56px;
+  width: auto;
+}
+
+.about__built {
+  margin: 0;
+  max-width: 34em;
+  color: #4a5a66;
+  line-height: 1.5;
+}
+
+/* --- « Licence d'utilisation » (08/08/2026) --------------------------
+   The GPLv3 logo at its own ratio (1920 x 955), never cropped -- the same
+   rule as the Corsican flag next door. The width is fixed and the height
+   follows, so the image stays sharp at every display size: the file is far
+   larger than what is shown, and that is deliberate. */
+
+.about__licence-logo {
+  width: 220px;
+  height: auto;
+  aspect-ratio: 1920 / 955;
+}
+
+/* Smaller than `.about__name`: « GNU GPL v3 ou ultérieure » is four times the
+   length of a person's name, and at 26px it would wrap in half the languages. */
+.about__licence-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a2b3c;
+}
+
+/* What the licence grants: a sentence, the line that announces the four
+   freedoms, and the four freedoms themselves. The block is flush left as a
+   whole -- centring four sentences of unequal length gives a ragged edge on
+   both sides and reads as a poster, not as a list. */
+.about__freedoms {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  max-width: 34em;
+}
+
+.about__freedoms-title {
+  margin: 0;
+  color: #4a5a66;
+  line-height: 1.5;
+}
+
+/* Bulleted, and deliberately so (Fabrice, 08/08/2026: « ça doit être
+   structuré »): four rights one can count are a list, not a paragraph cut in
+   four. */
+.about__freedoms-list {
+  margin: 0;
+  padding-left: 22px;
+  list-style: disc;
+  color: #4a5a66;
+  line-height: 1.6;
+}
+
+/* The logo is a button and must not look like one: no frame, no background,
+   nothing but the hand of the cursor saying that something happens here. */
+.about__licence-link {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
+/* --- F39, l'arbre des préférences (phase 17 ter) ----------------------
+   Il prend la place de la bande latérale gauche des fiches : même colonne de
+   la grille, mais blanc et cliquable au lieu d'ardoise et décoratif. */
+
+.tree {
+  grid-row: 1;
+  grid-column: 1;
+  width: 210px;
+  padding: 8px 0;
+  background-color: #ffffff;
+  border-right: 1px solid #c8d0d6;
+  overflow: auto;
+}
+
+.tree__branch {
+  padding: 5px 10px;
+  font-weight: 700;
+  color: #1a2b3c;
+  user-select: none;
+}
+
+/* Une feuille est un bouton : elle se clique, se tabule, et s'annonce comme
+   telle. Le retrait dit qu'elle appartient à sa branche. */
+.tree__leaf {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  padding: 5px 10px 5px 28px;
+  cursor: pointer;
+}
+
+.tree__leaf:hover {
+  background-color: #e8eef2;
+}
+
+/* La feuille choisie porte le gris-bleu de la ligne sélectionnée des tableaux
+   (charte §1) : une seule couleur de sélection dans tout Radinus. */
+/* Une feuille éteinte : le réglage existe, mais il demande une base ouverte —
+   la devise, quand les préférences sont ouvertes depuis la fenêtre des bases
+   (04/08/2026). Grise et non absente : un arbre qui perd une branche selon
+   d'où l'on vient se cherche. */
+.tree__leaf--off {
+  color: #9aa4ac;
+  cursor: default;
+}
+
+.tree__leaf--off:hover {
+  background-color: transparent;
+}
+
+.tree__leaf--chosen {
+  background-color: var(--radinus-row-selected-bg);
+  font-weight: 700;
+}
+
+.pane__title {
+  margin: 0 0 10px;
+  padding: 4px 8px;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: 700;
+  color: #1a2b3c;
+  background-color: var(--radinus-section-bg);
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.zoom__slider {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Le pourcentage en chiffres à côté du curseur : un curseur seul ne dit pas
+   où il en est, et « un peu plus gros » n'est pas une valeur qu'on retrouve. */
+.zoom__value {
+  min-width: 3.5em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.zoom__reset {
+  font: inherit;
+  padding: 2px 10px;
+  cursor: pointer;
+}
+
+.pane__hint {
+  margin: 12px 0 0;
+  color: #4a5a66;
+  font-style: italic;
+}
+
+/* La bande « Initialiser la base avec une sauvegarde » (04/08/2026) : le
+   bouton, et sous lui le nom du fichier choisi — ou la phrase qui dit qu'il
+   n'y en a pas. Une bande qui ne montrerait que son bouton laisserait croire
+   qu'un clic a suffi. */
+.database-form__restore {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px 0 2px;
+}
+
+.database-form__restore .pane__hint {
+  margin: 0;
+}
+
+/* The vertical slate strip of buttons, right of every window, ~110px wide
+   with 64px icon buttons stacked from the top and the exit "porte" alone at
+   the bottom (charter §3.2). */
+.panel {
+  grid-row: 1;
+  grid-column: 3;
+  width: 110px;
+  background-color: var(--radinus-panel-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  overflow: hidden;
+}
+
+/* Some forms also carry a decorative slate strip on the left with a large
+   theme image (charter §3.3). */
+.panel--left {
+  grid-column: 1;
+  justify-content: flex-start;
+  padding-top: 14px;
+}
+
+.panel__image {
+  width: 84px;
+  height: auto;
+}
+
+/* Pushes the exit button down to the bottom of the strip. */
+.panel__spacer {
+  flex: 1;
+}
+
+.panel__button {
+  width: 76px;
+  height: 76px;
+  padding: 6px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel__button img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* The original buttons sit on a faint raised plate. */
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+.panel__button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.panel__button:active:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.14);
+}
+
+.panel__button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* A hidden button must really disappear. `display: flex` above would
+   otherwise win over the browser's own rule for [hidden], and the button
+   would stay on screen — which is exactly what happened to the save button
+   in consultation mode (bug reported by Fabrice, 25/07/2026). */
+.panel__button[hidden] {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Bottom information bar: blue italic help, red for an alert.         */
+/* ------------------------------------------------------------------ */
+
+.info-bar {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  padding: 6px 12px;
+  font-style: italic;
+  font-size: 1.05em;
+  color: var(--radinus-info-bar-help-fg);
+  background-color: var(--radinus-window-bg);
+  border-top: 1px solid #c8c8c8;
+  min-height: 2em;
+}
+
+.info-bar--alert {
+  color: var(--radinus-info-bar-alert-fg);
+}
+
+/* ------------------------------------------------------------------ */
+/* List template (charter §3.2).                                       */
+/* ------------------------------------------------------------------ */
+
+.list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #b4b4b4;
+  background-color: var(--radinus-row-odd-bg);
+}
+
+.list__header {
+  display: grid;
+  align-items: center;
+  background-color: var(--radinus-table-header-bg);
+  color: var(--radinus-table-header-fg);
+  height: 30px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.list__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  height: 100%;
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.list__title:last-child {
+  border-right: none;
+}
+
+/* An amount column is read at its right edge, header included. */
+.list__title--numeric {
+  justify-content: flex-end;
+  padding-right: 4px;
+}
+
+/* The words of the header. The funnel sits beside them, not on top: a click
+   meant for the column must not land on the funnel. */
+.list__title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list__sort-marker {
+  margin-left: 6px;
+  min-width: 0.9em;
+  font-size: 0.85em;
+  opacity: 0.9;
+}
+
+.list__filter-toggle {
+  border: none;
+  background: transparent;
+  color: var(--radinus-table-header-fg);
+  cursor: pointer;
+  padding: 0 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.list__magnifier {
+  display: block;
+}
+
+.list__filter-toggle[aria-pressed="true"] {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* One search field per column, each nailed to its own column so that it
+   appears under the funnel that was clicked. The row itself takes no room
+   until one of them is opened. */
+.list__filter {
+  display: grid;
+  /* No gap and no side padding: the tracks must line up with the header's,
+     to the pixel, or the search field lands beside its column instead of
+     under it. */
+  gap: 0;
+  padding: 0;
+  height: 0;
+  overflow: hidden;
+  background-color: #e9eef2;
+  border-bottom: 0 solid #b4b4b4;
+}
+
+.list__filter--open {
+  padding: 4px 0;
+  height: auto;
+  overflow: visible;
+  border-bottom-width: 1px;
+}
+
+.list__filter[hidden] {
+  display: none;
+}
+
+.list__filter input {
+  width: calc(100% - 4px);
+  margin: 0 2px;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid #9aa8b2;
+  background-color: #ffffff;
+  font: inherit;
+}
+
+/* A funnel that was never opened takes no room in its column. */
+.list__filter-input[hidden] {
+  display: none;
+}
+
+.list__rows {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.list__row {
+  display: grid;
+  align-items: center;
+  /* **Every row has exactly this height, whatever is in it.** The table only
+     builds the rows on screen and works out the space above and below from
+     this number; a row that grows — the selected one, because its five
+     nomenclature combos are taller than text — makes that arithmetic false,
+     and the table then fights the scrollbar. The list wobbled and refused to
+     move as soon as a line was selected (reported by Fabrice, 25/07/2026). */
+  height: var(--radinus-row-height, 24px);
+  padding: 0;
+  cursor: default;
+  user-select: none;
+  overflow: hidden;
+}
+
+.list__cell {
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Amounts line up on their right edge, and a debit is red — the original's
+   own rule (03_CHARTE_GRAPHIQUE.md). */
+.list__cell--numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A closed account is still shown, but greyed: it is history, not a place to
+   put an operation. */
+.list__row--closed .list__cell {
+  color: #8a8a8a;
+  font-style: italic;
+}
+
+/* The TOTAL line of F07: not a record, a result. */
+.list__row--total .list__cell {
+  font-weight: 700;
+}
+
+.list__row:nth-child(odd) {
+  background-color: var(--radinus-row-odd-bg);
+}
+
+.list__row:nth-child(even) {
+  background-color: var(--radinus-row-even-bg);
+}
+
+.list__row[aria-selected="true"] {
+  background-color: var(--radinus-row-selected-bg);
+}
+
+.list__empty {
+  padding: 14px;
+  font-style: italic;
+  color: #555;
+}
+
+/* The question a list in choosing mode asks above its table (F06). */
+.window__question {
+  margin: 0 0 10px;
+  font-size: 1.25em;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.window__question[hidden] {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Form template (charter §3.3): labels left, fields right.            */
+/* ------------------------------------------------------------------ */
+
+.form {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  gap: 14px 18px;
+  padding: 22px 10px;
+  max-width: 640px;
+}
+
+.form__label {
+  justify-self: start;
+  color: #3a3a3a;
+}
+
+.form__label--readonly {
+  color: #9a9a9a;
+}
+
+/* A field the fiche does not have must really disappear, label included.
+   The grid above lays its children out one by one, so a hidden cell that
+   still takes part would shift everything after it. Only the category fiche
+   has a budget line; the six others show one field less. */
+.form__label[hidden],
+.form__field[hidden] {
+  display: none;
+}
+
+.form__field {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid #9aa8b2;
+  background-color: #ffffff;
+  font: inherit;
+}
+
+.form__field:focus {
+  outline: none;
+  border-color: #3a6ea5;
+  box-shadow: 0 0 0 1px #3a6ea5;
+}
+
+.form__field[readonly] {
+  background-color: #f7f7f7;
+  color: #6a6a6a;
+  text-align: right;
+  border-color: #cfcfcf;
+}
+
+.form__field:disabled {
+  background-color: #efefef;
+  color: #6a6a6a;
+}
+
+/* Combo: white field with the charter's blue-gray drop-down arrow. */
+select.form__field {
+  appearance: none;
+  padding-right: 34px;
+  background-image: linear-gradient(
+      var(--radinus-table-header-bg),
+      var(--radinus-table-header-bg)
+    ),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M0 0h12L6 8z' fill='white'/></svg>");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 0 center, right 7px center;
+  background-size: 28px 100%, 12px 8px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Oui/Non dialog (dialog.ts). Tauri's webview ignores window.confirm, */
+/* so the application asks its own questions, in the charter's colours. */
+/* ------------------------------------------------------------------ */
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.dialog {
+  background-color: var(--radinus-window-bg);
+  border: 1px solid #8f9ea8;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  max-width: 520px;
+  min-width: 320px;
+  padding: 0;
+}
+
+.dialog__question {
+  margin: 0;
+  padding: 20px 22px;
+  line-height: 1.45;
+}
+
+.dialog__buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 22px 18px;
+}
+
+.dialog__button {
+  min-width: 92px;
+  padding: 6px 14px;
+  border: 1px solid #8f9ea8;
+  background-color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dialog__button:hover {
+  background-color: #eef3f6;
+}
+
+.dialog__button--primary {
+  background-color: var(--radinus-table-header-bg);
+  border-color: var(--radinus-table-header-bg);
+  color: var(--radinus-table-header-fg);
+}
+
+.dialog__button--primary:hover {
+  filter: brightness(1.08);
+}
+
+.dialog__button:focus-visible {
+  outline: 2px solid #3a6ea5;
+  outline-offset: 1px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Fiche compte (F08): framed groups, RIB on one line, control bar.    */
+/* ------------------------------------------------------------------ */
+
+/* A fiche with five groups is taller than its window; it scrolls, and only
+   its content does — the side strips and the control bar stay put. */
+.window__content--scroll {
+  overflow-y: auto;
+  gap: 12px;
+}
+
+.group {
+  border: 1px solid #b9c2c9;
+  border-radius: 3px;
+  margin: 0;
+  padding: 4px 12px 12px;
+  min-width: 0;
+}
+
+.group > legend {
+  padding: 0 6px;
+  color: #4a5a66;
+}
+
+/* « Activité » and « Soldes » sit side by side at the foot of the fiche. */
+.group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.form--wide {
+  max-width: none;
+  padding: 12px 0;
+}
+
+/* The RIB is read left to right, as it is printed on a bank statement:
+   labels on one line, fields under them. */
+.rib {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.6fr 0.6fr 1.6fr;
+  gap: 6px 10px;
+  padding: 10px 0 0;
+}
+
+.rib__label {
+  color: #3a3a3a;
+}
+
+.iban {
+  display: grid;
+  gap: 4px;
+  padding: 14px 0 4px;
+  max-width: 520px;
+}
+
+.form__field--amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.form__check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #3a3a3a;
+}
+
+textarea.form__field {
+  resize: vertical;
+  font: inherit;
+}
+
+/* The blue control line of the fiche compte: bold, not italic — it states a
+   result rather than offering help. */
+.info-bar--control {
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------------ */
+/* F02 — the operations list: window menu, period, tree, totals.       */
+/* ------------------------------------------------------------------ */
+
+/* This window has two rows above its content: its own menu bar and the
+   period bounds. */
+.window--operations {
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.window--operations .window__content {
+  grid-row: 3;
+}
+
+.window--operations .panel {
+  grid-row: 1 / 4;
+}
+
+/* The information bar belongs at the **bottom**. Every other window has two
+   rows, so `grid-row: 2` is its last one; this window has four, and the bar
+   stayed on the second — a thick white band above the table, running over the
+   slate strip on the right (reported by Fabrice, 25/07/2026). */
+.window--operations .info-bar {
+  grid-row: 4;
+}
+
+/* F08 gagne une barre de menus (« Outils »), donc une rangée de plus que les
+   autres fiches : le menu tout en haut sur la largeur entière, les deux
+   bandes ardoise et le contenu dessous, la ligne bleue en bas. */
+.window--account {
+  grid-template-rows: auto 1fr auto;
+}
+
+.window--account .window-menu {
+  grid-row: 1;
+  grid-column: 1 / 4;
+}
+
+.window--account .window__content,
+.window--account .panel {
+  grid-row: 2;
+}
+
+.window--account .info-bar {
+  grid-row: 3;
+}
+
+.window-menu {
+  grid-row: 1;
+  grid-column: 1 / 3;
+  display: flex;
+  gap: 2px;
+  padding: 2px 6px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #c8c8c8;
+}
+
+.window-menu__entry {
+  border: none;
+  background: transparent;
+  font: inherit;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.window-menu__entry:hover {
+  background-color: #dde5ea;
+}
+
+.period {
+  grid-row: 2;
+  grid-column: 1 / 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+}
+
+.period input {
+  padding: 3px 6px;
+  border: 1px solid #9aa8b2;
+  font: inherit;
+}
+
+/* The « + » that unfolds an operation. Small, and its click never reaches the
+   row underneath: unfolding is not selecting. */
+.list__fold {
+  border: 1px solid #9aa8b2;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  width: 16px;
+  height: 16px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* A child is set in from its mother, so the tree can be read at a glance. */
+.list__cell--child {
+  border-left: 3px solid #b9c2c9;
+  margin-left: 12px;
+}
+
+.list__row--sub .list__cell {
+  color: #33424e;
+  font-style: italic;
+}
+
+/* A ventilation gets a pastel blue of its own, alternating on its own count:
+   the break with the account's operations must be seen at a glance (author's
+   request, 25/07/2026). Written with the container in front so it wins over
+   the plain odd/even of the table. */
+.list__rows .list__row--sub-even {
+  background-color: #e8f1fb;
+}
+
+.list__rows .list__row--sub-odd {
+  background-color: #d4e5f7;
+}
+
+/* The Complément is written by Radinus, not by the user. */
+.list__row--complement .list__cell {
+  color: #5b6b78;
+}
+
+.list__tick {
+  color: #2c6e2f;
+}
+
+/* Debits are red — the original's own rule (03_CHARTE_GRAPHIQUE.md). */
+.list__cell--numeric:nth-child(11) {
+  color: var(--radinus-info-bar-alert-fg, #b00020);
+}
+
+/* The two lines of totals under the table. */
+.totals {
+  display: grid;
+  grid-template-columns: repeat(6, max-content);
+  gap: 4px 14px;
+  padding: 8px 4px 2px;
+  font-weight: 700;
+}
+
+.totals__value {
+  font-variant-numeric: tabular-nums;
+}
+
+.totals__value--debit {
+  color: var(--radinus-info-bar-alert-fg, #b00020);
+}
+
+/* A nomenclature is picked, never typed: on the selected row, the five
+   nomenclature columns become drop-down lists (author's ruling, 25/07/2026). */
+.list__combo {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.95em;
+  padding: 0 2px;
+  border: 1px solid #9aa8b2;
+  background-color: #ffffff;
+  /* It must fit inside the row rather than push it open — see .list__row. */
+  height: calc(var(--radinus-row-height, 24px) - 4px);
+  line-height: 1;
+}
+
+/* The handle between two columns. Thin, on the right edge of each header
+   cell; dragging it widens the column, double-clicking puts back its own
+   width (author's request, 25/07/2026). */
+.list__resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.list__resizer:hover {
+  background-color: rgba(255, 255, 255, 0.45);
+}
+
+.list__title {
+  position: relative;
+  padding-right: 6px;
+}
+
+/* While a column is being dragged, nothing else on screen may be selected or
+   change the cursor under the hand. */
+body.resizing-column {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* The Période menu drops its choices under itself. */
+.window-menu__holder {
+  position: relative;
+}
+
+.window-menu__choices {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  background-color: #ffffff;
+  border: 1px solid #b4b4b4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.window-menu__choices[hidden] {
+  display: none;
+}
+
+.window-menu__choice {
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.window-menu__choice:hover {
+  background-color: #dde5ea;
+}
+
+/* The tick in front of the chosen entry. The slot is always there, so the
+   labels line up whether they are ticked or not. */
+.window-menu__choice::before {
+  content: "";
+  display: inline-block;
+  width: 1.2em;
+  text-transform: none;
+}
+
+.window-menu__choice--chosen::before {
+  content: "✓";
+}
+
+/* The Période menu: nine choices under the entry, and a sub-menu of the twelve
+   months beside the two that open a year (Fabrice, 25/07/2026). */
+.window-menu__holder {
+  position: relative;
+}
+
+.window-menu__choices {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  background-color: #ffffff;
+  border: 1px solid #b4b4b4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.window-menu__choices[hidden] {
+  display: none;
+}
+
+.window-menu__choice {
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  padding: 6px 14px 6px 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  /* The month names come from the same dictionary as the Mois column, which
+     writes them in lower case; a menu entry wants a capital. */
+  text-transform: capitalize;
+}
+
+/* A whole sentence, on the other hand, is written as Fluent wrote it: the
+   Filtre menu says « Uniquement les opérations pointées », not
+   « Uniquement Les Opérations Pointées ». */
+.window-menu__choice--plain {
+  text-transform: none;
+}
+
+.window-menu__choice:hover {
+  background-color: #dde5ea;
+}
+
+/* The tick in front of the chosen entry. The slot is always there, so the
+   labels line up whether they are ticked or not. */
+.window-menu__choice::before {
+  content: "";
+  display: inline-block;
+  width: 1.2em;
+  text-transform: none;
+}
+
+.window-menu__choice--chosen::before {
+  content: "✓";
+}
+
+/* An entry that opens a year shows it, and its months appear beside it. */
+.window-menu__choice--parent::after {
+  content: "▸";
+  float: right;
+  margin-left: 12px;
+  opacity: 0.6;
+}
+
+.window-menu__nest {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.window-menu__submenu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  min-width: 170px;
+  background-color: #ffffff;
+  border: 1px solid #b4b4b4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  flex-direction: column;
+}
+
+.window-menu__nest:hover .window-menu__submenu,
+.window-menu__nest:focus-within .window-menu__submenu,
+.window-menu__nest--open .window-menu__submenu {
+  display: flex;
+}
+
+/* ------------------------------------------------------------------ */
+/* F03 — the fiche opération: menu bar, banded sections, cheque zone.  */
+/* ------------------------------------------------------------------ */
+
+/* Its own menu bar above the fields, and the attachment count below them. */
+/* La fenêtre des bases, depuis qu'elle porte un menu (04/08/2026) : trois
+   rangées au lieu de deux — la barre, le contenu, l'état — et le panneau de
+   boutons qui les traverse. La grille par défaut n'en a que deux, et la barre
+   se serait posée SUR la liste. Mêmes règles que la fiche opération, qui a
+   exactement la même forme. */
+.window--databases {
+  grid-template-rows: auto 1fr auto;
+}
+
+.window--databases .window__content {
+  grid-row: 2;
+}
+
+.window--databases .panel {
+  grid-row: 1 / 3;
+}
+
+.window--databases .info-bar {
+  grid-row: 3;
+}
+
+.window--operation {
+  grid-template-rows: auto 1fr auto;
+}
+
+.window--operation .window__content {
+  grid-row: 2;
+}
+
+.window--operation .panel {
+  grid-row: 1 / 3;
+}
+
+.window--operation .info-bar {
+  grid-row: 3;
+}
+
+/* The original separates the sections of a fiche with a full-width grey
+   strip carrying the title in bold italic — not with a framed group
+   (charter §1, `--radinus-section-bg`, and the capture « Fiche operation
+   transaction.png »). */
+.band {
+  margin: 0;
+}
+
+.band__title {
+  margin: 0;
+  padding: 3px 10px;
+  background-color: var(--radinus-section-bg);
+  font-size: inherit;
+  font-weight: 700;
+  font-style: italic;
+  color: #2a2a2a;
+}
+
+/* Every section of this fiche is a grid of its own, so the label column is
+   fixed rather than measured: without it each section sizes its own labels
+   and the fields no longer line up from one section to the next — which is
+   not what the original does, where every field starts at the same place. */
+.window--operation .form {
+  grid-template-columns: 220px 1fr;
+}
+
+/* A field that holds a date, an amount or a choice is no wider than what it
+   holds: the original gives the two text lines the whole width and keeps
+   everything else short. */
+.form__field--medium {
+  max-width: 300px;
+}
+
+/* « Chèque en relation avec l'opération »: the number on the left, read-only,
+   and the three rectangular buttons stacked on its right — one of the very
+   few places in Radinus where a button carries a word rather than an icon
+   (04_SPECIFICATIONS_FENETRES.md, "Exceptions aux boutons-icônes"). */
+.check {
+  display: grid;
+  grid-template-columns: 220px 1fr max-content;
+  gap: 14px 18px;
+  align-items: start;
+  padding: 12px 0;
+}
+
+/* The cheque number is read, not typed — but it is read from the left, like
+   a number on a cheque, not pushed to the right like an amount. */
+#check.form__field[readonly] {
+  text-align: left;
+}
+
+.check__buttons {
+  display: grid;
+  gap: 6px;
+  width: 140px;
+}
+
+.text-button {
+  padding: 4px 10px;
+  border: 1px solid #4f6675;
+  background-color: var(--radinus-panel-bg);
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.text-button:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.text-button:disabled {
+  background-color: #b3bcc3;
+  border-color: #a0a8ae;
+  cursor: default;
+}
+
+/* The single entry of this window's menu bar does nothing: it names the page
+   one is on, as the original's does. It must not look clickable. */
+.window-menu__entry--inert {
+  cursor: default;
+}
+
+/* Une entrée de menu éteinte : Options tant que la fiche n'a pas d'opération
+   enregistrée (04/08/2026). **`:disabled` et non une classe** — la règle ne
+   peut alors atteindre que des boutons, et l'entrée « Identification » de F03,
+   qui est un `span`, garde exactement l'aspect validé le 26/07/2026. Éteinte
+   et non cachée : une entrée qui va et vient ferait douter de ce que la
+   fenêtre sait faire. */
+.window-menu__entry:disabled {
+  color: #8a949c;
+  cursor: default;
+}
+
+.window-menu__entry:disabled:hover {
+  background-color: transparent;
+}
+
+.window-menu__entry--inert:hover {
+  background-color: transparent;
+}
+
+/* Two things in the status line, each at its own end. */
+.info-bar--split {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Le champ de la seconde confirmation : on y tape le mot en toutes lettres.
+   Large et centré — c'est le geste qui compte, il doit se voir. */
+.dialog__field {
+  width: 100%;
+  margin: 14px 0 4px;
+  padding: 6px 8px;
+  border: 1px solid #9aa8b2;
+  background-color: #ffffff;
+  font: inherit;
+  font-size: 15px;
+  text-align: center;
+}
+
+.dialog__field:focus {
+  outline: none;
+  border-color: #3a6ea5;
+  box-shadow: 0 0 0 1px #3a6ea5;
+}
+
+/* ------------------------------------------------------------------ */
+/* F20 — la statistique : interrupteurs, matrice, splitter, détail.    */
+/* ------------------------------------------------------------------ */
+
+/* Quatre bandes : le menu, les interrupteurs, le contenu, la barre d'info —
+   le panneau bleu les longeant toutes. La barre de menus est arrivée le
+   26/07/2026 avec l'export de toutes les années. */
+.window--statistics {
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.window--statistics .window-menu {
+  grid-row: 1;
+}
+
+.window--statistics .switches {
+  grid-row: 2;
+}
+
+.window--statistics .window__content {
+  grid-row: 3;
+}
+
+.window--statistics .panel {
+  grid-row: 1 / 4;
+}
+
+.window--statistics .info-bar {
+  grid-row: 4;
+}
+
+/* La zone haute et la zone basse se partagent la hauteur, et le splitter
+   déplace leur frontière. */
+.window__content--split {
+  padding: 0;
+  gap: 0;
+}
+
+.matrix {
+  flex: 1 1 68%;
+  min-height: 120px;
+  overflow: auto;
+  background-color: #ffffff;
+}
+
+.list--detail {
+  flex: 1 1 32%;
+  min-height: 80px;
+}
+
+.splitter {
+  height: 6px;
+  flex: 0 0 6px;
+  background-color: #c8c8c8;
+  border-top: 1px solid #b0b0b0;
+  border-bottom: 1px solid #b0b0b0;
+  cursor: row-resize;
+}
+
+.splitter:hover {
+  background-color: var(--radinus-table-header-bg);
+}
+
+/* Pendant le glissement, rien ne doit se sélectionner sous le curseur. */
+body.splitting {
+  user-select: none;
+  cursor: row-resize;
+}
+
+/* Le bandeau des cinq interrupteurs. Le libellé bascule ON/OFF : c'est
+   l'interrupteur qui dit où il est. */
+.switches {
+  grid-row: 1;
+  grid-column: 1 / 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #c8c8c8;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: none;
+  background: none;
+  padding: 2px 4px;
+  font: inherit;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.switch__knob {
+  position: relative;
+  width: 42px;
+  height: 21px;
+  border-radius: 11px;
+  background-color: #d6d6d6;
+  border: 1px solid #b4b4b4;
+  transition: background-color 120ms;
+}
+
+.switch__knob::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background-color: var(--radinus-panel-bg);
+  transition: transform 120ms;
+}
+
+.switch[aria-pressed="true"] .switch__knob {
+  background-color: #b9c9d4;
+}
+
+.switch[aria-pressed="true"] .switch__knob::after {
+  transform: translateX(21px);
+}
+
+.switch[aria-pressed="false"] .switch__label {
+  color: #7a7a7a;
+}
+
+/* La matrice : l'axe, douze mois, le total. Une grille et non un tableau —
+   la sélection porte sur une **case**, pas sur une ligne. */
+/* La grille prend la largeur qu'on lui donne et partage le reste entre les
+   douze mois. Elle ne s'élargit au-delà que si les colonnes ne tiennent plus
+   dans leur minimum — c'est alors elle qui défile, pas la fenêtre. */
+.matrix__grid {
+  display: grid;
+  min-width: 100%;
+}
+
+.matrix__row {
+  display: grid;
+  grid-template-columns: minmax(150px, 232px) repeat(12, minmax(76px, 1fr)) minmax(104px, 1.2fr);
+}
+
+/* Les lignes alternent blanc et gris sur **toute** leur largeur, comme dans
+   l'original — c'est ce qui permet de suivre une ligne du regard sur treize
+   colonnes. La couleur est portée par la ligne et les cases sont
+   transparentes, sinon les quatre couleurs de l'auteur perdraient contre le
+   zébrage une fois sur deux. */
+.matrix__row:nth-child(even) {
+  background-color: var(--radinus-row-even-bg);
+}
+
+.matrix__row:nth-child(odd) {
+  background-color: var(--radinus-row-odd-bg);
+}
+
+.matrix__row--head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.matrix__title {
+  padding: 5px 8px;
+  background-color: var(--radinus-table-header-bg);
+  color: var(--radinus-table-header-fg);
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+  white-space: nowrap;
+}
+
+.matrix__title:first-child {
+  text-align: center;
+}
+
+.matrix__label {
+  padding: 3px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.matrix__cell {
+  padding: 3px 8px;
+  background-color: transparent;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  border-right: 1px solid #ececec;
+  border-bottom: 1px solid #f2f2f2;
+  white-space: nowrap;
+}
+
+/* Les trois couleurs de l'auteur (charte §1) : positive, négative, et celle
+   qui s'annule — verte, et généralement vide de tout montant. */
+.matrix__cell--positive {
+  background-color: var(--radinus-cell-positive-bg);
+}
+
+.matrix__cell--negative {
+  background-color: var(--radinus-cell-negative-bg);
+}
+
+.matrix__cell--cancelling {
+  background-color: var(--radinus-cell-cancelling-bg);
+}
+
+.matrix__cell--chosen {
+  outline: 2px solid var(--radinus-row-selected-bg);
+  outline-offset: -2px;
+  font-weight: 700;
+}
+
+.matrix__cell[tabindex] {
+  cursor: pointer;
+}
+
+.matrix__cell--total {
+  border-left: 1px solid #d0d0d0;
+}
+
+/* Les deux lignes de synthèse, dans les couleurs mesurées sur l'original. */
+/* Les deux lignes de synthèse restent visibles quand on descend dans une
+   longue matrice : elles sont ce qu'on vient y chercher. */
+.matrix__row--sum,
+.matrix__row--cumulative {
+  position: sticky;
+  background-color: #ffffff;
+  z-index: 1;
+}
+
+.matrix__row--sum {
+  bottom: 22px;
+  box-shadow: 0 -1px 0 #c8c8c8;
+}
+
+.matrix__row--cumulative {
+  bottom: 0;
+}
+
+.matrix__row--sum .matrix__cell,
+.matrix__row--cumulative .matrix__cell {
+  font-weight: 700;
+}
+
+/* Le libellé de chaque ligne de synthèse porte sa couleur mesurée sur
+   l'original ; les chiffres, eux, prennent celle de leur signe. */
+.matrix__row--sum .matrix__label {
+  font-weight: 700;
+  color: var(--radinus-total-somme-fg);
+}
+
+.matrix__row--cumulative .matrix__label {
+  font-weight: 700;
+  color: var(--radinus-total-cumul-fg);
+}
+
+.matrix__cell--up {
+  color: var(--radinus-total-somme-fg);
+}
+
+.matrix__cell--down {
+  color: var(--radinus-total-cumul-fg);
+}
+
+/* Le millésime géant du panneau, et ses deux horloges. */
+.panel--statistics {
+  align-items: center;
+}
+
+/* Le millésime se clique : on y saisit l'année voulue. */
+.panel__year {
+  display: block;
+  width: 100%;
+  padding: 10px 0 4px;
+  border: none;
+  background: none;
+  text-align: center;
+  font-family: inherit;
+  font-size: 30px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.panel__year:hover {
+  text-decoration: underline;
+}
+
+.panel__year:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -2px;
+}
+
+/* Un débit se lit en rouge dans le détail, comme dans F02. */
+.list__row--debit .list__cell:nth-last-child(2) {
+  color: var(--radinus-negative-amount-fg);
+}
+
+/* Le menu du clic droit d'un tableau : deux entrées, à l'endroit du clic. */
+.context-menu {
+  position: fixed;
+  z-index: 40;
+  min-width: 210px;
+  padding: 3px 0;
+  background-color: #ffffff;
+  border: 1px solid #b9c2c9;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+}
+
+.context-menu__entry {
+  display: block;
+  width: 100%;
+  padding: 6px 14px;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: #1a1a1a;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.context-menu__entry:hover {
+  background-color: var(--radinus-table-header-bg);
+  color: var(--radinus-table-header-fg);
+}
+
+/* Le trait qui sépare les formats de tableur des formats d'échange : les
+   trois premiers s'ouvrent dans Excel ou LibreOffice, les deux derniers se
+   relisent par un programme. */
+.context-menu__rule {
+  margin: 3px 0;
+  border: none;
+  border-top: 1px solid #d6dce1;
+}
+
+/* --- F19, le tableau de bord ------------------------------------------
+   Quatre bandes : le menu, la période et ses interrupteurs, les cartes, la
+   barre d'info — le panneau bleu les longeant toutes. */
+.window--dashboard {
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.window--dashboard .window-menu {
+  grid-row: 1;
+}
+
+.dashboard-bar {
+  grid-row: 2;
+  grid-column: 1 / 3;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #c8c8c8;
+}
+
+.dashboard-bar__dates {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.dashboard-bar__dates input {
+  padding: 3px 6px;
+  border: 1px solid #9aa8b2;
+  font: inherit;
+}
+
+.switches--inline {
+  grid-row: auto;
+  grid-column: auto;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.window--dashboard .window__content {
+  grid-row: 3;
+}
+
+.window--dashboard .panel {
+  grid-row: 1 / 4;
+}
+
+.window--dashboard .info-bar {
+  grid-row: 4;
+}
+
+/* Les cinq cartes : deux par rangée, la balance en pleine largeur. */
+/* Les cinq cartes remplissent la fenêtre : deux rangées d'égale hauteur pour
+   les anneaux et les tuiles, la balance en pleine largeur sous elles. */
+.window__content--cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(320px, 1fr) minmax(140px, auto) minmax(140px, auto);
+  gap: 10px;
+  padding: 10px;
+  overflow: auto;
+}
+
+.panel--dashboard {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- F25, l'évolution du solde ----------------------------------------
+   La structure est celle de l'original ; le graphique, lui, a été refait —
+   Fabrice a rendu la main dessus le 26/07/2026. Grille en retrait, traits
+   fins, pas de filigrane derrière les courbes. */
+.window--curves {
+  grid-template-rows: auto 1fr auto;
+}
+
+.window--curves .window-menu {
+  grid-row: 1;
+}
+
+.window--curves .window__content {
+  grid-row: 2;
+}
+
+.window--curves .panel {
+  grid-row: 1 / 3;
+}
+
+.window--curves .info-bar {
+  grid-row: 3;
+}
+
+.window__content--chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  min-height: 0;
+}
+
+.chart__heading {
+  margin: 0;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 400;
+  color: #1f3550;
+}
+
+.chart__legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 6px 12px;
+  border: 1px solid #d8dee3;
+  background-color: #ffffff;
+}
+
+.chart__legend-entry {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #1f3550;
+}
+
+.chart__legend-dash {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.chart__legend-dash--total {
+  height: 4px;
+}
+
+/* Les deux dates : de l'affichage seul (règle de Fabrice), jamais une saisie. */
+.chart__period {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  color: #4a7a99;
+}
+
+.chart__plot {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background-color: #ffffff;
+  border: 1px solid #d8dee3;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.chart__grid {
+  stroke: #e6ebef;
+  stroke-width: 1;
+}
+
+/* Le zéro se distingue des autres graduations : c'est la seule qui veut dire
+   quelque chose par elle-même sur un solde. */
+.chart__zero {
+  stroke: #b9c6d0;
+  stroke-width: 1.5;
+}
+
+.chart__tick {
+  font-size: 12px;
+  fill: #6b7a88;
+  text-anchor: end;
+}
+
+.chart__crosshair {
+  stroke: #8fa3b4;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
+.chart__empty {
+  padding: 24px;
+  color: #6b7a88;
+  font-style: italic;
+}
+
+/* L'infobulle suit le curseur : nom du compte, date, solde, et le total des
+   comptes choisis — sauf sur la courbe du total, où il ferait doublon. */
+.chart__bubble {
+  position: absolute;
+  z-index: 20;
+  padding: 7px 10px;
+  background-color: #ffffff;
+  border: 1px solid #b9c6d0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 13px;
+  color: #1f3550;
+  line-height: 1.45;
+}
+
+.chart__bubble[hidden] {
+  display: none;
+}
+
+.chart__bubble-swatch {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 6px;
+  vertical-align: baseline;
+}
+
+.panel--curves {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart__tick--time {
+  text-anchor: middle;
+}
+
+.chart__axis-name {
+  font-size: 13px;
+  fill: #6b7a88;
+  text-anchor: middle;
+}
+
+/* --- F05 — Classification rapide des opérations ------------------------
+   Cinq rangées : le menu, les deux bandeaux gris, le tableau, la barre
+   d'état ; le panneau bleu les traverse toutes. Le tableau prend ce qui
+   reste, et c'est voulu — toute la fenêtre existe pour qu'on en voie
+   beaucoup de lignes à la fois. */
+.window--quick {
+  grid-template-rows: auto auto auto 1fr auto;
+}
+
+.window--quick .window__content {
+  grid-row: 4;
+}
+
+.window--quick .panel {
+  grid-row: 1 / 6;
+}
+
+.window--quick .info-bar {
+  grid-row: 5;
+}
+
+/* Un bandeau gris de l'original : un titre en italique sur fond gris, et sa
+   ligne de champs en dessous.
+
+   **Ces règles sont réservées à F05**, et c'est une correction : écrites sans
+   portée, elles écrasaient le `.band` de la fiche opération et de la fiche
+   sous-opération, qui s'en servent depuis la phase 5. Deux fenêtres qui
+   partagent un nom de classe ne partagent pas forcément une mise en page. */
+.window--quick .band {
+  grid-column: 1 / 3;
+  padding: 0 10px 6px;
+}
+
+.window--quick .band__title {
+  margin: 0 0 6px;
+  padding: 3px 8px;
+  background-color: #dcdcdc;
+  border: 1px solid #c0c0c0;
+  font-size: var(--radinus-font-size-base);
+  font-style: italic;
+  font-weight: 700;
+}
+
+.window--quick .band__line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.window--quick .band__line input {
+  padding: 3px 6px;
+  border: 1px solid #9aa8b2;
+  font: inherit;
+}
+
+/* Les six paires case + menu, sur deux colonnes. Chaque paire garde sa place
+   quand elle est grisée : rien ne bouge quand on coche. */
+/* **Elles se rangent en colonnes, pas en lignes.** L'original met Categorie,
+   Affectation et Mode l'une sous l'autre à gauche, Tiers, Projet et Status à
+   droite ; une grille remplie ligne par ligne donnait Categorie-Affectation
+   puis Mode-Tiers, c'est-à-dire le bon nombre de cases dans le mauvais
+   ordre. */
+.characteristics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column;
+  gap: 4px 40px;
+  padding: 0 4px;
+}
+
+.characteristic {
+  display: grid;
+  grid-template-columns: 18px 130px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.characteristic__box {
+  margin: 0;
+}
+
+/* Décochée, la caractéristique est éteinte — étiquette pâle et menu inerte,
+   exactement comme dans la capture. Elle dit ainsi d'elle-même qu'on ne lui a
+   rien demandé. */
+.characteristic__label {
+  color: #808080;
+}
+
+.characteristic--armed .characteristic__label {
+  color: var(--radinus-text-fg, #000000);
+  font-weight: 600;
+}
+
+.characteristic__menu {
+  font: inherit;
+  padding: 2px 4px;
+  border: 1px solid #9aa8b2;
+  background-color: #ffffff;
+  min-width: 0;
+}
+
+.characteristic__menu:disabled {
+  color: #909090;
+  background-color: #f2f2f2;
+}
+
+/* --- F17 — Importation de relevés de comptes bancaires -----------------
+   Le menu, le tableau, et le pied des trois montants ; le panneau bleu les
+   traverse. */
+.window--statement {
+  grid-template-rows: auto 1fr auto;
+}
+
+.window--statement .window__content {
+  grid-row: 2;
+}
+
+.window--statement .panel {
+  grid-row: 1 / 4;
+}
+
+.window--statement .info-bar {
+  grid-row: 3;
+}
+
+/* Les trois montants du pied : Compte, Fichier, Ecart. */
+.totals--statement {
+  grid-template-columns: repeat(3, auto 1fr);
+  justify-content: start;
+  gap: 8px 14px;
+}
+
+/* **Les quatre états de l'original.** La couleur porte le **sens** —
+   RougeFoncé pour un débit, BleuFoncé pour un crédit — et le pastel avec
+   l'italique portent le **soupçon de doublon** (`Existe_TransacMemeType`). Une
+   ligne rapprochée pendant la séance passe au GrisClair : elle est faite, et
+   son sens n'a plus d'importance. */
+.list__row--debit .list__cell {
+  color: #9e2a2b;
+}
+
+.list__row--credit .list__cell {
+  color: #1c4e80;
+}
+
+.list__row--debit.list__row--alike .list__cell {
+  color: #d08a92;
+  font-style: italic;
+}
+
+.list__row--credit.list__row--alike .list__cell {
+  color: #8fa9c4;
+  font-style: italic;
+}
+
+.list__row--done .list__cell {
+  color: #9a9a9a;
+  font-style: normal;
+}
+
+/* Un format sans identifiant — le CSV — n'a pas de colonne FITID à montrer :
+   elle serait vide sur toutes les lignes, et une colonne toujours vide est une
+   colonne qui ment. */
+.window--no-fitid .list__header > .list__title:nth-child(3),
+.window--no-fitid .list__row > .list__cell:nth-child(3) {
+  visibility: hidden;
+}
+
+/* La case à cocher d'une colonne de constat — Rapproché, FITID. Elle se lit,
+   elle ne se clique pas. */
+.list__box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border: 1px solid #8a99a4;
+  background-color: #ffffff;
+  font-size: 0.85em;
+  line-height: 1;
+  color: #2a2a2a;
+}
+
+.list__cell:has(> .list__box) {
+  display: flex;
+  justify-content: center;
+}
+
+/* Un écart non nul est une information, pas une décoration. */
+.totals__value--alert {
+  color: var(--radinus-info-bar-alert-fg);
+  font-weight: 700;
+}
+
+/* --- F18 — Rapprocher une transaction ---------------------------------- */
+.window--statement-form .window__content {
+  grid-row: 1;
+}
+
+/* Le champ de choix des dialogues — le compte à importer quand le fichier en
+   porte plusieurs. */
+.dialog__field {
+  font: inherit;
+  padding: 5px 6px;
+  border: 1px solid #9aa8b2;
+  background-color: #ffffff;
+  width: 100%;
+}
+
+/* --- La fenêtre de découpage d'un relevé CSV ---------------------------
+   Trois temps empilés : l'aperçu du fichier, les réglages, l'extraction. Les
+   deux tableaux ont une hauteur fixe et se parcourent séparément — c'est en
+   allant de l'un à l'autre qu'on règle. */
+.window--csv .window__content {
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.window--csv .band__title {
+  margin: 0;
+  padding: 4px 10px;
+  background-color: transparent;
+  color: #1c3f5a;
+  font-size: 1.05em;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.list--csv-source {
+  height: 220px;
+  flex: none;
+}
+
+.list--csv-result {
+  height: 300px;
+  flex: none;
+}
+
+/* Les six réglages, sur deux colonnes comme l'original. */
+.csv-settings {
+  display: grid;
+  grid-template-columns: auto 90px auto minmax(90px, 260px);
+  align-items: center;
+  gap: 8px 16px;
+  padding: 0 10px;
+}
+
+.csv-settings__label {
+  justify-self: start;
+}
+
+.csv-settings__field {
+  font: inherit;
+  padding: 3px 6px;
+  border: 1px solid #9aa8b2;
+  background-color: #ffffff;
+  text-align: right;
+}
+
+.csv-settings__field--wide {
+  text-align: left;
+  width: 100%;
+}
+
+.csv-extraction-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.band__title--flush {
+  padding-left: 10px;
+}
+
+.csv-test {
+  font: inherit;
+  padding: 5px 14px;
+  border: 1px solid #7f8f9b;
+  background-color: #eef2f5;
+  cursor: pointer;
+}
+
+.csv-test:hover {
+  background-color: #dde5ea;
+}
+
+/* Une ligne que le découpage ne rendra pas importable : elle est montrée —
+   c'est ainsi qu'on voit son erreur — mais elle se distingue au premier coup
+   d'œil de ce qui entrera vraiment. */
+.list__row--dropped .list__cell {
+  color: #9a9a9a;
+  font-style: italic;
+}
+
+/* ------------------------------------------------------------------ */
+/* Phase 9 — chéquiers et chèques.                                     */
+/* ------------------------------------------------------------------ */
+
+/* Les cinq champs que la fiche chéquier fige dès que le carnet existe
+   (`GR_InterditModif..Grisé = Vrai`). Grisés comme un champ en lecture seule,
+   mais **sans son alignement à droite** : une référence est un texte, et
+   « 07328 » se lit à gauche, comme sur la capture « Parametres chequiers
+   verouillés.png ». */
+.form__field.form__field--locked {
+  background-color: #f7f7f7;
+  color: #6a6a6a;
+  border-color: #cfcfcf;
+}
+
+input[type="text"].form__field--locked {
+  text-align: left;
+}
+
+/* Une opération qui porte déjà un chèque, dans la fenêtre d'association.
+   C'est le `..PoliceGras = Vrai` de son `TableData_SyncFichier`, et c'est le
+   **seul** avertissement avant l'écrasement : la ligne reste choisissable. */
+.list__row--taken {
+  font-weight: 700;
+}
+
+/* Le menu « Filtre » de la fenêtre d'association : présent, nommé, inactif.
+   Il ne se déguise pas en menu vivant — désactivé, il se voit comme tel. */
+.window-menu__entry:disabled {
+  color: #8a8a8a;
+  cursor: default;
+}
+
+/* ------------------------------------------------------------------ */
+/* Phase 11 — le budget.                                               */
+/* ------------------------------------------------------------------ */
+
+/* La fenêtre du budget porte, comme les statistiques, une barre de menus
+   au-dessus du tableau — mais elle n'a pas de bandeau d'interrupteurs. Trois
+   rangées suffisent. */
+.window--budget {
+  grid-template-rows: auto 1fr auto;
+}
+
+.window--budget .switches {
+  grid-row: 1;
+  grid-column: 1 / 3;
+}
+
+/* Un bandeau caché doit vraiment disparaître : `display: flex` gagnerait
+   sinon sur la règle du navigateur pour [hidden], et le bandeau vide
+   recouvrirait la première rangée — c'est ce qui a masqué la barre de menus
+   du budget le 29/07/2026. */
+.switches[hidden] {
+  display: none;
+}
+
+.window--budget .window__content {
+  grid-row: 2;
+}
+
+.window--budget .panel {
+  grid-row: 1 / 3;
+}
+
+.window--budget .info-bar {
+  grid-row: 3;
+}
+
+/* Une case de saisie du budget : le champ occupe toute la case et se lit
+   comme le reste de la matrice, aligné à droite comme un montant. */
+.matrix__input {
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  font: inherit;
+  text-align: right;
+  padding: 1px 2px;
+}
+
+.matrix__input:focus {
+  outline: none;
+  border-color: #3a6ea5;
+  background-color: #ffffff;
+}
+
+/* Les deux couleurs du contrôle, et **elles ne dépendent pas du mode
+   d'affichage** : à 80 % une dépense est tenue et un revenu manque, seul le
+   nombre affiché change. C'est le noyau qui tranche (`budget::standing`), pas
+   la fenêtre — vert quand on fait au moins aussi bien que prévu, rouge quand
+   on fait moins bien (règle de Fabrice, 29/07/2026). */
+.matrix__cell--kept {
+  color: #1a6b2a;
+}
+
+.matrix__cell--overrun {
+  color: #b31414;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* Phase 12 — le transfert entre deux comptes.                         */
+/* ------------------------------------------------------------------ */
+
+/* Le montant du virement est écrit en très gros, comme sur sa capture : c'est
+   le seul chiffre de l'écran, et c'est lui qu'on relit avant de valider. */
+.form--giant .form__label {
+  font-size: 2.1em;
+  align-self: center;
+}
+
+.form__field--giant {
+  font-size: 2.1em;
+  text-align: right;
+  padding: 4px 10px;
+}
+
+/* ---------------------------------------------------------------------------
+   Phase 13 — les trois fenêtres de l'importation d'une feuille Excel.
+
+   Elles reprennent le vocabulaire visuel déjà en place — bandeaux gris,
+   panneau de droite, barre d'information — et n'ajoutent que ce que l'original
+   montre en propre : les groupes numérotés de l'étape 1, ses deux onglets de
+   l'étape 2, et le bouton rectangulaire gris-bleu qu'il utilise pour les
+   actions qui ne sont pas des icônes (03_CHARTE_GRAPHIQUE.md, `#6F95AE`).
+   --------------------------------------------------------------------------- */
+
+.window--excel .band {
+  margin-bottom: 8px;
+}
+
+.window--excel .band__title {
+  margin-bottom: 6px;
+}
+
+.excel-file {
+  padding: 0 10px 6px;
+}
+
+.excel-path {
+  margin: 6px 0;
+  font-style: italic;
+  color: #3a3a3a;
+  min-height: 1.2em;
+}
+
+.excel-settings {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 6px 14px;
+  align-items: center;
+  padding: 0 10px 6px;
+}
+
+.excel-settings__label {
+  justify-self: start;
+}
+
+.excel-settings__field {
+  font: inherit;
+  padding: 3px 6px;
+  border: 1px solid #9aa7b1;
+  background-color: #ffffff;
+  width: 140px;
+  text-align: right;
+}
+
+.excel-settings__field--wide {
+  width: 280px;
+  text-align: left;
+}
+
+.excel-choice {
+  padding: 0 10px 6px;
+}
+
+.excel-choice__line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 3px 0;
+}
+
+.excel-choice__text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.excel-note {
+  margin: 4px 0;
+  font-style: italic;
+  color: #3a3a3a;
+}
+
+/* Un groupe éteint faute de colonne mise en concordance : son code refuse de
+   s'appliquer (`SI nNumCol < 1 ALORS RETOUR`), la fenêtre le montre. */
+.excel-group {
+  border: 1px solid #b6c2cb;
+  margin: 0 10px 12px;
+  padding: 6px 12px 10px;
+}
+
+.excel-group[disabled] {
+  opacity: 0.55;
+}
+
+.excel-group legend {
+  font-weight: 700;
+  font-style: italic;
+  color: #2a2a2a;
+  padding: 0 6px;
+}
+
+.excel-destination {
+  margin-left: auto;
+  min-width: 200px;
+}
+
+.excel-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 6px 10px 0;
+}
+
+.excel-tab {
+  font: inherit;
+  padding: 5px 16px;
+  border: 1px solid #7f8f9b;
+  border-bottom: none;
+  background-color: #dfe6ea;
+  cursor: pointer;
+}
+
+.excel-tab[aria-pressed="true"] {
+  background-color: #6f95ae;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.excel-tab[hidden] {
+  display: none;
+}
+
+.excel-page {
+  border-top: 1px solid #7f8f9b;
+  padding: 8px 10px 0;
+}
+
+.excel-page[hidden] {
+  display: none;
+}
+
+.list--excel {
+  min-height: 260px;
+}
+
+/* Le trait qui sépare les groupes d'un menu de fenêtre — les quatre familles
+   du menu Export de F02 (capture de Fabrice, 30/07/2026) : la bureautique,
+   les tableurs en texte, les formats bancaires, les formats d'échange. */
+.window-menu__rule {
+  border: none;
+  border-top: 1px solid #c9d2d8;
+  margin: 3px 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Phase 16 — la fiche de règle périodique. Deux dispositions propres : le
+   couple fréquence + unité sur une seule ligne, et les trois conditions de fin
+   avec leurs deux champs conditionnels.
+   --------------------------------------------------------------------------- */
+
+.recurring-period {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form__field--tiny {
+  width: 90px;
+  text-align: right;
+}
+
+.recurring-endings {
+  padding: 4px 10px 8px;
+}
+
+.recurring-ending {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+/* Le champ que la condition commande : décalé sous son bouton, et éteint tant
+   que ce bouton n'est pas coché — son `Fenetre_Initialise` grise l'un ou
+   l'autre. */
+.recurring-ending__field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 0 6px 26px;
+}
+
+.recurring-ending__field .form__label {
+  min-width: 180px;
+}
+
+.recurring-ending__field .form__field:disabled {
+  opacity: 0.5;
+}
+
+/* ---------------------------------------------------------------------------
+   F32 — « Impression de RIB ( Relevé d'Identité Bancaire ) ».
+
+   Quatre bandes empilées, comme la capture : la banque, le titulaire, les
+   coordonnées bancaires sur une ligne, et le bloc de déclaration. Tous les
+   champs sont en lecture seule — ils portent donc le gris des zones non
+   saisissables plutôt que le blanc des champs vivants, pour que l'œil le
+   comprenne sans avoir à cliquer dedans.
+   --------------------------------------------------------------------------- */
+
+.window--rib .band {
+  margin-bottom: 10px;
+}
+
+.rib-grid {
+  display: grid;
+  grid-template-columns: max-content 300px max-content 1fr;
+  gap: 8px 14px;
+  align-items: start;
+  padding: 4px 10px 8px;
+}
+
+.rib-label {
+  padding-top: 4px;
+  justify-self: start;
+}
+
+.rib-field {
+  font: inherit;
+  padding: 3px 6px;
+  border: 1px solid #9aa7b1;
+  background-color: #f0f0f0;
+  color: #2d2d2d;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rib-field--area {
+  resize: none;
+  min-height: 62px;
+}
+
+.rib-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  padding: 4px 10px 0;
+}
+
+.rib-details__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rib-details__iban {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 10px 8px;
+  max-width: 540px;
+}
+
+.rib-field--code {
+  width: 70px;
+}
+
+.rib-field--number {
+  width: 220px;
+}
+
+.rib-field--key {
+  width: 50px;
+}
+
+.rib-field--bic {
+  width: 240px;
+}
+
+.rib-details__cell .rib-label,
+.rib-details__iban .rib-label {
+  padding-top: 0;
+}
+
+.rib-declaration {
+  padding: 4px 10px 8px;
+}
+
+.rib-declaration__line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1c3f8f;
+  font-weight: bold;
+}
+
+/* Le texte de la déclaration est bleu et serré dans l'original : c'est un
+   avertissement, pas un paragraphe de confort. */
+.rib-declaration__text {
+  margin: 10px 0 0 24px;
+  color: #1c3f8f;
+  line-height: 1.35;
+}
+
+/* ------------------------------------------------------------------ */
+/* Le choix de la langue, au tout premier lancement (02/08/2026).      */
+/*                                                                     */
+/* Aucune phrase n'y figure : à ce moment-là il n'y a pas de langue    */
+/* dans laquelle en écrire une. La marque du logiciel et trois lignes  */
+/* écrites chacune dans sa propre langue, et c'est tout.               */
+/* ------------------------------------------------------------------ */
+
+.language-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Resserré le 03/08/2026 en même temps que le défilement : chaque pixel
+     rendu par l'écart et la marge est une demi-ligne de liste en plus. */
+  gap: 14px;
+  padding: 12px 6px;
+  /* La fenêtre est haute de 470 px et ne se redimensionne pas ; la liste,
+     elle, s'allonge d'une ligne à chaque langue ajoutée. Sans ces deux
+     déclarations, la dixième langue passait sous le bord bas de la fenêtre
+     et devenait inatteignable (relevé par Fabrice, 03/08/2026). Le bloc
+     prend la hauteur restante, et `min-height: 0` l'autorise à être plus
+     petit que son contenu — sans quoi un enfant de flex refuse de rétrécir
+     et déborde en silence. */
+  flex: 1;
+  min-height: 0;
+}
+
+.language-choice__mark {
+  max-width: 260px;
+  /* Bridée en hauteur : l'image fait 180 px de haut à sa largeur naturelle,
+     et elle mangeait à elle seule quatre lignes de la liste. */
+  max-height: 150px;
+  height: auto;
+  width: auto;
+  object-fit: contain;
+  /* La marque garde sa taille : c'est la liste qui cède, jamais elle. */
+  flex-shrink: 0;
+}
+
+.language-choice__list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 320px;
+  border: 1px solid #9aa8b2;
+  background-color: #ffffff;
+  /* Ce que Fabrice a demandé le 03/08/2026 : la liste défile. Elle est le
+     seul endroit de Radinus qui grandisse tout seul avec le temps — une
+     langue de plus est une ligne de plus, et personne ne pense à rouvrir
+     cette feuille de style en ajoutant une langue. */
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.language-choice__entry {
+  border: 0;
+  border-bottom: 1px solid #e2e2e2;
+  background-color: transparent;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.language-choice__entry:last-child {
+  border-bottom: 0;
+}
+
+.language-choice__entry:hover {
+  background-color: var(--radinus-row-even-bg);
+}
+
+.language-choice__entry[aria-selected="true"] {
+  background-color: var(--radinus-row-selected-bg);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* Le sélecteur de base (02/08/2026).                                  */
+/* ------------------------------------------------------------------ */
+
+/* La base que le prochain démarrage ouvrira. Elle se voit sans être
+   nommée : la barre d'information ne compose aucune phrase. */
+.list__row--current .list__cell {
+  font-weight: 700;
+}
+
+

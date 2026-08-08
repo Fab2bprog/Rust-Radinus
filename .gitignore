@@ -1,0 +1,41 @@
+# Rust
+/target/
+**/target/
+# Cargo.lock IS committed (application, not a library — reproducible builds).
+
+# Node / frontend
+node_modules/
+dist/
+.vite/
+
+# Tauri build artifacts
+/src-tauri/gen/
+/src-tauri/target/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Portable runtime data (never committed — created at first launch)
+/settings/
+/databases/
+/backups/
+/logs/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test fixtures: CONFIDENTIAL, NEVER COMMITTED.
+# The reference Radinus 1.9.3 archive holds the author's real financial data
+# (2502 operations with their labels and amounts, real account balances). The
+# strategic restore test (radinus-core/tests/real_backup.rs) reads it from
+# here when present and only prints a notice when it isn't, so the repository
+# can be made public (PLAN_ACTION.md Phase 16) without the data going with it.
+# To run that test, copy the archive into radinus-core/tests/fixtures/ by hand.
+/radinus-core/tests/fixtures/

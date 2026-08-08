@@ -1,0 +1,48 @@
+[package]
+name = "radinus-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Radinus business-rule core: entities, SQLite persistence, imports/exports, backup, repair. No UI or Tauri dependency (see 08_ARCHITECTURE.md)."
+
+[lib]
+name = "radinus_core"
+path = "src/lib.rs"
+
+[dependencies]
+# JSON (de)serialization: typed IPC contract + radinus_sauve_*.json backup format.
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Acces SQLite. "bundled-sqlcipher-vendored-openssl" compile **SQLCipher** dans
+# le binaire a la place du SQLite ordinaire, avec sa bibliotheque de
+# cryptographie : aucune dependance systeme, ce qu'exige l'application portable
+# (08_ARCHITECTURE.md §3bis). SQLCipher est SQLite plus le chiffrement AES-256
+# des pages ; une base sans mot de passe s'ouvre exactement comme avant.
+# Licence BSD-3. Autorise par Fabrice le 05/08/2026.
+rusqlite = { version = "0.32", features = ["bundled-sqlcipher-vendored-openssl"] }
+# Core-side i18n (approved in 08_ARCHITECTURE.md §2.1).
+fluent = "0.16"
+fluent-bundle = "0.15"
+unic-langid = "0.9"
+# Zip read/write for the Radinus 1.9.3 backup archive format (strategic
+# requirement, Phase 1 §1.3). Authorized by Fabrice 24/07/2026 — see the
+# dependency registry, 08_ARCHITECTURE.md.
+zip = "8"
+# Calendar dates and date arithmetic. Fabrice's own crate — PLAN_ACTION.md
+# rule 6 gives his crates priority where they apply. Authorized 25/07/2026.
+# "serde" so the domain entities keep serializing dates as ISO-8601.
+time_compute = { version = "1.0.0", features = ["serde"] }
+office-toolkit = { version = "1.0.0", default-features = false, features = ["excel", "word"] }
+spreadsheet-ods = { version = "1.0.4", default-features = false }
+# Composition typographique des impressions et états (phase 15). Typst est un
+# moteur de composition écrit en Rust, sous licence Apache-2.0 : il pagine,
+# réimprime les en-têtes de tableau, coupe les pages. Le PDF est fabriqué par
+# notre code et non par le webview du système, ce qui est la seule façon
+# d'obtenir le même document sous Windows, macOS et Linux (exigence de
+# Fabrice, 31/07/2026). Autorisé par Fabrice le 01/08/2026.
+typst = "0.15"
+typst-layout = "0.15"
+typst-pdf = "0.15"
+
+[dev-dependencies]

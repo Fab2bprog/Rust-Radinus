@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Parametres chequier</title>
+    <script type="module" src="/ui/windows/chequebook-form.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F31 — « Parametres chequier » (captures « Nouveau parametre
+         chequier.png » et « Parametres chequiers verouillés.png »).
+
+         Bande d'ardoise à gauche avec l'image du carnet. Huit champs, dont
+         l'identifiant en lecture seule.
+
+         **Cinq d'entre eux se figent dès que le carnet existe** — Référence,
+         Fabriqué ou reçu le, Numéro du premier chèque, Numéro du dernier
+         chèque, Nombre de chèques. C'est le `GR_InterditModif..Grisé = Vrai`
+         du cas « M » de son `Maj_Controles`, et la raison est nette : les
+         chèques sont déjà créés, certains émis, certains payés, certains
+         associés à des opérations. Ne restent noirs que le compte et les
+         commentaires. -->
+    <div class="window window--chequebook">
+      <aside class="panel panel--left">
+        <img class="panel__image" src="/ui/assets/icons/chequier.png" alt="" />
+      </aside>
+
+      <main class="window__content">
+        <div class="form form--wide">
+          <label class="form__label" for="id" id="id-label"></label>
+          <input class="form__field form__field--medium" id="id" type="text" readonly />
+
+          <label class="form__label" for="reference" id="reference-label"></label>
+          <input class="form__field" id="reference" type="text" maxlength="50" />
+
+          <label class="form__label" for="received" id="received-label"></label>
+          <input class="form__field form__field--medium" id="received" type="date" />
+
+          <label class="form__label" for="first" id="first-label"></label>
+          <input class="form__field form__field--medium" id="first" type="number" min="0" step="1" />
+
+          <label class="form__label" for="last" id="last-label"></label>
+          <input class="form__field form__field--medium" id="last" type="number" min="0" step="1" />
+
+          <label class="form__label" for="quantity" id="quantity-label"></label>
+          <input
+            class="form__field form__field--medium"
+            id="quantity"
+            type="number"
+            min="0"
+            step="1"
+          />
+
+          <label class="form__label" for="account" id="account-label"></label>
+          <select class="form__field" id="account"></select>
+
+          <label class="form__label" for="comments" id="comments-label"></label>
+          <textarea class="form__field" id="comments" rows="3"></textarea>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="save" type="button">
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Fiche chèques</title>
+    <script type="module" src="/ui/windows/cheque-form.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F12 — « Fiche chèques » (capture « Fiche Cheque.png »).
+
+         Bande d'ardoise à gauche avec l'image du chèque et du stylo. Huit
+         champs, dont les deux premiers en lecture seule : l'identifiant et le
+         numéro, qui viennent du carnet et que rien ne pourrait y remettre
+         d'accord.
+
+         Le statut est un menu des quinze — et il ne bouge que si on le change
+         ici ou dans la case du tableau : remplir un chèque ne le passe pas à
+         « Émis », lui associer une opération ne le passe pas à « Payé ». -->
+    <div class="window window--cheque">
+      <aside class="panel panel--left">
+        <img class="panel__image" src="/ui/assets/icons/cheque.png" alt="" />
+      </aside>
+
+      <main class="window__content">
+        <div class="form form--wide">
+          <label class="form__label" for="id" id="id-label"></label>
+          <input class="form__field form__field--medium" id="id" type="text" readonly />
+
+          <label class="form__label" for="number" id="number-label"></label>
+          <input class="form__field form__field--medium" id="number" type="text" readonly />
+
+          <label class="form__label" for="issued" id="issued-label"></label>
+          <input class="form__field form__field--medium" id="issued" type="date" />
+
+          <label class="form__label" for="place" id="place-label"></label>
+          <input class="form__field" id="place" type="text" maxlength="50" />
+
+          <label class="form__label" for="payee" id="payee-label"></label>
+          <input class="form__field" id="payee" type="text" maxlength="50" />
+
+          <label class="form__label" for="amount" id="amount-label"></label>
+          <input class="form__field form__field--medium" id="amount" type="text" />
+
+          <label class="form__label" for="comments" id="comments-label"></label>
+          <input class="form__field" id="comments" type="text" maxlength="100" />
+
+          <label class="form__label" for="status" id="status-label"></label>
+          <select class="form__field" id="status"></select>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="save" type="button">
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

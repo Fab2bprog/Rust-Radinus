@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Journal</title>
+    <script type="module" src="/ui/windows/journal.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- Le journal de la dernière opération technique (⌘H).
+
+         **Il ne raconte qu'un traitement, le plus récent.** C'est ce que fait
+         l'original, dont le `gtabMonLog` est vidé à l'ouverture de chacune de
+         ses procédures. Le journal ne s'accumule pas et ne survit pas à la
+         fermeture du logiciel : ce n'est pas une archive, c'est le compte
+         rendu de ce qui vient de se passer.
+
+         Six colonnes, celles de son `Ajoute_Log`. La fenêtre ne fait que
+         lire : son panneau ne porte que la porte. -->
+    <div class="window window--journal">
+      <main class="window__content">
+        <section class="list">
+          <div class="list__header" id="header"></div>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox"></div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

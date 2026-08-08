@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Statistiques</title>
+    <script type="module" src="/ui/windows/statistics.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F20 — « Statistiques par categorie » (04_SPECIFICATIONS_FENETRES.md
+         F20-F24, capture « statistique categorie operation.png »).
+
+         Trois temps : on a déjà choisi les comptes, la matrice les synthétise
+         par mois, et cliquer une case chiffrée donne en bas les opérations
+         qu'elle compte.
+
+         **Le développement s'arrête à cette statistique-ci** (ordre de
+         Fabrice, 26/07/2026). Les cinq autres partagent ce gabarit et
+         s'écriront en s'en inspirant, une fois qu'il l'aura validé. -->
+    <div class="window window--statistics">
+      <!-- La barre de menus, ajoutée le 26/07/2026 : « Export », qui sort
+           toutes les années non vides dans un seul classeur, un onglet par
+           an. Le clic droit sur la matrice reste ce qu'il est — il exporte
+           l'année qu'on regarde. -->
+      <nav class="window-menu" id="window-menu"></nav>
+      <nav class="switches" id="switches"></nav>
+
+      <main class="window__content window__content--split">
+        <section class="matrix" id="matrix-zone">
+          <div class="matrix__grid" id="matrix" role="grid"></div>
+        </section>
+
+        <!-- Le splitter : la zone haute et la zone basse se partagent la
+             hauteur, et l'utilisateur déplace la frontière. -->
+        <div class="splitter" id="splitter" role="separator" aria-orientation="horizontal"></div>
+
+        <section class="list list--detail">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox"></div>
+        </section>
+      </main>
+
+      <aside class="panel panel--statistics">
+        <button class="panel__year" id="year" type="button"></button>
+        <button class="panel__button" id="next-year" type="button">
+          <img src="/ui/assets/icons/Temps_Plus.png" alt="" />
+        </button>
+        <button class="panel__button" id="previous-year" type="button">
+          <img src="/ui/assets/icons/Temps_Moins.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar info-bar--split" id="info-bar">
+        <span id="info-message"></span>
+        <span id="accounts-line"></span>
+      </footer>
+    </div>
+  </body>
+</html>

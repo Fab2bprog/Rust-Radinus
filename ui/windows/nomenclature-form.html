@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Fiche</title>
+    <script type="module" src="/ui/windows/nomenclature-form.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F10 — the fiche of a nomenclature (04_SPECIFICATIONS_FENETRES.md,
+         03_CHARTE_GRAPHIQUE.md §3.3). Left slate strip with the blue folder,
+         the fields, right strip with save and exit.
+
+         One page for the seven: the dossier says "gabarit identique pour les
+         fiches Affectation, Mode, Tiers, Projet, Poste budgétaire, Banque —
+         sans le champ Poste budgétaire". That field is therefore the only
+         thing that comes and goes, and it is hidden with its label for the
+         six nomenclatures that have no budget line. -->
+    <div class="window">
+      <aside class="panel panel--left">
+        <img
+          class="panel__image"
+          src="/ui/assets/icons/ImgRadinusClassement.png"
+          alt=""
+        />
+      </aside>
+
+      <main class="window__content">
+        <div class="form">
+          <label class="form__label form__label--readonly" for="id" id="id-label">
+          </label>
+          <input class="form__field" id="id" type="text" readonly />
+
+          <label class="form__label" for="label" id="label-label"></label>
+          <input class="form__field" id="label" type="text" maxlength="50" />
+
+          <label class="form__label" for="budget-line" id="budget-line-label"></label>
+          <select class="form__field" id="budget-line"></select>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="save" type="button">
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

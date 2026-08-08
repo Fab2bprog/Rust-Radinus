@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Préférences</title>
+    <script type="module" src="/ui/windows/preferences.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F39 — « Préférences » (04_SPECIFICATIONS_FENETRES.md F39, phase 17 ter).
+         Fenêtre nouvelle, sans équivalent en 1.9.3.
+
+         Arbre à gauche, champs de l'option choisie au milieu, bande ardoise à
+         droite avec la disquette et la porte : le gabarit des fiches, dans le
+         sens de toutes les autres fenêtres de Radinus.
+
+         **Une seule option écrit dans la table `Preferences`** : la devise.
+         La langue, elle, reste dans `Parametres.UtiliseLangue` où elle a
+         toujours été — la fenêtre écrit donc à deux endroits, et c'est voulu
+         (décision de Fabrice, 03/08/2026). Rien d'autre n'entre dans
+         `Preferences` sans qu'il l'ait demandé. -->
+    <div class="window window--preferences">
+      <nav class="tree" id="tree" aria-label="Options"></nav>
+
+      <main class="window__content">
+        <!-- Feuille « Langue ». Le même choix que l'entrée de menu, qui reste
+             en place : deux chemins, un seul réglage. -->
+        <section class="pane" id="pane-language" hidden>
+          <h2 class="pane__title" id="language-title"></h2>
+          <div class="form">
+            <label class="form__label" for="language" id="language-label"></label>
+            <select class="form__field" id="language"></select>
+          </div>
+        </section>
+
+        <!-- Feuille « Devise ». -->
+        <section class="pane" id="pane-currency" hidden>
+          <h2 class="pane__title" id="currency-title"></h2>
+          <div class="form">
+            <label class="form__label" for="currency" id="currency-label"></label>
+            <select class="form__field" id="currency"></select>
+
+            <!-- N'apparaît que sur « Personnalisé » : un champ éteint qu'on ne
+                 peut pas remplir est un champ qui ne sert à rien. -->
+            <label class="form__label" for="custom" id="custom-label" hidden></label>
+            <input class="form__field" id="custom" type="text" maxlength="8" hidden />
+          </div>
+          <p class="pane__hint" id="currency-hint"></p>
+        </section>
+        <!-- Feuille « Taille de l'affichage ». Le zoom du webview, celui du
+             ⌘+ d'un navigateur : tout grossit ensemble, texte comme icônes
+             comme colonnes. Grossir la seule police n'aurait presque rien
+             bougé — les feuilles de style de Radinus portent 415 mesures en
+             pixels contre 15 en em. -->
+        <section class="pane" id="pane-zoom" hidden>
+          <h2 class="pane__title" id="zoom-title"></h2>
+          <div class="form">
+            <label class="form__label" for="zoom" id="zoom-label"></label>
+            <div class="zoom">
+              <input class="zoom__slider" id="zoom" type="range" />
+              <output class="zoom__value" id="zoom-value"></output>
+              <button class="zoom__reset" id="zoom-reset" type="button"></button>
+            </div>
+          </div>
+          <p class="pane__hint" id="zoom-hint"></p>
+        </section>
+
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="save" type="button">
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

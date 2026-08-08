@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Fiche opération</title>
+    <script type="module" src="/ui/windows/operation-form.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F03 — « Opération Compte : <compte> » (04_SPECIFICATIONS_FENETRES.md,
+         capture « Fiche operation transaction.png »). Its own menu bar — a
+         single entry, **Options**, for the FITID (Fabrice, 04/08/2026) —, five
+         grey-banded sections, the slate strip on the right and the attachment
+         count at the bottom. Every word comes from Fluent.
+
+         The section banners are the original's: a full-width `#DCDCDC` strip
+         with the title in bold italic, not a framed group — that is what
+         separates the sections in 1.9.3. -->
+    <div class="window window--operation">
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <main class="window__content window__content--scroll">
+        <section class="band">
+          <h2 class="band__title" id="group-identification"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="label" id="label-label"></label>
+            <input class="form__field" id="label" type="text" maxlength="100" />
+
+            <label class="form__label" for="reference" id="reference-label"></label>
+            <input class="form__field" id="reference" type="text" maxlength="50" />
+
+            <label class="form__label" for="date" id="date-label"></label>
+            <input class="form__field form__field--medium" id="date" type="date" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-amount"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="direction" id="direction-label"></label>
+            <select class="form__field form__field--medium" id="direction"></select>
+
+            <label class="form__label" for="amount" id="amount-label"></label>
+            <input class="form__field form__field--medium" id="amount" type="text" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-status"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="status" id="status-label"></label>
+            <select class="form__field form__field--medium" id="status"></select>
+
+            <label class="form__label" for="clearing-date" id="clearing-date-label"></label>
+            <input class="form__field form__field--medium" id="clearing-date" type="date" />
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-classification"></h2>
+          <div class="form form--wide">
+            <label class="form__label" for="category" id="category-label"></label>
+            <select class="form__field form__field--medium" id="category"></select>
+
+            <label class="form__label" for="assignment" id="assignment-label"></label>
+            <select class="form__field form__field--medium" id="assignment"></select>
+
+            <label class="form__label" for="payment-mode" id="payment-mode-label"></label>
+            <select class="form__field form__field--medium" id="payment-mode"></select>
+
+            <label class="form__label" for="payee" id="payee-label"></label>
+            <select class="form__field form__field--medium" id="payee"></select>
+
+            <label class="form__label" for="project" id="project-label"></label>
+            <select class="form__field form__field--medium" id="project"></select>
+          </div>
+        </section>
+
+        <!-- The comment the post-it of the right-hand strip opens. Hidden
+             until it is asked for, and hidden again when it holds nothing. -->
+        <section class="band" id="comment-section" hidden>
+          <h2 class="band__title" id="group-comment"></h2>
+          <div class="form form--wide">
+            <textarea class="form__field" id="comment" rows="4"></textarea>
+          </div>
+        </section>
+
+        <section class="band">
+          <h2 class="band__title" id="group-check"></h2>
+          <div class="check">
+            <label class="form__label" for="check" id="check-label"></label>
+            <input class="form__field" id="check" type="text" readonly />
+            <div class="check__buttons">
+              <button class="text-button" id="check-info" type="button"></button>
+              <button class="text-button" id="check-link" type="button"></button>
+              <button class="text-button" id="check-unlink" type="button"></button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="comment-button" type="button">
+          <img src="/ui/assets/icons/postit.png" alt="" />
+        </button>
+        <button class="panel__button" id="sub" type="button">
+          <img src="/ui/assets/icons/Base_createinside.png" alt="" />
+        </button>
+        <button class="panel__button" id="template" type="button">
+          <img src="/ui/assets/icons/Modele.png" alt="" />
+        </button>
+        <button class="panel__button" id="attachment" type="button">
+          <img src="/ui/assets/icons/piecejointe.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="save" type="button">
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <!-- The status line carries two things that never overwrite each other:
+           what the window is saying, and how many attachments the operation
+           has (« Aucune pièce jointe » in the capture). -->
+      <footer class="info-bar info-bar--split" id="info-bar">
+        <span id="info-message"></span>
+        <span id="attachments"></span>
+      </footer>
+    </div>
+  </body>
+</html>
