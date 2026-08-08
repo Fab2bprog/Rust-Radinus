@@ -32,6 +32,21 @@ jobs:
           node-version: 22
           cache: npm
 
+      # **npm 12 n'exécute plus les scripts d'installation des dépendances**
+      # sans autorisation nommée (changement de juin 2026). C'est par là que
+      # passe l'essentiel des paquets malveillants : le script tourne avant
+      # qu'une ligne du projet ne s'exécute, avec les droits de qui installe.
+      #
+      # La CI installe donc comme la machine de l'auteur, et non autrement :
+      # sinon le champ `allowScripts` de `package.json` — qui nomme la seule
+      # exception de Radinus, `esbuild` et son binaire — ne serait vérifié
+      # nulle part, et on découvrirait qu'il est faux le jour d'une livraison.
+      #
+      # `npm@12` et non `npm@12.0.2` : les correctifs de cette série sont des
+      # correctifs de sécurité, et les figer reviendrait à s'en priver.
+      - name: Use npm 12
+        run: npm install -g npm@12
+
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
