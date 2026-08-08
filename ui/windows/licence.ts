@@ -14,6 +14,7 @@
 // window would hand the view the power to open anything on the machine, and
 // the view is never given a power it does not need.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { closeCurrentWindow } from "./window-frame";
 import { loadTexts, onLanguageChanged, t } from "./texts";

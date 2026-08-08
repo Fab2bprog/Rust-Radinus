@@ -21,6 +21,32 @@
 
 use std::path::Path;
 use std::process::Command;
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+/// **Une commande qui ne fait pas surgir de console noire.**
+///
+/// Tout processus console lancé depuis une application graphique de Windows
+/// reçoit une fenêtre de console **visible**. Radinus en lance pour la devise,
+/// pour la liste des imprimantes, pour imprimer, pour l'explorateur et pour la
+/// calculatrice : autant de rectangles noirs qui clignotent devant
+/// l'utilisateur sans rien lui apprendre (dossier de portage du 05/08/2026,
+/// §4.4).
+///
+/// `0x0800_0000` est `CREATE_NO_WINDOW`. Il n'existe que sur Windows ; ailleurs
+/// cette fonction rend une `Command` ordinaire, et **rien ne change sur macOS
+/// ni sous Linux**.
+///
+/// Toutes les commandes du fichier passent par ici. C'est le seul moyen qu'un
+/// oubli ne se paie pas d'une console de plus : il n'y a plus de `Command::new`
+/// à oublier.
+fn silent_command(program: &str) -> Command {
+    #[allow(unused_mut)]
+    let mut command = Command::new(program);
+    #[cfg(target_os = "windows")]
+    command.creation_flags(0x0800_0000);
+    command
+}
 
 /// Ouvre `path` avec l'application par défaut du système.
 ///
@@ -35,7 +61,7 @@ use std::process::Command;
 pub fn open_with_desktop(path: &Path) -> std::io::Result<()> {
     #[cfg(target_os = "macos")]
     let mut command = {
-        let mut command = Command::new("open");
+        let mut command = silent_command("open");
         command.arg(path);
         command
     };
@@ -45,14 +71,14 @@ pub fn open_with_desktop(path: &Path) -> std::io::Result<()> {
         // Le premier argument de `start` est le **titre de la fenêtre** ; sans
         // la chaîne vide, un chemin entre guillemets serait pris pour ce
         // titre et rien ne s'ouvrirait. C'est le piège classique de `start`.
-        let mut command = Command::new("cmd");
+        let mut command = silent_command("cmd");
         command.args(["/C", "start", ""]).arg(path);
         command
     };
 
     #[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
     let mut command = {
-        let mut command = Command::new("xdg-open");
+        let mut command = silent_command("xdg-open");
         command.arg(path);
         command
     };
@@ -69,21 +95,21 @@ pub fn open_with_desktop(path: &Path) -> std::io::Result<()> {
 pub fn open_link(url: &str) -> std::io::Result<()> {
     #[cfg(target_os = "macos")]
     let mut command = {
-        let mut command = Command::new("open");
+        let mut command = silent_command("open");
         command.arg(url);
         command
     };
 
     #[cfg(target_os = "windows")]
     let mut command = {
-        let mut command = Command::new("cmd");
+        let mut command = silent_command("cmd");
         command.args(["/C", "start", "", url]);
         command
     };
 
     #[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
     let mut command = {
-        let mut command = Command::new("xdg-open");
+        let mut command = silent_command("xdg-open");
         command.arg(url);
         command
     };
@@ -107,13 +133,13 @@ pub fn open_link(url: &str) -> std::io::Result<()> {
 pub fn open_calculator() -> std::io::Result<()> {
     #[cfg(target_os = "macos")]
     let mut command = {
-        let mut command = Command::new("open");
+        let mut command = silent_command("open");
         command.args(["-a", "Calculator"]);
         command
     };
 
     #[cfg(target_os = "windows")]
-    let mut command = Command::new("calc");
+    let mut command = silent_command("calc");
 
     command.spawn().map(|_| ())
 }
@@ -156,7 +182,7 @@ fn powershell(script: &str) -> Option<String> {
 }
 
 fn output_of(program: &str, args: &[&str]) -> Option<String> {
-    let output = Command::new(program).args(args).output().ok()?;
+    let output = silent_command(program).args(args).output().ok()?;
     if output.status.success() {
         Some(String::from_utf8_lossy(&output.stdout).into_owned())
     } else {
@@ -314,7 +340,7 @@ pub fn send_to_printer(path: &Path, printer: Option<&str>) -> std::io::Result<()
                 quoted(&path.display().to_string())
             ),
         };
-        let status = Command::new("powershell")
+        let status = silent_command("powershell")
             .args(["-NoProfile", "-NonInteractive", "-Command", &command])
             .status()?;
         if status.success() {
@@ -328,7 +354,7 @@ pub fn send_to_printer(path: &Path, printer: Option<&str>) -> std::io::Result<()
 
     #[cfg(not(target_os = "windows"))]
     {
-        let mut command = Command::new("lp");
+        let mut command = silent_command("lp");
         if let Some(name) = printer {
             command.args(["-d", name]);
         }
@@ -361,6 +387,28 @@ pub fn send_to_printer(path: &Path, printer: Option<&str>) -> std::io::Result<()
 /// développement — il répondra correctement. Ce n'est pas un défaut de ce code,
 /// c'est ce que coûte le fait de ne rien mémoriser.
 pub fn currency_sign() -> String {
+    // **Demandé une fois, gardé pour la session** (dossier de portage du
+    // 05/08/2026, §4.3).
+    //
+    // `Currency::System` est la valeur par défaut des préférences, si bien que
+    // l'ouverture de **chaque** base appelait cette fonction — donc, sous
+    // Windows, lançait PowerShell et l'attendait sur le fil principal. Un
+    // démarrage à froid de PowerShell coûte une à deux secondes : c'était la
+    // première cause de lenteur à l'ouverture d'une base, devant tout le reste.
+    //
+    // Le cache sert les trois systèmes : macOS et Linux lancent `locale`, moins
+    // cher mais pas gratuit, et le résultat ne change pas d'une seconde à
+    // l'autre.
+    //
+    // *Ce que ça coûte* : un réglage régional changé pendant que Radinus tourne
+    // n'est vu qu'au lancement suivant. C'est le bon échange — personne ne
+    // change de devise système en cours de saisie.
+    static SIGN: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    SIGN.get_or_init(ask_the_system_for_its_currency_sign).clone()
+}
+
+/// Ce que `currency_sign` demande au système, une seule fois par session.
+fn ask_the_system_for_its_currency_sign() -> String {
     #[cfg(target_os = "windows")]
     {
         // **The symbol comes back as numbers, not as text**, and that is the

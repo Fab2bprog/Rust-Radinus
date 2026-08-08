@@ -26,6 +26,7 @@
 // **Enregistrer referme la fiche**, dans les deux modes : la dernière ligne de
 // ses précautions est `SI Action_Confirmer() ALORS Ferme() FIN`.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

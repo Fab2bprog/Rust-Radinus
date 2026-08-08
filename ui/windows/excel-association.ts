@@ -12,6 +12,7 @@
 // restera vide pour ces opérations-là, comme dans son code — c'est la fenêtre
 // qui doit avoir été validée, pas chacune de ses lignes.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
 import { Table } from "./table";

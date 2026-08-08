@@ -8,6 +8,7 @@
 // visites — une sauvegarde, une réparation — et une fenêtre de Radinus n'est
 // jamais détruite.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { Table } from "./table";

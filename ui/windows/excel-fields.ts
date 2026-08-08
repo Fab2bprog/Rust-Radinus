@@ -14,6 +14,7 @@
 // sautait les lignes fautives en silence ; sur vingt mille lignes, une perte
 // muette est inacceptable, et Fabrice a tranché pour le compte-rendu.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { tell } from "./dialog";

@@ -1589,6 +1589,58 @@ of a window which cannot be resized.
 
 ---
 
+## P-39 — The Windows fixes come home, and macOS loses nothing (08/08/2026)
+
+**Ruled by Fabrice**, after reading the handover file written on his Windows
+machine on 05/08/2026: *« je te demande ton avis […] je me demande si à terme il
+ne va pas falloir 1 version de base (macOS) et 2 variantes »*, then, once
+answered: *« fais-moi les modifications que tu penses bonnes […] en préservant
+la convivialité et le bon fonctionnement de la version macOS »*.
+
+**One source, three systems — and the question was worth asking.** Three
+codebases would have to be corrected three times; in practice they are corrected
+one and a half times, and the day of a release someone discovers the Linux one
+is six months behind. The eighteen languages, the schema, the core, the 863
+render checks and the crossing tests are all shared, and all of it would have
+tripled. `#[cfg]` is not a makeshift: the compiler puts the Windows lines in the
+Windows binary and nowhere else, so the Mac executable carries none of this.
+
+**None of the nine fixes was incompatible with macOS**, which is what decided
+it. Four are branches macOS never executes. One — `Cmd` becoming `CmdOrCtrl` —
+changes nothing at all on a Mac: the library reads it as ⌘ there and as Ctrl
+elsewhere, and it merely writes at last what this file's own header had
+announced from the first day. **Two are not Windows fixes at all** and the Mac
+gains from them: the SQLite settings and the grouped balance transaction. NTFS
+only made visible what APFS was charging quietly.
+
+**Where the real limit is, and it is not in the code.** One source for three
+systems is honest only if the three are compiled. The CI builds macOS alone
+today; until a Windows job joins it, four of these fixes are verified by nobody
+but Fabrice, by hand. That is the open item, and it is named here so it is not
+forgotten.
+
+**One correction to the handover file itself.** Its invariant 4 states that
+Radinus is portable by nature, its root being the executable's folder. P-36
+reversed that the same day: Radinus installs by default and becomes portable on
+`portable_mode = 1`. The argument that ruled WAL out still holds — a database
+folder one copies onto a stick must not travel with two open state files — but
+it no longer rests on the same sentence.
+
+**Two things the document promised that turned out false, and both were caught
+by the tests.** It stated that no caller of `update_all_accounts` had a
+transaction open: true of 2.0.0, false here — `repair::run` has one, and
+SQLite said so eight tests at a time. The fix asks instead of assuming: it
+opens its own transaction only when none is running. And the console gate it
+named `command()` would have collided with a local variable of that name in
+`send_to_printer` —
+the very trap the document recorded. Named `silent_command`, the trap does not
+exist.
+
+**What was deliberately not brought back**: the « VERSION BETA » banner, which
+belongs to a test machine and not to the line that will be released.
+
+---
+
 ## How to add to this file
 
 One entry per ruling: an id, a date, what was decided in one sentence, and

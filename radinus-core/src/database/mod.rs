@@ -94,9 +94,57 @@ impl From<rusqlite::Error> for OpenError {
 /// never called again on ordinary opens.
 pub fn create_new_database(path: &Path) -> Result<Connection, OpenError> {
     let conn = open_or_create(path)?;
+    // Une base neuve n'est pas encore verrouillée : régler ici ne risque rien.
+    tune(&conn);
     schema::migrate(&conn)?;
     seed::seed_initial_data(&conn)?;
     Ok(conn)
+}
+
+/// **Les quatre réglages que SQLite ne prend pas tout seul.**
+///
+/// Sans eux, `Connection::open` laisse les valeurs d'usine, et les valeurs
+/// d'usine sont taillées pour un serveur qu'on peut débrancher : à chaque
+/// écriture, SQLite crée un fichier `…-journal`, le remplit, le force sur le
+/// disque, puis **l'efface**. macOS facture peu cette danse ; NTFS la facture
+/// cher, et c'est sous Windows qu'elle s'est vue (dossier de portage du
+/// 05/08/2026, §4.1). Le réglage sert les trois systèmes — Windows l'a
+/// seulement rendu visible.
+///
+/// - `journal_mode = TRUNCATE` — le journal est gardé et vidé au lieu d'être
+///   créé puis détruit : un aller-retour de moins par écriture.
+/// - `synchronous = NORMAL` — on abandonne la seule garantie qui portait sur
+///   la coupure de courant en pleine écriture. Une base Radinus n'est pas un
+///   serveur de banque, et l'utilisateur a ses sauvegardes.
+/// - `busy_timeout = 5000` — attendre cinq secondes plutôt que rendre
+///   « database is locked » à la première contrariété.
+/// - `temp_store = MEMORY` — les tables temporaires des tris et des jointures
+///   ne descendent plus sur le disque.
+///
+/// **WAL a été écarté sciemment**, en connaissance de ses avantages : il pose
+/// un `-wal` et un `-shm` à côté de la base, et un dossier de base qu'on copie
+/// sur une clé ne doit pas se promener avec deux fichiers d'état ouverts. Il
+/// ne fonctionne pas davantage sur un partage réseau.
+///
+/// ⚠ **Jamais avant `PRAGMA key`.** Ces pragmas lisent le fichier, et une
+/// lecture faite avant le déverrouillage fixe l'état de la connexion : la clé
+/// n'a plus d'effet ensuite. Les deux appels ci-dessous sont donc placés après
+/// `lock::readable`, et `lock::change` — qui ouvre sa propre connexion pour
+/// changer un mot de passe — n'est volontairement pas touché.
+///
+/// L'échec n'est pas fatal : une base qui refuse un réglage s'ouvre quand même,
+/// simplement plus lentement.
+pub fn tune(conn: &Connection) {
+    // `query_row` et non `execute` : `journal_mode` **rend** le mode retenu,
+    // et SQLite refuse `execute` sur un pragma qui répond quelque chose.
+    let _ = conn.query_row("PRAGMA journal_mode = TRUNCATE", [], |row| {
+        row.get::<_, String>(0)
+    });
+    let _ = conn.execute_batch(
+        "PRAGMA synchronous = NORMAL;
+         PRAGMA busy_timeout = 5000;
+         PRAGMA temp_store = MEMORY;",
+    );
 }
 
 /// Une base qui vient d'être ouverte, et ce que son ouverture a eu à réparer.
@@ -142,6 +190,8 @@ pub fn open_existing_database(path: &Path, password: Option<&str>) -> Result<Ope
     if !lock::readable(&conn) {
         return Err(OpenError::Locked);
     }
+    // **Après le déverrouillage, et pas avant** : voir `tune`.
+    tune(&conn);
 
     let has_parametres_table: bool = conn.query_row(
         "SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'Parametres')",

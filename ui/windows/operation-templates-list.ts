@@ -7,6 +7,7 @@
 // le met à l'écran ; c'est la validation de cette fiche qui écrira (règle de
 // Fabrice, 29/07/2026).
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

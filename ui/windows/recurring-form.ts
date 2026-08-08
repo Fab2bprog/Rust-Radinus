@@ -15,6 +15,7 @@
 // qu'on s'apprête à détruire. La règle, elle, ne recule pas — effacer et
 // rejouer sont deux gestes distincts.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

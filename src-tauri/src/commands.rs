@@ -7805,7 +7805,7 @@ fn connect_and_start<R: Runtime>(
     // elle, n'est pas relue : elle appartient au logiciel, pas à la base.
     apply_preferences(state);
     let menu = crate::menu::build(app).map_err(to_ipc_error)?;
-    app.set_menu(menu).map_err(to_ipc_error)?;
+    crate::menu::install(app, menu).map_err(to_ipc_error)?;
 
     if let Some(main) = app.get_webview_window("main") {
         let _ = main.show();
@@ -8484,6 +8484,28 @@ pub fn app_version<R: Runtime>(app: AppHandle<R>, state: State<'_, AppState>) ->
         &[("version", app.package_info().version.to_string().as_str())],
         &[],
     )
+}
+
+/// **La table des raccourcis que cette fenêtre doit reconnaître.**
+///
+/// Demandée une fois, à l'ouverture de chaque fenêtre. Elle est **vide sur
+/// macOS**, où la barre native entend déjà les frappes : une fenêtre qui
+/// écouterait aussi déclencherait chaque entrée deux fois. Voir
+/// `menu::shortcut_table` pour la raison complète.
+#[tauri::command]
+pub fn menu_shortcuts() -> Vec<crate::menu::Shortcut> {
+    crate::menu::shortcut_table()
+}
+
+/// **La frappe a été reconnue : exécute l'entrée.**
+///
+/// La fenêtre ne fait que nommer l'entrée ; c'est `menu::trigger` qui vérifie
+/// qu'elle est active et qui l'exécute par le chemin ordinaire, celui de la
+/// souris. Aucune décision n'est prise dans la vue, et aucune branche du menu
+/// n'est réécrite.
+#[tauri::command]
+pub fn menu_shortcut<R: Runtime>(app: AppHandle<R>, id: String) {
+    crate::menu::trigger(&app, &id);
 }
 
 /// The official text of the GNU GPL v3, in the system's browser.

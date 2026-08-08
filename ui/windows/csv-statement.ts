@@ -16,6 +16,7 @@
 // **Mais l'indulgence s'arrête à la porte** : ne basculent vers la fenêtre
 // d'intégration que les lignes portant une date **et** un montant lisibles.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { Table } from "./table";
 import { loadTexts, onLanguageChanged, t, tError } from "./texts";

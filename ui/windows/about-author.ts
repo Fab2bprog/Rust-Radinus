@@ -11,6 +11,7 @@
 // y est écrit trois fois à l'identique, et c'est le prix à payer pour que la
 // vue ne contienne toujours rien.
 
+import "./shortcuts";
 import { closeCurrentWindow } from "./window-frame";
 import { loadTexts, onLanguageChanged, t } from "./texts";
 

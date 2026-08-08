@@ -150,6 +150,211 @@ fn statistics_item_id(axis: Axis) -> String {
     format!("statistics-by:{}", axis.key())
 }
 
+// ------------------------------------------------------------------------
+// Les raccourcis clavier
+// ------------------------------------------------------------------------
+
+/// **Les dix raccourcis fixes du menu, écrits une seule fois.**
+///
+/// `build` les pose sur les entrées, et [`shortcut_table`] les traduit pour les
+/// fenêtres : deux lectures d'une même liste, jamais deux listes.
+///
+/// **`CmdOrCtrl` et non `Cmd`** (dossier de portage du 05/08/2026, §5.1).
+/// `muda` traduit « CMD » par META, et META sous Windows est **la touche
+/// Windows** : `Cmd+I` y ouvrait les Paramètres de Windows, `Cmd+G` la barre de
+/// jeu Xbox, `Cmd+T` la barre des tâches. `CmdOrCtrl` devient ⌘ sur macOS et
+/// Ctrl ailleurs — **rien ne change sur le Mac**, et Windows retrouve les
+/// raccourcis Ctrl que Radinus 1.9.3 avait toujours eus. Il n'y avait aucun jeu
+/// de touches à inventer : seulement à écrire ce que l'en-tête de ce fichier
+/// annonçait depuis le premier jour.
+const ACCELERATORS: &[(&str, &str)] = &[
+    (IMPORT_ITEM_ID, "CmdOrCtrl+I"),
+    (ACCOUNTS_ITEM_ID, "CmdOrCtrl+F1"),
+    (BALANCES_ITEM_ID, "CmdOrCtrl+F2"),
+    (OPERATIONS_ITEM_ID, "CmdOrCtrl+F3"),
+    (QUICK_CLASSIFY_ITEM_ID, "CmdOrCtrl+F4"),
+    (RECURRING_ITEM_ID, "CmdOrCtrl+F5"),
+    (TRANSFER_ITEM_ID, "CmdOrCtrl+F6"),
+    (CHEQUEBOOKS_ITEM_ID, "CmdOrCtrl+F7"),
+    (CURVES_ITEM_ID, "CmdOrCtrl+G"),
+    (DASHBOARD_ITEM_ID, "CmdOrCtrl+T"),
+];
+
+/// Le raccourci d'une entrée, ou rien si elle n'en porte pas.
+fn accelerator(id: &str) -> Option<&'static str> {
+    ACCELERATORS
+        .iter()
+        .find(|(item, _)| *item == id)
+        .map(|(_, keys)| *keys)
+}
+
+/// Le raccourci de la statistique de rang `rank` — les six sont calculées, pas
+/// énumérées, comme les entrées qu'elles servent.
+fn statistics_shortcut(rank: usize) -> String {
+    format!("CmdOrCtrl+Shift+{}", rank + 1)
+}
+
+/// Une frappe qu'une fenêtre doit reconnaître.
+///
+/// `code` est la **position** de la touche au sens de `KeyboardEvent.code`, et
+/// non le caractère produit : sur un clavier AZERTY, le « 1 » de la rangée du
+/// haut ne s'obtient qu'avec Majuscule, et comparer le caractère ferait
+/// répondre le raccourci sur une autre touche que celle qu'annonce le menu.
+#[derive(serde::Serialize)]
+pub struct Shortcut {
+    /// L'identifiant de l'entrée de menu à déclencher.
+    pub id: String,
+    /// La valeur de `KeyboardEvent.code` attendue.
+    pub code: String,
+    /// Si la frappe demande Majuscule en plus de Ctrl.
+    pub shift: bool,
+}
+
+/// Traduit la fin d'un accélérateur en `KeyboardEvent.code`.
+///
+/// **Compilée sous Windows seulement**, comme sa voisine : ailleurs la table
+/// est vide et personne ne l'appelle. Sans ce `cfg`, le compilateur signale à
+/// juste titre deux fonctions mortes — signalé par Fabrice le 08/08/2026.
+#[cfg(target_os = "windows")]
+fn code_of(key: &str) -> Option<String> {
+    if key.len() == 1 {
+        let letter = key.chars().next()?;
+        if letter.is_ascii_alphabetic() {
+            return Some(format!("Key{}", letter.to_ascii_uppercase()));
+        }
+        if letter.is_ascii_digit() {
+            return Some(format!("Digit{letter}"));
+        }
+        return None;
+    }
+    // F1 à F12, écrites telles quelles des deux côtés.
+    if key.starts_with('F') && key[1..].parse::<u8>().is_ok() {
+        return Some(key.to_string());
+    }
+    None
+}
+
+#[cfg(target_os = "windows")]
+fn shortcut_of(id: &str, accelerator: &str) -> Option<Shortcut> {
+    let mut parts = accelerator.split('+').collect::<Vec<_>>();
+    let key = parts.pop()?;
+    Some(Shortcut {
+        id: id.to_string(),
+        code: code_of(key)?,
+        shift: parts.iter().any(|part| part.eq_ignore_ascii_case("shift")),
+    })
+}
+
+/// **Ce que les fenêtres doivent écouter, parce que le menu ne les entend
+/// pas** (dossier de portage du 05/08/2026, §5.2).
+///
+/// Sous Windows, **aucune frappe faite dans une fenêtre de Radinus n'atteint la
+/// table d'accélérateurs**. Tauri installe pourtant le nécessaire, mais son
+/// crochet ne voit que les messages de la boucle de l'application, et les
+/// frappes faites dans un WebView2 n'y passent pas : le moteur les traite dans
+/// son propre processus, et `wry` ne pose aucun gestionnaire pour les lui
+/// reprendre. Une application Tauri étant un webview de bord à bord, aucun
+/// raccourci de menu ne peut fonctionner. C'est ouvert chez eux et sans
+/// correctif (`wry#451`, `tauri#6365`).
+///
+/// D'où le partage : **la fenêtre écoute, Rust décide**. La fenêtre reconnaît
+/// une frappe et rend un identifiant d'entrée ; c'est [`trigger`] qui juge si
+/// cette entrée est active et qui l'exécute, par le chemin ordinaire.
+///
+/// **Vide partout sauf sous Windows**, et c'est essentiel : là où la barre
+/// native entend, une fenêtre qui écouterait aussi déclencherait chaque entrée
+/// **deux fois**. La décision reste dans le seul fichier qui connaît les
+/// raccourcis, pas éparpillée dans quarante-et-une fenêtres.
+///
+/// **Pourquoi Windows seul, et pas « tout sauf macOS »** (arbitrage de Fabrice,
+/// 08/08/2026, après qu'il eut demandé si Linux souffrirait du même mal) : la
+/// panne diagnostiquée est celle de **WebView2**, qui traite les frappes dans
+/// son propre processus sans que rien ne les lui reprenne. Sous Linux, `muda`
+/// accroche un `AccelGroup` à la fenêtre et GTK examine ses accélérateurs avant
+/// de passer la touche au widget qui a le focus : il est probable qu'ils y
+/// fonctionnent nativement. On n'affirme donc que ce qui a été constaté. Si un
+/// essai sous Linux montre un jour des raccourcis muets, il suffira d'élargir
+/// ce `cfg` — un mot à changer, ici et sur les deux fonctions ci-dessus.
+pub fn shortcut_table() -> Vec<Shortcut> {
+    #[cfg(not(target_os = "windows"))]
+    {
+        Vec::new()
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let mut table: Vec<Shortcut> = ACCELERATORS
+            .iter()
+            .filter_map(|(id, keys)| shortcut_of(id, keys))
+            .collect();
+        for (rank, axis) in AXES.iter().enumerate() {
+            if let Some(shortcut) =
+                shortcut_of(&statistics_item_id(*axis), &statistics_shortcut(rank))
+            {
+                table.push(shortcut);
+            }
+        }
+        table
+    }
+}
+
+/// L'entrée `id` est-elle active dans la barre en vigueur ?
+///
+/// ⚠ **`Menu::get` n'est pas récursif** : il ne regarde que ses enfants
+/// directs, c'est-à-dire les sept sous-menus. La descente se fait donc ici.
+///
+/// Une barre introuvable répond « non » : mieux vaut un raccourci muet qu'un
+/// raccourci qui agit sur une base fermée.
+fn is_enabled<R: Runtime>(app: &AppHandle<R>, id: &str) -> bool {
+    let bar = app
+        .get_webview_window("main")
+        .and_then(|main| main.menu())
+        .or_else(|| app.menu());
+    let Some(bar) = bar else {
+        return false;
+    };
+    let Ok(items) = bar.items() else {
+        return false;
+    };
+    for kind in items {
+        let Some(submenu) = kind.as_submenu() else {
+            continue;
+        };
+        let Ok(children) = submenu.items() else {
+            continue;
+        };
+        for child in children {
+            if let Some(item) = child.as_menuitem() {
+                if item.id() == id {
+                    return item.is_enabled().unwrap_or(false);
+                }
+            }
+        }
+    }
+    false
+}
+
+/// Exécute l'entrée `id` comme si l'utilisateur l'avait choisie à la souris.
+///
+/// **Aucune logique n'est redite** : on fabrique le `MenuEvent` que le système
+/// aurait envoyé et on le confie à [`on_event`]. Les deux structures sont
+/// publiques et à champ public — c'est ce qui évite de réécrire quarante
+/// branches.
+///
+/// **Une entrée grisée ne se déclenche pas.** L'état est relu dans la barre en
+/// vigueur à l'instant de la frappe, et non supposé : la moitié du menu est
+/// éteinte tant qu'aucune base n'est ouverte.
+pub fn trigger<R: Runtime>(app: &AppHandle<R>, id: &str) {
+    if !is_enabled(app, id) {
+        return;
+    }
+    on_event(
+        app,
+        tauri::menu::MenuEvent {
+            id: tauri::menu::MenuId::new(id),
+        },
+    );
+}
+
 /// La clef Fluent de l'entrée de menu d'un axe.
 fn statistics_menu_key(axis: Axis) -> &'static str {
     match axis {
@@ -233,13 +438,50 @@ pub fn switch_language<R: Runtime>(app: &AppHandle<R>, code: i64) -> Result<(), 
     i18n::prepare(language);
 
     let menu = build(app).map_err(|error| error.to_string())?;
-    app.set_menu(menu).map_err(|error| error.to_string())?;
+    install(app, menu).map_err(|error| error.to_string())?;
 
     // Chaque fenêtre ouverte se rhabille d'elle-même. On ne nomme personne :
     // une fenêtre ajoutée demain sera prévenue sans qu'on y pense.
     app.emit(LANGUAGE_CHANGED_EVENT, language.tag())
         .map_err(|error| error.to_string())?;
     Ok(())
+}
+
+/// **Pose la barre de menus là où ce système l'attend.**
+///
+/// `app.set_menu` est global, et ce mot ne veut pas dire la même chose des deux
+/// côtés. Sur macOS la barre appartient à **l'application** : une seule, en haut
+/// de l'écran, quelle que soit la fenêtre devant. Sur Windows et sous Linux elle
+/// appartient à **chaque fenêtre**, et `set_menu` la recopie donc sur les
+/// quarante-et-une — puis toute fenêtre créée ensuite en hérite. Radinus
+/// s'affichait avec un menu général au-dessus de la liste des chèques
+/// (dossier de portage du 05/08/2026, §2).
+///
+/// Fabrice le veut sur la seule fenêtre d'accueil, celle qui porte la devise.
+/// Ailleurs qu'à macOS, la barre est donc posée sur `main` et sur personne
+/// d'autre.
+///
+/// **Vérifié avant d'être écrit, dans les sources de Tauri** : `on_menu_event`
+/// est un écouteur *global*, et chaque `MenuEvent` est distribué à tous les
+/// écouteurs globaux quelle que soit la fenêtre qui porte la barre. Sans cette
+/// vérification, le menu serait devenu inerte — plus laid encore que partout.
+///
+/// **Ce que ça coûte hors macOS** : une barre attachée à une fenêtre n'est
+/// atteignable que quand cette fenêtre est devant. « Paramètres › Afficher la
+/// fenêtre principale » est le chemin de retour, et il existait déjà.
+pub fn install<R: Runtime>(app: &AppHandle<R>, menu: Menu<R>) -> tauri::Result<()> {
+    #[cfg(target_os = "macos")]
+    {
+        app.set_menu(menu)?;
+        Ok(())
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        if let Some(main) = app.get_webview_window("main") {
+            main.set_menu(menu)?;
+        }
+        Ok(())
+    }
 }
 
 /// L'événement que reçoit toute fenêtre ouverte quand la langue change :
@@ -265,7 +507,7 @@ pub const LANGUAGE_CHANGED_EVENT: &str = "language-changed";
 pub fn refresh<R: Runtime>(app: &AppHandle<R>) {
     match build(app) {
         Ok(menu) => {
-            let _ = app.set_menu(menu);
+            let _ = install(app, menu);
         }
         Err(error) => eprintln!("[radinus] Could not rebuild the menu bar: {error}"),
     }
@@ -351,7 +593,7 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 IMPORT_ITEM_ID,
                 t("menu-file-import-statements"),
                 usable,
-                Some("Cmd+I"),
+                accelerator(IMPORT_ITEM_ID),
             )?,
             &MenuItem::with_id(
                 app,
@@ -397,49 +639,49 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 // l'éteindre enfermerait l'utilisateur dans une base où il ne
                 // pourrait plus rien faire.
                 opened,
-                Some("Cmd+F1"),
+                accelerator(ACCOUNTS_ITEM_ID),
             )?,
             &MenuItem::with_id(
                 app,
                 BALANCES_ITEM_ID,
                 t("menu-accounts-balances"),
                 usable,
-                Some("Cmd+F2"),
+                accelerator(BALANCES_ITEM_ID),
             )?,
             &MenuItem::with_id(
                 app,
                 OPERATIONS_ITEM_ID,
                 t("menu-accounts-operations"),
                 usable,
-                Some("Cmd+F3"),
+                accelerator(OPERATIONS_ITEM_ID),
             )?,
             &MenuItem::with_id(
                 app,
                 QUICK_CLASSIFY_ITEM_ID,
                 t("menu-accounts-quick-classify"),
                 usable,
-                Some("Cmd+F4"),
+                accelerator(QUICK_CLASSIFY_ITEM_ID),
             )?,
             &MenuItem::with_id(
                 app,
                 RECURRING_ITEM_ID,
                 t("menu-accounts-recurring"),
                 usable,
-                Some("Cmd+F5"),
+                accelerator(RECURRING_ITEM_ID),
             )?,
             &MenuItem::with_id(
                 app,
                 TRANSFER_ITEM_ID,
                 t("menu-accounts-transfer"),
                 usable,
-                Some("Cmd+F6"),
+                accelerator(TRANSFER_ITEM_ID),
             )?,
             &MenuItem::with_id(
                 app,
                 CHEQUEBOOKS_ITEM_ID,
                 t("menu-accounts-checkbooks"),
                 usable,
-                Some("Cmd+F7"),
+                accelerator(CHEQUEBOOKS_ITEM_ID),
             )?,
             &MenuItem::with_id(
                 app,
@@ -461,14 +703,14 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         CURVES_ITEM_ID,
         t("menu-statistics-balance-chart"),
         true,
-        Some("Cmd+G"),
+        accelerator(CURVES_ITEM_ID),
     )?;
     let dashboard = MenuItem::with_id(
         app,
         DASHBOARD_ITEM_ID,
         t("menu-statistics-dashboard"),
         true,
-        Some("Cmd+T"),
+        accelerator(DASHBOARD_ITEM_ID),
     )?;
     let by_axis: Vec<MenuItem<R>> = AXES
         .iter()
@@ -479,7 +721,7 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 statistics_item_id(*axis),
                 t(statistics_menu_key(*axis)),
                 true,
-                Some(format!("Cmd+Shift+{}", rank + 1).as_str()),
+                Some(statistics_shortcut(rank).as_str()),
             )
         })
         .collect::<tauri::Result<Vec<_>>>()?;

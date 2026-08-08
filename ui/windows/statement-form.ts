@@ -13,6 +13,7 @@
 // L'avertissement du bas vient du noyau, jamais d'ici : c'est lui qui sait si
 // le FITID est déjà en base, et c'est lui qui écrit la phrase.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

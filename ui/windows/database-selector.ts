@@ -26,6 +26,7 @@
 // fenêtres qui montrent déjà l'ancienne ferait écrire les opérations d'une
 // base dans une autre, sans un mot.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askForPassword, askForWord, tell } from "./dialog";

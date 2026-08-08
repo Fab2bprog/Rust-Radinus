@@ -10,6 +10,7 @@
 // Les deux boutons sont éteints tant que la déclaration sur l'honneur n'est
 // pas cochée (règle de Fabrice, 01/08/2026).
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askForPrinter } from "./printers";

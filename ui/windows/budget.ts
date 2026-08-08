@@ -15,6 +15,7 @@
 // et **la couleur ne change pas d'un mode à l'autre** : à 80 % une dépense est
 // tenue et un revenu manque, seul le nombre affiché diffère.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askForWholeNumber, askYesNo } from "./dialog";

@@ -16,6 +16,7 @@
 // choisies à l'œil — elles restent distinctes pour un daltonien, ce qui n'est
 // pas vrai de n'importe quelle suite de teintes.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askForWholeNumber } from "./dialog";

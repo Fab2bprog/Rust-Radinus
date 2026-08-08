@@ -20,6 +20,7 @@
 // toujours par diverger — ce qui, sur des opérations bancaires, veut dire
 // enregistrer autre chose que ce qu'on a vu.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askThreeWays, askYesNo } from "./dialog";

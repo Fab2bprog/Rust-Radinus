@@ -10,6 +10,7 @@
 // copie côté navigateur serait une seconde vérité, et deux vérités finissent
 // toujours par diverger.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

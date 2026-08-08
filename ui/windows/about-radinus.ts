@@ -10,6 +10,7 @@
 // n'exécute pas. C'est pourtant la seule chose qu'une fenêtre « à propos »
 // doive dire juste.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { closeCurrentWindow } from "./window-frame";
 import { loadTexts, onLanguageChanged, t } from "./texts";

@@ -18,6 +18,7 @@
 // fichier n'est pas accordé à l'interface, et `capabilities/default.json`
 // n'autorise toujours que la sauvegarde.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askForChoice, askThreeWays, askYesNo } from "./dialog";

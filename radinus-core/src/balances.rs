@@ -178,8 +178,38 @@ pub fn update_all_accounts(conn: &Connection) -> rusqlite::Result<()> {
             ids.push(id?);
         }
     }
+    // **Une transaction pour tous les comptes** (dossier de portage du
+    // 05/08/2026, §4.2). `update_all` pose trois `UPDATE` par compte ; hors
+    // transaction, chacun est validé seul et paie son écriture disque. Six
+    // comptes faisaient dix-huit validations pour la suppression d'une seule
+    // opération. Elles n'en font plus qu'une.
+    //
+    // `unchecked_transaction` parce que cette fonction reçoit `&Connection` et
+    // non `&mut` : elle ne peut pas ouvrir une transaction ordinaire. Le
+    // schéma emploie déjà la même porte, pour la même raison.
+    //
+    // ⚠ **Et rien ne le vérifie à la compilation.** Le dossier Windows
+    // affirmait qu'aucun appelant n'ouvrait de transaction ; c'était vrai de
+    // la 2.0.0, et faux ici — `repair::run` en ouvre une et appelle ceci
+    // dedans. SQLite l'a dit tout net : « cannot start a transaction within a
+    // transaction », huit tests de réparation d'un coup.
+    //
+    // D'où la question posée au lieu d'être supposée. `is_autocommit` rend
+    // faux dès qu'une transaction est ouverte sur cette connexion : dans ce
+    // cas on écrit dans celle de l'appelant, qui la validera, et le
+    // groupement est acquis quand même. **Une transaction imbriquée n'a pas
+    // d'intérêt ici** — ce qu'on cherche est une seule validation, et
+    // l'appelant en promet déjà une.
+    let own = if conn.is_autocommit() {
+        Some(conn.unchecked_transaction()?)
+    } else {
+        None
+    };
     for id in ids {
         update_all(conn, id)?;
+    }
+    if let Some(transaction) = own {
+        transaction.commit()?;
     }
     Ok(())
 }

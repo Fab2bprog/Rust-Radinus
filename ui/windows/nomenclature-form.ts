@@ -35,6 +35,7 @@
 // meant for the list also reached this form, which read them as "add a new
 // record" and blanked itself, reserve variables included.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo, questionIsOnScreen } from "./dialog";

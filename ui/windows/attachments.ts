@@ -11,6 +11,7 @@
 // `frVersCorbeille` de l'original, et une pièce supprimée par erreur se
 // récupère d'un clic droit.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

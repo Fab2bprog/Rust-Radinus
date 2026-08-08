@@ -10,6 +10,7 @@
 // chose qu'on savait déjà en la créant. Les mots sont ceux de F39 — deux
 // fenêtres qui demandent la même chose la demandent des mêmes mots.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { closeCurrentWindow } from "./window-frame";

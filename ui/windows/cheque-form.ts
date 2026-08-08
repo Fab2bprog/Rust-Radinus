@@ -15,6 +15,7 @@
 // d'un `Ferme()`. La fiche a fait ce qu'on lui demandait ; y rester donnerait à
 // croire qu'il reste un geste à faire.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { asMoneyField } from "./money-field";

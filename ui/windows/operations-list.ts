@@ -17,6 +17,7 @@
 // The table only builds the rows that are on screen: the author's own account
 // holds 2 502 operations and the plan asks for 40 000.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

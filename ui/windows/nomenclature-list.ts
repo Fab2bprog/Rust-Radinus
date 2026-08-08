@@ -17,6 +17,7 @@
 // moved out rather than copied: the accounts list would otherwise have been a
 // second copy of everything Fabrice made me fix on this one.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

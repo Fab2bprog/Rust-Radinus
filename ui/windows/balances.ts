@@ -11,6 +11,7 @@
 //
 // Nothing is done here — the right panel holds the door alone.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { Table } from "./table";

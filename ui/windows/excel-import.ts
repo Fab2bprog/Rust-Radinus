@@ -12,6 +12,7 @@
 // périme l'essai précédent — ce qui est à l'écran ne correspond plus à ce qui
 // est réglé, et il vaut mieux le dire que le laisser croire.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo, tell } from "./dialog";

@@ -15,6 +15,7 @@
 //   * **la fenêtre reste ouverte** après un virement, vidée pour le suivant —
 //     on n'en fait presque jamais un seul.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { tell } from "./dialog";

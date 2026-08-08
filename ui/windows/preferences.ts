@@ -14,6 +14,7 @@
 // n'ait demandé d'y mettre. Une préférence de plus se demande, elle ne se
 // glisse pas.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { askYesNo } from "./dialog";
 import { loadTexts, onLanguageChanged, t, tError } from "./texts";

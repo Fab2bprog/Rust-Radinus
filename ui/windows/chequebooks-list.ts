@@ -10,6 +10,7 @@
 // Faux dès le premier Oui. Et elle ne détruit aucune opération bancaire — elle
 // leur retire leur chèque.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

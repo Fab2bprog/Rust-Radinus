@@ -23,6 +23,7 @@
 // (`window.css`). C'est la seule chose de cette fenêtre qui n'ait pas tenu
 // jusqu'à dix langues, et elle tiendra maintenant jusqu'à cinquante.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { sortByOwnName } from "./languages";
 

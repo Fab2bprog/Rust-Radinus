@@ -11,6 +11,7 @@
 // Fabrice, 31/07/2026) : ce sont de vraies écritures, passées en banque pour
 // certaines, et elles gardent la marque de la règle qui les a produites.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

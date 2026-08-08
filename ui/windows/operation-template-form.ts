@@ -10,6 +10,7 @@
 //
 // **Enregistrer referme la fiche**, comme les fiches chèque et chéquier.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { asMoneyField } from "./money-field";

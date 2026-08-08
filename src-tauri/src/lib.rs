@@ -176,7 +176,7 @@ pub fn run() {
             tauri::Manager::manage(app, state);
 
             let menu = menu::build(app.handle())?;
-            app.set_menu(menu)?;
+            menu::install(app.handle(), menu)?;
             app.on_menu_event(menu::on_event);
 
             // **La fenêtre d'accueil s'efface tant qu'aucune base n'est
@@ -282,6 +282,8 @@ pub fn run() {
             commands::save_preferences_zoom,
             commands::app_version,
             commands::open_licence_page,
+            commands::menu_shortcuts,
+            commands::menu_shortcut,
             commands::close_preferences,
             commands::startup_error,
             commands::choose_language,

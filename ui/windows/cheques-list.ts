@@ -14,6 +14,7 @@
 // deux listes d'association ne montrent que les mères. C'est son `NombreOpChq`,
 // et les deux nombres peuvent donc diverger : fidélité assumée.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { Table } from "./table";

@@ -15,6 +15,7 @@
 // **Deleting an account destroys history.** Its operations go with it — the
 // only place in Radinus where that happens — so the question says how many.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askForWord, askYesNo } from "./dialog";

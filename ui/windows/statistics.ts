@@ -27,6 +27,7 @@
 // **lignes**, alors qu'ici on choisit une **case**. Le détail du bas, lui, est
 // une liste ordinaire et s'en sert.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { save } from "@tauri-apps/plugin-dialog";

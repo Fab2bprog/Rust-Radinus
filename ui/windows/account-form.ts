@@ -13,6 +13,7 @@
 // carried-over balances, which are typed here and nowhere else: everything
 // the rest of Radinus shows is computed from them.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askForAmount, askForWord, askYesNo, questionIsOnScreen, tell } from "./dialog";

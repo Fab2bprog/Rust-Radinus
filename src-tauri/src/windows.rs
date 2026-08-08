@@ -23,6 +23,10 @@ use radinus_core::statistics::Axis;
 use tauri::{AppHandle, Emitter, EventTarget, Manager, Runtime, WebviewUrl, WebviewWindowBuilder};
 
 /// A window this build knows how to open.
+///
+/// `Clone` parce que sous Windows la construction part sur un fil séparé et
+/// que la spécification doit l'y suivre — voir [`open`].
+#[derive(Clone)]
 pub struct WindowSpec {
     pub label: String,
     pub url: String,
@@ -1154,6 +1158,81 @@ pub fn open<R: Runtime>(
         }
     }
 
+    // **Sous Windows, bâtir une fenêtre ici figerait le logiciel** (dossier de
+    // portage du 05/08/2026, §1).
+    //
+    // La documentation de Tauri est explicite : *« On Windows, this function
+    // deadlocks when used in a synchronous command and event handlers. »* C'est
+    // une contrainte de WebView2 — créer un webview réclame que la boucle de
+    // messages tourne, et c'est précisément celle qu'occupe le gestionnaire en
+    // cours. macOS n'a pas cette contrainte, d'où un code identique qui n'a
+    // jamais bronché sur le Mac.
+    //
+    // Or `open` est appelée depuis les deux endroits interdits : les commandes,
+    // dont la quasi-totalité sont synchrones, et `menu::on_event`, qui est un
+    // gestionnaire d'événement. Le symptôme était net : Radinus démarrait, puis
+    // **le premier clic demandant une fenêtre figeait tout**, sans un mot.
+    //
+    // Corriger ici plutôt que chez les quarante appelants répare tout d'un
+    // coup, et laisse macOS exactement comme il était.
+    //
+    // **Le garde `BUILDING`** empêche qu'un double clic lance deux
+    // constructions pour la même étiquette : la seconde arriverait avant que la
+    // première n'ait posé sa fenêtre, et `get_webview_window` ci-dessus ne
+    // l'aurait pas encore vue.
+    //
+    // *Ce que ça coûte* : `open` rend `Ok(())` avant que la fenêtre existe, et
+    // une construction ratée se dit dans la console au lieu de remonter à
+    // l'appelant. C'est le prix d'une fenêtre qui s'ouvre.
+    #[cfg(target_os = "windows")]
+    {
+        use std::collections::HashSet;
+        use std::sync::{Mutex, OnceLock};
+
+        static BUILDING: OnceLock<Mutex<HashSet<String>>> = OnceLock::new();
+        let building = BUILDING.get_or_init(|| Mutex::new(HashSet::new()));
+        {
+            let mut held = match building.lock() {
+                Ok(held) => held,
+                Err(poisoned) => poisoned.into_inner(),
+            };
+            if !held.insert(spec.label.clone()) {
+                // Déjà en cours de construction : le second clic ne fait rien.
+                return Ok(());
+            }
+        }
+
+        let app = app.clone();
+        let spec = spec.clone();
+        let query = query.map(str::to_owned);
+        std::thread::spawn(move || {
+            if let Err(error) = build_the_window(&app, &spec, query.as_deref()) {
+                eprintln!(
+                    "[radinus] Could not build the {} window: {error}",
+                    spec.label
+                );
+            }
+            // **Retiré quoi qu'il arrive**, réussite comme échec : une
+            // étiquette laissée dans le garde interdirait cette fenêtre pour le
+            // reste de la session.
+            if let Ok(mut held) = building.lock() {
+                held.remove(&spec.label);
+            }
+        });
+        return Ok(());
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    build_the_window(app, spec, query)
+}
+
+/// La construction proprement dite : tout ce que `open` faisait avant que
+/// Windows n'oblige à la déporter sur un fil.
+fn build_the_window<R: Runtime>(
+    app: &AppHandle<R>,
+    spec: &WindowSpec,
+    query: Option<&str>,
+) -> tauri::Result<()> {
     let url = address(&spec.url, query);
 
     let (width, height) = what_the_screen_allows(app, spec);

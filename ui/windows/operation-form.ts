@@ -33,6 +33,7 @@
 //   * the window is built once and never destroyed: leaving hides it, coming
 //     back shows it, and being left behind empties it, reserve included.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askForText, askYesNo, questionIsOnScreen } from "./dialog";

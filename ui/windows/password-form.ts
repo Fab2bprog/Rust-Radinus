@@ -13,6 +13,7 @@
 // retrait, parce qu'elle porte sur ce que l'utilisateur vient de taper et
 // qu'aucun aller-retour ne rendrait plus sûr.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";

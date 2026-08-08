@@ -26,6 +26,7 @@
 // lancement du logiciel, c'est-à-dire au moment précis où l'on juge s'il est
 // lent.
 
+import "./windows/shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { drawCurve, type CurvePoint } from "./windows/curve";

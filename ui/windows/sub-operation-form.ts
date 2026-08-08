@@ -20,6 +20,7 @@
 // l'enregistrer sans y toucher le laissent intact — rien de tout cela n'entre
 // dans le calcul du reste. La fenêtre le dit, elle ne l'interdit pas.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo, questionIsOnScreen } from "./dialog";

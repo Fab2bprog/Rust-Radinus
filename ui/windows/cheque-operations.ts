@@ -17,6 +17,7 @@
 // **La croix rouge détache, elle ne supprime pas.** L'opération reste dans son
 // compte, le chèque reste dans son carnet ; seul `IDCheque` revient à zéro.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { Table } from "./table";

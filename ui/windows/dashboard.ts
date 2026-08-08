@@ -25,6 +25,7 @@
 // couleur), les secteurs sont séparés par un filet de la couleur du fond, et
 // la légende nomme chaque poste à côté de son carré.
 
+import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { buildPeriodMenu, currentMonth, type Period } from "./period";
