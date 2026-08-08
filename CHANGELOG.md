@@ -11,7 +11,7 @@ Two version numbers live in this project and they do not move together:
   the line Radinus 1.x walked from 0 to 9 and is at 10 today. A database is
   migrated forward when it is opened, never backward.
 
-## [2.0.1] — unreleased
+## [2.0.2] — unreleased
 
 The cross-platform rewrite of Radinus 1.9.3 (Windows/WinDev) in Rust and
 Tauri, macOS first. Same author, same data, same windows — a different
@@ -80,4 +80,4 @@ machine underneath.
   asks for the language, then for the database, and creates one only when
   told to.
 
-[2.0.1]: https://github.com/
+[2.0.2]: https://github.com/

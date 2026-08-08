@@ -87,6 +87,10 @@ pub const ABOUT_RADINUS_ITEM_ID: &str = "settings-about-radinus";
 pub const LICENCE_ITEM_ID: &str = "settings-licence";
 pub const DATABASE_FOLDER_ITEM_ID: &str = "misc-database-folder";
 pub const APPLICATION_FOLDER_ITEM_ID: &str = "misc-application-folder";
+/// « Accès au dossier contenant les pièces jointes » (Fabrice, 08/08/2026).
+pub const ATTACHMENTS_FOLDER_ITEM_ID: &str = "misc-attachments-folder";
+/// « Gestion des pièces jointes » (Fabrice, 08/08/2026).
+pub const ATTACHMENTS_MANAGER_ITEM_ID: &str = "settings-attachments";
 
 /// Le site de Radinus, celui du document 01 §6.
 const WEBSITE: &str = "https://www.radinus.fr";
@@ -302,6 +306,13 @@ pub fn shortcut_table() -> Vec<Shortcut> {
 /// ⚠ **`Menu::get` n'est pas récursif** : il ne regarde que ses enfants
 /// directs, c'est-à-dire les sept sous-menus. La descente se fait donc ici.
 ///
+/// **Et elle descend aussi loin qu'il le faut** : depuis le 08/08/2026, la
+/// barre porte un sous-menu dans un sous-menu — « Paramètres › Accès dossiers
+/// Radinus › … ». Une descente d'un seul niveau aurait rendu « non » pour ces
+/// entrées-là. Aucune ne porte de raccourci aujourd'hui, mais un piège qui
+/// n'attend qu'une ligne de plus pour se refermer n'est pas un piège qu'on
+/// laisse.
+///
 /// Une barre introuvable répond « non » : mieux vaut un raccourci muet qu'un
 /// raccourci qui agit sur une base fermée.
 fn is_enabled<R: Runtime>(app: &AppHandle<R>, id: &str) -> bool {
@@ -315,22 +326,29 @@ fn is_enabled<R: Runtime>(app: &AppHandle<R>, id: &str) -> bool {
     let Ok(items) = bar.items() else {
         return false;
     };
+    enabled_among(&items, id).unwrap_or(false)
+}
+
+/// Cherche `id` dans ces entrées et dans tous leurs sous-menus.
+///
+/// Rend `None` quand l'entrée n'est nulle part — ce qui n'est pas la même chose
+/// que « trouvée et grisée », et c'est pourquoi ce n'est pas un `bool`.
+fn enabled_among<R: Runtime>(items: &[tauri::menu::MenuItemKind<R>], id: &str) -> Option<bool> {
     for kind in items {
-        let Some(submenu) = kind.as_submenu() else {
-            continue;
-        };
-        let Ok(children) = submenu.items() else {
-            continue;
-        };
-        for child in children {
-            if let Some(item) = child.as_menuitem() {
-                if item.id() == id {
-                    return item.is_enabled().unwrap_or(false);
+        if let Some(item) = kind.as_menuitem() {
+            if item.id() == id {
+                return Some(item.is_enabled().unwrap_or(false));
+            }
+        }
+        if let Some(submenu) = kind.as_submenu() {
+            if let Ok(children) = submenu.items() {
+                if let Some(found) = enabled_among(&children, id) {
+                    return Some(found);
                 }
             }
         }
     }
-    false
+    None
 }
 
 /// Exécute l'entrée `id` comme si l'utilisateur l'avait choisie à la souris.
@@ -803,6 +821,44 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         Submenu::with_items(app, t("menu-nomenclatures"), usable, &nomenclature_entries)?;
 
     // --- Paramètres ---
+    //
+    // **Les deux dossiers y montent, les trois « à propos » en descendent**
+    // (Fabrice, 08/08/2026). Le rangement suit le sens : Paramètres réunit ce
+    // qui touche à l'installation — les réglages, la fenêtre, les dossiers —,
+    // et Divers ce qui n'agit sur rien : la calculatrice, le site, et ce que
+    // Radinus dit de lui-même.
+    //
+    // « Accès dossiers Radinus » **n'ouvre rien** : c'est un sous-menu, et les
+    // deux entrées qu'il déroule gardent chacune leur gestionnaire, y compris
+    // l'avertissement posé devant le dossier de la base.
+    let folders_menu = Submenu::with_items(
+        app,
+        t("menu-settings-folders"),
+        true,
+        &[
+            &MenuItem::with_id(
+                app,
+                DATABASE_FOLDER_ITEM_ID,
+                t("menu-misc-database-folder"),
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                ATTACHMENTS_FOLDER_ITEM_ID,
+                t("menu-misc-attachments-folder"),
+                opened,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                APPLICATION_FOLDER_ITEM_ID,
+                t("menu-misc-application-folder"),
+                true,
+                None::<&str>,
+            )?,
+        ],
+    )?;
     let settings_menu = Submenu::with_items(
         app,
         t("menu-settings"),
@@ -822,26 +878,12 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 opened,
                 None::<&str>,
             )?,
-            &PredefinedMenuItem::separator(app)?,
+            &folders_menu,
             &MenuItem::with_id(
                 app,
-                ABOUT_AUTHOR_ITEM_ID,
-                t("menu-settings-about-author"),
-                true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                ABOUT_RADINUS_ITEM_ID,
-                t("menu-settings-about-radinus"),
-                true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                LICENCE_ITEM_ID,
-                t("menu-settings-licence"),
-                true,
+                ATTACHMENTS_MANAGER_ITEM_ID,
+                t("menu-settings-attachments"),
+                opened,
                 None::<&str>,
             )?,
         ],
@@ -859,17 +901,33 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         true,
         None::<&str>,
     )?);
+    misc_items.push(MenuItem::with_id(
+        app,
+        WEBSITE_ITEM_ID,
+        t("menu-misc-website"),
+        true,
+        None::<&str>,
+    )?);
+    // **Le trait suit ce qu'il sépare.** Il était dans Paramètres, devant les
+    // trois « à propos » ; il les accompagne ici, et coupe au même endroit : ce
+    // qui fait quelque chose d'un côté, ce que Radinus dit de lui-même de
+    // l'autre.
+    let after_website = misc_items.len();
     for (id, key) in [
-        (WEBSITE_ITEM_ID, "menu-misc-website"),
-        (DATABASE_FOLDER_ITEM_ID, "menu-misc-database-folder"),
-        (APPLICATION_FOLDER_ITEM_ID, "menu-misc-application-folder"),
+        (ABOUT_AUTHOR_ITEM_ID, "menu-settings-about-author"),
+        (ABOUT_RADINUS_ITEM_ID, "menu-settings-about-radinus"),
+        (LICENCE_ITEM_ID, "menu-settings-licence"),
     ] {
         misc_items.push(MenuItem::with_id(app, id, t(key), true, None::<&str>)?);
     }
-    let misc_entries: Vec<&dyn tauri::menu::IsMenuItem<R>> = misc_items
-        .iter()
-        .map(|item| item as &dyn tauri::menu::IsMenuItem<R>)
-        .collect();
+    let separator = PredefinedMenuItem::separator(app)?;
+    let mut misc_entries: Vec<&dyn tauri::menu::IsMenuItem<R>> = Vec::new();
+    for (rank, item) in misc_items.iter().enumerate() {
+        if rank == after_website {
+            misc_entries.push(&separator);
+        }
+        misc_entries.push(item);
+    }
     let misc_menu = Submenu::with_items(app, t("menu-misc"), true, &misc_entries)?;
 
     Menu::with_items(
@@ -1028,6 +1086,54 @@ pub fn on_event<R: Runtime>(app: &AppHandle<R>, event: tauri::menu::MenuEvent) {
         if let Err(error) = crate::system::open_with_desktop(&folder) {
             eprintln!("[radinus] Could not open {}: {error}", folder.display());
         }
+        return;
+    }
+
+    if event.id() == ATTACHMENTS_MANAGER_ITEM_ID {
+        let window = crate::windows::attachments_manager_window(language);
+        if let Err(error) = crate::windows::open(app, &window, None) {
+            eprintln!("[radinus] Could not open the attachments manager: {error}");
+        }
+        return;
+    }
+
+    // **Le dossier des pièces jointes, et son propre avertissement** (Fabrice,
+    // 08/08/2026).
+    //
+    // Le danger n'y est pas celui du dossier de la base, et la phrase le dit :
+    // on n'y perd pas des comptes, **on y casse un lien**. Radinus range chaque
+    // pièce sous un nom qu'il a choisi lui-même ; la renommer ou la jeter ne la
+    // détache pas de l'opération, qui continuera de l'annoncer sans pouvoir
+    // l'ouvrir. Avertir de la vraie conséquence vaut mieux que recommander la
+    // prudence en général.
+    //
+    // **Grisée tant qu'aucune base n'est ouverte** : le dossier des pièces
+    // appartient à la base, et il n'y en a aucun à montrer avant.
+    if event.id() == ATTACHMENTS_FOLDER_ITEM_ID {
+        let folder = app
+            .state::<crate::state::AppState>()
+            .attachments_dir();
+        // Le dossier ne naît qu'à la première pièce jointe : sans lui, on ne
+        // montre rien plutôt que de montrer autre chose.
+        if !folder.is_dir() {
+            return;
+        }
+        app.dialog()
+            .message(i18n::text(language, "attachments-folder-warning"))
+            .title(i18n::text(language, "attachments-folder-warning-title"))
+            .kind(MessageDialogKind::Warning)
+            .buttons(MessageDialogButtons::OkCancelCustom(
+                i18n::text(language, "ui-yes"),
+                i18n::text(language, "ui-no"),
+            ))
+            .show(move |accepted| {
+                if !accepted {
+                    return;
+                }
+                if let Err(error) = crate::system::open_with_desktop(&folder) {
+                    eprintln!("[radinus] Could not open {}: {error}", folder.display());
+                }
+            });
         return;
     }
 

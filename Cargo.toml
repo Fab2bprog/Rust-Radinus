@@ -3,7 +3,7 @@ resolver = "2"
 members = ["radinus-core", "src-tauri"]
 
 [workspace.package]
-version = "2.0.1"
+version = "2.0.2"
 edition = "2021"
 authors = ["Fabrice Garcia"]
 license = "GPL-3.0-or-later"

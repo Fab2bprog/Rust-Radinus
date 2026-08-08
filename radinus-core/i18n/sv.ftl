@@ -292,6 +292,45 @@ database-folder-warning =
     Den här mappen innehåller alla dina data. Att byta namn på, flytta eller ta bort en fil kan förlora dina konton, skada dem eller hindra Radinus från att fungera.
     Vill du verkligen öppna den?
 menu-misc-application-folder = Öppna mappen som innehåller programmet
+menu-misc-attachments-folder = Åtkomst till mappen med bilagorna
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Hantera bilagorna
+window-attachments-manager-title = Hantera bilagorna
+attachments-column-document = Dokument
+attachments-column-size = Storlek
+attachments-column-added = Tillagd den
+attachments-column-state = Tillstånd
+attachments-state-intact = Oförändrad
+attachments-state-altered = Ändrad sedan dess
+attachments-state-missing = Filen saknas
+attachments-state-unknown = Kan ej kontrolleras
+attachments-state-orphan = Föräldralös
+attachments-no-operation = Ingen transaktion
+attachments-orphan-remove-question = Den här filen hör inte till någon transaktion. Flytta den till papperskorgen?
+attachments-manager-help = Dubbelklicka på en rad för att öppna dokumentet.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Visa transaktionen
+attachments-reveal = Visa i filhanteraren
+attachments-manager-summary = { $count } bilagor, { $size } totalt.
+attachments-disk-name = Namn på disken: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Öppna bilagornas mapp
+attachments-folder-warning =
+    Den här mappen innehåller filerna du bifogat till dina transaktioner. Radinus lagrar dem under ett namn som det väljer själv: att byta namn på, flytta eller ta bort en fil lossar den inte från transaktionen, som fortsätter att visa den fast den inte längre öppnas.
+    Vill du verkligen öppna den?
 
 # ---------------------------------------------------------------------
 # Bankkonton — F04, F06, F07, F08.
@@ -1741,6 +1780,7 @@ ui-money-sign-position = after
 window-preferences-title = Alternativ
 menu-settings-preferences = Alternativ…
 menu-settings-show-main = Visa huvudfönstret
+menu-settings-folders = Radinus mappar
 preferences-branch-display = Visning
 preferences-leaf-language = Språk
 preferences-leaf-currency = Valuta

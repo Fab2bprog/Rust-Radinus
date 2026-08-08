@@ -315,6 +315,45 @@ database-folder-warning =
     يحتوي هذا المجلد على جميع بياناتك. إعادة تسمية ملف أو نقله أو حذفه قد يفقدك حساباتك أو يتلفها أو يمنع Radinus من العمل.
     هل تريد فتحه فعلاً؟
 menu-misc-application-folder = الوصول إلى المجلد الذي يحتوي التطبيق
+menu-misc-attachments-folder = الوصول إلى المجلد الذي يحتوي على المرفقات
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = إدارة المرفقات
+window-attachments-manager-title = إدارة المرفقات
+attachments-column-document = مستند
+attachments-column-size = الحجم
+attachments-column-added = أُضيف في
+attachments-column-state = الحالة
+attachments-state-intact = سليم
+attachments-state-altered = تغيّر منذ ذلك الحين
+attachments-state-missing = الملف مفقود
+attachments-state-unknown = غير قابل للتحقق
+attachments-state-orphan = يتيم
+attachments-no-operation = لا عملية
+attachments-orphan-remove-question = هذا الملف غير مرتبط بأي عملية. هل تنقله إلى سلة المهملات؟
+attachments-manager-help = انقر نقرًا مزدوجًا على سطر لفتح المستند.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = عرض العملية
+attachments-reveal = إظهار في مدير الملفات
+attachments-manager-summary = { $count } مرفقات، { $size } إجمالاً.
+attachments-disk-name = الاسم على القرص: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = فتح مجلد المرفقات
+attachments-folder-warning =
+    يحتوي هذا المجلد على الملفات التي أرفقتها بعملياتك. يحفظها Radinus باسم يختاره بنفسه: إعادة تسمية ملف أو نقله أو حذفه لا يفصله عن العملية، التي ستظل تعلن عنه ولن يُفتح بعد ذلك.
+    هل تريد فتحه فعلاً؟
 
 # ---------------------------------------------------------------------
 # الحسابات المصرفية — F04, F06, F07, F08.
@@ -1835,6 +1874,7 @@ ui-money-sign-position = after
 window-preferences-title = التفضيلات
 menu-settings-preferences = التفضيلات…
 menu-settings-show-main = عرض النافذة الرئيسية
+menu-settings-folders = مجلدات Radinus
 preferences-branch-display = العرض
 preferences-leaf-language = اللغة
 preferences-leaf-currency = العملة

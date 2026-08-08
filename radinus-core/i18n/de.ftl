@@ -295,6 +295,45 @@ database-folder-warning =
     Dieser Ordner enthält alle Ihre Daten. Eine Datei darin umzubenennen, zu verschieben oder zu löschen kann Ihre Konten verlieren, beschädigen oder Radinus unbrauchbar machen.
     Möchten Sie ihn wirklich öffnen?
 menu-misc-application-folder = Zugriff auf den Ordner mit der Anwendung
+menu-misc-attachments-folder = Zugriff auf den Ordner mit den Anhängen
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Anhänge verwalten
+window-attachments-manager-title = Anhänge verwalten
+attachments-column-document = Dokument
+attachments-column-size = Größe
+attachments-column-added = Hinzugefügt am
+attachments-column-state = Zustand
+attachments-state-intact = Unverändert
+attachments-state-altered = Seitdem geändert
+attachments-state-missing = Datei fehlt
+attachments-state-unknown = Nicht prüfbar
+attachments-state-orphan = Verwaist
+attachments-no-operation = Keine Buchung
+attachments-orphan-remove-question = Diese Datei gehört zu keiner Buchung. In den Papierkorb verschieben?
+attachments-manager-help = Doppelklicken Sie auf eine Zeile, um das Dokument zu öffnen.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Die Buchung anzeigen
+attachments-reveal = Im Dateimanager anzeigen
+attachments-manager-summary = { $count } Anhänge, insgesamt { $size }.
+attachments-disk-name = Name auf der Festplatte: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Den Ordner der Anhänge öffnen
+attachments-folder-warning =
+    Dieser Ordner enthält die Dateien, die Sie Ihren Buchungen beigefügt haben. Radinus legt sie unter einem selbst gewählten Namen ab: eine Datei umzubenennen, zu verschieben oder zu löschen löst sie nicht von der Buchung — diese kündigt sie weiterhin an, und sie lässt sich nicht mehr öffnen.
+    Möchten Sie ihn wirklich öffnen?
 
 # ---------------------------------------------------------------------
 # Bankkonten — F04, F06, F07, F08.
@@ -1750,6 +1789,7 @@ ui-money-sign-position = after
 window-preferences-title = Voreinstellungen
 menu-settings-preferences = Voreinstellungen…
 menu-settings-show-main = Hauptfenster anzeigen
+menu-settings-folders = Radinus-Ordner
 preferences-branch-display = Anzeige
 preferences-leaf-language = Sprache
 preferences-leaf-currency = Währung

@@ -264,6 +264,45 @@ database-folder-warning =
     Esta pasta contém todos os seus dados. Renomear, mover ou eliminar um ficheiro pode fazer perder as suas contas, danificá-las ou impedir o Radinus de funcionar.
     Deseja realmente abri-la?
 menu-misc-application-folder = Aceder à pasta que contém a aplicação
+menu-misc-attachments-folder = Acesso à pasta que contém os anexos
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Gestão dos anexos
+window-attachments-manager-title = Gestão dos anexos
+attachments-column-document = Documento
+attachments-column-size = Tamanho
+attachments-column-added = Adicionado em
+attachments-column-state = Estado
+attachments-state-intact = Intacto
+attachments-state-altered = Alterado desde
+attachments-state-missing = Ficheiro ausente
+attachments-state-unknown = Não verificável
+attachments-state-orphan = Órfão
+attachments-no-operation = Nenhuma operação
+attachments-orphan-remove-question = Este ficheiro não está ligado a nenhuma operação. Enviá-lo para a reciclagem?
+attachments-manager-help = Faça duplo clique numa linha para abrir o documento.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Mostrar a operação
+attachments-reveal = Revelar no explorador de ficheiros
+attachments-manager-summary = { $count } anexos, { $size } no total.
+attachments-disk-name = Nome no disco: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Abrir a pasta dos anexos
+attachments-folder-warning =
+    Esta pasta contém os ficheiros que anexou às suas operações. O Radinus guarda-os com um nome escolhido por ele: renomear, mover ou eliminar um não o desliga da operação, que continuará a anunciá-lo e ele deixará de abrir.
+    Deseja realmente abri-la?
 
 # ---------------------------------------------------------------------
 # Contas bancárias — F04, F06, F07, F08.
@@ -1563,6 +1602,7 @@ ui-money-sign-position = after
 window-preferences-title = Preferências
 menu-settings-preferences = Preferências…
 menu-settings-show-main = Mostrar a janela principal
+menu-settings-folders = Pastas do Radinus
 preferences-branch-display = Visualização
 preferences-leaf-language = Idioma
 preferences-leaf-currency = Moeda

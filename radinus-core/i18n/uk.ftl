@@ -305,6 +305,45 @@ database-folder-warning =
     У цій теці зберігаються всі ваші дані. Перейменування, переміщення або вилучення файлу може призвести до втрати рахунків, їх пошкодження або до непрацездатності Radinus.
     Sправді відкрити її?
 menu-misc-application-folder = Доступ до теки з програмою
+menu-misc-attachments-folder = Доступ до теки з долученнями
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Керування долученнями
+window-attachments-manager-title = Керування долученнями
+attachments-column-document = Документ
+attachments-column-size = Розмір
+attachments-column-added = Додано
+attachments-column-state = Стан
+attachments-state-intact = Не змінено
+attachments-state-altered = Змінено відтоді
+attachments-state-missing = Файл відсутній
+attachments-state-unknown = Неможливо перевірити
+attachments-state-orphan = Осиротілий
+attachments-no-operation = Немає операції
+attachments-orphan-remove-question = Цей файл не пов'язаний із жодною операцією. Надіслати його до смітника?
+attachments-manager-help = Двічі клацніть рядок, щоб відкрити документ.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Показати операцію
+attachments-reveal = Показати у файловому менеджері
+attachments-manager-summary = Долучень: { $count }, разом { $size }.
+attachments-disk-name = Ім'я на диску: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Відкрити теку долучень
+attachments-folder-warning =
+    У цій теці зберігаються файли, долучені вами до операцій. Radinus зберігає їх під іменем, яке обрав сам: перейменування, переміщення або вилучення файлу не від'єднує його від операції — вона й далі його показуватиме, а він більше не відкриється.
+    Sправді відкрити її?
 
 # ---------------------------------------------------------------------
 # Банківські рахунки — F04, F06, F07, F08.
@@ -1802,6 +1841,7 @@ ui-money-sign-position = after
 window-preferences-title = Параметри
 menu-settings-preferences = Параметри…
 menu-settings-show-main = Показати головне вікно
+menu-settings-folders = Теки Radinus
 preferences-branch-display = Відображення
 preferences-leaf-language = Мова
 preferences-leaf-currency = Валюта

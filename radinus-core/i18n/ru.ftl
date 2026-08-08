@@ -306,6 +306,45 @@ database-folder-warning =
     В этой папке хранятся все ваши данные. Переименование, перемещение или удаление файла может привести к потере счетов, их повреждению или к неработоспособности Radinus.
     Действительно открыть её?
 menu-misc-application-folder = Доступ к папке с приложением
+menu-misc-attachments-folder = Доступ к папке с вложениями
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Управление вложениями
+window-attachments-manager-title = Управление вложениями
+attachments-column-document = Документ
+attachments-column-size = Размер
+attachments-column-added = Добавлено
+attachments-column-state = Состояние
+attachments-state-intact = Не изменено
+attachments-state-altered = Изменено с тех пор
+attachments-state-missing = Файл отсутствует
+attachments-state-unknown = Проверить нельзя
+attachments-state-orphan = Осиротевший
+attachments-no-operation = Нет операции
+attachments-orphan-remove-question = Этот файл не связан ни с одной операцией. Отправить его в корзину?
+attachments-manager-help = Дважды щёлкните строку, чтобы открыть документ.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Показать операцию
+attachments-reveal = Показать в файловом менеджере
+attachments-manager-summary = Вложений: { $count }, всего { $size }.
+attachments-disk-name = Имя на диске: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Открыть папку вложений
+attachments-folder-warning =
+    В этой папке хранятся файлы, приложенные вами к операциям. Radinus хранит их под именем, которое выбрал сам: переименование, перемещение или удаление файла не отвязывает его от операции — она по-прежнему будет его показывать, а он больше не откроется.
+    Действительно открыть её?
 
 # ---------------------------------------------------------------------
 # Банковские счета — F04, F06, F07, F08.
@@ -1802,6 +1841,7 @@ ui-money-sign-position = after
 window-preferences-title = Параметры
 menu-settings-preferences = Параметры…
 menu-settings-show-main = Показать главное окно
+menu-settings-folders = Папки Radinus
 preferences-branch-display = Отображение
 preferences-leaf-language = Язык
 preferences-leaf-currency = Валюта

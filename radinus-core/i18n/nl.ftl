@@ -297,6 +297,45 @@ database-folder-warning =
     Deze map bevat al uw gegevens. Een bestand hernoemen, verplaatsen of verwijderen kan uw rekeningen doen verliezen, beschadigen of Radinus onbruikbaar maken.
     Wilt u de map echt openen?
 menu-misc-application-folder = Toegang tot de map met de toepassing
+menu-misc-attachments-folder = Toegang tot de map met de bijlagen
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Beheer van de bijlagen
+window-attachments-manager-title = Beheer van de bijlagen
+attachments-column-document = Document
+attachments-column-size = Grootte
+attachments-column-added = Toegevoegd op
+attachments-column-state = Staat
+attachments-state-intact = Ongewijzigd
+attachments-state-altered = Sindsdien gewijzigd
+attachments-state-missing = Bestand ontbreekt
+attachments-state-unknown = Niet controleerbaar
+attachments-state-orphan = Wees
+attachments-no-operation = Geen verrichting
+attachments-orphan-remove-question = Dit bestand hoort bij geen enkele verrichting. Naar de prullenbak verplaatsen?
+attachments-manager-help = Dubbelklik op een regel om het document te openen.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = De verrichting tonen
+attachments-reveal = Tonen in de bestandsbeheerder
+attachments-manager-summary = { $count } bijlagen, { $size } in totaal.
+attachments-disk-name = Naam op de schijf: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = De map met bijlagen openen
+attachments-folder-warning =
+    Deze map bevat de bestanden die u aan uw verrichtingen hebt gehecht. Radinus bewaart ze onder een zelfgekozen naam: een bestand hernoemen, verplaatsen of verwijderen maakt het niet los van de verrichting, die het blijft aankondigen terwijl het niet meer opent.
+    Wilt u de map echt openen?
 
 # ---------------------------------------------------------------------
 # Bankrekeningen — F04, F06, F07, F08.
@@ -1756,6 +1795,7 @@ ui-money-sign-position = before
 window-preferences-title = Voorkeuren
 menu-settings-preferences = Voorkeuren…
 menu-settings-show-main = Hoofdvenster tonen
+menu-settings-folders = Mappen van Radinus
 preferences-branch-display = Weergave
 preferences-leaf-language = Taal
 preferences-leaf-currency = Valuta

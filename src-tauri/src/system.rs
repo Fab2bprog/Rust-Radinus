@@ -86,6 +86,65 @@ pub fn open_with_desktop(path: &Path) -> std::io::Result<()> {
     command.spawn().map(|_| ())
 }
 
+/// **Montre `path` dans le navigateur de fichiers du système, sélectionné.**
+///
+/// Ce n'est pas la même chose qu'ouvrir le dossier : on veut que le fichier
+/// soit **désigné**, mis en évidence parmi ses voisins. Les pièces jointes de
+/// Radinus portent des noms de GUID, et retrouver le bon à l'œil dans un
+/// dossier qui en contient trois cents n'est pas un travail qu'on demande à
+/// quelqu'un.
+///
+/// Chaque système a sa formule, et aucune ne demande de dépendance :
+///
+/// * macOS — `open -R`, le « Révéler dans le Finder » du menu contextuel ;
+/// * Windows — `explorer /select,`. ⚠ **`explorer` rend un code d'erreur même
+///   quand il réussit** : on lance sans attendre le verdict, sinon Radinus
+///   annoncerait un échec à chaque fois ;
+/// * Linux — la méthode `ShowItems` du protocole freedesktop, comprise par
+///   Nautilus, Dolphin et Nemo. **Repli sur l'ouverture du dossier** quand
+///   `dbus-send` manque ou que le bureau ne répond pas : montrer le dossier
+///   vaut mieux que ne rien montrer.
+pub fn reveal_in_file_manager(path: &Path) -> std::io::Result<()> {
+    // Chaque bloc est **la dernière expression de la fonction sur son système**,
+    // les autres n'existant pas là-bas : pas de `return` à écrire, et clippy le
+    // dit — signalé par le clippy de Fabrice le 08/08/2026, sur son Mac, parce
+    // que le mien ne compile pas cette branche-là.
+    #[cfg(target_os = "macos")]
+    {
+        silent_command("open").arg("-R").arg(path).spawn().map(|_| ())
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        // Pas d'espace après la virgule : `explorer` prend l'ensemble comme un
+        // seul argument, et un espace lui ferait ouvrir « Documents ».
+        silent_command("explorer")
+            .arg(format!("/select,{}", path.display()))
+            .spawn()
+            .map(|_| ())
+    }
+
+    #[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
+    {
+        let shown = silent_command("dbus-send")
+            .args([
+                "--session",
+                "--dest=org.freedesktop.FileManager1",
+                "--type=method_call",
+                "/org/freedesktop/FileManager1",
+                "org.freedesktop.FileManager1.ShowItems",
+            ])
+            .arg(format!("array:string:file://{}", path.display()))
+            .arg("string:")
+            .status();
+        if matches!(&shown, Ok(status) if status.success()) {
+            return Ok(());
+        }
+        let folder = path.parent().unwrap_or(path);
+        open_with_desktop(folder)
+    }
+}
+
 /// Ouvre une adresse web dans le navigateur par défaut.
 ///
 /// Les trois mêmes commandes que pour un fichier — elles prennent une URL

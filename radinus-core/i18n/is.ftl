@@ -292,6 +292,45 @@ database-folder-warning =
     Þessi mappa geymir öll gögnin þín. Að endurnefna, færa eða eyða skrá getur glatað reikningunum þínum, skemmt þá eða komið í veg fyrir að Radinus virki.
     Viltu í alvöru opna hana?
 menu-misc-application-folder = Opna möppuna sem inniheldur forritið
+menu-misc-attachments-folder = Aðgangur að möppunni með viðhengjunum
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Umsjón viðhengja
+window-attachments-manager-title = Umsjón viðhengja
+attachments-column-document = Skjal
+attachments-column-size = Stærð
+attachments-column-added = Bætt við
+attachments-column-state = Staða
+attachments-state-intact = Óbreytt
+attachments-state-altered = Breytt síðan
+attachments-state-missing = Skrá vantar
+attachments-state-unknown = Ekki hægt að staðfesta
+attachments-state-orphan = Munaðarlaus
+attachments-no-operation = Engin færsla
+attachments-orphan-remove-question = Þessi skrá tilheyrir engri færslu. Setja hana í ruslið?
+attachments-manager-help = Tvísmelltu á línu til að opna skjalið.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Sýna færsluna
+attachments-reveal = Sýna í skráastjóra
+attachments-manager-summary = { $count } viðhengi, { $size } alls.
+attachments-disk-name = Nafn á diski: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Opna möppu viðhengja
+attachments-folder-warning =
+    Þessi mappa geymir skrárnar sem þú hengdir við færslurnar þínar. Radinus vistar þær undir nafni sem hann velur sjálfur: að endurnefna, færa eða eyða skrá losar hana ekki frá færslunni, sem heldur áfram að tilkynna hana og hún opnast ekki lengur.
+    Viltu í alvöru opna hana?
 
 # ---------------------------------------------------------------------
 # Bankareikningar — F04, F06, F07, F08.
@@ -1740,6 +1779,7 @@ ui-money-sign-position = after
 window-preferences-title = Kjörstillingar
 menu-settings-preferences = Kjörstillingar…
 menu-settings-show-main = Sýna aðalgluggann
+menu-settings-folders = Möppur Radinus
 preferences-branch-display = Birting
 preferences-leaf-language = Tungumál
 preferences-leaf-currency = Gjaldmiðill

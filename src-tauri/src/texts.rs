@@ -107,6 +107,23 @@ const ABOUT_AUTHOR_KEYS: &[&str] = &[
     "about-author-flag-alt",
 ];
 
+/// Ce que dit « Gestion des pièces jointes » (08/08/2026).
+///
+/// Les cinq états d'une pièce, la question du retrait et la phrase du bas n'y
+/// sont pas : ce sont des phrases composées par le contrôleur — un état est
+/// choisi parmi cinq, un total porte deux trous —, et le dictionnaire ne sert
+/// que des phrases entières.
+const ATTACHMENTS_MANAGER_KEYS: &[&str] = &[
+    "window-attachments-manager-title",
+    "attachments-column-document",
+    "attachments-column-size",
+    "attachments-column-added",
+    "attachments-column-state",
+    "attachments-manager-help",
+    "attachments-show-operation",
+    "attachments-reveal",
+];
+
 /// Ce que dit « Licence d'utilisation » (08/08/2026).
 const LICENCE_KEYS: &[&str] = &[
     "licence-heading",
@@ -959,6 +976,7 @@ pub fn dictionary(language: Language, kind: Option<Nomenclature>) -> Dictionary 
         .chain(ABOUT_AUTHOR_KEYS)
         .chain(ABOUT_RADINUS_KEYS)
         .chain(LICENCE_KEYS)
+        .chain(ATTACHMENTS_MANAGER_KEYS)
     {
         texts.insert((*key).to_string(), i18n::text(language, key));
     }
@@ -1010,6 +1028,7 @@ mod tests {
                         + ABOUT_AUTHOR_KEYS.len()
                         + ABOUT_RADINUS_KEYS.len()
                         + LICENCE_KEYS.len()
+                        + ATTACHMENTS_MANAGER_KEYS.len()
                         + ABOUT_KEYS.len()
                 );
                 for (key, value) in &texts {

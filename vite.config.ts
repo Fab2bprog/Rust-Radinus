@@ -21,6 +21,7 @@ export default defineConfig(async () => ({
         "about-author": "ui/windows/about-author.html",
         "about-radinus": "ui/windows/about-radinus.html",
         licence: "ui/windows/licence.html",
+        "attachments-manager": "ui/windows/attachments-manager.html",
         "nomenclature-list": "ui/windows/nomenclature-list.html",
         "nomenclature-form": "ui/windows/nomenclature-form.html",
         "accounts-list": "ui/windows/accounts-list.html",

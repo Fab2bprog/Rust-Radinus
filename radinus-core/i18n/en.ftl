@@ -265,6 +265,45 @@ database-folder-warning =
     This folder holds all your data. Renaming, moving or deleting a file in it can lose your accounts, corrupt them, or stop Radinus from working.
     Do you really want to open it?
 menu-misc-application-folder = Open the application folder
+menu-misc-attachments-folder = Open the folder holding the attachments
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Manage the attachments
+window-attachments-manager-title = Manage the attachments
+attachments-column-document = Document
+attachments-column-size = Size
+attachments-column-added = Added on
+attachments-column-state = State
+attachments-state-intact = Intact
+attachments-state-altered = Changed since
+attachments-state-missing = File missing
+attachments-state-unknown = Cannot be checked
+attachments-state-orphan = Orphan
+attachments-no-operation = No operation
+attachments-orphan-remove-question = This file is attached to no operation. Move it to the trash?
+attachments-manager-help = Double-click a line to open the document.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Show the operation
+attachments-reveal = Reveal in the file manager
+attachments-manager-summary = { $count } attachments, { $size } in all.
+attachments-disk-name = Name on disk: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Open the attachments folder
+attachments-folder-warning =
+    This folder holds the files you attached to your operations. Radinus stores them under a name of its own choosing: renaming, moving or deleting one does not detach it — the operation will still announce it, and it will no longer open.
+    Do you really want to open it?
 
 # --- Bank accounts — F04, F06, F07, F08 -------------------------------
 
@@ -1567,6 +1606,7 @@ ui-money-sign-position = before
 window-preferences-title = Preferences
 menu-settings-preferences = Preferences…
 menu-settings-show-main = Show the main window
+menu-settings-folders = Radinus folders
 preferences-branch-display = Display
 preferences-leaf-language = Language
 preferences-leaf-currency = Currency

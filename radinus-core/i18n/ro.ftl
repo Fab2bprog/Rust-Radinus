@@ -300,6 +300,45 @@ database-folder-warning =
     Acest dosar conține toate datele dumneavoastră. Redenumirea, mutarea sau ștergerea unui fișier vă poate pierde conturile, le poate deteriora sau poate împiedica Radinus să funcționeze.
     Doriți într-adevăr să îl deschideți?
 menu-misc-application-folder = Acces la folderul care conține aplicația
+menu-misc-attachments-folder = Acces la dosarul care conține atașamentele
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Gestionarea atașamentelor
+window-attachments-manager-title = Gestionarea atașamentelor
+attachments-column-document = Document
+attachments-column-size = Mărime
+attachments-column-added = Adăugat la
+attachments-column-state = Stare
+attachments-state-intact = Intact
+attachments-state-altered = Modificat între timp
+attachments-state-missing = Fișier lipsă
+attachments-state-unknown = Neverificabil
+attachments-state-orphan = Orfan
+attachments-no-operation = Nicio operațiune
+attachments-orphan-remove-question = Acest fișier nu este legat de nicio operațiune. Îl trimiteți la coșul de gunoi?
+attachments-manager-help = Faceți dublu clic pe o linie pentru a deschide documentul.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Afișați operațiunea
+attachments-reveal = Afișați în managerul de fișiere
+attachments-manager-summary = { $count } atașamente, { $size } în total.
+attachments-disk-name = Nume pe disc: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Deschiderea dosarului atașamentelor
+attachments-folder-warning =
+    Acest dosar conține fișierele pe care le-ați atașat operațiunilor dumneavoastră. Radinus le păstrează sub un nume ales de el: redenumirea, mutarea sau ștergerea unui fișier nu îl desprinde de operațiune, care va continua să îl anunțe fără ca el să se mai deschidă.
+    Doriți într-adevăr să îl deschideți?
 
 # ---------------------------------------------------------------------
 # Conturi bancare — F04, F06, F07, F08.
@@ -1780,6 +1819,7 @@ ui-money-sign-position = after
 window-preferences-title = Preferințe
 menu-settings-preferences = Preferințe…
 menu-settings-show-main = Afișarea ferestrei principale
+menu-settings-folders = Dosarele Radinus
 preferences-branch-display = Afișare
 preferences-leaf-language = Limbă
 preferences-leaf-currency = Monedă

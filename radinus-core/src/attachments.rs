@@ -459,6 +459,200 @@ pub fn restore_file(folder: &Path, guid_name: &str, bytes: &[u8]) -> std::io::Re
     file.write_all(bytes)
 }
 
+// ---------------------------------------------------------------------------
+// L'inventaire : toutes les pièces, et ce qui traîne à côté
+// ---------------------------------------------------------------------------
+
+/// Ce qu'on peut dire d'une pièce jointe en regardant le disque.
+///
+/// **Cinq états et pas trois**, parce que « ça va » et « ça ne va pas » ne
+/// suffisent pas à décider quoi faire : on ne traite pas de la même façon un
+/// fichier disparu, un fichier modifié depuis qu'il a été joint, et un fichier
+/// qu'on ne peut pas juger.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Health {
+    /// Le fichier est là et son empreinte correspond.
+    Intact,
+    /// Le fichier est là et il a changé depuis qu'il a été joint.
+    Altered,
+    /// La base annonce la pièce, le fichier n'est plus dans le dossier.
+    Missing,
+    /// Le fichier est là, mais son empreinte ne vient pas de nous — les pièces
+    /// héritées de la 1.9.3 sont dans ce cas. **Ce n'est pas une alerte** :
+    /// dire « altéré » d'un fichier qu'on ne sait pas juger ferait peur pour
+    /// rien.
+    Unknown,
+    /// Un fichier du dossier que la base ne réclame pas. Reste d'une
+    /// suppression faite à la main, d'une restauration interrompue, d'une
+    /// opération effacée avant que Radinus ne sache faire le ménage.
+    Orphan,
+}
+
+/// Une ligne de l'inventaire.
+///
+/// Une pièce orpheline n'a **ni** `id` **ni** opération : elle n'existe que
+/// sur le disque. D'où les champs facultatifs — c'est le type qui dit qu'un
+/// orphelin ne se supprime pas par le même chemin qu'une pièce enregistrée.
+#[derive(Debug, Clone)]
+pub struct Inventoried {
+    /// La clef de la pièce en base, absente pour un orphelin.
+    pub id: Option<i64>,
+    /// L'opération qui la porte, absente pour un orphelin.
+    pub operation: Option<InventoriedOperation>,
+    /// Le nom d'origine du document. Pour un orphelin, on n'a que son nom de
+    /// disque : c'est celui-là qu'on montre, faute de mieux.
+    pub name: String,
+    /// Le nom sous lequel il est rangé dans le dossier.
+    pub guid_name: String,
+    /// La taille lue **sur le disque**, et non celle notée en base : c'est
+    /// celle-là qui dit la place réellement occupée. Zéro si le fichier manque.
+    pub size: i64,
+    pub mime: String,
+    pub added: Option<NaiveDate>,
+    pub note: String,
+    pub health: Health,
+}
+
+/// Ce qu'il faut savoir de l'opération pour la reconnaître dans une liste.
+#[derive(Debug, Clone)]
+pub struct InventoriedOperation {
+    pub id: i64,
+    /// Le compte qui la porte. La fiche d'une opération s'ouvre **sur son
+    /// compte** — c'est lui qui donne le titre de la fenêtre et le contexte de
+    /// la saisie —, et sans ce numéro il n'y aurait pas de quoi l'ouvrir.
+    pub account_id: i64,
+    pub date: Option<NaiveDate>,
+    pub label: String,
+    pub amount: i64,
+}
+
+/// **Toutes les pièces jointes de la base, plus ce qui traîne dans le
+/// dossier** (Fabrice, 08/08/2026).
+///
+/// Deux sources, réunies : les lignes de `PiecesJointes` avec leur opération,
+/// et les fichiers du dossier qu'aucune ligne ne réclame. C'est ce qui fait la
+/// différence entre une liste et un outil de ménage — une pièce dont le
+/// fichier a disparu et un fichier que plus personne ne réclame sont deux
+/// pannes silencieuses, et aucune fenêtre ne les montrait.
+///
+/// L'ordre est celui de l'opération, du plus récent au plus ancien, les
+/// orphelins en dernier : ils n'appartiennent à rien et n'ont pas de date à
+/// laquelle se ranger.
+///
+/// Le dossier absent n'est pas une erreur : il naît à la première pièce
+/// jointe. On rend alors ce que la base connaît, avec les fichiers portés
+/// manquants.
+pub fn inventory(conn: &Connection, folder: &Path) -> SqlResult<Vec<Inventoried>> {
+    let mut statement = conn.prepare(
+        "SELECT p.IDPiecesJointes, p.NomFichier, p.NomFichierGUID, p.TailleFich, \
+                p.MiMeType, p.DateAjout, p.CheckSumInfo, p.NoteInfo, \
+                o.IDOperation, o.Date, o.Libelle, o.Montant, o.IDCompte \
+         FROM PiecesJointes p \
+         JOIN Operation o ON o.IDOperation = p.IDOperation \
+         ORDER BY o.Date DESC, o.IDOperation DESC, p.IDPiecesJointes",
+    )?;
+    let mut lines: Vec<Inventoried> = statement
+        .query_map([], |row| {
+            let guid_name: String = row.get(2)?;
+            let checksum: String = row.get(6)?;
+            let path = path_in(folder, &guid_name);
+            let (health, size) = match std::fs::metadata(&path) {
+                Err(_) => (Health::Missing, 0),
+                Ok(found) => {
+                    let health = match is_intact(&path, &checksum) {
+                        Some(true) => Health::Intact,
+                        Some(false) => Health::Altered,
+                        None => Health::Unknown,
+                    };
+                    (health, found.len() as i64)
+                }
+            };
+            Ok(Inventoried {
+                id: Some(row.get(0)?),
+                operation: Some(InventoriedOperation {
+                    id: row.get(8)?,
+                    account_id: row.get(12)?,
+                    date: row
+                        .get::<_, Option<String>>(9)?
+                        .and_then(|text| NaiveDate::parse_from_str(&text, "%Y-%m-%d").ok()),
+                    label: row.get(10)?,
+                    amount: row.get(11)?,
+                }),
+                name: row.get(1)?,
+                guid_name,
+                size,
+                mime: row.get(4)?,
+                added: row
+                    .get::<_, Option<String>>(5)?
+                    .and_then(|text| NaiveDate::parse_from_str(&text, "%Y-%m-%d").ok()),
+                note: row.get(7)?,
+                health,
+            })
+        })?
+        .collect::<SqlResult<_>>()?;
+
+    // Puis ce que le dossier porte et que personne ne réclame.
+    let claimed: std::collections::HashSet<String> =
+        lines.iter().map(|line| line.guid_name.clone()).collect();
+    let mut orphans: Vec<Inventoried> = Vec::new();
+    if let Ok(entries) = std::fs::read_dir(folder) {
+        for entry in entries.flatten() {
+            let Ok(kind) = entry.file_type() else {
+                continue;
+            };
+            if !kind.is_file() {
+                continue;
+            }
+            let name = entry.file_name().to_string_lossy().into_owned();
+            // Les fichiers cachés du système ne sont pas des pièces jointes.
+            if name.starts_with('.') || claimed.contains(&name) {
+                continue;
+            }
+            let size = entry.metadata().map(|found| found.len() as i64).unwrap_or(0);
+            let extension = std::path::Path::new(&name)
+                .extension()
+                .map(|found| found.to_string_lossy().into_owned())
+                .unwrap_or_default();
+            orphans.push(Inventoried {
+                id: None,
+                operation: None,
+                name: name.clone(),
+                guid_name: name,
+                size,
+                mime: mime_of(&extension).to_string(),
+                added: None,
+                note: String::new(),
+                health: Health::Orphan,
+            });
+        }
+    }
+    orphans.sort_by(|left, right| left.name.cmp(&right.name));
+    lines.extend(orphans);
+    Ok(lines)
+}
+
+/// **Le chemin d'un fichier du dossier, si ce nom en désigne bien un.**
+///
+/// Sert au fichier orphelin, qui n'a pas de ligne en base, et à tout geste qui
+/// part d'un nom venu de la fenêtre.
+///
+/// **Le nom est vérifié avant d'être suivi.** Un nom portant `..` ou une barre
+/// oblique désignerait un fichier hors du dossier des pièces jointes. On ne
+/// construit un chemin qu'à partir d'un nom simple, et on refuse tout le
+/// reste — une fenêtre ne doit jamais pouvoir nommer un fichier ailleurs.
+pub fn checked_path(folder: &Path, guid_name: &str) -> Option<PathBuf> {
+    if guid_name.is_empty()
+        || guid_name.starts_with('.')
+        || guid_name.contains('/')
+        || guid_name.contains('\\')
+        || guid_name.contains("..")
+    {
+        return None;
+    }
+    let path = path_in(folder, guid_name);
+    path.is_file().then_some(path)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

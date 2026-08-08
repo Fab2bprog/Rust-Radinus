@@ -292,6 +292,45 @@ database-folder-warning =
     Denne mappen inneholder alle dataene dine. Å gi nytt navn til, flytte eller slette en fil kan miste kontoene dine, ødelegge dem eller hindre Radinus i å virke.
     Vil du virkelig åpne den?
 menu-misc-application-folder = Åpne mappen som inneholder programmet
+menu-misc-attachments-folder = Tilgang til mappen med vedleggene
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Behandling av vedleggene
+window-attachments-manager-title = Behandling av vedleggene
+attachments-column-document = Dokument
+attachments-column-size = Størrelse
+attachments-column-added = Lagt til den
+attachments-column-state = Tilstand
+attachments-state-intact = Uendret
+attachments-state-altered = Endret siden
+attachments-state-missing = Filen mangler
+attachments-state-unknown = Kan ikke kontrolleres
+attachments-state-orphan = Foreldreløs
+attachments-no-operation = Ingen post
+attachments-orphan-remove-question = Denne filen hører ikke til noen post. Flytte den til papirkurven?
+attachments-manager-help = Dobbeltklikk på en linje for å åpne dokumentet.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Vis posten
+attachments-reveal = Vis i filbehandleren
+attachments-manager-summary = { $count } vedlegg, { $size } til sammen.
+attachments-disk-name = Navn på disken: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Åpne vedleggenes mappe
+attachments-folder-warning =
+    Denne mappen inneholder filene du har lagt ved postene dine. Radinus lagrer dem under et navn den velger selv: å gi nytt navn til, flytte eller slette en fil løsner den ikke fra posten, som fortsatt viser den selv om den ikke lenger åpnes.
+    Vil du virkelig åpne den?
 
 # ---------------------------------------------------------------------
 # Bankkontoer — F04, F06, F07, F08.
@@ -1738,6 +1777,7 @@ ui-money-sign-position = after
 window-preferences-title = Alternativer
 menu-settings-preferences = Alternativer…
 menu-settings-show-main = Vis hovedvinduet
+menu-settings-folders = Radinus-mapper
 preferences-branch-display = Visning
 preferences-leaf-language = Språk
 preferences-leaf-currency = Valuta

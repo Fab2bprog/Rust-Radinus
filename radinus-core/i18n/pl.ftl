@@ -306,6 +306,45 @@ database-folder-warning =
     Ten folder zawiera wszystkie twoje dane. Zmiana nazwy, przeniesienie lub usunięcie pliku może spowodować utratę kont, ich uszkodzenie lub uniemożliwić działanie Radinusa.
     Czy na pewno chcesz go otworzyć?
 menu-misc-application-folder = Dostęp do folderu zawierającego aplikację
+menu-misc-attachments-folder = Dostęp do folderu z załącznikami
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Zarządzanie załącznikami
+window-attachments-manager-title = Zarządzanie załącznikami
+attachments-column-document = Dokument
+attachments-column-size = Rozmiar
+attachments-column-added = Dodano
+attachments-column-state = Stan
+attachments-state-intact = Nienaruszony
+attachments-state-altered = Zmieniony od tego czasu
+attachments-state-missing = Brak pliku
+attachments-state-unknown = Nie do sprawdzenia
+attachments-state-orphan = Osierocony
+attachments-no-operation = Brak operacji
+attachments-orphan-remove-question = Ten plik nie jest powiązany z żadną operacją. Przenieść do kosza?
+attachments-manager-help = Kliknij dwukrotnie wiersz, aby otworzyć dokument.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Pokaż operację
+attachments-reveal = Pokaż w menedżerze plików
+attachments-manager-summary = Załączniki: { $count }, łącznie { $size }.
+attachments-disk-name = Nazwa na dysku: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Otwórz folder załączników
+attachments-folder-warning =
+    Ten folder zawiera pliki dołączone przez ciebie do operacji. Radinus przechowuje je pod nazwą, którą sam wybrał: zmiana nazwy, przeniesienie lub usunięcie pliku nie odłącza go od operacji, która nadal będzie go zapowiadać, a on się już nie otworzy.
+    Czy na pewno chcesz go otworzyć?
 
 # ---------------------------------------------------------------------
 # Konta bankowe — F04, F06, F07, F08.
@@ -1801,6 +1840,7 @@ ui-money-sign-position = after
 window-preferences-title = Preferencje
 menu-settings-preferences = Preferencje…
 menu-settings-show-main = Pokaż okno główne
+menu-settings-folders = Foldery Radinusa
 preferences-branch-display = Wyświetlanie
 preferences-leaf-language = Język
 preferences-leaf-currency = Waluta

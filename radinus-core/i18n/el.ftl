@@ -297,6 +297,45 @@ database-folder-warning =
     Αυτός ο φάκελος περιέχει όλα τα δεδομένα σας. Η μετονομασία, η μετακίνηση ή η διαγραφή ενός αρχείου μπορεί να χάσει τους λογαριασμούς σας, να τους αλλοιώσει ή να εμποδίσει το Radinus να λειτουργήσει.
     Θέλετε πραγματικά να τον ανοίξετε;
 menu-misc-application-folder = Πρόσβαση στον φάκελο που περιέχει την εφαρμογή
+menu-misc-attachments-folder = Πρόσβαση στον φάκελο με τα συνημμένα
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Διαχείριση των συνημμένων
+window-attachments-manager-title = Διαχείριση των συνημμένων
+attachments-column-document = Έγγραφο
+attachments-column-size = Μέγεθος
+attachments-column-added = Προστέθηκε στις
+attachments-column-state = Κατάσταση
+attachments-state-intact = Ανέπαφο
+attachments-state-altered = Άλλαξε έκτοτε
+attachments-state-missing = Λείπει το αρχείο
+attachments-state-unknown = Μη επαληθεύσιμο
+attachments-state-orphan = Ορφανό
+attachments-no-operation = Καμία κίνηση
+attachments-orphan-remove-question = Αυτό το αρχείο δεν συνδέεται με καμία κίνηση. Να μεταφερθεί στον κάδο;
+attachments-manager-help = Κάντε διπλό κλικ σε μια γραμμή για να ανοίξετε το έγγραφο.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Εμφάνιση της κίνησης
+attachments-reveal = Εμφάνιση στον διαχειριστή αρχείων
+attachments-manager-summary = { $count } συνημμένα, { $size } συνολικά.
+attachments-disk-name = Όνομα στον δίσκο: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Άνοιγμα του φακέλου των συνημμένων
+attachments-folder-warning =
+    Αυτός ο φάκελος περιέχει τα αρχεία που επισυνάψατε στις κινήσεις σας. Το Radinus τα αποθηκεύει με όνομα που επιλέγει το ίδιο: η μετονομασία, η μετακίνηση ή η διαγραφή ενός αρχείου δεν το αποσυνδέει από την κίνηση, η οποία θα συνεχίσει να το αναγγέλλει χωρίς να ανοίγει πια.
+    Θέλετε πραγματικά να τον ανοίξετε;
 
 # ---------------------------------------------------------------------
 # Τραπεζικοί λογαριασμοί — F04, F06, F07, F08.
@@ -1757,6 +1796,7 @@ ui-money-sign-position = after
 window-preferences-title = Προτιμήσεις
 menu-settings-preferences = Προτιμήσεις…
 menu-settings-show-main = Εμφάνιση του κύριου παραθύρου
+menu-settings-folders = Φάκελοι του Radinus
 preferences-branch-display = Εμφάνιση
 preferences-leaf-language = Γλώσσα
 preferences-leaf-currency = Νόμισμα

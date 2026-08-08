@@ -1,14 +1,14 @@
-# Radinus 2.0.1
+# Radinus 2.0.2
 
 Radinus est un logiciel libre de gestion de finances personnelles (licence GNU
-GPL v3 ou ultérieure). La version 2.0.1 est une réécriture multiplateforme
+GPL v3 ou ultérieure). La version 2.0.2 est une réécriture multiplateforme
 (macOS d'abord) de Radinus 1.9.3, logiciel Windows/WinDev du même auteur.
 
 - **Auteur :** Fabrice Garcia
 - **Licence :** GNU GPL v3 ou ultérieure (voir `LICENSE`)
 - **Technologie :** [Tauri](https://tauri.app) v2 + Rust, interface web
 - **Base de données :** SQLite, fichier unique, portable
-- **État :** développement en cours, en route vers la version 2.0.1
+- **État :** développement en cours, en route vers la version 2.0.2
 - **Journal des versions :** voir `CHANGELOG.md`
 
 ## Ce que fait Radinus

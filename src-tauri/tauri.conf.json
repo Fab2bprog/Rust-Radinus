@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Radinus",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "identifier": "fr.radinus.app",
   "build": {
     "beforeDevCommand": "npm run dev",

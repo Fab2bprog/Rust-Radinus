@@ -275,6 +275,24 @@ pub fn about_author_window(language: Language) -> WindowSpec {
     }
 }
 
+/// « Gestion des pièces jointes » (menu Paramètres, 08/08/2026).
+///
+/// Large et redimensionnable, contrairement aux trois petites fenêtres de la
+/// famille « À propos » : elle porte sept colonnes et autant de lignes qu'il y
+/// a de documents joints dans toute la base.
+pub fn attachments_manager_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "attachments-manager".to_string(),
+        url: "ui/windows/attachments-manager.html".to_string(),
+        title: i18n::text(language, "window-attachments-manager-title"),
+        width: 1040.0,
+        height: 560.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
 /// « Licence d'utilisation » (menu Paramètres, 08/08/2026).
 ///
 /// Taller than its two sisters and for one reason: it carries a logo, a title,

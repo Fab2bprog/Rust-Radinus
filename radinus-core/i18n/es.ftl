@@ -265,6 +265,45 @@ database-folder-warning =
     Esta carpeta contiene todos sus datos. Renombrar, mover o eliminar un archivo puede hacerle perder sus cuentas, dañarlas o impedir que Radinus funcione.
     ¿Desea abrirla realmente?
 menu-misc-application-folder = Acceso a la carpeta que contiene la aplicación
+menu-misc-attachments-folder = Acceso a la carpeta que contiene los archivos adjuntos
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Gestión de los archivos adjuntos
+window-attachments-manager-title = Gestión de los archivos adjuntos
+attachments-column-document = Documento
+attachments-column-size = Tamaño
+attachments-column-added = Añadido el
+attachments-column-state = Estado
+attachments-state-intact = Intacto
+attachments-state-altered = Modificado desde
+attachments-state-missing = Archivo ausente
+attachments-state-unknown = No verificable
+attachments-state-orphan = Huérfano
+attachments-no-operation = Ninguna operación
+attachments-orphan-remove-question = Este archivo no está vinculado a ninguna operación. ¿Enviarlo a la papelera?
+attachments-manager-help = Haga doble clic en una línea para abrir el documento.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Mostrar la operación
+attachments-reveal = Mostrar en el explorador de archivos
+attachments-manager-summary = { $count } archivos adjuntos, { $size } en total.
+attachments-disk-name = Nombre en el disco: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Abrir la carpeta de los archivos adjuntos
+attachments-folder-warning =
+    Esta carpeta contiene los archivos que ha adjuntado a sus operaciones. Radinus los guarda con un nombre elegido por él: cambiar el nombre, mover o eliminar uno no lo desvincula de la operación, que seguirá anunciándolo y ya no se abrirá.
+    ¿Desea abrirla realmente?
 
 # --- Cuentas bancarias — F04, F06, F07, F08 ---------------------------
 
@@ -1562,6 +1601,7 @@ ui-money-sign-position = after
 window-preferences-title = Preferencias
 menu-settings-preferences = Preferencias…
 menu-settings-show-main = Mostrar la ventana principal
+menu-settings-folders = Carpetas de Radinus
 preferences-branch-display = Presentación
 preferences-leaf-language = Idioma
 preferences-leaf-currency = Moneda

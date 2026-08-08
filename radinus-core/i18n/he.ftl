@@ -294,6 +294,45 @@ database-folder-warning =
     תיקייה זו מכילה את כל הנתונים שלך. שינוי שם, העברה או מחיקה של קובץ עלולים לאבד את החשבונות שלך, לפגוע בהם או למנוע מ-Radinus לפעול.
     לפתוח אותה?
 menu-misc-application-folder = גישה לתיקייה המכילה את היישום
+menu-misc-attachments-folder = גישה לתיקייה המכילה את הקבצים המצורפים
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = ניהול הקבצים המצורפים
+window-attachments-manager-title = ניהול הקבצים המצורפים
+attachments-column-document = מסמך
+attachments-column-size = גודל
+attachments-column-added = נוסף בתאריך
+attachments-column-state = מצב
+attachments-state-intact = תקין
+attachments-state-altered = שונה מאז
+attachments-state-missing = הקובץ חסר
+attachments-state-unknown = לא ניתן לאימות
+attachments-state-orphan = יתום
+attachments-no-operation = אין פעולה
+attachments-orphan-remove-question = קובץ זה אינו מקושר לאף פעולה. להעביר לאשפה?
+attachments-manager-help = לחיצה כפולה על שורה תפתח את המסמך.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = הצגת הפעולה
+attachments-reveal = הצגה במנהל הקבצים
+attachments-manager-summary = { $count } קבצים מצורפים, { $size } בסך הכול.
+attachments-disk-name = שם בדיסק: { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = פתיחת תיקיית הקבצים המצורפים
+attachments-folder-warning =
+    תיקייה זו מכילה את הקבצים שצירפת לפעולות שלך. Radinus שומר אותם בשם שהוא בחר: שינוי שם, העברה או מחיקה של קובץ אינם מנתקים אותו מהפעולה, שתמשיך להציג אותו והוא לא ייפתח עוד.
+    לפתוח אותה?
 
 # ---------------------------------------------------------------------
 # חשבונות בנק — F04, F06, F07, F08.
@@ -1763,6 +1802,7 @@ ui-money-sign-position = after
 window-preferences-title = העדפות
 menu-settings-preferences = העדפות…
 menu-settings-show-main = הצגת החלון הראשי
+menu-settings-folders = תיקיות Radinus
 preferences-branch-display = תצוגה
 preferences-leaf-language = שפה
 preferences-leaf-currency = מטבע

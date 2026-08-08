@@ -6854,6 +6854,219 @@ pub fn delete_attachment(state: State<'_, AppState>, id: i64) -> Result<String, 
     }
 }
 
+/// Une ligne de « Gestion des pièces jointes », telle que la fenêtre la pose.
+#[derive(Serialize)]
+pub struct InventoryRowDto {
+    /// Vaut 0 pour un orphelin : il n'a pas de ligne en base.
+    pub id: i64,
+    /// Le nom de disque, seule prise sur un orphelin.
+    pub guid_name: String,
+    pub orphan: bool,
+    /// L'opération qui porte la pièce, et le compte sur lequel sa fiche
+    /// s'ouvre. Zéro tous les deux pour un orphelin, qui n'appartient à rien.
+    pub operation_id: i64,
+    pub account_id: i64,
+    /// Le fichier est-il là ? **Un fait, pas une phrase** : décider d'après le
+    /// libellé de l'état marcherait en français et nulle part ailleurs.
+    pub on_disk: bool,
+    pub date: String,
+    /// La date en ISO, sur quoi la colonne se trie.
+    pub date_key: String,
+    pub operation: String,
+    pub amount: String,
+    pub name: String,
+    pub size: String,
+    /// La taille en octets, sur quoi la colonne se trie.
+    pub size_key: i64,
+    pub added: String,
+    pub added_key: String,
+    pub state: String,
+    pub note: String,
+}
+
+/// **L'inventaire de toutes les pièces jointes** (Fabrice, 08/08/2026).
+///
+/// Le noyau rend des nombres et des états ; ce sont les phrases qui se
+/// composent ici, dans la langue en cours — la vue n'en écrit aucune.
+#[tauri::command]
+pub fn attachments_inventory(state: State<'_, AppState>) -> Result<Vec<InventoryRowDto>, String> {
+    use radinus_core::attachments::Health;
+    let folder = state.attachments_dir();
+    let conn = state.database()?;
+    let language = ui_language();
+    let lines = radinus_core::attachments::inventory(&conn, &folder).map_err(to_ipc_error)?;
+    Ok(lines
+        .into_iter()
+        .map(|line| {
+            let state_key = match line.health {
+                Health::Intact => "attachments-state-intact",
+                Health::Altered => "attachments-state-altered",
+                Health::Missing => "attachments-state-missing",
+                Health::Unknown => "attachments-state-unknown",
+                Health::Orphan => "attachments-state-orphan",
+            };
+            let operation = line.operation.as_ref();
+            InventoryRowDto {
+                id: line.id.unwrap_or(0),
+                guid_name: line.guid_name,
+                orphan: line.health == Health::Orphan,
+                operation_id: operation.map(|found| found.id).unwrap_or(0),
+                account_id: operation.map(|found| found.account_id).unwrap_or(0),
+                on_disk: line.health != Health::Missing,
+                date: operation
+                    .and_then(|found| found.date)
+                    .map(|day| day.format("%d/%m/%Y").to_string())
+                    .unwrap_or_default(),
+                date_key: operation
+                    .and_then(|found| found.date)
+                    .map(|day| day.format("%Y-%m-%d").to_string())
+                    .unwrap_or_default(),
+                operation: operation
+                    .map(|found| found.label.clone())
+                    .unwrap_or_else(|| {
+                        radinus_core::i18n::text(language, "attachments-no-operation")
+                    }),
+                amount: operation
+                    .map(|found| radinus_core::money::format(found.amount, language))
+                    .unwrap_or_default(),
+                name: line.name,
+                size: human_size(line.size),
+                size_key: line.size,
+                added: line
+                    .added
+                    .map(|day| day.format("%d/%m/%Y").to_string())
+                    .unwrap_or_default(),
+                added_key: line
+                    .added
+                    .map(|day| day.format("%Y-%m-%d").to_string())
+                    .unwrap_or_default(),
+                state: radinus_core::i18n::text(language, state_key),
+                note: line.note,
+            }
+        })
+        .collect())
+}
+
+/// Une taille lisible. **Les unités ne se traduisent pas** : « Ko », « Mo »,
+/// « KB », « MB » — c'est le même octet partout, et inventer dix-huit jeux
+/// d'abréviations ferait dix-huit occasions de se tromper.
+fn human_size(bytes: i64) -> String {
+    const STEP: f64 = 1024.0;
+    let value = bytes.max(0) as f64;
+    if value < STEP {
+        return format!("{bytes} o");
+    }
+    for (rank, unit) in ["Ko", "Mo", "Go"].iter().enumerate() {
+        let divisor = STEP.powi(rank as i32 + 1);
+        if value < divisor * STEP || rank == 2 {
+            return format!("{:.1} {unit}", value / divisor);
+        }
+    }
+    format!("{bytes} o")
+}
+
+/// Ce que dit la barre du bas : combien de pièces, et la place qu'elles
+/// prennent.
+#[tauri::command]
+pub fn attachments_summary(state: State<'_, AppState>) -> Result<String, String> {
+    let folder = state.attachments_dir();
+    let conn = state.database()?;
+    let language = ui_language();
+    let lines = radinus_core::attachments::inventory(&conn, &folder).map_err(to_ipc_error)?;
+    let total: i64 = lines.iter().map(|line| line.size).sum();
+    Ok(radinus_core::i18n::message_of(
+        language,
+        "attachments-manager-summary",
+        &[
+            ("count", &lines.len().to_string()),
+            ("size", &human_size(total)),
+        ],
+        &[],
+    ))
+}
+
+/// Le nom de disque d'une pièce, pour la barre du bas.
+#[tauri::command]
+pub fn attachment_disk_name(name: String) -> String {
+    radinus_core::i18n::text_with(ui_language(), "attachments-disk-name", "name", &name)
+}
+
+/// Ouvre un fichier orphelin — celui qu'aucune opération ne réclame.
+///
+/// Il n'a pas de ligne en base, donc pas d'empreinte à vérifier : on ne peut
+/// rien dire de son intégrité, et on ne prétend rien.
+#[tauri::command]
+pub fn open_orphan_attachment(
+    state: State<'_, AppState>,
+    guid_name: String,
+) -> Result<(), String> {
+    let folder = state.attachments_dir();
+    let language = ui_language();
+    let Some(path) = radinus_core::attachments::checked_path(&folder, &guid_name) else {
+        return Err(radinus_core::i18n::text_with(
+            language,
+            "attachment-file-missing",
+            "name",
+            &guid_name,
+        ));
+    };
+    crate::system::open_with_desktop(&path).map_err(|error| {
+        radinus_core::i18n::text_with(language, "attachment-failed", "reason", &error.to_string())
+    })
+}
+
+/// **Montre le fichier dans le navigateur de fichiers du système**, désigné
+/// parmi ses voisins (Fabrice, 08/08/2026).
+///
+/// Une pièce jointe de Radinus porte un nom de GUID : la retrouver à l'œil
+/// dans un dossier qui en contient trois cents n'est pas un travail qu'on
+/// demande à quelqu'un. Le fichier est donc **sélectionné**, pas seulement
+/// entouré de son dossier.
+///
+/// La fenêtre n'envoie qu'un nom, jamais un chemin : c'est le noyau qui vérifie
+/// que ce nom désigne bien un fichier du dossier des pièces jointes, et lui
+/// seul qui sait où ce dossier se trouve.
+#[tauri::command]
+pub fn reveal_attachment(state: State<'_, AppState>, guid_name: String) -> Result<(), String> {
+    let folder = state.attachments_dir();
+    let language = ui_language();
+    let Some(path) = radinus_core::attachments::checked_path(&folder, &guid_name) else {
+        return Err(radinus_core::i18n::text_with(
+            language,
+            "attachment-file-missing",
+            "name",
+            &guid_name,
+        ));
+    };
+    crate::system::reveal_in_file_manager(&path).map_err(|error| {
+        radinus_core::i18n::text_with(language, "attachment-failed", "reason", &error.to_string())
+    })
+}
+
+/// La question posée avant de jeter un fichier orphelin.
+#[tauri::command]
+pub fn orphan_removal_question() -> String {
+    radinus_core::i18n::text(ui_language(), "attachments-orphan-remove-question")
+}
+
+/// Jette un fichier orphelin à la corbeille. Rien à effacer en base : par
+/// définition, aucune ligne ne le réclame.
+#[tauri::command]
+pub fn delete_orphan_attachment(
+    state: State<'_, AppState>,
+    guid_name: String,
+) -> Result<String, String> {
+    let folder = state.attachments_dir();
+    let language = ui_language();
+    let Some(path) = radinus_core::attachments::checked_path(&folder, &guid_name) else {
+        return Err(radinus_core::i18n::text(language, "attachment-gone"));
+    };
+    match crate::system::move_to_trash(&path) {
+        Ok(()) => Ok(radinus_core::i18n::text(language, "attachment-removed")),
+        Err(_) => Ok(radinus_core::i18n::text(language, "attachment-removed-kept")),
+    }
+}
+
 #[tauri::command]
 pub fn open_attachments_window<R: Runtime>(
     app: AppHandle<R>,

@@ -16,6 +16,20 @@ dist/
 .DS_Store
 Thumbs.db
 
+# **Les jumeaux invisibles de macOS** (Fabrice, 08/08/2026, après une compilation
+# refusée sous Windows). Quand un fichier du Mac passe par un support qui ne sait
+# pas porter ses métadonnées — clé USB, partage réseau, dossier échangé —, macOS
+# range celles-ci dans un second fichier de même nom précédé de `._`. Ce ne sont
+# pas des fichiers texte : ce sont des blocs binaires. Sous Windows, un `._menu.rs`
+# ou un `._fr.ftl` est vu comme un fichier du projet, et la compilation s'arrête
+# sur du charabia.
+#
+# ⚠ **Cette ligne les empêche d'être commités, pas d'apparaître.** Ils naissent
+# de la copie, pas de git. Deux façons de ne jamais les voir : cloner le dépôt
+# sur la machine Windows plutôt que d'y copier le dossier, ou passer un
+# `dot_clean .` sur le Mac avant de copier.
+._*
+
 # Editors
 .vscode/*
 !.vscode/extensions.json

@@ -293,6 +293,45 @@ database-folder-warning =
     Ce dossier contient toutes vos données. Y renommer, déplacer ou supprimer un fichier peut faire perdre vos comptes, les corrompre, ou empêcher Radinus de fonctionner.
     Voulez-vous vraiment l'ouvrir ?
 menu-misc-application-folder = Accès au dossier contenant l'application
+menu-misc-attachments-folder = Accès au dossier contenant les pièces jointes
+# --- « Gestion des pièces jointes » (08/08/2026) -------------------------
+#
+# La fenêtre montre les pièces de toutes les opérations, plus les fichiers
+# du dossier que la base ne réclame pas. Les cinq états ne sont pas trois :
+# un fichier disparu, un fichier modifié et un fichier qu'on ne sait pas
+# juger ne se traitent pas de la même façon.
+menu-settings-attachments = Gestion des pièces jointes
+window-attachments-manager-title = Gestion des pièces jointes
+attachments-column-document = Document
+attachments-column-size = Taille
+attachments-column-added = Ajoutée le
+attachments-column-state = État
+attachments-state-intact = Intacte
+attachments-state-altered = Modifiée depuis
+attachments-state-missing = Fichier absent
+attachments-state-unknown = Non vérifiable
+attachments-state-orphan = Orpheline
+attachments-no-operation = Aucune opération
+attachments-orphan-remove-question = Ce fichier n'est rattaché à aucune opération. Le mettre à la corbeille ?
+attachments-manager-help = Double-cliquez sur une ligne pour ouvrir le document.
+
+# Les deux entrées du clic droit. « Afficher l'opération » n'apparaît pas
+# sur un orphelin — il n'appartient à aucune opération — et « Révéler »
+# disparaît quand le fichier n'est plus sur le disque.
+attachments-show-operation = Afficher l'opération
+attachments-reveal = Révéler dans le navigateur de fichiers
+attachments-manager-summary = { $count } pièces jointes, { $size } au total.
+attachments-disk-name = Nom sur le disque : { $name }
+
+# L'avertissement du dossier des pièces jointes (Fabrice, 08/08/2026).
+# Le danger n'y est pas le même que pour la base : on ne perd pas des
+# comptes, on casse un lien — l'opération annonce une pièce qui ne
+# s'ouvre plus. C'est ce que dit la phrase, plutôt que « ne faites pas
+# n'importe quoi ».
+attachments-folder-warning-title = Ouvrir le dossier des pièces jointes
+attachments-folder-warning =
+    Ce dossier contient les fichiers que vous avez attachés à vos opérations. Radinus les range sous un nom qu'il a choisi lui-même : y renommer, déplacer ou supprimer un fichier ne le retire pas de l'opération, celle-ci continuera de l'annoncer et il ne s'ouvrira plus.
+    Voulez-vous vraiment l'ouvrir ?
 
 # ---------------------------------------------------------------------
 # Comptes bancaires — F04, F06, F07, F08.
@@ -1747,6 +1786,7 @@ ui-money-sign-position = after
 window-preferences-title = Préférences
 menu-settings-preferences = Préférences…
 menu-settings-show-main = Afficher la fenêtre principale
+menu-settings-folders = Accès dossiers Radinus
 preferences-branch-display = Affichage
 preferences-leaf-language = Langue
 preferences-leaf-currency = Devise
