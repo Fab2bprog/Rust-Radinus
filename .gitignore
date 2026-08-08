@@ -39,3 +39,23 @@ npm-debug.log*
 # can be made public (PLAN_ACTION.md Phase 16) without the data going with it.
 # To run that test, copy the archive into radinus-core/tests/fixtures/ by hand.
 /radinus-core/tests/fixtures/
+
+# Signature et notarisation Apple : JAMAIS dans un dépôt.
+# Le certificat lui-même vit dans le trousseau du Mac et ne passe pas par ici.
+# Ces lignes visent l'accident : le jour où on l'exporte « juste pour le
+# sauvegarder » et où le fichier atterrit dans le dossier du projet. Une clé
+# privée envoyée une fois reste dans l'historique même effacée, et laisse
+# signer n'importe quoi au nom de son auteur.
+*.p12
+*.pfx
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
+*.pem
+*.key
+
+# Les mots de passe de notarisation voyagent par variables d'environnement,
+# et un fichier .env est l'endroit où on finit par les écrire.
+.env
+.env.*

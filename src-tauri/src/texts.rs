@@ -118,6 +118,8 @@ const LICENCE_KEYS: &[&str] = &[
     "licence-freedom-share",
     "licence-freedom-improve",
     "licence-read",
+    "licence-copyright",
+    "licence-no-warranty",
     "licence-info",
 ];
 

@@ -162,6 +162,17 @@ body {
   line-height: 1.6;
 }
 
+/* The copyright and the absence of warranty. **Bold, on Fabrice's order**
+   (08/08/2026), and it is the right instinct: the GPL asks for a « prominently
+   visible » notice, and the second of the two is what stands between him and
+   someone who lost his accounts to a bug. */
+.about__licence-notice {
+  margin: 0;
+  font-weight: 700;
+  color: #4a5a66;
+  line-height: 1.5;
+}
+
 /* The logo is a button and must not look like one: no frame, no background,
    nothing but the hand of the cursor saying that something happens here. */
 .about__licence-link {

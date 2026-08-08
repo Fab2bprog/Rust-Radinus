@@ -31,6 +31,8 @@ function dress(): void {
   element<HTMLElement>("freedom-study").textContent = t("licence-freedom-study");
   element<HTMLElement>("freedom-share").textContent = t("licence-freedom-share");
   element<HTMLElement>("freedom-improve").textContent = t("licence-freedom-improve");
+  element<HTMLElement>("copyright").textContent = t("licence-copyright");
+  element<HTMLElement>("no-warranty").textContent = t("licence-no-warranty");
   element<HTMLElement>("info-bar").textContent = t("licence-info");
   element<HTMLElement>("read").title = t("licence-read");
   element<HTMLElement>("close").title = t("ui-title-close");

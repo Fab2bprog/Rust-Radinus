@@ -511,6 +511,20 @@ const UI_TEXTS = {
   "licence-freedom-share": "Le copier et le donner autour de vous.",
   "licence-freedom-improve": "Le modifier, et partager vos modifications.",
   "licence-read": "Lire le texte complet de la licence",
+  "licence-copyright": "Copyright © 2026 Fabrice Garcia",
+  // « À propos de l'auteur » et « À propos de Radinus » (08/08/2026). Elles
+  // n'avaient aucune vérification jusque-là ; elles portent désormais les deux
+  // mentions de la GPL, et une mention qu'on ne regarde jamais est une mention
+  // qui disparaît sans bruit.
+  "about-author-name": "Auteur : Fabrice Garcia",
+  "about-author-place": "20290 Borgo, Corsica, France",
+  "about-author-flag-alt": "Drapeau de la Corse — la tête de Maure",
+  "about-radinus-name": "Radinus",
+  "about-radinus-rust-alt": "Le logo du langage Rust",
+  "about-radinus-tauri-alt": "Le logo de Tauri",
+  "about-radinus-built": "Radinus est écrit en Rust et bâti avec Tauri.",
+  "about-radinus-licence": "Logiciel libre, sous licence GNU GPL v3.",
+  "licence-no-warranty": "Ce logiciel est fourni sans aucune garantie, dans la mesure permise par la loi.",
   "licence-info": "Le texte officiel s'ouvre dans votre navigateur, sur gnu.org.",
   "ui-title-save": "Enregistrer",
   "ui-title-add": "Ajouter",
@@ -9290,6 +9304,52 @@ async function openWindow(page, url, options) {
   await page.close();
 }
 
+// --- Les deux « À propos » portent les mêmes mentions (08/08/2026) ------
+//
+// Fabrice a demandé que le copyright et l'absence de garantie soient dits dans
+// les trois fenêtres de la famille, et non dans la seule « Licence
+// d'utilisation ». Les trois lisent les deux mêmes clefs : corrigées une fois,
+// corrigées partout — et c'est cela que ces vérifications tiennent.
+for (const [window, size] of [
+  ["about-author", { width: 520, height: 480 }],
+  ["about-radinus", { width: 520, height: 560 }],
+]) {
+  const page = await browser.newPage();
+  await page.setViewportSize(size);
+  const errors = await openWindow(page, `http://localhost:4173/ui/windows/${window}.html`);
+  check(`${window} : la fenêtre s'ouvre sans une plainte`, errors.length === 0, errors.join(" | "));
+
+  const notices = await page.evaluate(() =>
+    ["copyright", "no-warranty"].map((id) => ({
+      text: document.getElementById(id).textContent,
+      weight: getComputedStyle(document.getElementById(id)).fontWeight,
+    })),
+  );
+  check(
+    `${window} : le copyright nomme l'auteur et l'année`,
+    notices[0].text.includes("Fabrice Garcia") && notices[0].text.includes("2026"),
+    notices[0].text,
+  );
+  check(
+    `${window} : l'absence de garantie est dite`,
+    notices[1].text.length > 20 && !notices[1].text.startsWith("licence-"),
+    notices[1].text,
+  );
+  check(
+    `${window} : les deux mentions sont en gras`,
+    notices.every((notice) => Number(notice.weight) >= 700),
+    notices.map((notice) => notice.weight).join(","),
+  );
+  check(
+    `${window} : rien ne déborde`,
+    await page.evaluate(() =>
+      document.documentElement.scrollHeight <= window.innerHeight &&
+      document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  );
+  await page.close();
+}
+
 // --- « Licence d'utilisation » (08/08/2026) -----------------------------
 //
 // The first window of the « À propos » family to be watched at all: neither
@@ -9306,11 +9366,11 @@ async function openWindow(page, url, options) {
   // une phrase égale à sa clef est une phrase que personne n'a traduite.
   const said = await page.evaluate(() =>
     ["name", "intro", "freedoms-title", "freedom-use", "freedom-study",
-     "freedom-share", "freedom-improve", "info-bar"]
+     "freedom-share", "freedom-improve", "copyright", "no-warranty", "info-bar"]
       .map((id) => document.getElementById(id).textContent),
   );
   check(
-    "licence : les huit phrases arrivent entières du noyau",
+    "licence : les dix phrases arrivent entières du noyau",
     said.every((text) => text && !text.startsWith("licence-")),
     said.join(" | "),
   );
@@ -9333,6 +9393,31 @@ async function openWindow(page, url, options) {
   check("licence : les quatre libertés sont quatre", freedoms.count === 4, String(freedoms.count));
   check("licence : et elles portent une puce", freedoms.marker === "disc", freedoms.marker);
   check("licence : aucune n'est vide", freedoms.filled);
+
+  // Les deux mentions que la GPL réclame : le copyright, et l'absence de
+  // garantie. En gras — c'est ce que Fabrice a demandé, et la licence parle
+  // elle-même d'une mention « bien visible ».
+  const notices = await page.evaluate(() =>
+    ["copyright", "no-warranty"].map((id) => ({
+      text: document.getElementById(id).textContent,
+      weight: getComputedStyle(document.getElementById(id)).fontWeight,
+    })),
+  );
+  check(
+    "licence : le copyright nomme l'auteur et l'année",
+    notices[0].text.includes("Fabrice Garcia") && notices[0].text.includes("2026"),
+    notices[0].text,
+  );
+  check(
+    "licence : l'absence de garantie est dite",
+    notices[1].text.length > 20,
+    notices[1].text,
+  );
+  check(
+    "licence : les deux mentions sont en gras",
+    notices.every((notice) => Number(notice.weight) >= 700),
+    notices.map((notice) => notice.weight).join(","),
+  );
 
   // Le logo EST le bouton. Le dossier jaune de la bande ardoise est parti le
   // 08/08/2026 : « pas adapté », et l'action a rejoint l'emblème.

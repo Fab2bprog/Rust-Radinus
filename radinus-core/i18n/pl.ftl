@@ -1871,5 +1871,13 @@ licence-freedom-study = Badać jego kod źródłowy, otwarty dla wszystkich.
 licence-freedom-share = Kopiować go i przekazywać innym.
 licence-freedom-improve = Zmieniać go i dzielić się swoimi zmianami.
 licence-read = Przeczytaj pełny tekst licencji
+
+# The two notices the GPL asks an interactive interface to display, next
+# to the right to redistribute and the way to read the licence, which the
+# window already carried (LICENSE, definition of « Appropriate Legal
+# Notices »). The copyright is a name and a year: identical everywhere,
+# here all the same so that the view holds no sentence of its own.
+licence-copyright = Copyright © 2026 Fabrice Garcia
+licence-no-warranty = Ten program jest dostarczany bez żadnej gwarancji, w zakresie dozwolonym przez prawo.
 licence-info = Oficjalny tekst otworzy się w twojej przeglądarce, na gnu.org.
 

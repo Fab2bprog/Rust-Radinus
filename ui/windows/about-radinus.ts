@@ -23,6 +23,8 @@ async function dress(): Promise<void> {
   element<HTMLImageElement>("rust").alt = t("about-radinus-rust-alt");
   element<HTMLImageElement>("tauri").alt = t("about-radinus-tauri-alt");
   element<HTMLElement>("built").textContent = t("about-radinus-built");
+  element<HTMLElement>("copyright").textContent = t("licence-copyright");
+  element<HTMLElement>("no-warranty").textContent = t("licence-no-warranty");
   element<HTMLElement>("info-bar").textContent = t("about-radinus-licence");
   element<HTMLElement>("close").title = t("ui-title-close");
 

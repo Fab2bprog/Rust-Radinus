@@ -22,6 +22,8 @@ function dress(): void {
   element<HTMLImageElement>("flag").alt = t("about-author-flag-alt");
   element<HTMLElement>("name").textContent = t("about-author-name");
   element<HTMLElement>("place").textContent = t("about-author-place");
+  element<HTMLElement>("copyright").textContent = t("licence-copyright");
+  element<HTMLElement>("no-warranty").textContent = t("licence-no-warranty");
   element<HTMLElement>("close").title = t("ui-title-close");
 }
 
