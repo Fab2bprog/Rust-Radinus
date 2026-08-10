@@ -1516,6 +1516,7 @@ restore-unreadable = קובץ זה אינו ארכיון Radinus קריא: { $re
 restore-question = לשחזר את "{ $file }"? כל התוכן הנוכחי של מסד הנתונים שלך יימחק ויוחלף, ומה שנמצא בו יאבד.
 restore-done = השחזור הסתיים: { $accounts } חשבונות ו-{ $operations } תנועות.
 restore-failed = השחזור נכשל: { $reason }
+restore-empty-fields = שדות ריקים שנקראו כערך אפס: { $count }.
 
 
 # --- יומן הפעולות הטכניות (שלב 17) --------------------
@@ -1596,6 +1597,7 @@ journal-step-restore-missing = הקובץ חסר בארכיון: טבלה זו �
 journal-step-restore-wipe = מחיקה מוחלטת של תוכן מסד הנתונים לפני השחזור
 journal-step-restore-write = כתיבה אל מסד הנתונים
 journal-step-restore-total = סך הכול שוחזר: חשבונות, תנועות
+journal-step-restore-empty-fields = שדות ריקים שהושלמו בעת הקריאה
 backup-verify-mismatch = הארכיון שנכתב אינו נקרא מחדש כפי שנכתב: אין להסתמך עליו, יש לבצע את הגיבוי מחדש.
 
 # --- הקבצים המצורפים של תנועה (F28, שלב 17) -----------------

@@ -1501,6 +1501,7 @@ restore-unreadable = Diese Datei ist kein lesbares Radinus-Archiv: { $reason }
 restore-question = „{ $file }“ wiederherstellen? Der gesamte aktuelle Inhalt Ihrer Datenbank wird gelöscht und ersetzt, und was sich darin befindet, geht verloren.
 restore-done = Wiederherstellung abgeschlossen: { $accounts } Konten und { $operations } Buchungen.
 restore-failed = Wiederherstellung nicht möglich: { $reason }
+restore-empty-fields = Leere Felder als Nullwert gelesen: { $count }.
 
 
 # --- Das Protokoll der technischen Vorgänge (Phase 17) ------------------
@@ -1580,6 +1581,7 @@ journal-step-restore-missing = Datei fehlt im Archiv: Diese Tabelle wird nicht w
 journal-step-restore-wipe = Vollständige Löschung des Datenbankinhalts vor der Wiederherstellung
 journal-step-restore-write = Schreiben in die Datenbank
 journal-step-restore-total = Wiederhergestellt insgesamt: Konten, Buchungen
+journal-step-restore-empty-fields = Beim Lesen ergänzte leere Felder
 backup-verify-mismatch = Das geschriebene Archiv liest sich nicht so zurück, wie es geschrieben wurde: Verlassen Sie sich nicht darauf, machen Sie die Datensicherung erneut.
 
 # --- Die Anhänge einer Buchung (F28, Phase 17) --------------------------

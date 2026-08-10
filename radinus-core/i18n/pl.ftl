@@ -1548,6 +1548,7 @@ restore-unreadable = Ten plik nie jest czytelnym archiwum Radinus: { $reason }
 restore-question = Przywrócić „{ $file }”? Cała obecna zawartość twojej bazy zostanie skasowana i zastąpiona, a to, co się w niej znajduje, zostanie utracone.
 restore-done = Przywracanie zakończone: { $accounts } kont i { $operations } operacji.
 restore-failed = Przywracanie niemożliwe: { $reason }
+restore-empty-fields = Puste pola odczytane jako wartość zerowa: { $count }.
 
 
 # --- Dziennik operacji technicznych (faza 17) --------------------------
@@ -1629,6 +1630,7 @@ journal-step-restore-missing = Brak pliku w archiwum: ta tabela nie zostanie prz
 journal-step-restore-wipe = Całkowite skasowanie zawartości bazy przed przywracaniem
 journal-step-restore-write = Zapis do bazy
 journal-step-restore-total = Razem przywrócone: konta, operacje
+journal-step-restore-empty-fields = Puste pola uzupełnione podczas odczytu
 backup-verify-mismatch = Zapisane archiwum nie odczytuje się tak, jak zostało zapisane: nie polegaj na nim, zrób kopię zapasową jeszcze raz.
 
 # --- Załączniki operacji (F28, faza 17) ---------------------------------

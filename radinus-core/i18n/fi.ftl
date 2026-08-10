@@ -1497,6 +1497,7 @@ restore-unreadable = Tämä tiedosto ei ole luettava Radinus-arkisto: { $reason 
 restore-question = Palautetaanko ”{ $file }”? Tietokantasi koko nykyinen sisältö poistetaan ja korvataan, ja siinä oleva menetetään.
 restore-done = Palautus valmis: { $accounts } tiliä ja { $operations } tapahtumaa.
 restore-failed = Palautus epäonnistui: { $reason }
+restore-empty-fields = Tyhjiä kenttiä luettu nolla-arvona: { $count }.
 
 
 # --- Teknisten toimintojen loki (vaihe 17) ------------------------------
@@ -1576,6 +1577,7 @@ journal-step-restore-missing = Tiedosto puuttuu arkistosta: tätä taulua ei pal
 journal-step-restore-wipe = Tietokannan sisällön täydellinen poisto ennen palautusta
 journal-step-restore-write = Kirjoitus tietokantaan
 journal-step-restore-total = Palautettu yhteensä: tilit, tapahtumat
+journal-step-restore-empty-fields = Lukemisen aikana täytetyt tyhjät kentät
 backup-verify-mismatch = Kirjoitettua arkistoa ei saada luettua takaisin sellaisena kuin se kirjoitettiin: älä luota siihen, tee varmuuskopio uudelleen.
 
 # --- Tapahtuman liitteet (F28, vaihe 17) --------------------------------

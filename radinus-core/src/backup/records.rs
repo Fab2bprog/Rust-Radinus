@@ -29,6 +29,87 @@ use crate::domain::{
 use serde::{Deserialize, Serialize};
 use time_compute::{Datelike, NaiveDate};
 
+/// Reading a legacy archive **field by field, without ever refusing one**.
+///
+/// The format says every field is always present, even when null or zero
+/// (see this module's header). Real archives disagree. Two users lost a whole
+/// restore on 10/08/2026 — `invalid type: null, expected i64` — because a
+/// column added to their database years after it was created had been left
+/// `null` on every row written before that day. One field of one row sank
+/// nineteen tables, since serde stops at the first one it cannot read.
+///
+/// So every field of every table now reads through this module. A `null`
+/// gives the neutral value; a field the archive does not carry at all gives
+/// the same, which is the second face of the same problem — an older archive
+/// simply has no such column. Neither is a reason to lose a history.
+///
+/// **Nothing is silently swallowed**: each substitution is counted, and the
+/// restore reports the total. Zero for an identifier means "no project, no
+/// payee, no check", which is exactly what the empty field meant. Zero for an
+/// amount is a heavier claim, and the count is what lets the user go and look.
+///
+/// The counter is per thread because that is the scope of one archive read:
+/// `read_archive` clears it before parsing and reads it after, and no two
+/// archives are read on the same thread at once.
+pub mod lenient {
+    use serde::{Deserialize, Deserializer};
+    use std::cell::Cell;
+
+    thread_local! {
+        static EMPTIED: Cell<u64> = const { Cell::new(0) };
+    }
+
+    /// Forgets what was counted — called before reading an archive.
+    pub fn forget() {
+        EMPTIED.with(|count| count.set(0));
+    }
+
+    /// How many fields were read as their neutral value since [`forget`].
+    pub fn emptied() -> u64 {
+        EMPTIED.with(|count| count.get())
+    }
+
+    fn note() {
+        EMPTIED.with(|count| count.set(count.get() + 1));
+    }
+
+    pub fn missing_integer() -> i64 {
+        note();
+        0
+    }
+
+    pub fn missing_decimal() -> f64 {
+        note();
+        0.0
+    }
+
+    pub fn missing_text() -> String {
+        note();
+        String::new()
+    }
+
+    pub fn missing_flag() -> bool {
+        note();
+        false
+    }
+
+    pub fn integer<'de, D: Deserializer<'de>>(source: D) -> Result<i64, D::Error> {
+        Ok(Option::<i64>::deserialize(source)?.unwrap_or_else(missing_integer))
+    }
+
+    pub fn decimal<'de, D: Deserializer<'de>>(source: D) -> Result<f64, D::Error> {
+        Ok(Option::<f64>::deserialize(source)?.unwrap_or_else(missing_decimal))
+    }
+
+    pub fn text<'de, D: Deserializer<'de>>(source: D) -> Result<String, D::Error> {
+        Ok(Option::<String>::deserialize(source)?.unwrap_or_else(missing_text))
+    }
+
+    pub fn flag<'de, D: Deserializer<'de>>(source: D) -> Result<bool, D::Error> {
+        Ok(Option::<bool>::deserialize(source)?.unwrap_or_else(missing_flag))
+    }
+}
+
 /// Parses a WinDev `AAAAMMJJ` date string. Empty string (WinDev's "no date")
 /// and malformed values both give `None`: a single damaged field in a legacy
 /// archive must not sink an otherwise good restore. Callers that need the
@@ -91,9 +172,17 @@ macro_rules! named_item_row {
         #[derive(Debug, Clone, Default, Serialize, Deserialize)]
         #[serde(default)]
         pub struct $name {
-            #[serde(rename = $id_field)]
+            #[serde(
+                rename = $id_field,
+                default = "lenient::missing_integer",
+                deserialize_with = "lenient::integer"
+            )]
             pub id: i64,
-            #[serde(rename = "Libelle")]
+            #[serde(
+                rename = "Libelle",
+                default = "lenient::missing_text",
+                deserialize_with = "lenient::text"
+            )]
             pub libelle: String,
         }
 
@@ -124,9 +213,17 @@ named_item_row!(TiersRow, "IDTiers");
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct BankRow {
-    #[serde(rename = "IDBanques")]
+    #[serde(
+        rename = "IDBanques",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_banques: i64,
-    #[serde(rename = "NomBanque")]
+    #[serde(
+        rename = "NomBanque",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub nom_banque: String,
 }
 
@@ -148,24 +245,52 @@ impl BankRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct StatutChequeRow {
-    #[serde(rename = "IDStatutCheque")]
+    #[serde(
+        rename = "IDStatutCheque",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_statut_cheque: i64,
-    #[serde(rename = "Libelle")]
+    #[serde(
+        rename = "Libelle",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub libelle: String,
-    #[serde(rename = "Description")]
+    #[serde(
+        rename = "Description",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub description: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CategorieRow {
-    #[serde(rename = "IDCategorie")]
+    #[serde(
+        rename = "IDCategorie",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_categorie: i64,
-    #[serde(rename = "Libelle")]
+    #[serde(
+        rename = "Libelle",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub libelle: String,
-    #[serde(rename = "IDTypeCategorie")]
+    #[serde(
+        rename = "IDTypeCategorie",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_type_categorie: i64,
-    #[serde(rename = "IDPosteBudget")]
+    #[serde(
+        rename = "IDPosteBudget",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_poste_budget: i64,
 }
 
@@ -200,64 +325,172 @@ impl CategorieRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct PreferencesRow {
-    #[serde(rename = "IDPreferences")]
+    #[serde(
+        rename = "IDPreferences",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_preferences: i64,
-    #[serde(rename = "Cle")]
+    #[serde(
+        rename = "Cle",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub cle: String,
-    #[serde(rename = "ValeurJSON")]
+    #[serde(
+        rename = "ValeurJSON",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub valeur_json: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CompteRow {
-    #[serde(rename = "IDCompte")]
+    #[serde(
+        rename = "IDCompte",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_compte: i64,
-    #[serde(rename = "Libelle")]
+    #[serde(
+        rename = "Libelle",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub libelle: String,
-    #[serde(rename = "IDTypeCompte")]
+    #[serde(
+        rename = "IDTypeCompte",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_type_compte: i64,
-    #[serde(rename = "IDBanques")]
+    #[serde(
+        rename = "IDBanques",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_banques: i64,
-    #[serde(rename = "ReportPointe")]
+    #[serde(
+        rename = "ReportPointe",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub report_pointe: f64,
-    #[serde(rename = "ReportEngage")]
+    #[serde(
+        rename = "ReportEngage",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub report_engage: f64,
-    #[serde(rename = "ReportPrevu")]
+    #[serde(
+        rename = "ReportPrevu",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub report_prevu: f64,
-    #[serde(rename = "SoldeBanque")]
+    #[serde(
+        rename = "SoldeBanque",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub solde_banque: f64,
-    #[serde(rename = "SoldeReel")]
+    #[serde(
+        rename = "SoldeReel",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub solde_reel: f64,
-    #[serde(rename = "SoldeFinal")]
+    #[serde(
+        rename = "SoldeFinal",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub solde_final: f64,
-    #[serde(rename = "NomTitulaire")]
+    #[serde(
+        rename = "NomTitulaire",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub nom_titulaire: String,
-    #[serde(rename = "AdresseTitulaire")]
+    #[serde(
+        rename = "AdresseTitulaire",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub adresse_titulaire: String,
-    #[serde(rename = "COBCodeBanque")]
+    #[serde(
+        rename = "COBCodeBanque",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub cob_code_banque: String,
-    #[serde(rename = "COBCodeGuichet")]
+    #[serde(
+        rename = "COBCodeGuichet",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub cob_code_guichet: String,
-    #[serde(rename = "COBNumCompte")]
+    #[serde(
+        rename = "COBNumCompte",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub cob_num_compte: String,
-    #[serde(rename = "COBClefRIB")]
+    #[serde(
+        rename = "COBClefRIB",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub cob_clef_rib: String,
-    #[serde(rename = "COBIBAN")]
+    #[serde(
+        rename = "COBIBAN",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub cob_iban: String,
-    #[serde(rename = "COBBIC")]
+    #[serde(
+        rename = "COBBIC",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub cob_bic: String,
-    #[serde(rename = "AdresseAgenceBank")]
+    #[serde(
+        rename = "AdresseAgenceBank",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub adresse_agence_bank: String,
-    #[serde(rename = "DateOuverture")]
+    #[serde(
+        rename = "DateOuverture",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date_ouverture: String,
-    #[serde(rename = "DateCloture")]
+    #[serde(
+        rename = "DateCloture",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date_cloture: String,
-    #[serde(rename = "NumProchCheque")]
+    #[serde(
+        rename = "NumProchCheque",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub num_proch_cheque: i64,
-    #[serde(rename = "CompteCloture")]
+    #[serde(
+        rename = "CompteCloture",
+        default = "lenient::missing_flag",
+        deserialize_with = "lenient::flag"
+    )]
     pub compte_cloture: bool,
-    #[serde(rename = "Devise")]
+    #[serde(
+        rename = "Devise",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub devise: String,
 }
 
@@ -324,23 +557,59 @@ impl CompteRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ChequierRow {
-    #[serde(rename = "IDChequier")]
+    #[serde(
+        rename = "IDChequier",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_chequier: i64,
-    #[serde(rename = "IDReferenceChq")]
+    #[serde(
+        rename = "IDReferenceChq",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub id_reference_chq: String,
-    #[serde(rename = "DateRecep")]
+    #[serde(
+        rename = "DateRecep",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date_recep: String,
-    #[serde(rename = "NumPremierChq")]
+    #[serde(
+        rename = "NumPremierChq",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub num_premier_chq: i64,
-    #[serde(rename = "NumDernChq")]
+    #[serde(
+        rename = "NumDernChq",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub num_dern_chq: i64,
-    #[serde(rename = "QteChq")]
+    #[serde(
+        rename = "QteChq",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub qte_chq: i64,
-    #[serde(rename = "FormatNumChq")]
+    #[serde(
+        rename = "FormatNumChq",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub format_num_chq: i64,
-    #[serde(rename = "Commentaires")]
+    #[serde(
+        rename = "Commentaires",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub commentaires: String,
-    #[serde(rename = "IDCompte")]
+    #[serde(
+        rename = "IDCompte",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_compte: i64,
 }
 
@@ -376,23 +645,59 @@ impl ChequierRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ChequeRow {
-    #[serde(rename = "IDCheque")]
+    #[serde(
+        rename = "IDCheque",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_cheque: i64,
-    #[serde(rename = "NumChq")]
+    #[serde(
+        rename = "NumChq",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub num_chq: i64,
-    #[serde(rename = "IDChequier")]
+    #[serde(
+        rename = "IDChequier",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_chequier: i64,
-    #[serde(rename = "DateEmission")]
+    #[serde(
+        rename = "DateEmission",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date_emission: String,
-    #[serde(rename = "Beneficiaire")]
+    #[serde(
+        rename = "Beneficiaire",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub beneficiaire: String,
-    #[serde(rename = "Montant")]
+    #[serde(
+        rename = "Montant",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub montant: f64,
-    #[serde(rename = "Commentaires")]
+    #[serde(
+        rename = "Commentaires",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub commentaires: String,
-    #[serde(rename = "LieuEmission")]
+    #[serde(
+        rename = "LieuEmission",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub lieu_emission: String,
-    #[serde(rename = "IDStatutCheque")]
+    #[serde(
+        rename = "IDStatutCheque",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_statut_cheque: i64,
 }
 
@@ -428,45 +733,125 @@ impl ChequeRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct OperationRow {
-    #[serde(rename = "IDOperation")]
+    #[serde(
+        rename = "IDOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_operation: i64,
-    #[serde(rename = "Libelle")]
+    #[serde(
+        rename = "Libelle",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub libelle: String,
-    #[serde(rename = "Date")]
+    #[serde(
+        rename = "Date",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date: String,
-    #[serde(rename = "Montant")]
+    #[serde(
+        rename = "Montant",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub montant: f64,
-    #[serde(rename = "IDModeOperation")]
+    #[serde(
+        rename = "IDModeOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_mode_operation: i64,
-    #[serde(rename = "IDCategorie")]
+    #[serde(
+        rename = "IDCategorie",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_categorie: i64,
-    #[serde(rename = "IDAffectation")]
+    #[serde(
+        rename = "IDAffectation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_affectation: i64,
-    #[serde(rename = "IDCompte")]
+    #[serde(
+        rename = "IDCompte",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_compte: i64,
-    #[serde(rename = "IDStatutOperation")]
+    #[serde(
+        rename = "IDStatutOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_statut_operation: i64,
-    #[serde(rename = "DatePointage")]
+    #[serde(
+        rename = "DatePointage",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date_pointage: String,
-    #[serde(rename = "SoldePointe")]
+    #[serde(
+        rename = "SoldePointe",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub solde_pointe: f64,
-    #[serde(rename = "FitID")]
+    #[serde(
+        rename = "FitID",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub fit_id: String,
-    #[serde(rename = "ReferencePaiement")]
+    #[serde(
+        rename = "ReferencePaiement",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub reference_paiement: String,
-    #[serde(rename = "NumRelevBanque")]
+    #[serde(
+        rename = "NumRelevBanque",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub num_releve_banque: String,
-    #[serde(rename = "IDOperationParent")]
+    #[serde(
+        rename = "IDOperationParent",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_operation_parent: i64,
-    #[serde(rename = "EstParent")]
+    #[serde(
+        rename = "EstParent",
+        default = "lenient::missing_flag",
+        deserialize_with = "lenient::flag"
+    )]
     pub est_parent: bool,
-    #[serde(rename = "GUIDCalOpPeriode")]
+    #[serde(
+        rename = "GUIDCalOpPeriode",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub guid_cal_op_periode: String,
-    #[serde(rename = "IDCheque")]
+    #[serde(
+        rename = "IDCheque",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_cheque: i64,
-    #[serde(rename = "IDTiers")]
+    #[serde(
+        rename = "IDTiers",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_tiers: i64,
-    #[serde(rename = "IDProjets")]
+    #[serde(
+        rename = "IDProjets",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_projets: i64,
 }
 
@@ -535,11 +920,23 @@ impl OperationRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CommentaireRow {
-    #[serde(rename = "IDCommentaire")]
+    #[serde(
+        rename = "IDCommentaire",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_commentaire: i64,
-    #[serde(rename = "CommentaireTxt")]
+    #[serde(
+        rename = "CommentaireTxt",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub commentaire_txt: String,
-    #[serde(rename = "IDOperation")]
+    #[serde(
+        rename = "IDOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_operation: i64,
 }
 
@@ -563,25 +960,65 @@ impl CommentaireRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct PiecesJointesRow {
-    #[serde(rename = "IDPiecesJointes")]
+    #[serde(
+        rename = "IDPiecesJointes",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_pieces_jointes: i64,
-    #[serde(rename = "IDOperation")]
+    #[serde(
+        rename = "IDOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_operation: i64,
-    #[serde(rename = "NomFichier")]
+    #[serde(
+        rename = "NomFichier",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub nom_fichier: String,
-    #[serde(rename = "NomFichierGUID")]
+    #[serde(
+        rename = "NomFichierGUID",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub nom_fichier_guid: String,
-    #[serde(rename = "PathRelFichier")]
+    #[serde(
+        rename = "PathRelFichier",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub path_rel_fichier: String,
-    #[serde(rename = "TailleFich")]
+    #[serde(
+        rename = "TailleFich",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub taille_fich: i64,
-    #[serde(rename = "MiMeType")]
+    #[serde(
+        rename = "MiMeType",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub mime_type: String,
-    #[serde(rename = "DateAjout")]
+    #[serde(
+        rename = "DateAjout",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date_ajout: String,
-    #[serde(rename = "CheckSumInfo")]
+    #[serde(
+        rename = "CheckSumInfo",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub checksum_info: String,
-    #[serde(rename = "NoteInfo")]
+    #[serde(
+        rename = "NoteInfo",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub note_info: String,
 }
 
@@ -619,15 +1056,35 @@ impl PiecesJointesRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct BudgetRow {
-    #[serde(rename = "IDBudget")]
+    #[serde(
+        rename = "IDBudget",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_budget: i64,
-    #[serde(rename = "Annee")]
+    #[serde(
+        rename = "Annee",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub annee: i64,
-    #[serde(rename = "Mois")]
+    #[serde(
+        rename = "Mois",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub mois: i64,
-    #[serde(rename = "IDPosteBudget")]
+    #[serde(
+        rename = "IDPosteBudget",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_poste_budget: i64,
-    #[serde(rename = "Montant")]
+    #[serde(
+        rename = "Montant",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub montant: f64,
 }
 
@@ -655,23 +1112,59 @@ impl BudgetRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ModeleOperationRow {
-    #[serde(rename = "IDModeleOperation")]
+    #[serde(
+        rename = "IDModeleOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_modele_operation: i64,
-    #[serde(rename = "Libelle")]
+    #[serde(
+        rename = "Libelle",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub libelle: String,
-    #[serde(rename = "Montant")]
+    #[serde(
+        rename = "Montant",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub montant: f64,
-    #[serde(rename = "IDModeOperation")]
+    #[serde(
+        rename = "IDModeOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_mode_operation: i64,
-    #[serde(rename = "IDCategorie")]
+    #[serde(
+        rename = "IDCategorie",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_categorie: i64,
-    #[serde(rename = "IDAffectation")]
+    #[serde(
+        rename = "IDAffectation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_affectation: i64,
-    #[serde(rename = "IDStatutOperation")]
+    #[serde(
+        rename = "IDStatutOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_statut_operation: i64,
-    #[serde(rename = "IDTiers")]
+    #[serde(
+        rename = "IDTiers",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_tiers: i64,
-    #[serde(rename = "IDProjets")]
+    #[serde(
+        rename = "IDProjets",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_projets: i64,
 }
 
@@ -707,47 +1200,131 @@ impl ModeleOperationRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CalOpPeriodiqueRow {
-    #[serde(rename = "GUIDCalOpPeriode")]
+    #[serde(
+        rename = "GUIDCalOpPeriode",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub guid_cal_op_periode: String,
-    #[serde(rename = "Libelle")]
+    #[serde(
+        rename = "Libelle",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub libelle: String,
-    #[serde(rename = "IDCompte")]
+    #[serde(
+        rename = "IDCompte",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_compte: i64,
-    #[serde(rename = "IDModeOperation")]
+    #[serde(
+        rename = "IDModeOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_mode_operation: i64,
-    #[serde(rename = "IDCategorie")]
+    #[serde(
+        rename = "IDCategorie",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_categorie: i64,
-    #[serde(rename = "IDAffectation")]
+    #[serde(
+        rename = "IDAffectation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_affectation: i64,
-    #[serde(rename = "IDStatutOperation")]
+    #[serde(
+        rename = "IDStatutOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_statut_operation: i64,
-    #[serde(rename = "IDTiers")]
+    #[serde(
+        rename = "IDTiers",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_tiers: i64,
-    #[serde(rename = "IDProjets")]
+    #[serde(
+        rename = "IDProjets",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_projets: i64,
-    #[serde(rename = "Montant")]
+    #[serde(
+        rename = "Montant",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub montant: f64,
-    #[serde(rename = "DateProchOp")]
+    #[serde(
+        rename = "DateProchOp",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date_proch_op: String,
-    #[serde(rename = "Periode")]
+    #[serde(
+        rename = "Periode",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub periode: i64,
-    #[serde(rename = "PeriodeFreq")]
+    #[serde(
+        rename = "PeriodeFreq",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub periode_freq: i64,
-    #[serde(rename = "PeriodeNbrRepete")]
+    #[serde(
+        rename = "PeriodeNbrRepete",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub periode_nbr_repete: i64,
-    #[serde(rename = "ModeFinInsertion")]
+    #[serde(
+        rename = "ModeFinInsertion",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub mode_fin_insertion: i64,
-    #[serde(rename = "DateFin")]
+    #[serde(
+        rename = "DateFin",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date_fin: String,
-    #[serde(rename = "DateDernOpGen")]
+    #[serde(
+        rename = "DateDernOpGen",
+        default = "lenient::missing_text",
+        deserialize_with = "lenient::text"
+    )]
     pub date_dern_op_gen: String,
-    #[serde(rename = "NbrOpInsert")]
+    #[serde(
+        rename = "NbrOpInsert",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub nbr_op_insert: i64,
-    #[serde(rename = "NbrOpAnterieur")]
+    #[serde(
+        rename = "NbrOpAnterieur",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub nbr_op_anterieur: i64,
-    #[serde(rename = "MontantInsert")]
+    #[serde(
+        rename = "MontantInsert",
+        default = "lenient::missing_decimal",
+        deserialize_with = "lenient::decimal"
+    )]
     pub montant_insert: f64,
-    #[serde(rename = "IDOperation")]
+    #[serde(
+        rename = "IDOperation",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_operation: i64,
 }
 
@@ -807,19 +1384,47 @@ impl CalOpPeriodiqueRow {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ParametresRow {
-    #[serde(rename = "IDParametres", default)]
+    #[serde(
+        rename = "IDParametres",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub id_parametres: i64,
-    #[serde(rename = "RunOnce")]
+    #[serde(
+        rename = "RunOnce",
+        default = "lenient::missing_flag",
+        deserialize_with = "lenient::flag"
+    )]
     pub run_once: bool,
-    #[serde(rename = "InitValDefaut")]
+    #[serde(
+        rename = "InitValDefaut",
+        default = "lenient::missing_flag",
+        deserialize_with = "lenient::flag"
+    )]
     pub init_val_defaut: bool,
-    #[serde(rename = "VerSoftMajeur")]
+    #[serde(
+        rename = "VerSoftMajeur",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub ver_soft_majeur: i64,
-    #[serde(rename = "VerSoftMineur")]
+    #[serde(
+        rename = "VerSoftMineur",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub ver_soft_mineur: i64,
-    #[serde(rename = "VerSoftDebug")]
+    #[serde(
+        rename = "VerSoftDebug",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub ver_soft_debug: i64,
-    #[serde(rename = "VerDataBase")]
+    #[serde(
+        rename = "VerDataBase",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub ver_data_base: i64,
     /// Le numéro de la constante « nation » du WLangage (1 = allemand,
     /// 5 = français, 3 = anglais, 7 = espagnol, 11 = italien, 14 = portugais).
@@ -827,7 +1432,11 @@ pub struct ParametresRow {
     /// la base stocke ce nombre-là, si bien que la restauration n'a rien à
     /// convertir — et qu'une archive étrangère ne s'ouvre plus en anglais,
     /// comme elle le faisait.
-    #[serde(rename = "UtiliseLangue")]
+    #[serde(
+        rename = "UtiliseLangue",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
     pub utilise_langue: i64,
 }
 

@@ -1493,6 +1493,7 @@ restore-unreadable = Ce fichier n'est pas une archive Radinus lisible : { $reaso
 restore-question = Restaurer « { $file } » ? Tout le contenu actuel de votre base sera effacé et remplacé, et ce qui s'y trouve sera perdu.
 restore-done = Restauration terminée : { $accounts } comptes et { $operations } opérations.
 restore-failed = Restauration impossible : { $reason }
+restore-empty-fields = Champs vides lus comme valeur nulle : { $count }.
 
 # **Remplacer une base sous un logiciel qui tourne, ça ne se rattrape pas**
 # (décision de Fabrice, 03/08/2026). Une restauration et une remise à zéro
@@ -1579,6 +1580,7 @@ journal-step-restore-missing = Fichier absent de l'archive : cette table ne sera
 journal-step-restore-wipe = Effacement total du contenu de la base avant restauration
 journal-step-restore-write = Écriture dans la base
 journal-step-restore-total = Total restauré : comptes, opérations
+journal-step-restore-empty-fields = Champs vides comblés à la lecture
 backup-verify-mismatch = L'archive écrite ne se relit pas telle qu'elle a été écrite : ne vous y fiez pas, refaites la sauvegarde.
 
 # --- Les pièces jointes d'une opération (F28, phase 17) -----------------

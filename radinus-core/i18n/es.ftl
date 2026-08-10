@@ -1335,6 +1335,7 @@ restore-unreadable = Este archivo no es un archivo Radinus legible: { $reason }
 restore-question = ¿Restaurar «{ $file }»? Todo el contenido actual de su base se borrará y se sustituirá, y lo que allí se encuentre se perderá.
 restore-done = Restauración terminada: { $accounts } cuentas y { $operations } operaciones.
 restore-failed = Restauración imposible: { $reason }
+restore-empty-fields = Campos vacíos leídos como valor nulo: { $count }.
 
 
 # --- El registro de las operaciones técnicas (fase 17) --------------------
@@ -1413,6 +1414,7 @@ journal-step-restore-missing = Archivo ausente del archivo comprimido: esta tabl
 journal-step-restore-wipe = Borrado total del contenido de la base antes de la restauración
 journal-step-restore-write = Escritura en la base
 journal-step-restore-total = Total restaurado: cuentas, operaciones
+journal-step-restore-empty-fields = Campos vacíos completados durante la lectura
 backup-verify-mismatch = El archivo escrito no se relee tal como fue escrito: no se fíe de él, rehaga la copia de seguridad.
 
 # --- Los adjuntos de una operación (F28, fase 17) -----------------

@@ -1586,6 +1586,7 @@ restore-unreadable = هذا الملف ليس أرشيف Radinus قابلاً ل
 restore-question = استعادة "{ $file }"؟ سيُمحى كل المحتوى الحالي لقاعدتك ويُستبدل، وسيُفقد كل ما فيها.
 restore-done = انتهت الاستعادة: { $accounts } حسابات و{ $operations } عملية.
 restore-failed = الاستعادة غير ممكنة: { $reason }
+restore-empty-fields = الحقول الفارغة التي قُرئت كقيمة صفرية: { $count }.
 
 
 # --- سجل العمليات التقنية (المرحلة 17) --------------------
@@ -1668,6 +1669,7 @@ journal-step-restore-missing = الملف غير موجود في الأرشيف:
 journal-step-restore-wipe = محو كامل لمحتوى قاعدة البيانات قبل الاستعادة
 journal-step-restore-write = الكتابة في قاعدة البيانات
 journal-step-restore-total = إجمالي ما تمت استعادته: الحسابات، العمليات
+journal-step-restore-empty-fields = الحقول الفارغة التي مُلئت أثناء القراءة
 backup-verify-mismatch = لا يُقرأ الأرشيف المكتوب كما كُتب: لا تثق به، وأعد النسخ الاحتياطي.
 
 # --- مرفقات العملية (F28، المرحلة 17) -----------------

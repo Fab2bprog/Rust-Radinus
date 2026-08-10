@@ -11,6 +11,22 @@ Two version numbers live in this project and they do not move together:
   the line Radinus 1.x walked from 0 to 9 and is at 10 today. A database is
   migrated forward when it is opened, never backward.
 
+## [2.0.3] — 10/08/2026
+
+### Fixed
+
+- **A 1.9.3 archive whose fields are `null` restores again.** Two users lost
+  a whole restore on `invalid type: null, expected i64`: a column added to
+  their database long after it was created had been left `null` on every row
+  written before that day, and serde stops at the first field it cannot read
+  — one field of one row sank nineteen tables. Every field of every table now
+  reads through `backup::records::lenient`: a `null` gives the neutral value,
+  and so does a field the archive does not carry at all, which is the same
+  problem seen from an older archive still. Nothing is swallowed silently:
+  the substitutions are counted and the restore reports the total, in the
+  window and in the journal. The writer is untouched — archives Radinus
+  produces stay readable by 1.9.3.
+
 ## [2.0.2] — unreleased
 
 The cross-platform rewrite of Radinus 1.9.3 (Windows/WinDev) in Rust and

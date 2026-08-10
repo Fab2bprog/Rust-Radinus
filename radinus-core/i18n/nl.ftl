@@ -1506,6 +1506,7 @@ restore-unreadable = Dit bestand is geen leesbaar Radinus-archief: { $reason }
 restore-question = “{ $file }” terugzetten? De volledige huidige inhoud van uw database wordt gewist en vervangen, en wat zich daarin bevindt, gaat verloren.
 restore-done = Terugzetten voltooid: { $accounts } rekeningen en { $operations } boekingen.
 restore-failed = Terugzetten niet mogelijk: { $reason }
+restore-empty-fields = Lege velden gelezen als nulwaarde: { $count }.
 
 
 # --- Het logboek van de technische bewerkingen (fase 17) ----------------
@@ -1585,6 +1586,7 @@ journal-step-restore-missing = Bestand ontbreekt in het archief: deze tabel word
 journal-step-restore-wipe = Volledige wissing van de inhoud van de database vóór het terugzetten
 journal-step-restore-write = Schrijven in de database
 journal-step-restore-total = Totaal teruggezet: rekeningen, boekingen
+journal-step-restore-empty-fields = Lege velden ingevuld tijdens het lezen
 backup-verify-mismatch = Het geschreven archief laat zich niet teruglezen zoals het is geschreven: vertrouw er niet op, maak de back-up opnieuw.
 
 # --- De bijlagen van een boeking (F28, fase 17) -------------------------

@@ -1493,6 +1493,7 @@ restore-unreadable = Þessi skrá er ekki læsileg Radinus-safnskrá: { $reason 
 restore-question = Endurheimta „{ $file }“? Öllu núverandi innihaldi gagnagrunnsins þíns verður eytt og skipt út, og það sem þar er glatast.
 restore-done = Endurheimt lokið: { $accounts } reikningar og { $operations } færslur.
 restore-failed = Endurheimt ekki möguleg: { $reason }
+restore-empty-fields = Auð svæði lesin sem núllgildi: { $count }.
 
 
 # --- Dagbók tæknilegu aðgerðanna (áfangi 17) ----------------------------
@@ -1572,6 +1573,7 @@ journal-step-restore-missing = Skrá vantar í safnskrána: þessi tafla verður
 journal-step-restore-wipe = Algjör eyðing á innihaldi gagnagrunnsins fyrir endurheimt
 journal-step-restore-write = Skrifun í gagnagrunninn
 journal-step-restore-total = Samtals endurheimt: reikningar, færslur
+journal-step-restore-empty-fields = Auð svæði fyllt við lestur
 backup-verify-mismatch = Skrifaða safnskráin les sig ekki eins og hún var skrifuð: treystu henni ekki, taktu öryggisafritið aftur.
 
 # --- Viðhengi færslu (F28, áfangi 17) -----------------------------------

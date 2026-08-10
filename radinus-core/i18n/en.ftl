@@ -1339,6 +1339,7 @@ restore-unreadable = This file is not a readable Radinus archive: { $reason }
 restore-question = Restore "{ $file }"? Everything your database currently holds will be erased and replaced, and what is in it will be lost.
 restore-done = Restore complete: { $accounts } accounts and { $operations } operations.
 restore-failed = Restore failed: { $reason }
+restore-empty-fields = Empty fields read as a neutral value: { $count }.
 
 
 # --- The technical journal (phase 17) ----------------------------------
@@ -1417,6 +1418,7 @@ journal-step-restore-missing = File missing from the archive: this table will no
 journal-step-restore-wipe = Erasing everything the database holds before restoring
 journal-step-restore-write = Writing into the database
 journal-step-restore-total = Total restored: accounts, operations
+journal-step-restore-empty-fields = Empty fields filled in while reading
 backup-verify-mismatch = The archive just written does not read back the way it was written: do not rely on it, make the backup again.
 
 # --- Attachments of an operation (F28, phase 17) ------------------------

@@ -563,6 +563,18 @@ pub fn restore<R: Runtime>(app: AppHandle<R>, relative: String, password: Option
                     "",
                     &format!("{} — {}", report.accounts, report.operations),
                 );
+                // Le journal garde la trace des champs comblés, même quand la
+                // fenêtre n'en dit rien : c'est là qu'on ira voir six mois
+                // plus tard, si un montant paraît suspect.
+                if report.empty_fields > 0 {
+                    journal.add(
+                        "journal-step-restore-empty-fields",
+                        "",
+                        Status::Success,
+                        "",
+                        &report.empty_fields.to_string(),
+                    );
+                }
                 // Les fichiers des pièces jointes ressortent de l'archive
                 // après les lignes qui les désignent.
                 let folder = target.attachments.clone();
@@ -633,20 +645,31 @@ pub fn restore<R: Runtime>(app: AppHandle<R>, relative: String, password: Option
                     }
                     everything_moved(&app);
                 }
-                tell(
-                    &app,
-                    &title,
-                    &i18n::message_of(
-                        language,
-                        "restore-done",
-                        &[],
-                        &[
-                            ("accounts", report.accounts as i64),
-                            ("operations", report.operations as i64),
-                        ],
-                    ),
-                    false,
+                // **Ce qui a été comblé se dit**, quand il y a eu quelque
+                // chose à combler (10/08/2026). Une archive écrite par
+                // Radinus n'en porte aucun ; beaucoup d'archives 1.9.3 en
+                // portent des milliers, et l'utilisateur a le droit de savoir
+                // que sa restauration a lu des champs vides plutôt que de
+                // s'être arrêtée dessus.
+                let mut said = i18n::message_of(
+                    language,
+                    "restore-done",
+                    &[],
+                    &[
+                        ("accounts", report.accounts as i64),
+                        ("operations", report.operations as i64),
+                    ],
                 );
+                if report.empty_fields > 0 {
+                    said.push(' ');
+                    said.push_str(&i18n::message_of(
+                        language,
+                        "restore-empty-fields",
+                        &[],
+                        &[("count", report.empty_fields as i64)],
+                    ));
+                }
+                tell(&app, &title, &said, false);
             }
             Err(reason) => tell(
                 &app,

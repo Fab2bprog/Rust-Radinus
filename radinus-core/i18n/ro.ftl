@@ -1529,6 +1529,7 @@ restore-unreadable = Acest fișier nu este o arhivă Radinus lizibilă: { $reaso
 restore-question = Restaurați „{ $file }”? Tot conținutul actual al bazei dumneavoastră va fi șters și înlocuit, iar ceea ce se află în ea va fi pierdut.
 restore-done = Restaurare terminată: { $accounts } conturi și { $operations } operațiuni.
 restore-failed = Restaurare imposibilă: { $reason }
+restore-empty-fields = Câmpuri goale citite ca valoare nulă: { $count }.
 
 
 # --- Jurnalul operațiunilor tehnice (faza 17) ---------------------------
@@ -1609,6 +1610,7 @@ journal-step-restore-missing = Fișier absent din arhivă: acest tabel nu va fi 
 journal-step-restore-wipe = Ștergerea totală a conținutului bazei înainte de restaurare
 journal-step-restore-write = Scrierea în bază
 journal-step-restore-total = Total restaurat: conturi, operațiuni
+journal-step-restore-empty-fields = Câmpuri goale completate la citire
 backup-verify-mismatch = Arhiva scrisă nu se recitește așa cum a fost scrisă: nu vă bazați pe ea, refaceți copia de siguranță.
 
 # --- Atașamentele unei operațiuni (F28, faza 17) ------------------------

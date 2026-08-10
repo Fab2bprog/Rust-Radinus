@@ -1494,6 +1494,7 @@ restore-unreadable = Den här filen är inget läsbart Radinus-arkiv: { $reason 
 restore-question = Återställa ”{ $file }”? Allt nuvarande innehåll i din databas raderas och ersätts, och det som finns där går förlorat.
 restore-done = Återställningen är klar: { $accounts } konton och { $operations } transaktioner.
 restore-failed = Det gick inte att återställa: { $reason }
+restore-empty-fields = Tomma fält lästa som nollvärde: { $count }.
 
 
 # --- Loggen över tekniska åtgärder (fas 17) -----------------------------
@@ -1573,6 +1574,7 @@ journal-step-restore-missing = Filen saknas i arkivet: den här tabellen återst
 journal-step-restore-wipe = Total radering av databasens innehåll före återställning
 journal-step-restore-write = Skrivning i databasen
 journal-step-restore-total = Totalt återställt: konton, transaktioner
+journal-step-restore-empty-fields = Tomma fält ifyllda vid inläsning
 backup-verify-mismatch = Det skrivna arkivet läses inte tillbaka så som det skrevs: lita inte på det, gör om säkerhetskopian.
 
 # --- En transaktions bilagor (F28, fas 17) ------------------------------

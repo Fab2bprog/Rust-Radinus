@@ -194,6 +194,14 @@ pub struct Archive {
     /// Ce que l'archive portait, table par table, dans l'ordre d'écriture —
     /// de quoi journaliser la lecture comme 1.9.3 le fait.
     pub read: Vec<TableRead>,
+    /// **Combien de champs vides ont été lus comme valeur neutre.**
+    ///
+    /// Voir `records::lenient` : un `null` ou un champ absent ne fait plus
+    /// échouer la lecture, il devient 0, chaîne vide ou faux. Ce compte est
+    /// remonté jusqu'à l'utilisateur, parce qu'un identifiant vide est sans
+    /// conséquence mais qu'un montant vide n'en est pas une non plus qu'on
+    /// puisse taire.
+    pub empty_fields: u64,
 }
 
 /// How many rows each table contributed to a restore. Returned so a caller
@@ -218,6 +226,12 @@ pub struct RestoreReport {
     pub budgets: usize,
     pub operation_templates: usize,
     pub recurring_rules: usize,
+    /// **Les champs vides que l'archive portait**, lus comme valeur neutre
+    /// plutôt que refusés — voir `records::lenient`. Zéro dans une archive
+    /// écrite par Radinus ; non nul pour beaucoup d'archives 1.9.3, dont les
+    /// colonnes ajoutées après coup sont restées `null` sur les lignes
+    /// antérieures.
+    pub empty_fields: u64,
 }
 
 /// Reads and parses every table file in the archive at `path`. Does not touch
@@ -250,6 +264,10 @@ pub fn read_archive(path: &Path) -> Result<Archive, BackupError> {
         return Err(BackupError::NotARadinusBackup);
     }
 
+    // Ce qui suit lit les dix-neuf tables ; le compteur des champs vides
+    // repart donc de zéro ici, et se lit une fois tout parcouru.
+    records::lenient::forget();
+
     // Ce que l'archive portait vraiment, table par table, avant de parler du
     // contenu : c'est la seule façon de distinguer « ce fichier n'était pas
     // là » de « cette table était vide ».
@@ -276,8 +294,9 @@ pub fn read_archive(path: &Path) -> Result<Archive, BackupError> {
         })
         .collect();
 
-    Ok(Archive {
+    let archive = Archive {
         read,
+        empty_fields: 0,
         affectations: table(&table_files, "affectations", "Affectation")?,
         banques: table(&table_files, "banques", "Banques")?,
         budget: table(&table_files, "budget", "Budget")?,
@@ -297,6 +316,11 @@ pub fn read_archive(path: &Path) -> Result<Archive, BackupError> {
         statuts_cheque: table(&table_files, "statutcheque", "StatutCheque")?,
         tiers: table(&table_files, "tiers", "Tiers")?,
         preferences: table(&table_files, "preferences", "Preferences")?,
+    };
+
+    Ok(Archive {
+        empty_fields: records::lenient::emptied(),
+        ..archive
     })
 }
 
@@ -464,6 +488,9 @@ fn restore_in_transaction(
         recurring_rules: insert_recurring_rules(&tx, archive)?,
         operation_templates: insert_operation_templates(&tx, archive)?,
         budgets: insert_budgets(&tx, archive)?,
+        // Ce que la lecture de l'archive a dû combler : on le fait voyager
+        // avec les comptes de lignes, jusqu'au message rendu à l'utilisateur.
+        empty_fields: archive.empty_fields,
     };
     restore_settings(&tx, archive)?;
     insert_preferences(&tx, archive)?;
@@ -1596,6 +1623,93 @@ mod tests {
         assert_eq!(survivors, 0);
 
         std::fs::remove_file(&archive_path).ok();
+        std::fs::remove_file(&db_path).ok();
+    }
+    /// **Une archive 1.9.3 pleine de `null` se restaure quand même.**
+    ///
+    /// Le 10/08/2026, deux utilisateurs ont perdu toute leur restauration sur
+    /// `invalid type: null, expected i64`. Leurs bases étaient plus anciennes
+    /// que les colonnes qu'on leur avait ajoutées : `IDProjets`, `IDTiers`,
+    /// `IDCheque` étaient restés vides sur toutes les lignes écrites avant
+    /// l'ajout. Un champ d'une ligne coulait dix-neuf tables.
+    ///
+    /// Ce test porte les deux formes du même problème : le champ présent mais
+    /// `null`, et le champ absent du fichier. Les deux doivent passer, et le
+    /// compte des champs comblés doit être rendu — c'est lui que
+    /// l'utilisateur verra.
+    #[test]
+    fn une_archive_aux_champs_vides_se_restaure_et_se_compte() {
+        let path = scratch("nulls", "zip");
+        {
+            let file = std::fs::File::create(&path).unwrap();
+            let mut zip = zip::ZipWriter::new(file);
+            let opts: zip::write::FileOptions<'_, ()> = zip::write::FileOptions::default();
+            let entries: [(&str, &str); 5] = [
+                ("_", ""),
+                (
+                    "radinus_sauve_banques.json",
+                    r#"{ "Banques":[ { "IDBanques":21, "NomBanque":null } ] }"#,
+                ),
+                (
+                    "radinus_sauve_comptes.json",
+                    r#"{ "Compte":[ { "IDCompte":1, "Libelle":"CCP", "IDTypeCompte":1, "IDBanques":21, "ReportPointe":5972.54, "ReportEngage":null, "ReportPrevu":0, "SoldeBanque":1549.81, "SoldeReel":1549.81, "SoldeFinal":1549.81, "NomTitulaire":null, "AdresseTitulaire":"", "COBCodeBanque":"", "COBCodeGuichet":"", "COBNumCompte":"", "COBClefRIB":"", "COBIBAN":"", "COBBIC":"", "AdresseAgenceBank":"", "DateOuverture":"", "DateCloture":"", "NumProchCheque":null, "CompteCloture":null, "Devise":"EUR" } ] }"#,
+                ),
+                (
+                    // La première ligne porte des `null` là où les deux
+                    // utilisateurs en avaient ; la seconde n'a carrément pas
+                    // les colonnes — une archive plus ancienne encore.
+                    "radinus_sauve_operations.json",
+                    r#"{ "Operation":[
+                        { "IDOperation":1, "Libelle":"RETRAIT", "Date":"20260115", "Montant":-100, "IDModeOperation":null, "IDCategorie":null, "IDAffectation":null, "IDCompte":1, "IDStatutOperation":1, "DatePointage":"20260115", "SoldePointe":null, "FitID":null, "ReferencePaiement":null, "NumRelevBanque":null, "IDOperationParent":null, "EstParent":null, "GUIDCalOpPeriode":null, "IDCheque":null, "IDTiers":null, "IDProjets":null },
+                        { "IDOperation":2, "Libelle":"VIREMENT", "Date":"20260116", "Montant":250, "IDCompte":1, "IDStatutOperation":1, "DatePointage":"20260116" }
+                    ] }"#,
+                ),
+                (
+                    "radinus_sauve_parametres.json",
+                    r#"{ "Parametres":[ { "IDParametres":1, "RunOnce":true, "InitValDefaut":true, "VerSoftMajeur":1, "VerSoftMineur":9, "VerSoftDebug":0, "VerDataBase":9, "UtiliseLangue":5 } ] }"#,
+                ),
+            ];
+            for (name, body) in entries {
+                zip.start_file(name, opts).unwrap();
+                zip.write_all(body.as_bytes()).unwrap();
+            }
+            zip.finish().unwrap();
+        }
+
+        let db_path = scratch("nulls_db", "sqlite");
+        let mut conn = crate::database::create_new_database(&db_path).unwrap();
+        let report = restore_file_into(&mut conn, &path).unwrap();
+
+        assert_eq!(report.accounts, 1, "le compte est repris");
+        assert_eq!(report.operations, 2, "les deux opérations sont reprises");
+        assert!(
+            report.empty_fields >= 20,
+            "les champs vides sont comptés, pas tus : {}",
+            report.empty_fields
+        );
+
+        // Un identifiant vide vaut zéro, c'est-à-dire « rien » : pas de
+        // projet, pas de tiers, pas de chèque.
+        let (projet, tiers, cheque): (i64, i64, i64) = conn
+            .query_row(
+                "SELECT IDProjets, IDTiers, IDCheque FROM Operation WHERE IDOperation = 1",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .unwrap();
+        assert_eq!((projet, tiers, cheque), (0, 0, 0));
+
+        // Et la ligne à qui il manquait des colonnes entières est là aussi.
+        let libelle: String = conn
+            .query_row(
+                "SELECT Libelle FROM Operation WHERE IDOperation = 2",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(libelle, "VIREMENT");
+
+        std::fs::remove_file(&path).ok();
         std::fs::remove_file(&db_path).ok();
     }
 }

@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
-description = "Radinus 2.0.2 — personal finance manager. Tauri controller (thin bridge, no business logic — see 08_ARCHITECTURE.md §2.2)."
+description = "Radinus 2.0.3 — personal finance manager. Tauri controller (thin bridge, no business logic — see 08_ARCHITECTURE.md §2.2)."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
