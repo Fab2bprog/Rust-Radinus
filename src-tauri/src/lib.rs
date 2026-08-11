@@ -291,6 +291,7 @@ pub fn run() {
             commands::database_is_open,
             commands::open_database,
             commands::backup_database,
+            commands::backup_open_database,
             commands::restore_database,
             commands::repair_database,
             commands::open_operations_journal,

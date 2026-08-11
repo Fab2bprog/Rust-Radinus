@@ -709,8 +709,32 @@ pub fn notify_elements_changed<R: Runtime>(app: AppHandle<R>, kind: String) -> R
         &crate::windows::changed_event(&list),
         (),
     )
-    .map_err(to_ipc_error)
+    .map_err(to_ipc_error)?;
+
+    // **Et toutes les autres fenêtres, qui tiennent ces mots dans leurs listes
+    // déroulantes** (bug remonté par un utilisateur le 10/08/2026 : « il faut
+    // fermer le programme pour qu'on puisse avoir ce nouveau libellé dans les
+    // opérations »).
+    //
+    // Une fenêtre de Radinus est bâtie une fois et jamais détruite : elle
+    // charge ses catégories, ses tiers et ses affectations à sa construction,
+    // et les garde jusqu'au prochain démarrage. L'événement ci-dessus ne
+    // s'adresse qu'à la liste de la nomenclature touchée — c'est voulu, sept
+    // listes partagent une même page —, si bien que la fiche opération, la
+    // classification rapide et les sept autres ne savaient rien.
+    //
+    // Celui-ci est diffusé à tout le monde et ne porte aucune cible : chaque
+    // fenêtre qui tient de telles listes le reçoit et les relit. Le coût est
+    // celui d'une relecture de nomenclature dans les fenêtres ouvertes, au
+    // moment où l'utilisateur vient d'en modifier une.
+    app.emit(NOMENCLATURES_CHANGED, kind.key())
+        .map_err(to_ipc_error)
 }
+
+/// L'événement que toute fenêtre portant des listes déroulantes de
+/// nomenclature doit écouter. Il porte la clef de la nomenclature touchée,
+/// pour qui saurait n'en relire qu'une.
+pub const NOMENCLATURES_CHANGED: &str = "nomenclatures-changed";
 
 /// Whether leaving this list would take unsaved work down with it — the fiche
 /// being its child, closing the list closes the fiche too.
@@ -3221,6 +3245,24 @@ pub fn dashboard(
 #[tauri::command]
 pub fn backup_database<R: Runtime>(app: AppHandle<R>, path: String, password: Option<String>) {
     crate::database_operations::backup(app, path, password);
+}
+
+/// **Sauvegarder la base ouverte, et attendre qu'elle le soit.**
+///
+/// Celle du dessus vise une ligne de la fenêtre des bases et rend la main
+/// aussitôt. Celle-ci vise la base en cours et **ne rend la main qu'une fois
+/// l'archive écrite et relue** : elle est appelée par l'importation Excel, qui
+/// propose le filet avant de sauter et n'a aucune raison de sauter avant qu'il
+/// soit tendu.
+///
+/// L'attente a lieu sur un fil de travail : le sélecteur de fichiers et
+/// l'écriture n'ont rien à faire sur le fil principal, et un dialogue ouvert
+/// depuis celui-ci fige l'application sur macOS.
+#[tauri::command]
+pub async fn backup_open_database<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
+    tauri::async_runtime::spawn_blocking(move || crate::database_operations::backup_open(&app))
+        .await
+        .map_err(|error| error.to_string())?
 }
 
 #[tauri::command]
@@ -8147,6 +8189,28 @@ pub fn create_database(
                         ],
                     )
                 );
+                // **Les fichiers des pièces jointes sortent aussi de
+                // l'archive** (bug remonté par un utilisateur le 10/08/2026).
+                // Ce chemin-ci remontait les tables et s'arrêtait là : la
+                // fenêtre de gestion connaissait chaque document, le dossier
+                // n'en portait aucun, et tout s'affichait « fichier absent ».
+                // Le menu Outils › Restauration, lui, les extrayait depuis le
+                // premier jour — c'est le même appel, oublié ici seulement.
+                //
+                // Une extraction qui échoue ne fait pas échouer la création,
+                // comme une archive illisible ne la fait pas échouer : la base
+                // est saine, et des fichiers manquants se rejoignent à la main.
+                // Le dossier voisin du fichier, celui que `create_next_database_slot`
+                // vient de créer et que l'ouverture retiendra.
+                let folder = slot.join("attachments");
+                if let Err(error) =
+                    radinus_core::backup::restore_attachments(
+                        std::path::Path::new(archive.trim()),
+                        &folder,
+                    )
+                {
+                    eprintln!("[radinus] Attachments not restored: {error}");
+                }
                 // L'archive porte sa langue et sa devise ; **celles de la
                 // fenêtre l'emportent**, parce qu'on vient de les choisir.
                 let _ = radinus_core::i18n::store_language(&connection, language);

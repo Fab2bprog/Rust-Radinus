@@ -1060,7 +1060,6 @@ window-excel-fields-title = Importación de hoja de excel [ Paso 2/3 ]: asociaci
 window-excel-association-title = Importación de hoja de excel: asociación de los datos
 
 excel-backup-question = Una hoja de Excel está hecha a mano: puede contener fechas correctas pero falsas, importes con el formato correcto y el signo equivocado, y eso ningún control puede verlo. La importación escribirá esas líneas en su cuenta. ¿Desea guardar una copia de seguridad de sus datos antes de empezar?
-excel-backup-later = La copia de seguridad todavía no está conectada en esta versión de Radinus 2. Mientras tanto, cierre Radinus y copie usted mismo su archivo de base de datos: así podrá importar sin ningún riesgo.
 
 excel-group-file = 1 - Designar el archivo Excel que se va a importar
 excel-pick = Designar el archivo Excel
@@ -1331,6 +1330,7 @@ backup-archive = Archivo Radinus
 backup-no-database = No hay ninguna base de datos abierta.
 backup-done = Copia de seguridad escrita en «{ $file }».
 backup-failed = Copia de seguridad imposible: { $reason }
+backup-not-started = No se ha podido iniciar la copia de seguridad:
 restore-unreadable = Este archivo no es un archivo Radinus legible: { $reason }
 restore-question = ¿Restaurar «{ $file }»? Todo el contenido actual de su base se borrará y se sustituirá, y lo que allí se encuentre se perderá.
 restore-done = Restauración terminada: { $accounts } cuentas y { $operations } operaciones.

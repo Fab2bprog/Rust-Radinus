@@ -1094,3 +1094,25 @@ void (async () => {
   await reload();
   onLanguageChanged(dress, TITLE);
 })();
+
+/// **Une nomenclature a changé pendant que cette fenêtre vivait.**
+///
+/// Bug remonté par un utilisateur le 10/08/2026 : « lorsque l'on rajoute une
+/// nomenclature, il faut fermer le programme pour qu'on puisse avoir ce
+/// nouveau libellé dans les opérations ». Une fenêtre de Radinus est bâtie une
+/// fois et jamais détruite : elle lisait ses listes à sa construction et les
+/// gardait jusqu'au prochain démarrage.
+///
+/// Ici les listes ne sont lues qu'à l'ouverture d'un menu de colonne : relire
+/// la variable suffit, il n'y a rien à reposer.
+void listen("nomenclatures-changed", async () => {
+  combos = await invoke<Combos>("list_operation_combos");
+  // **Et les lignes elles-mêmes** (Fabrice, 10/08/2026). Elles portent le mot,
+  // pas la clef : une catégorie renommée laissait l'ancien nom sous les yeux
+  // de celui qui venait de la renommer, et lui faisait douter de son geste.
+  // Le prix est une relecture de la période affichée, celle-là même que la
+  // fenêtre paie déjà après une saisie.
+  if (ready) {
+    await reload();
+  }
+});

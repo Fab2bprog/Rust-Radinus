@@ -234,193 +234,242 @@ fn suggested_backup<R: Runtime>(app: &AppHandle<R>) -> (std::path::PathBuf, Stri
 /// d'une sauvegarde.
 pub fn backup<R: Runtime>(app: AppHandle<R>, relative: String, password: Option<String>) {
     std::thread::spawn(move || {
-        let language = language(&app);
-        let Some(target) = target_of(&app, &relative) else {
-            return;
-        };
-        let title = i18n::text(language, "menu-file-backup");
-        let (directory, name) = suggested_backup(&app);
+        backup_now(&app, &relative, password.as_deref());
+    });
+}
 
-        let (answered, answer) = std::sync::mpsc::channel();
-        app.dialog()
-            .file()
-            .set_directory(&directory)
-            .set_file_name(&name)
-            .add_filter(i18n::text(language, "backup-archive"), &["zip"])
-            .save_file(move |chosen| {
-                let _ = answered.send(chosen);
-            });
-        let Ok(Some(chosen)) = answer.recv() else {
-            return;
-        };
-        let Ok(path) = chosen.into_path() else {
-            return;
-        };
+/// **La sauvegarde elle-même**, sans le fil qui la porte.
+///
+/// [`backup`] la lance et rend la main aussitôt, parce que la fenêtre des
+/// bases ne doit pas geler pendant qu'on écrit des mégaoctets. Mais
+/// l'importation Excel, elle, a besoin du contraire : elle propose le filet
+/// **avant** de sauter, et reprendre son cours pendant que la sauvegarde
+/// s'écrit ne serait pas tenir la promesse faite à l'utilisateur. Elle appelle
+/// donc ceci, et attend.
+///
+/// Rend la main quand tout est fini : archive écrite, relue, journalisée, et
+/// le compte rendu affiché. Ne rend rien — elle parle elle-même.
+pub fn backup_now<R: Runtime>(app: &AppHandle<R>, relative: &str, password: Option<&str>) {
+    let language = language(app);
+    let Some(target) = target_of(app, relative) else {
+        return;
+    };
+    let title = i18n::text(language, "menu-file-backup");
+    let (directory, name) = suggested_backup(app);
 
-        let mut journal = Journal::new(language);
-        journal.add_file(
-            "journal-step-backup-begin",
-            &path.to_string_lossy(),
-            Status::Started,
-            "",
-            &stamp(),
-        );
+    let (answered, answer) = std::sync::mpsc::channel();
+    app.dialog()
+        .file()
+        .set_directory(&directory)
+        .set_file_name(&name)
+        .add_filter(i18n::text(language, "backup-archive"), &["zip"])
+        .save_file(move |chosen| {
+            let _ = answered.send(chosen);
+        });
+    let Ok(Some(chosen)) = answer.recv() else {
+        return;
+    };
+    let Ok(path) = chosen.into_path() else {
+        return;
+    };
 
-        // **Les pièces jointes sont celles de la cible**, plus celles de la
-        // base ouverte : sauvegarder « famille » depuis « perso » emportait
-        // sinon les fichiers du mauvais dossier.
-        let folder = target.attachments.clone();
-        let written = match app.try_state::<AppState>() {
-            Some(state) => match hold(&state, &target, language, password.as_deref()) {
-                Ok(mut held) => radinus_core::backup::writer::write_archive_with_attachments(
-                    held.conn(),
-                    &path,
-                    Some(&folder),
-                )
-                .map_err(|error| error.to_string()),
-                Err(error) => Err(error),
-            },
-            None => Err(i18n::text(language, "backup-no-database")),
-        };
+    let mut journal = Journal::new(language);
+    journal.add_file(
+        "journal-step-backup-begin",
+        &path.to_string_lossy(),
+        Status::Started,
+        "",
+        &stamp(),
+    );
 
-        // Une ligne par table, comme chez lui : le nombre d'enregistrements
-        // versés et ce qu'ils pèsent. Notre écriture va droit dans le zip,
-        // sans fichier temporaire : ses trois lignes par table deviennent une.
-        let written = match written {
-            Ok((tables, joined)) => {
-                let mut rows = 0usize;
-                let mut bytes = 0usize;
-                for table in &tables {
-                    rows += table.rows;
-                    bytes += table.bytes;
-                    journal.add(
-                        "journal-step-backup-table",
-                        table.table,
-                        Status::Success,
-                        "",
-                        &format!("{} — {}", table.rows, kilobytes(table.bytes)),
-                    );
-                }
-                // Les fichiers des pièces jointes, qui voyagent avec.
-                let kept: Vec<_> = joined.iter().filter(|file| file.found).collect();
-                let weight: usize = kept.iter().map(|file| file.bytes).sum();
+    // **Les pièces jointes sont celles de la cible**, plus celles de la
+    // base ouverte : sauvegarder « famille » depuis « perso » emportait
+    // sinon les fichiers du mauvais dossier.
+    let folder = target.attachments.clone();
+    let written = match app.try_state::<AppState>() {
+        Some(state) => match hold(&state, &target, language, password) {
+            Ok(mut held) => radinus_core::backup::writer::write_archive_with_attachments(
+                held.conn(),
+                &path,
+                Some(&folder),
+            )
+            .map_err(|error| error.to_string()),
+            Err(error) => Err(error),
+        },
+        None => Err(i18n::text(language, "backup-no-database")),
+    };
+
+    // Une ligne par table, comme chez lui : le nombre d'enregistrements
+    // versés et ce qu'ils pèsent. Notre écriture va droit dans le zip,
+    // sans fichier temporaire : ses trois lignes par table deviennent une.
+    let written = match written {
+        Ok((tables, joined)) => {
+            let mut rows = 0usize;
+            let mut bytes = 0usize;
+            for table in &tables {
+                rows += table.rows;
+                bytes += table.bytes;
                 journal.add(
-                    "journal-step-backup-attachments",
-                    "PiecesJointes",
+                    "journal-step-backup-table",
+                    table.table,
                     Status::Success,
                     "",
-                    &format!("{} — {}", kept.len(), kilobytes(weight)),
+                    &format!("{} — {}", table.rows, kilobytes(table.bytes)),
                 );
-                // Celles que la base désigne et que le disque n'a plus : une
-                // par ligne, parce qu'il faudra bien savoir lesquelles.
-                for missing in joined.iter().filter(|file| !file.found) {
-                    journal.add(
-                        "journal-step-backup-attachment-missing",
-                        "PiecesJointes",
-                        Status::Failure,
-                        "",
-                        &missing.guid_name,
-                    );
-                }
-                Ok((rows, bytes, tables.len()))
             }
-            Err(reason) => {
-                journal.add_file(
-                    "journal-step-backup-write",
-                    &path.to_string_lossy(),
-                    Status::Failure,
-                    &reason,
-                    "",
-                );
-                Err(reason)
-            }
-        };
-
-        // **La relecture**, le contrôle que 1.9.3 ne pouvait pas faire : on
-        // rouvre l'archive par le chemin qu'emprunterait une restauration, et
-        // on dit ce qu'on y retrouve.
-        let written = match written {
-            Ok((rows, bytes, tables)) => {
-                match radinus_core::backup::verify_archive(&path) {
-                    Ok(read) => {
-                        let found: usize = read.iter().filter(|table| table.present).count();
-                        let reread: usize = read.iter().map(|table| table.rows).sum();
-                        let ok = found == tables && reread == rows;
-                        journal.add_file(
-                            "journal-step-backup-verified",
-                            &path.to_string_lossy(),
-                            if ok { Status::Success } else { Status::Failure },
-                            "",
-                            &format!("{found} / {tables} — {reread} / {rows}"),
-                        );
-                        if ok {
-                            Ok((rows, bytes))
-                        } else {
-                            Err(i18n::text(language, "backup-verify-mismatch"))
-                        }
-                    }
-                    Err(error) => {
-                        journal.add_file(
-                            "journal-step-backup-verified",
-                            &path.to_string_lossy(),
-                            Status::Failure,
-                            &error.to_string(),
-                            "",
-                        );
-                        Err(error.to_string())
-                    }
-                }
-            }
-            Err(reason) => Err(reason),
-        };
-
-        let written = written.map(|(rows, bytes)| {
+            // Les fichiers des pièces jointes, qui voyagent avec.
+            let kept: Vec<_> = joined.iter().filter(|file| file.found).collect();
+            let weight: usize = kept.iter().map(|file| file.bytes).sum();
             journal.add(
-                "journal-step-backup-total",
-                "",
+                "journal-step-backup-attachments",
+                "PiecesJointes",
                 Status::Success,
                 "",
-                &format!(
-                    "{rows} — {} — {}",
-                    kilobytes(bytes),
-                    kilobytes(std::fs::metadata(&path).map(|m| m.len() as usize).unwrap_or(0))
-                ),
+                &format!("{} — {}", kept.len(), kilobytes(weight)),
             );
-        });
-
-        journal.add_file(
-            "journal-step-backup-end",
-            &path.to_string_lossy(),
-            if written.is_ok() {
-                Status::Finished
-            } else {
-                Status::Failure
-            },
-            "",
-            &stamp(),
-        );
-        keep_journal(&app, journal, false);
-
-        match written {
-            Ok(()) => tell(
-                &app,
-                &title,
-                &i18n::text_with(
-                    language,
-                    "backup-done",
-                    "file",
-                    &path.to_string_lossy(),
-                ),
-                false,
-            ),
-            Err(reason) => tell(
-                &app,
-                &title,
-                &i18n::text_with(language, "backup-failed", "reason", &reason),
-                true,
-            ),
+            // Celles que la base désigne et que le disque n'a plus : une
+            // par ligne, parce qu'il faudra bien savoir lesquelles.
+            for missing in joined.iter().filter(|file| !file.found) {
+                journal.add(
+                    "journal-step-backup-attachment-missing",
+                    "PiecesJointes",
+                    Status::Failure,
+                    "",
+                    &missing.guid_name,
+                );
+            }
+            Ok((rows, bytes, tables.len()))
         }
+        Err(reason) => {
+            journal.add_file(
+                "journal-step-backup-write",
+                &path.to_string_lossy(),
+                Status::Failure,
+                &reason,
+                "",
+            );
+            Err(reason)
+        }
+    };
+
+    // **La relecture**, le contrôle que 1.9.3 ne pouvait pas faire : on
+    // rouvre l'archive par le chemin qu'emprunterait une restauration, et
+    // on dit ce qu'on y retrouve.
+    let written = match written {
+        Ok((rows, bytes, tables)) => {
+            match radinus_core::backup::verify_archive(&path) {
+                Ok(read) => {
+                    let found: usize = read.iter().filter(|table| table.present).count();
+                    let reread: usize = read.iter().map(|table| table.rows).sum();
+                    let ok = found == tables && reread == rows;
+                    journal.add_file(
+                        "journal-step-backup-verified",
+                        &path.to_string_lossy(),
+                        if ok { Status::Success } else { Status::Failure },
+                        "",
+                        &format!("{found} / {tables} — {reread} / {rows}"),
+                    );
+                    if ok {
+                        Ok((rows, bytes))
+                    } else {
+                        Err(i18n::text(language, "backup-verify-mismatch"))
+                    }
+                }
+                Err(error) => {
+                    journal.add_file(
+                        "journal-step-backup-verified",
+                        &path.to_string_lossy(),
+                        Status::Failure,
+                        &error.to_string(),
+                        "",
+                    );
+                    Err(error.to_string())
+                }
+            }
+        }
+        Err(reason) => Err(reason),
+    };
+
+    let written = written.map(|(rows, bytes)| {
+        journal.add(
+            "journal-step-backup-total",
+            "",
+            Status::Success,
+            "",
+            &format!(
+                "{rows} — {} — {}",
+                kilobytes(bytes),
+                kilobytes(std::fs::metadata(&path).map(|m| m.len() as usize).unwrap_or(0))
+            ),
+        );
     });
+
+    journal.add_file(
+        "journal-step-backup-end",
+        &path.to_string_lossy(),
+        if written.is_ok() {
+            Status::Finished
+        } else {
+            Status::Failure
+        },
+        "",
+        &stamp(),
+    );
+    keep_journal(app, journal, false);
+
+    match written {
+        Ok(()) => tell(
+            app,
+            &title,
+            &i18n::text_with(
+                language,
+                "backup-done",
+                "file",
+                &path.to_string_lossy(),
+            ),
+            false,
+        ),
+        Err(reason) => tell(
+            app,
+            &title,
+            &i18n::text_with(language, "backup-failed", "reason", &reason),
+            true,
+        ),
+    }
+}
+
+/// **Sauvegarder la base ouverte**, sans avoir à en connaître le chemin.
+///
+/// Les quatre opérations techniques visent la ligne choisie dans la fenêtre
+/// des bases, et reçoivent son chemin. Une fenêtre d'importation, elle, ne
+/// connaît que le compte sur lequel elle travaille : le chemin de la base ne
+/// lui a jamais été dit, et n'a aucune raison de l'être.
+///
+/// `AppState` ne retient de la base ouverte que son dossier de pièces
+/// jointes — c'est ce qui sert à la reconnaître dans `target_of`. Le fichier
+/// est son voisin, et le chemin attendu ici est celui-là, relatif à la racine
+/// des données.
+pub fn backup_open<R: Runtime>(app: &AppHandle<R>) -> Result<(), String> {
+    let language = language(app);
+    let absent = || i18n::text(language, "backup-no-database");
+
+    let state = app.try_state::<AppState>().ok_or_else(absent)?;
+    if !state.has_database() {
+        return Err(absent());
+    }
+    let sqlite = state
+        .attachments_dir()
+        .parent()
+        .map(|folder| folder.join(radinus_core::location::DATABASE_FILE_NAME))
+        .ok_or_else(absent)?;
+    let relative = sqlite
+        .strip_prefix(&state.data_root)
+        .map_err(|_| absent())?
+        .to_path_buf();
+
+    // La base ouverte est déjà déverrouillée : sa clé ne sert pas ici.
+    backup_now(app, &relative.to_string_lossy(), None);
+    Ok(())
 }
 
 /// **Restauration** — menu Fichier › Opérations base de données ›

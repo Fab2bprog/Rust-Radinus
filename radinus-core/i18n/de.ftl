@@ -1212,7 +1212,6 @@ window-excel-association-title = Import eines Excel-Blatts: Zuordnung der Daten
 # gebaut: sie enthält, was sie enthält, und ein Teil des Unsinns, den sie
 # mitbringt, ist nicht erkennbar. Also bieten wir das Netz an, bevor gesprungen wird.
 excel-backup-question = Ein Excel-Blatt wird von Hand gebaut: es kann Datumsangaben enthalten, die gültig und trotzdem falsch sind, Beträge im richtigen Format mit falschem Vorzeichen — und das kann keine Prüfung erkennen. Der Import schreibt diese Zeilen in Ihr Konto. Möchten Sie Ihre Daten sichern, bevor Sie beginnen?
-excel-backup-later = Die Datensicherung ist in dieser Version von Radinus 2 noch nicht angeschlossen. Schließen Sie solange Radinus und kopieren Sie Ihre Datenbankdatei selbst: dann können Sie ohne Risiko importieren.
 
 excel-group-file = 1 - Die zu importierende Excel-Datei bestimmen
 excel-pick = Die Excel-Datei bestimmen
@@ -1495,6 +1494,7 @@ backup-archive = Radinus-Archiv
 backup-no-database = Es ist keine Datenbank geöffnet.
 backup-done = Datensicherung geschrieben in „{ $file }“.
 backup-failed = Datensicherung nicht möglich: { $reason }
+backup-not-started = Die Datensicherung konnte nicht gestartet werden:
 restore-unreadable = Diese Datei ist kein lesbares Radinus-Archiv: { $reason }
 # Die Frage sagt, was verloren geht, bevor es verloren geht. Das Archiv ist zu
 # diesem Zeitpunkt bereits gelesen worden: Was sie ankündigt, ist sicher.

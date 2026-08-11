@@ -285,7 +285,6 @@ const UI_TEXTS = {
   // lire ce que l'utilisateur lira.
   "excel-backup-question":
     "Une feuille Excel est faite à la main : elle peut contenir des dates justes mais fausses. Voulez-vous sauvegarder vos données avant de commencer ?",
-  "excel-backup-later": "La sauvegarde n'est pas encore branchée dans cette version de Radinus 2.",
   "excel-group-file": "1 - Désigner le fichier Excel à importer",
   "excel-pick": "Designer le fichier Excel",
   "excel-sheet": "Feuille du classeur :",

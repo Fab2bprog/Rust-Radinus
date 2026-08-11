@@ -1205,7 +1205,6 @@ window-excel-association-title = Import av Excel-blad: koppling av data
 # den innehåller det den innehåller, och en del av allt strunt den bär på
 # går inte att upptäcka. Därför erbjuds skyddsnätet före hoppet.
 excel-backup-question = Ett Excel-blad är gjort för hand: det kan innehålla datum som är riktiga men ändå fel, belopp med rätt format och fel tecken — och det kan ingen kontroll se. Importen skriver in de här raderna på ditt konto. Vill du säkerhetskopiera dina data innan du börjar?
-excel-backup-later = Säkerhetskopieringen är ännu inte inkopplad i den här versionen av Radinus 2. Stäng under tiden Radinus och kopiera själv din databasfil: då kan du importera utan att riskera något.
 
 excel-group-file = 1 - Ange vilken Excel-fil som ska importeras
 excel-pick = Ange Excel-filen
@@ -1488,6 +1487,7 @@ backup-archive = Radinus-arkiv
 backup-no-database = Ingen databas är öppen.
 backup-done = Säkerhetskopian skriven till ”{ $file }”.
 backup-failed = Det gick inte att göra säkerhetskopian: { $reason }
+backup-not-started = Säkerhetskopieringen kunde inte startas:
 restore-unreadable = Den här filen är inget läsbart Radinus-arkiv: { $reason }
 # Frågan säger vad som går förlorat innan det går förlorat. Arkivet har redan
 # lästs vid det laget: det som den aviserar är säkert.

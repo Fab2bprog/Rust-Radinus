@@ -741,7 +741,12 @@ const CHEQUE_KEYS: &[&str] = &[
     // fenêtre d'association) ne sont **pas** ici : elles se demandent avec leur
     // valeur, par les commandes qui la connaissent.
     "excel-backup-question",
-    "excel-backup-later",
+    // **La sauvegarde de la base ouverte est branchée** (10/08/2026) : c'est
+    // elle qui parle quand elle réussit, et cette clef-ci ne sert plus qu'au
+    // cas où l'appel lui-même échoue — pas de base ouverte, racine
+    // introuvable. `excel-backup-later`, le message qui disait que la
+    // sauvegarde n'existait pas, a disparu avec le trou qu'il annonçait.
+    "backup-not-started",
     "excel-group-file",
     "excel-pick",
     "excel-sheet",

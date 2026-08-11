@@ -212,11 +212,23 @@ async function offerBackup(): Promise<void> {
     t("ui-yes"),
     t("ui-no"),
   );
-  if (wanted) {
-    // La sauvegarde n'est pas encore écrite (phase 17). On le dit plutôt que
-    // de faire semblant : promettre une sauvegarde qui n'a pas lieu serait
-    // pire que ne rien proposer du tout.
-    await tell(t("excel-backup-later"), t("ui-ok"));
+  if (!wanted) {
+    return;
+  }
+  // **On attend que la sauvegarde soit faite avant de continuer** (bug remonté
+  // par un utilisateur le 10/08/2026). Ce « oui » ne menait nulle part : il
+  // affichait un message écrit à l'époque où la sauvegarde n'était pas encore
+  // branchée, et qui est resté en place quand elle l'a été. Répondre à
+  // quelqu'un qui demande un filet qu'il n'y en a pas est pire que de ne rien
+  // lui proposer.
+  //
+  // La commande ouvre le sélecteur, écrit l'archive, la relit et dit où elle
+  // est — elle parle donc elle-même, et il n'y a rien à annoncer ici. Elle ne
+  // rend la main qu'une fois tout cela fini : l'importation ne reprend qu'après.
+  try {
+    await invoke("backup_open_database");
+  } catch (error) {
+    await tell(tError("backup-not-started", error), t("ui-ok"));
   }
 }
 

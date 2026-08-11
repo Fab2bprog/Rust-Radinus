@@ -11,6 +11,34 @@ Two version numbers live in this project and they do not move together:
   the line Radinus 1.x walked from 0 to 9 and is at 10 today. A database is
   migrated forward when it is opened, never backward.
 
+## [2.0.4] — 11/08/2026
+
+### Fixed
+
+- **Attachments come out of the archive when a database is born from a
+  backup.** Creating a database with "initialise from a backup" restored the
+  tables and stopped there: the attachments window listed every document, the
+  folder held none of them, and everything read "file missing". The very same
+  extraction had always run in Tools › Restore — it was simply missing here.
+  Reported by a user on 10/08/2026.
+- **A new nomenclature shows up without restarting.** "When you add a
+  nomenclature you have to close the program before the new label appears in
+  the operations" — a window of Radinus is built once and never destroyed, so
+  it read its lists at construction and kept them for the session. Saving a
+  nomenclature now broadcasts a second event to every window; the six fiches
+  put their lists back **keeping the current selection** — a fiche someone is
+  filling in must not be wiped — and the three tables read themselves again,
+  since their rows carry the word and not the key.
+
+### Changed
+
+- **The Excel import backs up for real.** Answering "yes" to "would you like
+  to back up your data before starting?" used to display a message written
+  when backup was not yet wired up, and left the user with nothing. It now
+  opens the file selector, writes the archive, verifies it, says where it is
+  — and the import waits until it is done, because a net offered before the
+  jump has to be there before the jump.
+
 ## [2.0.3] — 10/08/2026
 
 ### Fixed

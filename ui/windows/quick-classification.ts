@@ -608,3 +608,26 @@ void (async () => {
     },
   });
 })();
+
+/// **Une nomenclature a changé pendant que cette fenêtre vivait.**
+///
+/// Bug remonté par un utilisateur le 10/08/2026 : « lorsque l'on rajoute une
+/// nomenclature, il faut fermer le programme pour qu'on puisse avoir ce
+/// nouveau libellé dans les opérations ». Une fenêtre de Radinus est bâtie une
+/// fois et jamais détruite : elle lisait ses listes à sa construction et les
+/// gardait jusqu'au prochain démarrage.
+///
+/// Les menus de classement ne portent aucune saisie en cours : ils se
+/// remplissent entièrement.
+void listen("nomenclatures-changed", async () => {
+  const fresh = await invoke<Combos>("list_operation_combos");
+  options.set("category", fresh.category);
+  options.set("assignment", fresh.assignment);
+  options.set("payment-mode", fresh.payment_mode);
+  options.set("payee", fresh.payee);
+  options.set("project", fresh.project);
+  fillCharacteristics();
+  // Les lignes portent ces mots elles aussi : un libellé renommé doit se voir
+  // ici sans rouvrir la fenêtre.
+  await reload();
+});

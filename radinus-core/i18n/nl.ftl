@@ -1217,7 +1217,6 @@ window-excel-association-title = Import van Excel-blad: koppeling van de gegeven
 # gemaakt: het bevat wat het bevat, en een deel van de onzin die erin staat is
 # niet te ontdekken. We bieden dus het vangnet aan vóór de sprong.
 excel-backup-question = Een Excel-blad wordt met de hand gemaakt: het kan data bevatten die geldig en toch verkeerd zijn, bedragen met de juiste opmaak en het verkeerde teken — en dat kan geen enkele controle zien. De import schrijft die rijen in uw rekening. Wilt u een back-up van uw gegevens maken voordat u begint?
-excel-backup-later = De back-up is in deze versie van Radinus 2 nog niet aangesloten. Sluit Radinus in de tussentijd en kopieer zelf uw databasebestand: dan kunt u zonder risico importeren.
 
 excel-group-file = 1 - Het te importeren Excel-bestand aanwijzen
 excel-pick = Het Excel-bestand aanwijzen
@@ -1500,6 +1499,7 @@ backup-archive = Radinus-archief
 backup-no-database = Er is geen database geopend.
 backup-done = Back-up geschreven in “{ $file }”.
 backup-failed = Back-up niet mogelijk: { $reason }
+backup-not-started = De back-up kon niet worden gestart:
 restore-unreadable = Dit bestand is geen leesbaar Radinus-archief: { $reason }
 # De vraag zegt wat er verloren gaat voordat het verloren gaat. Het archief is
 # op dat moment al gelezen: wat zij aankondigt, is zeker.

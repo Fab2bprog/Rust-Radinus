@@ -1064,7 +1064,6 @@ window-excel-fields-title = Excel sheet import [ Step 2/3 ]: field mapping
 window-excel-association-title = Excel sheet import: data association
 
 excel-backup-question = An Excel sheet is made by hand: it may hold dates that are valid but wrong, amounts in the right format with the wrong sign — and no check can see that. The import will write those lines into your account. Would you like to back up your data before starting?
-excel-backup-later = Backup is not wired up yet in this version of Radinus 2. In the meantime, close Radinus and copy your database file yourself: you can then import with nothing at risk.
 
 excel-group-file = 1 - Choose the Excel file to import
 excel-pick = Choose the Excel file
@@ -1335,6 +1334,7 @@ backup-archive = Radinus archive
 backup-no-database = No database is open.
 backup-done = Backup written to "{ $file }".
 backup-failed = Backup failed: { $reason }
+backup-not-started = The backup could not be started:
 restore-unreadable = This file is not a readable Radinus archive: { $reason }
 restore-question = Restore "{ $file }"? Everything your database currently holds will be erased and replaced, and what is in it will be lost.
 restore-done = Restore complete: { $accounts } accounts and { $operations } operations.

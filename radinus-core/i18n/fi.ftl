@@ -1208,7 +1208,6 @@ window-excel-association-title = Excel-taulukon tuonti: tietojen yhdistäminen
 # sen mitä sisältää, eikä osaa sen kantamasta sekamelskasta voi havaita
 # mitenkään. Siksi turvaverkko tarjotaan ennen hyppyä.
 excel-backup-question = Excel-taulukko tehdään käsin: se voi sisältää päivämääriä, jotka ovat muodoltaan oikein mutta silti vääriä, ja summia, joiden muoto on oikea mutta etumerkki väärä — eikä sitä näe mikään tarkistus. Tuonti kirjoittaa nämä rivit tilillesi. Haluatko varmuuskopioida tietosi ennen aloittamista?
-excel-backup-later = Varmuuskopiointia ei ole vielä kytketty tähän Radinus 2:n versioon. Sulje sillä välin Radinus ja kopioi tietokantatiedostosi itse: silloin voit tuoda tiedot mitään riskeeraamatta.
 
 excel-group-file = 1 - Valitse tuotava Excel-tiedosto
 excel-pick = Valitse Excel-tiedosto
@@ -1491,6 +1490,7 @@ backup-archive = Radinus-arkisto
 backup-no-database = Yhtään tietokantaa ei ole auki.
 backup-done = Varmuuskopio kirjoitettu tiedostoon ”{ $file }”.
 backup-failed = Varmuuskopiointi epäonnistui: { $reason }
+backup-not-started = Varmuuskopiointia ei voitu aloittaa:
 restore-unreadable = Tämä tiedosto ei ole luettava Radinus-arkisto: { $reason }
 # Kysymys kertoo, mitä menetetään, ennen kuin se menetetään. Arkisto on jo
 # tässä vaiheessa luettu: sen ilmoittama tieto on varmaa.

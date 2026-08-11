@@ -393,6 +393,11 @@ void listen<string>(PARAMETERS_EVENT, (event) => {
 // Les opérations ont bougé ailleurs : les chiffres d'ici sont périmés.
 void listen(CHANGED_EVENT, () => void reload());
 
+/// **Une nomenclature a changé** (Fabrice, 10/08/2026). Le tableau de bord
+/// range les opérations sous les noms des catégories et des postes : un mot
+/// renommé ailleurs doit se lire ici sans rouvrir la fenêtre.
+void listen("nomenclatures-changed", () => void reload());
+
 for (const field of [fromField, toField]) {
   field.addEventListener("change", () => void reload());
 }

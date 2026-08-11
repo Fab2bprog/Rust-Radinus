@@ -1204,7 +1204,6 @@ window-excel-association-title = Importation de feuille excel : association des 
 # il contient ce qu'il contient, et une partie du n'importe quoi qu'il porte
 # est indétectable. On propose donc le filet avant de sauter.
 excel-backup-question = Une feuille Excel est faite à la main : elle peut contenir des dates justes mais fausses, des montants du bon format et du mauvais signe — et cela, aucun contrôle ne peut le voir. L'importation écrira ces lignes dans votre compte. Voulez-vous sauvegarder vos données avant de commencer ?
-excel-backup-later = La sauvegarde n'est pas encore branchée dans cette version de Radinus 2. En attendant, fermez Radinus et copiez vous-même votre fichier de base de données : vous pourrez alors importer sans rien risquer.
 
 excel-group-file = 1 - Désigner le fichier Excel à importer
 excel-pick = Designer le fichier Excel
@@ -1487,6 +1486,7 @@ backup-archive = Archive Radinus
 backup-no-database = Aucune base de données n'est ouverte.
 backup-done = Sauvegarde écrite dans « { $file } ».
 backup-failed = Sauvegarde impossible : { $reason }
+backup-not-started = La sauvegarde n'a pas pu commencer :
 restore-unreadable = Ce fichier n'est pas une archive Radinus lisible : { $reason }
 # La question dit ce qui sera perdu avant de le perdre. L'archive a déjà été
 # lue à ce moment : ce qu'elle annonce est certain.

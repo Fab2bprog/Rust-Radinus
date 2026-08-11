@@ -1204,7 +1204,6 @@ window-excel-association-title = Innflutningur á excel-blaði: tenging gagnanna
 # hún inniheldur það sem hún inniheldur, og hluti af öllu ruglinu sem hún ber
 # er ógreinanlegur. Því bjóðum við netið áður en stokkið er.
 excel-backup-question = Excel-blað er búið til í höndunum: það getur innihaldið dagsetningar sem eru gildar en rangar, upphæðir á réttu sniði en með röngu formerki — og það getur ekkert eftirlit séð. Innflutningurinn skrifar þessar línur inn á reikninginn þinn. Viltu taka öryggisafrit af gögnunum þínum áður en þú byrjar?
-excel-backup-later = Öryggisafritun er ekki enn tengd í þessari útgáfu af Radinus 2. Á meðan skaltu loka Radinus og afrita gagnagrunnsskrána þína sjálfur: þá geturðu flutt inn án þess að hætta á neitt.
 
 excel-group-file = 1 - Veldu Excel-skrána sem á að flytja inn
 excel-pick = Velja Excel-skrána
@@ -1487,6 +1486,7 @@ backup-archive = Radinus-safnskrá
 backup-no-database = Enginn gagnagrunnur er opinn.
 backup-done = Öryggisafrit skrifað í „{ $file }“.
 backup-failed = Öryggisafritun ekki möguleg: { $reason }
+backup-not-started = Ekki tókst að hefja öryggisafritun:
 restore-unreadable = Þessi skrá er ekki læsileg Radinus-safnskrá: { $reason }
 # Spurningin segir hverju verður glatað áður en því er glatað. Safnskráin hefur
 # þegar verið lesin á þessari stundu: það sem hún boðar er öruggt.

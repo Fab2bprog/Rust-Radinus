@@ -1,14 +1,13 @@
-# Radinus 2.0.2
+# Radinus 2.0.4
 
 Radinus is free software (GNU GPL v3 or later) for managing personal finances.
-Version 2.0.2 is a cross-platform rewrite (macOS first) of Radinus 1.9.3, a
+Version 2.0.4 is a cross-platform rewrite (macOS first) of Radinus 1.9.3, a
 Windows/WinDev application, by the same author.
 
 - **Author:** Fabrice Garcia
 - **License:** GNU GPL v3 or later (see `LICENSE`)
 - **Stack:** [Tauri](https://tauri.app) v2 + Rust, web-based UI
 - **Database:** SQLite, single file, portable
-- **Status:** under active development, on the way to the 2.0.2 release
 - **Changelog:** see `CHANGELOG.md`
 
 ## What Radinus does

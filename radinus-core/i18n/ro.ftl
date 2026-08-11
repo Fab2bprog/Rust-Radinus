@@ -1234,7 +1234,6 @@ window-excel-association-title = Importarea foii excel: asocierea datelor
 # conține ce conține, iar o parte din aiurelile pe care le poartă
 # este imposibil de detectat. Se întinde deci plasa înainte de săritură.
 excel-backup-question = O foaie Excel este făcută de mână: poate conține date valide, dar greșite, sume cu formatul corect și semnul greșit — iar acest lucru niciun control nu îl poate vedea. Importul va scrie aceste rânduri în contul dumneavoastră. Doriți să salvați o copie de siguranță a datelor înainte de a începe?
-excel-backup-later = Copia de siguranță nu este încă branșată în această versiune de Radinus 2. Până atunci, închideți Radinus și copiați dumneavoastră fișierul bazei de date: veți putea astfel importa fără niciun risc.
 
 excel-group-file = 1 - Desemnarea fișierului Excel de importat
 excel-pick = Desemnare fișier Excel
@@ -1523,6 +1522,7 @@ backup-archive = Arhivă Radinus
 backup-no-database = Nicio bază de date nu este deschisă.
 backup-done = Copie de siguranță scrisă în „{ $file }”.
 backup-failed = Copie de siguranță imposibilă: { $reason }
+backup-not-started = Copia de siguranță nu a putut fi începută:
 restore-unreadable = Acest fișier nu este o arhivă Radinus lizibilă: { $reason }
 # Întrebarea spune ce se va pierde înainte de a se pierde. Arhiva a fost deja
 # citită în acel moment: ceea ce anunță este sigur.

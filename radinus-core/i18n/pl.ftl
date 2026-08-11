@@ -1247,7 +1247,6 @@ window-excel-association-title = Importowanie arkusza excel: powiązanie danych
 # zawiera to, co zawiera, a część bzdur, które niesie, jest niewykrywalna.
 # Proponujemy więc siatkę, zanim się skoczy.
 excel-backup-question = Arkusz Excel jest robiony ręcznie: może zawierać daty poprawne w formie, lecz błędne, kwoty o dobrym formacie i złym znaku — a tego żadna kontrola nie zobaczy. Import zapisze te wiersze na twoim koncie. Czy chcesz zrobić kopię zapasową swoich danych przed rozpoczęciem?
-excel-backup-later = Kopia zapasowa nie jest jeszcze podłączona w tej wersji Radinus 2. Na razie zamknij Radinus i sam skopiuj swój plik bazy danych: będziesz mógł wtedy importować, niczym nie ryzykując.
 
 excel-group-file = 1 - Wskaż plik Excel do zaimportowania
 excel-pick = Wskaż plik Excel
@@ -1542,6 +1541,7 @@ backup-archive = Archiwum Radinus
 backup-no-database = Żadna baza danych nie jest otwarta.
 backup-done = Kopia zapasowa zapisana w „{ $file }”.
 backup-failed = Kopia zapasowa niemożliwa: { $reason }
+backup-not-started = Nie udało się rozpocząć kopii zapasowej:
 restore-unreadable = Ten plik nie jest czytelnym archiwum Radinus: { $reason }
 # Pytanie mówi, co zostanie utracone, zanim to zostanie utracone. Archiwum jest
 # w tym momencie już odczytane: to, co zapowiada, jest pewne.

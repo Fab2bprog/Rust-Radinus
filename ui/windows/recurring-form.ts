@@ -373,3 +373,27 @@ void (async () => {
   await load();
   onLanguageChanged(dress, { key: "window-recurring-form-title" });
 })();
+
+/// **Une nomenclature a changé pendant que cette fenêtre vivait.**
+///
+/// Bug remonté par un utilisateur le 10/08/2026 : « lorsque l'on rajoute une
+/// nomenclature, il faut fermer le programme pour qu'on puisse avoir ce
+/// nouveau libellé dans les opérations ». Une fenêtre de Radinus est bâtie une
+/// fois et jamais détruite : elle lisait ses listes à sa construction et les
+/// gardait jusqu'au prochain démarrage.
+///
+/// La liste est reposée sur place, **avec le choix en cours conservé** : on ne
+/// refait pas l'écran d'une fiche que quelqu'un est en train de remplir.
+void listen("nomenclatures-changed", async () => {
+  combos = await invoke<Combos>("list_operation_combos");
+  for (const [id, list] of [
+    ["category", "category"],
+    ["payment-mode", "payment_mode"],
+    ["assignment", "assignment"],
+    ["payee", "payee"],
+    ["project", "project"],
+  ] as [string, keyof Combos][]) {
+    const menu = element<HTMLSelectElement>(id);
+    fill(menu, combos?.[list] ?? [], Number(menu.value));
+  }
+});
