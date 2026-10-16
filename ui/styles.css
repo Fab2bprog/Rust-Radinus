@@ -178,20 +178,34 @@ body {
   flex-direction: column;
 }
 
-/* Autant de tuiles que de comptes ouverts, sur une seule ligne tant qu'elles
-   tiennent. `auto-fit` plutôt qu'un nombre fixe de colonnes : Radinus ne sait
-   pas combien de comptes a le foyer, et un utilisateur en a quatre quand un
-   autre en a onze. */
+/* **Une seule rangée, et un ascenseur quand elle ne tient plus** (Fabrice,
+   07/10/2026 : « lorsqu'on rétrécit la fenêtre j'aimerais un ascenseur
+   horizontal pour faire scroller les comptes »). Avant, les tuiles passaient à
+   la ligne : onze comptes poussaient les deux anneaux hors de l'écran.
+
+   Les tuiles s'élargissent tant qu'il y a de la place — quatre comptes
+   remplissent la carte — et ne descendent jamais sous leur largeur de
+   naissance : c'est la rangée qui défile, pas le nom du compte qui se tronque
+   davantage. Radinus ne sait pas combien de comptes a le foyer. */
 .welcome__tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  display: flex;
   gap: 9px;
   padding-top: 9px;
+  /* La place de l'ascenseur, pour qu'il ne se pose pas sur le bas des tuiles
+     là où il flotte par-dessus le contenu. */
+  padding-bottom: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-/* Une tuile est un bouton : elle ouvre la liste des opérations de son compte,
-   donc elle se clique, se tabule et s'annonce comme telle. */
+/* Une tuile ouvre la liste des opérations de son compte : elle se clique, se
+   tabule et s'annonce comme un bouton. Elle n'en est plus un au sens du HTML
+   depuis qu'elle porte une case à cocher — un bouton n'a pas le droit d'en
+   contenir. */
 .tile {
+  flex: 1 0 215px;
+  min-width: 215px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -201,12 +215,62 @@ body {
   border: 1px solid #c2c2c2;
   padding: 7px 10px 8px;
   cursor: pointer;
+  /* Prendre une tuile ne doit pas sélectionner son texte. */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .tile:hover,
 .tile:focus-visible {
   background-color: #e8eef2;
   border-color: var(--radinus-table-header-bg);
+}
+
+/* **Un compte décoché reste là, mais en retrait.** Il n'entre plus dans les
+   totaux ni dans les anneaux ; il s'ouvre toujours d'un clic, et sa case reste
+   nette pour qu'on voie où le recocher. */
+.tile--excluded {
+  background-color: #f1f1f1;
+  border-style: dashed;
+}
+
+.tile--excluded > :not(.tile__head),
+.tile--excluded .tile__name {
+  opacity: 0.5;
+}
+
+/* La tuile qu'on a en main. */
+.tile--moving {
+  opacity: 0.45;
+}
+
+body.moving-tile,
+body.moving-tile .tile {
+  cursor: grabbing;
+}
+
+/* Le trait qui dit où la tuile va se poser — le même que pour les colonnes
+   des tableaux. */
+.tile-drop-mark {
+  position: fixed;
+  z-index: 30;
+  width: 3px;
+  background-color: #f2a900;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+.tile__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tile__check {
+  flex: none;
+  margin: 0;
+  cursor: pointer;
 }
 
 .tile__name {

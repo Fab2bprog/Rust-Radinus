@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Partager une dépense</title>
+    <script type="module" src="/ui/windows/sharing.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F48 — « Partager une dépense » (Fabrice, 11/10/2026, P-71).
+
+         « Qui paie quoi ? » À gauche, le partage — libellé, total, règle,
+         arrondi —, les postes qui ne concernent pas tout le monde, et les
+         fichiers : le projet en JSON, les trois rapports PDF, l'export Excel.
+         À droite, le résultat, puis une seule grille pour les personnes — une
+         ligne chacune, leurs contraintes, une colonne par poste où l'on coche
+         qui participe à quoi —, les règlements et où ils en sont. Rien n'entre
+         dans la base : l'outil marche sans base ouverte. -->
+    <div class="window window--loan window--sharing">
+      <main class="window__content loan sharing">
+        <p class="cushion__question" id="question"></p>
+
+        <div class="loan__afford sharing__body">
+          <div class="loan__side">
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="setup-title"></h2>
+              <label class="loan__field">
+                <span class="loan__label" id="label-label"></span>
+                <input class="form__field" id="label" autocomplete="off" />
+              </label>
+              <p class="loan__hint" id="label-hint"></p>
+              <label class="loan__field">
+                <span class="loan__label" id="total-label"></span>
+                <input class="form__field goal__small" id="total" inputmode="decimal" autocomplete="off" />
+              </label>
+              <p class="loan__hint" id="total-hint"></p>
+              <div class="sharing__modes">
+                <label class="goal__question">
+                  <input type="radio" name="mode" value="whole" checked />
+                  <span id="mode-whole"></span>
+                </label>
+                <label class="goal__question">
+                  <input type="radio" name="mode" value="item" />
+                  <span id="mode-item"></span>
+                </label>
+              </div>
+              <label class="loan__field" id="rule-line">
+                <span class="loan__label" id="rule-label"></span>
+                <select class="form__field" id="rule"></select>
+              </label>
+              <p class="sharing__advice" id="rule-advice" aria-live="polite" hidden></p>
+              <label class="sharing__check">
+                <input type="checkbox" id="round-euro" />
+                <span id="round-euro-label"></span>
+              </label>
+              <label class="sharing__check">
+                <input type="checkbox" id="hide-incomes" checked />
+                <span id="hide-incomes-label"></span>
+              </label>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="items-title"></h2>
+              <p class="loan__hint" id="items-hint"></p>
+              <table class="cut__table sharing__items">
+                <thead>
+                  <tr>
+                    <th id="column-item"></th>
+                    <th class="loan__number" id="column-amount"></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="items"></tbody>
+              </table>
+              <button class="holiday__file sharing__add" id="add-item" type="button"></button>
+            </article>
+
+            <article class="loan__card holiday__files">
+              <button class="holiday__file" id="open" type="button"></button>
+              <button class="holiday__file" id="save" type="button"></button>
+              <button class="loan__pdf" id="pdf-distribution" type="button">
+                <img src="/ui/assets/icons/pdf.png" alt="" />
+                <span id="pdf-distribution-label"></span>
+              </button>
+              <button class="loan__pdf" id="pdf-payments" type="button">
+                <img src="/ui/assets/icons/pdf.png" alt="" />
+                <span id="pdf-payments-label"></span>
+              </button>
+              <select class="form__field sharing__unit" id="statements-unit"></select>
+              <button class="loan__pdf" id="statements" type="button">
+                <img src="/ui/assets/icons/pdf.png" alt="" />
+                <span id="statements-label"></span>
+              </button>
+              <button class="holiday__file holiday__excel" id="excel" type="button"></button>
+            </article>
+          </div>
+
+          <div class="loan__main">
+            <article class="loan__card goal__answer" id="answer" data-tone="none">
+              <span class="loan__label" id="result-title"></span>
+              <p class="goal__headline" id="headline"></p>
+              <p class="sharing__warning" id="warning" hidden></p>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="people-title"></h2>
+              <p class="loan__hint" id="people-hint"></p>
+              <div class="sharing__scroll">
+                <table class="cut__table sharing__grid">
+                  <thead id="people-head"></thead>
+                  <tbody id="people"></tbody>
+                </table>
+              </div>
+              <div class="sharing__actions">
+                <button class="holiday__file sharing__add" id="add-person" type="button"></button>
+                <button class="holiday__file sharing__add" id="apply-advice" type="button" hidden></button>
+                <button class="holiday__file sharing__add" id="from-incomes" type="button" hidden></button>
+                <button class="holiday__file sharing__add" id="reset-percents" type="button" hidden></button>
+              </div>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="payments-title"></h2>
+              <p class="loan__hint" id="payments-hint"></p>
+              <table class="cut__table sharing__payments">
+                <thead>
+                  <tr>
+                    <th id="column-date"></th>
+                    <th id="column-who"></th>
+                    <th class="loan__number" id="column-paid-amount"></th>
+                    <th id="column-label"></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="payments"></tbody>
+              </table>
+              <button class="holiday__file sharing__add" id="add-payment" type="button"></button>
+            </article>
+
+            <article class="loan__card" id="balances-card">
+              <h2 class="loan__card-title" id="balances-title"></h2>
+              <ul class="sharing__summary" id="summary"></ul>
+              <table class="cut__table sharing__units">
+                <thead>
+                  <tr>
+                    <th id="column-unit"></th>
+                    <th id="column-members"></th>
+                    <th class="loan__number" id="column-due"></th>
+                    <th class="loan__number" id="column-paid"></th>
+                    <th id="column-balance"></th>
+                  </tr>
+                </thead>
+                <tbody id="units"></tbody>
+              </table>
+              <h3 class="sharing__subtitle" id="transfers-title"></h3>
+              <ul class="sharing__transfers" id="transfers"></ul>
+            </article>
+
+            <ul class="goal__notes" id="notes"></ul>
+            <p class="loan__hint" id="disclaimer"></p>
+          </div>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

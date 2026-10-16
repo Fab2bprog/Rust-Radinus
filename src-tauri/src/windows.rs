@@ -196,6 +196,27 @@ pub fn statistics_window(language: Language, axis: Axis) -> WindowSpec {
     }
 }
 
+/// F39 — « Bilan croisé » : les catégories en lignes, les affectations en
+/// colonnes, sur un mois (demande de Fabrice, 25/08/2026).
+///
+/// Comme les statistiques, il se calcule sur plusieurs comptes et passe donc
+/// par le choix des comptes avant de s'ouvrir. Une seule fenêtre, sans axe à
+/// nommer : ses deux axes sont fixés par ce qu'elle est.
+pub fn crossed_balance_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "crossed-balance".to_string(),
+        url: "ui/windows/crossed-balance.html".to_string(),
+        title: i18n::text(language, "window-crossed-balance-title"),
+        width: 1600.0,
+        height: 900.0,
+        closable: false,
+        // Autant de colonnes que d'affectations, autant de lignes que de
+        // catégories : c'est une fenêtre que l'on agrandit.
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
 /// F19 — « Tableau de bord ».
 ///
 /// Comme les statistiques, il se calcule sur plusieurs comptes et passe donc
@@ -225,6 +246,148 @@ pub fn balance_curves_window(language: Language) -> WindowSpec {
         height: 900.0,
         closable: false,
         // Un graphique gagne toujours à être agrandi.
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
+/// F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026) : le graphique
+/// de F25, et sous lui le tableau des opérations de la zone qu'on y trace.
+/// Une fenêtre à elle, distincte de F25 — « Graphique, on se concentre sur le
+/// solde ; Analyse, c'est une vision plus approfondie ».
+pub fn balance_analysis_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "balance-analysis".to_string(),
+        url: "ui/windows/balance-analysis.html".to_string(),
+        title: i18n::text(language, "window-analysis-title"),
+        width: 1500.0,
+        height: 950.0,
+        closable: false,
+        // Un graphique et un tableau : les deux gagnent à être agrandis.
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
+/// F41 — « Simulation de crédit » (Fabrice, 08/10/2026), menu Divers, sous la
+/// calculatrice. Deux onglets — « Le crédit » et « Puis-je le rembourser ? » —
+/// sous les curseurs, des graphiques et un tableau : elle gagne à être
+/// agrandie.
+pub fn loan_simulation_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "loan-simulation".to_string(),
+        url: "ui/windows/loan-simulation.html".to_string(),
+        title: i18n::text(language, "window-loan-title"),
+        width: 1320.0,
+        height: 940.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
+/// F42 — « Consommation d'un appareil électrique » (Fabrice, 09/10/2026),
+/// menu Outils, sous la simulation de crédit. Une page sans onglet : l'appareil
+/// et le contrat en haut, le résultat dessous.
+pub fn appliance_cost_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "appliance-cost".to_string(),
+        url: "ui/windows/appliance-cost.html".to_string(),
+        title: i18n::text(language, "window-appliance-title"),
+        width: 1180.0,
+        height: 860.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
+/// F43 — « Mon matelas de sécurité » (Fabrice, 09/10/2026), menu Outils,
+/// sous la consommation d'un appareil électrique.
+pub fn safety_cushion_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "safety-cushion".to_string(),
+        url: "ui/windows/safety-cushion.html".to_string(),
+        title: i18n::text(language, "window-cushion-title"),
+        width: 1260.0,
+        height: 900.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
+/// F44 — « Objectif Épargne » (Fabrice, 10/10/2026), menu Outils, sous le
+/// matelas de sécurité.
+pub fn savings_goal_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "savings-goal".to_string(),
+        url: "ui/windows/savings-goal.html".to_string(),
+        title: i18n::text(language, "window-goal-title"),
+        width: 1280.0,
+        height: 920.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
+/// F45 — « Et si je réduisais… ? » (Fabrice, 10/10/2026), menu Outils, sous
+/// l'objectif d'épargne.
+pub fn spending_cut_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "spending-cut".to_string(),
+        url: "ui/windows/spending-cut.html".to_string(),
+        title: i18n::text(language, "window-cut-title"),
+        width: 1320.0,
+        height: 940.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
+/// F46 — « Préparer mes vacances » (Fabrice, 10/10/2026), menu Outils, sous
+/// « Et si je réduisais… ? ».
+pub fn holiday_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "holiday".to_string(),
+        url: "ui/windows/holiday.html".to_string(),
+        title: i18n::text(language, "window-holiday-title"),
+        width: 1340.0,
+        height: 940.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
+/// F47 — « Carnet de ma voiture » (Fabrice, 10/10/2026), menu Outils, sous
+/// « Préparer mes vacances ».
+pub fn car_logbook_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "car-logbook".to_string(),
+        url: "ui/windows/car-logbook.html".to_string(),
+        title: i18n::text(language, "window-car-title"),
+        width: 1380.0,
+        height: 960.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
+/// F48 — « Partager une dépense » (Fabrice, 11/10/2026, P-71), menu Outils,
+/// sous « Carnet de ma voiture ». La seule fenêtre d'outil qui s'ouvre sans
+/// base : elle n'en lit rien.
+pub fn sharing_window(language: Language) -> WindowSpec {
+    WindowSpec {
+        label: "sharing".to_string(),
+        url: "ui/windows/sharing.html".to_string(),
+        title: i18n::text(language, "window-sharing-title"),
+        width: 1440.0,
+        height: 960.0,
+        closable: false,
         resizable_chrome: true,
         parent: None,
     }
@@ -802,7 +965,7 @@ pub fn transfer_window(language: Language) -> WindowSpec {
     }
 }
 
-/// F26 — « Saisie du budget » et F27 — « Contrôle du budget ».
+/// F26 — « Saisie du budget » et F39 — « Contrôle du budget ».
 ///
 /// **Deux portes, deux fenêtres** (règle de Fabrice, 29/07/2026) : on saisit
 /// son budget, ou on contrôle s'il a été tenu. Une page pour les deux, parce
@@ -1334,7 +1497,17 @@ pub mod tests {
             accounts_list_window(Language::French, AccountsPurpose::ManyAccounts),
             account_form_window(Language::French),
             dashboard_window(Language::French),
+            crossed_balance_window(Language::French),
             balance_curves_window(Language::French),
+            balance_analysis_window(Language::French),
+            loan_simulation_window(Language::French),
+            appliance_cost_window(Language::French),
+            safety_cushion_window(Language::French),
+            savings_goal_window(Language::French),
+            spending_cut_window(Language::French),
+            holiday_window(Language::French),
+            car_logbook_window(Language::French),
+            sharing_window(Language::French),
             balances_window(Language::French),
             operations_window(Language::French, "CCP"),
             operation_form_window(Language::French, "CCP"),

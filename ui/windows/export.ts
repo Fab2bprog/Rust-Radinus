@@ -68,17 +68,23 @@ export const empty = (fill?: string | null): SheetCell => ({ kind: "empty", fill
 /// **Les deux formats bancaires n'y sont pas** : l'OFX et le QIF n'exportent
 /// pas un tableau mais des opérations, et n'ont donc de sens que dans F02. Ils
 /// vivent dans son menu à elle.
+///
+/// `name` est le nom du format tout seul, pour un menu qui a déjà dit
+/// « Exporter vers » : « Excel (.xlsx) » sous cette entrée, et non « Exporter
+/// vers Excel (.xlsx) » une seconde fois. **Ce sont des noms propres, et ils
+/// ne se traduisent pas** — Excel s'appelle Excel dans les dix-huit langues —
+/// c'est pourquoi ils sont écrits ici, et non dans les fichiers de langue.
 export const FORMATS = [
-  { key: "export-to-excel", extension: "xlsx" },
-  { key: "export-to-word", extension: "docx" },
-  { key: "export-to-ods", extension: "ods" },
-  { key: "export-to-csv", extension: "csv", apart: true },
-  { key: "export-to-tsv", extension: "tsv" },
-  { key: "export-to-ini", extension: "ini", apart: true },
-  { key: "export-to-json", extension: "json" },
-  { key: "export-to-toml", extension: "toml" },
-  { key: "export-to-xml", extension: "xml" },
-  { key: "export-to-yaml", extension: "yaml" },
+  { key: "export-to-excel", extension: "xlsx", name: "Excel (.xlsx)" },
+  { key: "export-to-word", extension: "docx", name: "Word (.docx)" },
+  { key: "export-to-ods", extension: "ods", name: "LibreOffice Calc (.ods)" },
+  { key: "export-to-csv", extension: "csv", name: "CSV (.csv)", apart: true },
+  { key: "export-to-tsv", extension: "tsv", name: "TSV (.tsv)" },
+  { key: "export-to-ini", extension: "ini", name: "INI (.ini)", apart: true },
+  { key: "export-to-json", extension: "json", name: "JSON (.json)" },
+  { key: "export-to-toml", extension: "toml", name: "TOML (.toml)" },
+  { key: "export-to-xml", extension: "xml", name: "XML (.xml)" },
+  { key: "export-to-yaml", extension: "yaml", name: "YAML (.yaml)" },
 ] as const;
 
 export type Extension = (typeof FORMATS)[number]["extension"];
@@ -137,14 +143,61 @@ function fileNameOf(name: string): string {
   return cleaned === "" ? "radinus" : cleaned;
 }
 
+/// **Une entrée qu'une fenêtre ajoute en tête de son menu du clic droit**, au
+/// dessus des exports, et qui ouvre un sous-menu de choix.
+///
+/// Le menu est commun à tous les tableaux de Radinus ; ce qu'une fenêtre y
+/// ajoute ne regarde qu'elle (Fabrice, 03/10/2026 : « je veux modifier ce menu
+/// pour l'instant uniquement à cet endroit »). Un tableau qui ne donne rien
+/// garde le menu qu'il a toujours eu.
+export interface MenuAddition {
+  label: string;
+  /// Éteinte, l'entrée est montrée en grisé et son sous-menu ne s'ouvre pas :
+  /// elle dit qu'elle existe, et qu'il lui manque quelque chose pour servir.
+  enabled: boolean;
+  choices: {
+    label: string;
+    /// Une marque posée sur le choix (`data-<name>="<value>"`), que la feuille
+    /// de style peut teinter — la clef d'une vérification, par exemple. Elle
+    /// porte son nom : une autre entrée, un autre jour, n'héritera pas des
+    /// couleurs de celle-ci parce que ses clefs se ressemblent.
+    mark?: { name: string; value: string };
+    run: () => void;
+  }[];
+}
+
+/// **Une entrée simple en tête du menu du clic droit** — « Copier la
+/// cellule », « Copier les lignes sélectionnées » (Fabrice, 07/10/2026). Elle
+/// fait quelque chose tout de suite, sans sous-menu. Éteinte, elle est montrée
+/// en grisé : elle dit qu'elle existe, et qu'il lui manque quelque chose.
+export interface MenuHeadEntry {
+  label: string;
+  enabled: boolean;
+  /// Ce qui distingue l'entrée pour une feuille de style ou une vérification.
+  name: string;
+  run: () => void;
+}
+
 /// Pose le menu du clic droit sur `zone`, avec les deux exports.
 ///
 /// `build` n'est appelé qu'au moment où l'on choisit : une fenêtre n'a aucune
 /// raison de fabriquer sa feuille tant que personne ne la demande.
+///
+/// `additions` est appelé à chaque ouverture du menu : ce qu'il rend dépend
+/// de l'instant — de la sélection, de la langue.
+///
+/// `exportsUnder`, quand il est donné, **range les dix exports dans un
+/// sous-menu** sous le nom qu'il rend — « Exporter vers » (Fabrice,
+/// 03/10/2026). Un menu qui porte deux entrées à lui et dix exports à plat ne
+/// se lit plus ; trois entrées qui s'ouvrent, si. Sans lui, les exports
+/// restent à plat, comme dans tous les autres tableaux.
 export function onRightClick(
   zone: HTMLElement,
   build: () => Promise<Sheet> | Sheet,
   said: (message: string, alert?: boolean) => void,
+  additions?: () => MenuAddition[],
+  exportsUnder?: () => string,
+  head?: (event: MouseEvent) => MenuHeadEntry[],
 ): void {
   let menu: HTMLElement | null = null;
 
@@ -190,20 +243,118 @@ export function onRightClick(
     menu.style.left = `${event.clientX}px`;
     menu.style.top = `${event.clientY}px`;
 
+    // **Tout en haut, la copie**, puis un trait : c'est le geste le plus
+    // courant du menu, et le seul qui dépende de l'endroit exact du clic —
+    // d'où l'événement qu'on lui tend.
+    const first = head?.(event) ?? [];
+    for (const one of first) {
+      const entry = document.createElement("button");
+      entry.type = "button";
+      entry.className = "context-menu__entry context-menu__entry--head";
+      entry.dataset.head = one.name;
+      entry.textContent = one.label;
+      entry.disabled = !one.enabled;
+      entry.addEventListener("click", () => {
+        close();
+        one.run();
+      });
+      menu.append(entry);
+    }
+    if (first.length > 0) {
+      const rule = document.createElement("hr");
+      rule.className = "context-menu__rule context-menu__rule--head";
+      menu.append(rule);
+    }
+
+    // Ce que la fenêtre ajoute, en tête, puis un trait : les exports viennent
+    // après, tels qu'ils ont toujours été.
+    const added = additions?.() ?? [];
+    for (const addition of added) {
+      const nest = document.createElement("div");
+      nest.className = "context-menu__nest";
+      const opener = document.createElement("button");
+      opener.type = "button";
+      opener.className = "context-menu__entry context-menu__entry--opener";
+      opener.textContent = addition.label;
+      opener.disabled = !addition.enabled;
+      nest.append(opener);
+
+      if (addition.enabled) {
+        const nested = document.createElement("div");
+        nested.className = "context-menu__submenu";
+        for (const choice of addition.choices) {
+          const entry = document.createElement("button");
+          entry.type = "button";
+          entry.className = "context-menu__entry";
+          entry.textContent = choice.label;
+          if (choice.mark !== undefined) {
+            entry.dataset[choice.mark.name] = choice.mark.value;
+          }
+          entry.addEventListener("click", () => {
+            close();
+            choice.run();
+          });
+          nested.append(entry);
+        }
+        nest.append(nested);
+        // Le survol l'ouvre ; le clic aussi, pour qui n'a pas de survol ou
+        // préfère le clavier.
+        opener.addEventListener("click", () => {
+          nest.classList.toggle("context-menu__nest--open");
+        });
+      }
+      menu.append(nest);
+    }
+    // Les exports : à plat sous un trait, ou rangés dans leur propre
+    // sous-menu quand la fenêtre l'a demandé.
+    let exports: HTMLElement = menu;
+    if (exportsUnder !== undefined) {
+      const nest = document.createElement("div");
+      nest.className = "context-menu__nest";
+      const opener = document.createElement("button");
+      opener.type = "button";
+      opener.className = "context-menu__entry context-menu__entry--opener";
+      opener.textContent = exportsUnder();
+      opener.addEventListener("click", () => {
+        nest.classList.toggle("context-menu__nest--open");
+      });
+      exports = document.createElement("div");
+      exports.className = "context-menu__submenu";
+      nest.append(opener, exports);
+      menu.append(nest);
+    } else if (added.length > 0) {
+      const rule = document.createElement("hr");
+      rule.className = "context-menu__rule";
+      menu.append(rule);
+    }
+
     for (const format of FORMATS) {
       if ("apart" in format && format.apart) {
         const rule = document.createElement("hr");
         rule.className = "context-menu__rule";
-        menu.append(rule);
+        exports.append(rule);
       }
       const entry = document.createElement("button");
       entry.type = "button";
       entry.className = "context-menu__entry";
-      entry.textContent = t(format.key);
+      // Sous « Exporter vers », le nom du format suffit.
+      entry.textContent = exportsUnder !== undefined ? format.name : t(format.key);
       entry.addEventListener("click", () => run(format.extension));
-      menu.append(entry);
+      exports.append(entry);
     }
     document.body.append(menu);
+    // **Un sous-menu s'ouvre du côté où il y a de la place.** À droite du
+    // menu d'ordinaire ; à gauche quand le clic a eu lieu près du bord droit
+    // de la fenêtre, où il sortirait de l'écran. Et vers le haut quand le
+    // clic a eu lieu près du bas : celui des exports porte dix lignes.
+    const nested = added.length > 0 || exportsUnder !== undefined;
+    const placed = menu.getBoundingClientRect();
+    if (nested && placed.right + 210 > window.innerWidth) {
+      menu.classList.add("context-menu--near-the-edge");
+    }
+    if (nested && placed.bottom + 300 > window.innerHeight) {
+      menu.classList.add("context-menu--near-the-bottom");
+    }
     document.addEventListener("mousedown", closeIfOutside);
   });
 

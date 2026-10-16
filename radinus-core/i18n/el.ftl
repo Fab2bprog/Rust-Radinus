@@ -255,13 +255,16 @@ menu-accounts-checkbooks = Διαχείριση των μπλοκ επιταγώ
 
 menu-statistics = Στατιστικά
 menu-statistics-balance-chart = Γράφημα Εξέλιξη του υπολοίπου
+menu-statistics-balance-analysis = Ανάλυση Εξέλιξη του υπολοίπου
 menu-statistics-by-category = Στατ. ανά κατηγορία
 menu-statistics-by-assignment = Στατ. ανά κατανομή
 menu-statistics-by-budget-line = Στατ. ανά κονδύλι προϋπολογισμού
 menu-statistics-by-payment-mode = Στατ. ανά τρόπο πληρωμής
 menu-statistics-by-payee = Στατ. ανά αντισυμβαλλόμενο και έμπορο
 menu-statistics-by-project = Στατ. ανά έργο
+menu-statistics-by-verification = Στατ. ανά έλεγχο
 menu-statistics-dashboard = Πίνακας ελέγχου των κινήσεων
+menu-statistics-crossed-balance = Διασταυρωμένος απολογισμός
 
 menu-budget = Προϋπολογισμός
 menu-budget-entry = Καταχώριση προϋπολογισμού
@@ -279,6 +282,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = Πρότυπα κινήσεων
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = Εργαλεία
 menu-settings = Ρυθμίσεις
 menu-settings-about-author = Σχετικά με τον δημιουργό
 menu-settings-about-radinus = Σχετικά με το Radinus
@@ -435,6 +440,15 @@ operations-selection-total = Συνολικό ποσό των επιλεγμέν
 
 operations-column-date = Ημερομηνία
 operations-column-clearing-date = Ημ/νία Συμφωνίας
+operations-column-status = Κατάσταση κίνησης
+operation-status-pointed = Συμφωνημένη
+operation-status-committed = Δεσμευμένη
+operation-status-planned = Προγραμματισμένη
+operations-column-verification = Έλεγχος
+operation-verification-to-verify = Προς έλεγχο
+operation-verification-verified = Ελεγμένη
+operation-verification-doubtful = Αμφίβολη
+operation-verification-disputed = Αμφισβητούμενη
 operations-column-label = Περιγραφή
 operations-column-category = Κατηγορία
 operations-column-assignment = Κατανομή
@@ -510,6 +524,9 @@ filter-all = Όλες οι κινήσεις
 filter-pointed = Μόνο οι συμφωνημένες κινήσεις
 filter-committed = Μόνο οι δεσμευμένες κινήσεις
 filter-planned = Μόνο οι προγραμματισμένες κινήσεις
+filter-by-status = Φίλτρο κατάστασης
+filter-by-verification = Φίλτρο ελέγχου
+filter-show-all = Εμφάνιση όλων
 
 # --- Καρτέλα κίνησης (F03) --------------------------------------------
 # Οι τίτλοι είναι αυτοί της εικόνας «Fiche operation transaction.png», με τα
@@ -543,6 +560,7 @@ operation-field-direction = Τύπος κίνησης:
 operation-field-amount = Ποσό
 operation-field-status = Κατάσταση κίνησης
 operation-field-clearing-date = Ημερομηνία συμφωνίας
+operation-field-verification = Έλεγχος
 operation-field-category = Κατηγορία
 operation-field-assignment = Κατανομή
 operation-field-payment-mode = Τρόπος
@@ -565,6 +583,10 @@ operation-nothing-to-show = Καμία κίνηση προς εμφάνιση.
 operation-label-required = Η περιγραφή της κίνησης είναι υποχρεωτική.
 operation-date-required = Η ημερομηνία της κίνησης είναι υποχρεωτική.
 operation-clearing-date-invalid = Η ημερομηνία συμφωνίας δεν είναι έγκυρη ημερομηνία.
+operation-clearing-date-required = Μια σημειωμένη κίνηση πρέπει υποχρεωτικά να φέρει ημερομηνία σημείωσης.
+operation-clearing-date-question =
+    Μια σημειωμένη κίνηση πρέπει υποχρεωτικά να φέρει ημερομηνία σημείωσης.
+    Θέλετε να αποθηκεύσετε με την ημερομηνία της κίνησης, { $date };
 operation-is-a-sub = Αυτή η γραμμή είναι υποκίνηση: τροποποιείται από τη δική της καρτέλα.
 operation-delete-form-open = Η καρτέλα του «{ $label }» είναι ανοιχτή. Κλείστε την πριν από τη διαγραφή.
 
@@ -604,6 +626,7 @@ sub-operation-is-the-complement = Αυτό είναι το Συμπλήρωμα:
 sub-operation-of = Επιμερισμός του «{ $label }» ({ $amount })
 
 operations-pointed = { $count ->
+    [0] Καμία κίνηση προς συμφωνία: η επιλογή είναι ήδη συμφωνημένη.
     [one] 1 συμφωνημένη κίνηση.
    *[other] { $count } συμφωνημένες κινήσεις.
 }
@@ -617,6 +640,7 @@ operations-select-one = Παρακαλώ επιλέξτε μία μόνο κίν
 operation-copy = Αντίγραφο προς αποθήκευση: τίποτα δεν έχει δημιουργηθεί ακόμη.
 operations-show-children = Εμφάνιση όλων των υποκινήσεων
 operations-hide-children = Απόκρυψη όλων των υποκινήσεων
+operations-recurring-from = Δημιουργία περιοδικής κίνησης από αυτή την κίνηση
 
 # --- Δεύτερη επιβεβαίωση μιας σοβαρής διαγραφής ------------------------
 # Η διαγραφή ενός τραπεζικού λογαριασμού παρασύρει όλο το ιστορικό του: ένα
@@ -637,6 +661,7 @@ window-statistics-title = { $kind ->
     [payment-mode] Στατιστικά ανά τρόπο πληρωμής
     [payee] Στατιστικά ανά αντισυμβαλλόμενο και έμπορο
     [project] Στατιστικά ανά έργο
+    [verification] Στατιστικά ανά έλεγχο
    *[category] Στατιστικά ανά κατηγορία
 }
 
@@ -646,6 +671,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] ΤρόποςΚίνησης
     [payee] Αντισυμβαλλόμενος
     [project] Έργα
+    [verification] Έλεγχος
    *[category] ΌνομαΚατηγορίας
 }
 
@@ -655,6 +681,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] Χωρίς τρόπο πληρωμής
     [payee] Χωρίς αντισυμβαλλόμενο
     [project] Χωρίς έργο
+    [verification] Προς έλεγχο
    *[category] Χωρίς κατηγορία
 }
 statistics-total = Σύνολο
@@ -696,6 +723,19 @@ accounts-stats-multiselect-help = Πληροφορία: Χρησιμοποιήσ
 statistics-year-question = Σε ποιο έτος θέλετε να εργαστείτε; Το Radinus πάει από { $first } έως { $last }.
 statistics-year-choose = Επιλογή έτους
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = Διασταυρωμένος απολογισμός
+crossed-balance-window-name = Διασταυρωμένος απολογισμός
+crossed-balance-column = Κατηγορία
+crossed-balance-no-data = Καμία κίνηση αυτόν τον μήνα για τους επιλεγμένους λογαριασμούς.
+crossed-balance-month-question = Σε ποιον μήνα θέλετε να εργαστείτε; Αριθμός από { $first } έως { $last }.
+crossed-balance-month-choose = Επιλογή μήνα
+crossed-balance-next = Επόμενος μήνας
+crossed-balance-previous = Προηγούμενος μήνας
+
 # --- Εξαγωγή των πινάκων (δεξί κλικ) ----------------------------------
 # Λειτουργία του πίνακα, όχι ενός παραθύρου: την έχουν όλες οι λίστες.
 
@@ -714,8 +754,16 @@ export-to-xml = Εξαγωγή σε XML (.xml)
 # όνομα AN_2026. Τα κενά έτη — με τους διακόπτες όπως έχουν τεθεί — δεν
 # περιλαμβάνονται.
 export-menu = Εξαγωγή
+export-to = Εξαγωγή σε
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = Αντιγραφή κελιού
+copy-rows = Αντιγραφή επιλεγμένων γραμμών
+copy-failed = Η αντιγραφή στο πρόχειρο απέτυχε.
 export-all-years-excel = Εξαγωγή όλων των ετών σε Excel
 export-all-years-ods = Εξαγωγή όλων των ετών σε LibreOffice Calc
+export-all-months-excel = Εξαγωγή όλων των μηνών του εμφανιζόμενου έτους σε Excel
+export-all-months-ods = Εξαγωγή όλων των μηνών του εμφανιζόμενου έτους σε LibreOffice Calc
 export-no-year = Κανένα έτος δεν έχει κινήσεις: δεν υπάρχει τίποτα προς εξαγωγή.
 export-years-done = { $years } έτη εξήχθησαν στο «{ $file }».
 export-to-json = Εξαγωγή σε JSON (.json)
@@ -729,6 +777,7 @@ statistics-window-name = { $kind ->
     [payment-mode] Στατιστικά ανά τρόπο πληρωμής
     [payee] Στατιστικά ανά αντισυμβαλλόμενο και έμπορο
     [project] Στατιστικά ανά έργο
+    [verification] Στατιστικά ανά έλεγχο
    *[category] Στατιστικά ανά κατηγορία
 }
 statistics-detail-name = Λεπτομέρεια των στατιστικών
@@ -772,6 +821,19 @@ curve-axis-balance = υπόλοιπο
 curve-nothing = Δεν επιλέχθηκε κανένας λογαριασμός: δεν υπάρχει γράφημα για σχεδίαση.
 curve-empty = Καμία κίνηση σε αυτήν την περίοδο.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = Ανάλυση της εξέλιξης του υπολοίπου
+analysis-heading = Ανάλυση της εξέλιξης του υπολοίπου
+analysis-hint = Σύρετε πάνω στο γράφημα με πατημένο το κουμπί του ποντικιού για να δείτε τις κινήσεις αυτής της περιόδου.
+analysis-zone = Ζώνη:
+analysis-opening = Αρχικό υπόλοιπο:
+analysis-closing = Τελικό υπόλοιπο:
+analysis-variation = Μεταβολή:
+analysis-detail-name = Ανάλυση υπολοίπου
+analysis-detail-none = Καμία κίνηση σε αυτή τη ζώνη.
+
 # --- F05 — Γρήγορη ταξινόμηση των κινήσεων ------------------------
 # Το παράθυρο όπου ταξινομεί κανείς **μαζικά**: επιλέγει γραμμές, τσεκάρει τα
 # χαρακτηριστικά προς αλλαγή και τα εφαρμόζει με μία κίνηση — στη μνήμη.
@@ -791,6 +853,7 @@ quick-check-payment-mode = Τρόπος
 quick-check-payee = Αντισυμβαλλόμενος
 quick-check-project = Έργο
 quick-check-status = Κατάσταση
+quick-check-verification = Έλεγχος
 quick-column-date = Ημερομηνία
 quick-column-label = Περιγραφή
 quick-column-amount = Ποσό
@@ -800,6 +863,7 @@ quick-column-payment-mode = Τρόπος πληρωμής
 quick-column-payee = Αντισυμβαλλόμενος
 quick-column-project = Έργα
 quick-column-status = Κατάσταση
+quick-column-verification = Έλεγχος
 # Σε Mac, Ctrl + κλικ είναι δεξί κλικ: το πλήκτρο που προσθέτει σε μια επιλογή
 # είναι εκεί το ⌘, και η βοήθεια πρέπει να αναφέρει αυτό που δουλεύει.
 quick-multiselect-help = Πληροφορία: Χρησιμοποιήστε κλικ ποντικιού + πλήκτρο [{ $modifier }] στον πίνακα για να επιλέξετε πολλά στοιχεία
@@ -860,7 +924,7 @@ statement-no-match = Καμία γραμμή δεν αντιστοιχεί στ�
 statement-help = Πληροφορία: Χρησιμοποιήστε κλικ ποντικιού + πλήκτρο [{ $modifier }] στον πίνακα για να επιλέξετε πολλές γραμμές
 statement-choose-account = Αυτό το αρχείο περιέχει πολλούς λογαριασμούς. Ποιον θέλετε να εισαγάγετε;
 statement-select-line = Επιλέξτε τουλάχιστον μία γραμμή της κατάστασης λογαριασμού.
-statement-title-open = Άνοιγμα αρχείου κατάστασης λογαριασμού (.ofx)
+statement-title-open = Άνοιγμα αρχείου κατάστασης λογαριασμού (OFX, QIF, CSV)
 statement-title-info = Πληροφορίες για το ανοιχτό αρχείο
 statement-title-integrate = Ένταξη της επιλογής στον λογαριασμό
 statement-title-validate = Ένταξη αυτής της κίνησης στον λογαριασμό
@@ -869,6 +933,15 @@ statement-no-fitid = Προσοχή: αυτό το αρχείο δεν δίνε�
 statement-loaded = { $count ->
     [0] Αυτό το αρχείο δεν περιέχει καμία κίνηση για αυτόν τον λογαριασμό.
    *[other] { $count } γραμμές διαβάστηκαν, εκ των οποίων { $known } υπάρχουν ήδη στον λογαριασμό σας.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] { $count } γραμμές διαβάστηκαν· καμία δεν μοιάζει με κίνηση που υπάρχει ήδη στον λογαριασμό σας.
+    [one] { $count } γραμμές διαβάστηκαν, εκ των οποίων μία μοιάζει με κίνηση που υπάρχει ήδη στον λογαριασμό σας (ίδια ημερομηνία, ίδια περιγραφή, ίδιο ποσό).
+   *[other] { $count } γραμμές διαβάστηκαν, εκ των οποίων { $alike } μοιάζουν με κινήσεις που υπάρχουν ήδη στον λογαριασμό σας (ίδια ημερομηνία, ίδια περιγραφή, ίδιο ποσό).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] Μία ακόμη γραμμή μοιάζει με κίνηση που υπάρχει ήδη (ίδια ημερομηνία, ίδια περιγραφή, ίδιο ποσό).
+   *[other] { $alike } ακόμη γραμμές μοιάζουν με κινήσεις που υπάρχουν ήδη (ίδια ημερομηνία, ίδια περιγραφή, ίδιο ποσό).
 }
 statement-integrated = { $count ->
     [0] Τίποτα δεν εισήχθη: αυτές οι γραμμές βρίσκονται ήδη στον λογαριασμό σας.
@@ -905,7 +978,23 @@ statement-file-info =
     Λογαριασμός του αρχείου: { $account }
     Περίοδος: από { $from } έως { $to }
     Υπόλοιπο που δηλώνει η τράπεζα: { $balance }
-    { $count } κινήσεις, εκ των οποίων { $known } υπάρχουν ήδη στον λογαριασμό σας.
+statement-qif-question = Τίποτα σε αυτό το αρχείο δεν δείχνει αν η ημερομηνία «{ $date }» γράφεται ημέρα/μήνας ή μήνας/ημέρα. Σημαίνει:
+statement-qif-day-month = Ημέρα { $day }, μήνας { $month } (ημέρα/μήνας)
+statement-qif-month-day = Ημέρα { $day }, μήνας { $month } (μήνας/ημέρα)
+statement-qif-dates-mixed = Αυτό το αρχείο γράφει τις ημερομηνίες του με δύο τρόπους: το «{ $first }» διαβάζεται ημέρα/μήνας, το «{ $second }» μήνας/ημέρα. Δεν εισάγεται, ώστε να μην αλλοιωθεί καμία ημερομηνία.
+statement-qif-amounts-mixed = Αυτό το αρχείο γράφει τα ποσά του με δύο τρόπους: το «{ $first }» με τελεία, το «{ $second }» με κόμμα. Δεν εισάγεται, ώστε να μην αλλοιωθεί κανένα ποσό.
+statement-qif-opening = Αρχικό υπόλοιπο { $amount } στις { $date }: δεν είναι κίνηση, δεν εισάγεται.
+statement-qif-opening-undated = Αρχικό υπόλοιπο { $amount }: δεν είναι κίνηση, δεν εισάγεται.
+statement-qif-suspect = Η γραμμή { $rank }, «{ $label }» ({ $amount }), μοιάζει με αρχικό υπόλοιπο: ελέγξτε την πριν την εντάξετε.
+statement-qif-rejected = { $count ->
+    [one] Μία δυσανάγνωστη γραμμή δεν εισάγεται: { $lines }.
+   *[other] { $count } δυσανάγνωστες γραμμές δεν εισάγονται: { $lines }.
+}
+statement-qif-reason-date = ημερομηνία
+statement-qif-reason-amount = ποσό
+statement-qif-reason-differ = αντιφατικά ποσά
+statement-qif-no-account = Αυτός ο λογαριασμός δεν υπάρχει πλέον στο αρχείο: ανοίξτε ξανά το αρχείο.
+statement-balance-unknown = δεν αναφέρεται στο αρχείο
 statement-group-identification = Ταυτοποίηση της κίνησης
 statement-group-amount = Ποσό της κίνησης
 statement-group-classification = Ταξινόμηση της κίνησης για υπολογισμό στατιστικών
@@ -1536,6 +1625,9 @@ password-show = Εμφάνιση του κωδικού
 password-remove-question = Να αφαιρεθεί η προστασία αυτής της βάσης;
 password-mismatch = Οι δύο καταχωρίσεις του νέου κωδικού διαφέρουν
 password-wrong = Ο κωδικός δεν ταιριάζει
+database-too-recent = Αυτή η βάση αποθηκεύτηκε από νεότερη έκδοση του Radinus (έκδοση βάσης { $found }· αυτή η έκδοση διαβάζει έως την έκδοση { $supported }). Ενημερώστε το Radinus για να την ανοίξετε.
+database-not-radinus = Αυτό το αρχείο δεν είναι βάση Radinus.
+database-unreadable = Η βάση δεν μπόρεσε να διαβαστεί: { $reason }
 password-close-first = Κλείστε αυτή τη βάση πριν αλλάξετε τον κωδικό της
 password-now-protected = Η βάση προστατεύεται με κωδικό
 password-now-clear = Η βάση δεν προστατεύεται πλέον
@@ -1771,6 +1863,11 @@ welcome-total-final = Τελικό υπόλοιπο
 welcome-total-real-detail = συμφωνημένες + δεσμευμένες
 welcome-total-final-detail = συμφωνημένες + δεσμευμένες + προγραμματισμένες
 welcome-accounts = Οι λογαριασμοί σας
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = Λογαριασμοί που υπολογίζονται στα σύνολα: { $count } από { $total }
+welcome-tile-counted = Υπολογισμός αυτού του λογαριασμού στα σύνολα
 welcome-tile-bank = Στην τράπεζα
 welcome-tile-real = Πραγματικό
 welcome-tile-final = Τελικό
@@ -1825,6 +1922,58 @@ preferences-leaf-zoom = Μέγεθος της εμφάνισης
 preferences-field-zoom = Μεγέθυνση:
 preferences-zoom-reset = Προεπιλεγμένη τιμή
 preferences-zoom-hint = Όλα μεγαλώνουν μαζί: το κείμενο, τα εικονίδια, οι στήλες. Κάτω από 100 %, χωρούν περισσότερα στην οθόνη. Η γραμμή μενού του συστήματος και τα παράθυρα διαλόγου του, όμως, ακολουθούν τις ρυθμίσεις του υπολογιστή σας και όχι αυτές εδώ.
+preferences-branch-import = Εισαγωγή
+preferences-leaf-verification = Έλεγχος
+preferences-field-verification = Εισαγόμενες κινήσεις:
+preferences-verification-hint = «Ελεγμένη»: εμπιστεύεστε την τράπεζά σας, μια εισαγόμενη κίνηση θεωρείται σωστή. «Προς έλεγχο»: κάθε εισαγόμενη κίνηση περιμένει τον έλεγχό σας· έπειτα την αλλάζετε εσείς σε «Ελεγμένη» στη λίστα κινήσεων. Η ρύθμιση αυτή ισχύει μόνο για τις επόμενες εισαγωγές.
+preferences-leaf-qif = Καταστάσεις λογαριασμού QIF
+preferences-field-qif-order = Σειρά ημέρας και μήνα:
+preferences-qif-order-ask = Να ερωτώμαι κάθε φορά
+preferences-qif-order-day-month = Πάντα ημέρα/μήνας (05/03 = 5 Μαρτίου)
+preferences-qif-order-month-day = Πάντα μήνας/ημέρα (05/03 = 3 Μαΐου)
+preferences-qif-order-help = Χρησιμοποιείται μόνο όταν καμία ημερομηνία του αρχείου δεν επιτρέπει να κριθεί το ζήτημα. Μόλις μια ημερομηνία όπως 24/11 αποδείξει τη σειρά, αποφασίζει το αρχείο, όποια κι αν είναι αυτή η ρύθμιση.
+preferences-field-qif-label = Περιγραφή της κίνησης:
+preferences-qif-label-both = Αντισυμβαλλόμενος + σημείωση
+preferences-qif-label-payee = Μόνο αντισυμβαλλόμενος
+preferences-qif-label-memo = Μόνο σημείωση
+preferences-qif-label-help = Όταν μια κίνηση φέρει ταυτόχρονα αντισυμβαλλόμενο και σημείωση. Αν φέρει μόνο ένα από τα δύο, χρησιμοποιείται αυτό, όποια κι αν είναι αυτή η ρύθμιση.
+preferences-qif-hint = Αυτές οι ρυθμίσεις ισχύουν για όλες τις καταστάσεις λογαριασμού QIF, όποια βάση δεδομένων κι αν είναι ανοιχτή. Το «Να ερωτώμαι κάθε φορά» είναι το ασφαλέστερο: ένα αρχείο με αμφίσημες ημερομηνίες δεν διαβάζεται ποτέ στην τύχη.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = Επαναφορά προεπιλεγμένων στηλών
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = Εμφάνιση/Απόκρυψη
+columns-colour = Χρωματισμός στήλης:
+columns-colour-none = Κανένα χρώμα
+columns-colour-red = Κόκκινο
+columns-colour-orange = Πορτοκαλί
+columns-colour-pink = Ροζ
+columns-colour-pastel-green = Παστέλ πράσινο
+columns-colour-green = Πράσινο
+columns-colour-pastel-blue = Παστέλ μπλε
+columns-colour-blue = Μπλε
+columns-colour-pastel-yellow = Παστέλ κίτρινο
+columns-colour-yellow = Κίτρινο
+preferences-leaf-columns = Στήλες πινάκων
+preferences-table-operations-list = Λίστα κινήσεων
+preferences-columns-reset = Επαναφορά
+preferences-columns-reset-all = Επαναφορά όλων
+preferences-columns-done = Οι στήλες επανήλθαν στην αρχική τους διάταξη.
+preferences-columns-hint = Κάθε πίνακας θυμάται τη σειρά των στηλών του, όσες αποκρύπτετε και το πλάτος τους. Η «Επαναφορά» του επιστρέφει αμέσως την αρχική του διάταξη.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = Επαναφορά
+preferences-leaf-comfort = Ρυθμίσεις άνεσης
+preferences-comfort-reset = Επαναφορά των ρυθμίσεων άνεσης
+preferences-comfort-hint = Επαναφέρει τις στήλες όλων των πινάκων, τη σειρά και τα πλαίσια ελέγχου των λογαριασμών στο αρχικό παράθυρο, καθώς και το μέγεθος της εμφάνισης. Η γλώσσα, το νόμισμα και ο έλεγχος των εισαγόμενων κινήσεων δεν αλλάζουν.
+preferences-comfort-question = Επαναφορά των ρυθμίσεων άνεσης; Οι στήλες των πινάκων, το αρχικό παράθυρο και το μέγεθος της εμφάνισης θα επανέλθουν στην αρχική τους κατάσταση.
+preferences-comfort-done = Οι ρυθμίσεις άνεσης επαναφέρθηκαν.
 
 # --- Το πανό της υποδοχής ------------------------------------------------
 #
@@ -1891,3 +2040,943 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = Αυτό το πρόγραμμα παρέχεται χωρίς καμία εγγύηση, στο μέτρο που επιτρέπει ο νόμος.
 licence-info = Το επίσημο κείμενο ανοίγει στο πρόγραμμα περιήγησής σας, στο gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = Προσομοίωση δανείου
+window-loan-title = Προσομοίωση δανείου
+loan-tab-credit = Το δάνειο
+loan-tab-afford = Μπορώ να το αποπληρώσω;
+loan-field-kind = Είδος δανείου
+loan-kind-consumer = Καταναλωτικό δάνειο
+loan-kind-mortgage = Στεγαστικό δάνειο
+loan-field-amount = Ποσό δανείου
+loan-field-payment = Μηνιαία δόση
+loan-field-months = Διάρκεια
+loan-field-rate = Σταθερό επιτόκιο
+loan-field-fees = Έξοδα φακέλου
+loan-field-insurance = Ασφάλιση ανά μήνα
+loan-unit-months = μήνες
+loan-unit-percent = %
+loan-invalid-field = Η τιμή δεν είναι αριθμός: διορθώστε την για να ξαναγίνει ο υπολογισμός.
+loan-report-button = Αναφορά PDF
+loan-monthly-table = Πίνακας ανά μήνα
+loan-months-count = { $count ->
+        [one] { $count } μήνας
+       *[other] { $count } μήνες
+    }
+loan-percent = { $value }%
+loan-notice-payment-too-low = Αυτή η δόση δεν καλύπτει τους τόκους: το δάνειο δεν θα αποπληρωνόταν ποτέ. Η διάρκεια μένει στους 600 μήνες.
+loan-notice-too-long = Αυτή η δόση θα απαιτούσε πάνω από 600 μήνες: η διάρκεια μένει στους 600 μήνες.
+loan-figure-payment = Μηνιαία δόση
+loan-figure-payment-insured = Δόση με ασφάλιση
+loan-figure-taeg = ΣΕΠΕ
+loan-figure-interest = Κόστος τόκων
+loan-figure-insurance = Κόστος ασφάλισης
+loan-figure-cost = Συνολικό κόστος δανείου
+loan-figure-total-due = Συνολικό οφειλόμενο ποσό
+loan-figure-all-in = Σύνολο αποπληρωμής, με ασφάλιση
+loan-part-capital = Ποσό δανείου
+loan-part-interest = Τόκοι
+loan-part-fees = Έξοδα φακέλου
+loan-part-insurance = Ασφάλιση
+loan-donut-cost-caption = συνολικά
+loan-chart-cost = Τι κοστίζει αυτό το δάνειο
+loan-chart-capital = Υπόλοιπο κεφαλαίου
+loan-schedule-title = Πίνακας αποπληρωμής
+loan-schedule-yearly = Πίνακας αποπληρωμής, ανά έτος
+loan-column-number = Αρ.
+loan-column-year = Έτος
+loan-column-date = Λήξη
+loan-column-payment = Δόση
+loan-column-payments = Δόσεις
+loan-column-interest = Τόκοι
+loan-column-capital = Κεφάλαιο
+loan-column-insurance = Ασφάλιση
+loan-column-remaining = Υπόλοιπο κεφαλαίου
+loan-history-label = Εξεταζόμενη περίοδος
+loan-period-last-12 = Τελευταίοι 12 μήνες
+loan-accounts-title = Εξεταζόμενοι λογαριασμοί
+loan-period-title = Περίοδος
+loan-column-account = Λογαριασμός
+loan-column-bank = Τράπεζα
+loan-column-balance = Πραγματικό υπόλοιπο
+loan-unavailable-no-account = Επιλέξτε τουλάχιστον έναν λογαριασμό για να εξετάσετε το ιστορικό σας.
+loan-unavailable-no-month = Αυτή η περίοδος δεν έχει ακόμη κανέναν πλήρη μήνα: επιλέξτε άλλη.
+loan-verdict-title = Με λίγα λόγια
+loan-verdict-green = Εφικτό
+loan-verdict-orange = Οριακό
+loan-verdict-red = Επικίνδυνο
+loan-verdict-no-income = Κανένα έσοδο σε αυτή την περίοδο: ο δείκτης χρέους δεν υπολογίζεται.
+loan-check-debt-green = Δείκτης χρέους { $ratio }: κάτω από το όριο της μεθόδου ({ $green }).
+loan-check-debt-orange = Δείκτης χρέους { $ratio }: μεταξύ { $green } και { $red }, στο όριο.
+loan-check-debt-red = Δείκτης χρέους { $ratio }: πάνω από { $red }.
+loan-check-effort = Η δόση των { $payment } παίρνει το { $share } όσων αποταμιεύετε { $kind ->
+        [good] έναν καλό μήνα
+        [hard] έναν δύσκολο μήνα
+       *[usual] έναν συνηθισμένο μήνα
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] Ένας καλός μήνας
+        [hard] Ένας δύσκολος μήνας
+       *[usual] Ένας συνηθισμένος μήνας
+    } δεν σας αφήνει τίποτα στην άκρη: η δόση των { $payment } θα έβγαινε από το αποθεματικό σας.
+loan-check-reserve-green = Το υπόλοιπό σας μένει θετικό ως το τέλος του δανείου.
+loan-check-reserve-red = Εξαιτίας αυτού του δανείου, το υπόλοιπό σας θα έπεφτε κάτω από το μηδέν: { $month }.
+loan-check-reserve-sooner = Το υπόλοιπό σας θα έπεφτε κάτω από το μηδέν ({ $month }), { $count ->
+        [one] έναν μήνα
+       *[other] { $count } μήνες
+    } νωρίτερα απ' ό,τι χωρίς αυτό το δάνειο.
+loan-check-reserve-anyway = Το υπόλοιπό σας θα έπεφτε κάτω από το μηδέν ακόμη και χωρίς αυτό το δάνειο (περίπου: { $month }), που δεν αλλάζει σχεδόν τίποτα.
+loan-check-reserve-floor-green = Το υπόλοιπό σας μένει πάνω από το αποθεματικό ασφαλείας ({ $floor }) ως το τέλος του δανείου.
+loan-check-reserve-floor-red = Εξαιτίας αυτού του δανείου, το υπόλοιπό σας θα έπεφτε κάτω από το αποθεματικό ασφαλείας ({ $floor }): { $month }.
+loan-check-reserve-floor-sooner = Το υπόλοιπό σας θα έπεφτε κάτω από το αποθεματικό ασφαλείας ({ $floor }· { $month }), { $count ->
+        [one] έναν μήνα
+       *[other] { $count } μήνες
+    } νωρίτερα απ' ό,τι χωρίς αυτό το δάνειο.
+loan-check-reserve-floor-anyway = Το υπόλοιπό σας θα έπεφτε κάτω από το αποθεματικό ασφαλείας ({ $floor }) ακόμη και χωρίς αυτό το δάνειο (περίπου: { $month }), που δεν αλλάζει σχεδόν τίποτα.
+loan-warning-deficit = Προσοχή: σε αυτή την περίοδο, τα έξοδά σας ξεπερνούν ήδη τα έσοδα κατά { $amount } τον μήνα κατά μέσο όρο, πριν από οποιοδήποτε δάνειο.
+loan-figure-reference = Αποταμίευση { $kind ->
+        [good] ενός καλού μήνα
+        [hard] ενός δύσκολου μήνα
+       *[usual] ενός συνηθισμένου μήνα
+    }
+loan-figure-tipped = Μήνες που το δάνειο θα έφερνε μείον
+loan-gauge-caption = δείκτης χρέους
+loan-figure-income = Μέσα έσοδα ανά μήνα
+loan-figure-spending = Μέσα έξοδα ανά μήνα
+loan-figure-saving = Μέση αποταμίευση ανά μήνα
+loan-figure-running = Τρέχοντα δάνεια ανά μήνα
+loan-figure-new = Νέα δόση, με ασφάλιση
+loan-figure-rest = Για να ζείτε ανά μήνα
+loan-figure-debt = Δείκτης χρέους
+loan-red-months-value = { $count } από { $total }
+loan-figure-balance-now = Πραγματικό υπόλοιπο σήμερα
+loan-figure-balance-end = Προβλεπόμενο υπόλοιπο στη λήξη του δανείου
+loan-chart-income = Πού πηγαίνει το μέσο εισόδημά σας
+loan-donut-income-caption = μέσο εισόδημα
+loan-part-spending = Τρέχοντα έξοδα
+loan-part-running = Τρέχοντα δάνεια
+loan-part-new = Νέο δάνειο
+loan-part-rest = Υπόλοιπο
+loan-part-missing = Λείπουν
+loan-chart-history = Το ιστορικό σας με αυτό το δάνειο
+loan-chart-history-hint = Τι θα είχε μείνει κάθε μήνα μετά τη δόση. Έντονο κόκκινο: οι μήνες που το δάνειο θα έφερνε μείον· απαλό κόκκινο: όσοι ήταν ήδη μείον χωρίς αυτό.
+loan-chart-projection = Το προβλεπόμενο υπόλοιπό σας
+loan-mark-loan-end = Λήξη: { $label }
+loan-mark-negative = Μείον
+loan-mark-floor = Κάτω από το αποθεματικό
+loan-mark-floor-line = Αποθεματικό ασφαλείας
+loan-running-title = Τρέχοντα δάνεια που λήφθηκαν υπόψη
+loan-running-column-label = Περιοδική κίνηση
+loan-running-column-monthly = Ανά μήνα
+loan-running-column-end = Τελευταία δόση
+loan-no-running = Δεν αναγνωρίστηκε κανένα τρέχον δάνειο στις περιοδικές κινήσεις σας.
+loan-period-caption = { $from } – { $to } ({ $count ->
+        [one] { $count } μήνας
+       *[other] { $count } μήνες
+    })
+loan-transfers = { $count ->
+        [0] Δεν αναγνωρίστηκε καμία μεταφορά ανάμεσα στους επιλεγμένους λογαριασμούς σας.
+        [one] Μία μεταφορά ανάμεσα στους επιλεγμένους λογαριασμούς σας αναγνωρίστηκε και εξαιρέθηκε.
+       *[other] { $count } μεταφορές ανάμεσα στους επιλεγμένους λογαριασμούς σας αναγνωρίστηκαν και εξαιρέθηκαν.
+    }
+loan-method = Μέσοι όροι στους πλήρεις μήνες της περιόδου, κινήσεις συμφωνημένες και δεσμευμένες, χωρίς τις μεταφορές ανάμεσα στους επιλεγμένους λογαριασμούς σας.
+loan-report-title = Προσομοίωση δανείου
+loan-report-made-on = προσομοίωση της { $date }
+loan-disclaimer = Ενδεικτική προσομοίωση χωρίς συμβατική ισχύ. Δεσμευτική είναι μόνο η προσφορά της τράπεζας.
+loan-tab-rules = Ρυθμίσεις κρίσης
+loan-method-optimistic = Αισιόδοξη
+loan-method-neutral = Ουδέτερη
+loan-method-severe = Αυστηρή
+loan-method-line = Μέθοδος κρίσης: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = Η ετυμηγορία απαντά σε τρία ερωτήματα, και κάθε μέθοδος βάζει τις δικές της απαιτήσεις. Διαλέξτε αυτή που σας ταιριάζει: η ετυμηγορία της καρτέλας «Μπορώ να το αποπληρώσω;» την ακολουθεί. Η τελευταία γραμμή υποθέτει ότι τα έξοδά σας αυξάνονται κάθε χρόνο κατά το ποσοστό που δίνεται· η δόση δεν αλλάζει.
+loan-rule-row-debt = Αποδεκτός δείκτης χρέους
+loan-rule-row-reference = Αποταμίευση αναφοράς
+loan-rule-row-share = Μέρος αυτής της αποταμίευσης που μπορεί να πάρει η δόση
+loan-rule-row-floor = Όριο κάτω από το οποίο δεν πρέπει να πέσει το υπόλοιπο
+loan-rule-row-sooner = Αν το υπόλοιπο πέσει κάτω από αυτό ακόμη και χωρίς το δάνειο
+loan-rule-row-growth = Αύξηση των εξόδων σας ανά έτος
+loan-rule-limits = πράσινο έως { $green }, πορτοκαλί έως { $red }
+loan-rule-reference = { $kind ->
+        [good] ένας καλός μήνας
+        [hard] ένας δύσκολος μήνας
+       *[usual] ένας συνηθισμένος μήνας
+    }: { $amount }
+loan-rule-floor-zero = μηδέν
+loan-rule-floor-cushion = ένας μήνας εξόδων: { $amount }
+loan-rule-sooner = πορτοκαλί αν το δάνειο το επισπεύδει κατά { $orange }, κόκκινο κατά { $red }
+loan-unit-percent-year = % τον χρόνο
+loan-method-optimistic-explain = Η αισιόδοξη μέθοδος υποθέτει έναν καλό μήνα, δέχεται δείκτη χρέους έως 40% και δεν κρατά αποθεματικό: δείχνει τι είναι δυνατό αν όλα πάνε καλά.
+loan-method-neutral-explain = Η ουδέτερη μέθοδος υποθέτει έναν συνηθισμένο μήνα και ακολουθεί τον κανόνα των τραπεζών, 33 έως 35%: είναι η κρίση αναφοράς.
+loan-method-severe-explain = Η αυστηρή μέθοδος υποθέτει έναν δύσκολο μήνα και κρατά έναν μήνα εξόδων ως αποθεματικό για τα απρόοπτα: δείχνει τι αντέχει ακόμη κι αν τα πράγματα πάνε άσχημα.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = Κατανάλωση ηλεκτρικής συσκευής
+window-appliance-title = Κατανάλωση ηλεκτρικής συσκευής
+appliance-device-title = Η συσκευή
+appliance-on-title = Σε λειτουργία
+appliance-standby-title = Σε αναμονή
+appliance-field-on-watts = Ισχύς σε λειτουργία
+appliance-field-on-hours = Χρόνος λειτουργίας ανά ημέρα
+appliance-field-days = Ημέρες χρήσης ανά εβδομάδα
+appliance-field-share = Ποσοστό λειτουργίας σε ώρες εκτός αιχμής
+appliance-field-standby-watts = Ισχύς σε αναμονή
+appliance-field-standby-hours = Χρόνος αναμονής ανά ημέρα χρήσης
+appliance-unit-watts = W
+appliance-unit-hours = h
+appliance-unit-days = στις 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/kWh
+appliance-standby-hint = Αν μείνει κενό, η αναμονή διαρκεί το υπόλοιπο της ημέρας. Τις ημέρες χωρίς χρήση η συσκευή μένει στην πρίζα: όλος αυτός ο χρόνος μετρά ως αναμονή. Εκτός πρίζας, η ισχύς αναμονής της είναι 0 W.
+appliance-contract-title = Το συμβόλαιό σας
+appliance-field-option = Επιλογή τιμολογίου
+appliance-option-base = Βασικό (μία τιμή)
+appliance-option-off-peak = Ώρες αιχμής / Ώρες εκτός αιχμής
+appliance-field-base = Τιμή ανά kWh
+appliance-field-peak = Τιμή ανά kWh σε ώρες αιχμής
+appliance-field-off-peak = Τιμή ανά kWh σε ώρες εκτός αιχμής
+appliance-field-off-peak-hours = Ώρες εκτός αιχμής ανά ημέρα
+appliance-contract-hint = Αυτές οι τιμές ισχύουν μόνο για αυτόν τον υπολογισμό. Το αποθηκευμένο τιμολόγιο ορίζεται στις Ρυθμίσεις › Προτιμήσεις › Εργαλεία.
+appliance-contract-reset = Επαναφορά του αποθηκευμένου τιμολογίου
+appliance-period-day = Ανά ημέρα
+appliance-period-month = Ανά μήνα
+appliance-period-year = Ανά έτος
+appliance-energy = { $value } kWh
+appliance-less-than = λιγότερο από { $amount }
+appliance-detail-title = Αναλυτικά για ένα έτος
+appliance-column-part = Στοιχείο
+appliance-column-energy = Ενέργεια
+appliance-column-cost = Κόστος
+appliance-column-share = Ποσοστό
+appliance-line-on = Σε λειτουργία
+appliance-line-standby = Σε αναμονή
+appliance-line-on-peak = Σε λειτουργία, ώρες αιχμής
+appliance-line-on-off-peak = Σε λειτουργία, ώρες εκτός αιχμής
+appliance-line-standby-peak = Σε αναμονή, ώρες αιχμής
+appliance-line-standby-off-peak = Σε αναμονή, ώρες εκτός αιχμής
+appliance-line-total = Σύνολο
+appliance-chart-title = Πού πηγαίνουν τα χρήματα
+appliance-chart-caption = ανά έτος
+appliance-standby-sentence = Μόνο η αναμονή κοστίζει { $amount } τον χρόνο: { $share } του κόστους της συσκευής.
+appliance-note-plate = Η ισχύς που αναγράφεται στη συσκευή ή στο εγχειρίδιό της είναι μέγιστη τιμή: σε λειτουργία, οι περισσότερες συσκευές καταναλώνουν λιγότερο. Για πραγματική τιμή, μετρήστε την με έναν μετρητή κατανάλωσης πρίζας και καταχωρίστε την ένδειξή του.
+appliance-note-subscription = Το πάγιο δεν υπολογίζεται: το πληρώνετε είτε η συσκευή είναι στην πρίζα είτε όχι.
+appliance-invalid-watts = Παρακαλώ εισαγάγετε ισχύ από 0 έως 100.000 W.
+appliance-invalid-hours = Παρακαλώ εισαγάγετε διάρκεια από 0 έως 24 ώρες την ημέρα.
+appliance-invalid-days = Παρακαλώ εισαγάγετε ακέραιο αριθμό ημερών, από 0 έως 7.
+appliance-invalid-share = Παρακαλώ εισαγάγετε ποσοστό από 0 έως 100%.
+appliance-invalid-day-overflow = Η λειτουργία και η αναμονή ξεπερνούν τις 24 ώρες την ημέρα.
+appliance-invalid-price = Παρακαλώ εισαγάγετε τιμή ανά kWh από 0 έως 100.
+appliance-invalid-off-peak-hours = Παρακαλώ εισαγάγετε ακέραιο αριθμό ωρών εκτός αιχμής, από 0 έως 24.
+preferences-branch-tools = Εργαλεία
+preferences-leaf-electricity = Τιμολόγιο ηλεκτρικού ρεύματος
+preferences-electricity-blue = Επιστροφή στο Tarif Bleu της EDF
+preferences-electricity-hint = Το τιμολόγιο του συμβολαίου σας, που χρησιμοποιεί το εργαλείο «Κατανάλωση ηλεκτρικής συσκευής». Προεπιλογή: το Tarif Bleu της EDF (Γαλλία) την 1η Αυγούστου 2026, τιμές με φόρους, μετρητής 3 έως 6 kVA. Αυτές οι τιμές αλλάζουν συχνά τον Φεβρουάριο και τον Αύγουστο: αντιγράψτε αυτές του λογαριασμού σας.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = Το αποθεματικό ασφαλείας μου
+window-cushion-title = Το αποθεματικό ασφαλείας μου
+cushion-question = Αν τα εισοδήματά σας σταματούσαν αύριο, πόσους μήνες θα αντέχατε με τις αποταμιεύσεις σας;
+cushion-accounts-title = Οι λογαριασμοί σας
+cushion-column-account = Λογαριασμός
+cushion-column-balance = Πραγματικό υπόλοιπο
+cushion-column-savings = Αποταμίευση
+cushion-column-spending = Έξοδα
+cushion-accounts-hint = «Αποταμίευση»: τα χρήματα στα οποία βασίζεστε σε περίπτωση δυσκολίας. «Έξοδα»: οι λογαριασμοί από τους οποίους γίνονται τα καθημερινά σας έξοδα.
+cushion-history-label = Περίοδος ανάλυσης
+cushion-backup-label = Εναλλακτικό εισόδημα ανά μήνα
+cushion-backup-hint = Ό,τι θα συνέχιζε να εισπράττεται: επίδομα ανεργίας, μισθός συντρόφου… Κενό: κανένα εισόδημα.
+cushion-categories-title = Τα έξοδα που λαμβάνονται υπόψη
+cushion-categories-hint = Αποεπιλέξτε ό,τι θα περικόπτατε σε περίπτωση δυσκολίας.
+cushion-categories-empty = Κανένα έξοδο σε αυτή την περίοδο.
+cushion-verdict-title = Το αποθεματικό σας
+cushion-targets-title = Τα όρια ασφαλείας
+cushion-projection-title = Οι αποταμιεύσεις σας σε περίπτωση δυσκολίας
+cushion-projection-hint = Τι θα απέμενε κάθε μήνα αν τα εισοδήματά σας σταματούσαν σήμερα.
+cushion-note = Εκτίμηση βάσει του ιστορικού σας: τα έξοδα ενός δύσκολου μήνα μπορεί να διαφέρουν από τον μέσο όρο.
+cushion-invalid-backup = Αυτό το ποσό δεν είναι αναγνώσιμο: διορθώστε το για να γίνει ξανά ο υπολογισμός.
+cushion-no-spending-account = Επιλέξτε τουλάχιστον έναν λογαριασμό «Έξοδα».
+cushion-no-month = Αυτή η περίοδος δεν έχει ακόμη κανέναν πλήρη μήνα.
+cushion-months = { $value } μήνες
+cushion-per-month = { $amount } ανά μήνα
+cushion-figure-holds = Χωρίς όριο
+cushion-gauge-caption = καλυμμένων εξόδων
+cushion-verdict-short = Λιγότερο από τρεις μήνες: ένα απρόοπτο θα σας έφερνε γρήγορα σε δύσκολη θέση.
+cushion-verdict-fair = Από τρεις έως έξι μήνες: ένα ικανοποιητικό αποθεματικό, που αξίζει να ενισχύσετε αν μπορείτε.
+cushion-verdict-solid = Έξι μήνες ή περισσότερο: το αποθεματικό σας είναι γερό.
+cushion-verdict-holds = Το εναλλακτικό εισόδημά σας καλύπτει τα έξοδά σας: οι αποταμιεύσεις σας δεν θα μειώνονταν.
+cushion-verdict-nothing = Κανένα έξοδο δεν λαμβάνεται υπόψη για την περίοδο: δεν υπάρχει τίποτα να καλυφθεί.
+cushion-tile-savings = Διαθέσιμες αποταμιεύσεις
+cushion-tile-spending = Έξοδα που λαμβάνονται υπόψη
+cushion-tile-backup = Εναλλακτικό εισόδημα
+cushion-tile-burn = Οι αποταμιεύσεις θα μειώνονταν κατά
+cushion-tile-rhythm = Ρυθμός αποταμίευσης
+cushion-burn-none = Τίποτα
+cushion-target-title = { $months } μήνες εξόδων: { $amount }
+cushion-target-reached = Επιτεύχθηκε.
+cushion-target-date = Λείπουν { $missing }. Με τον ρυθμό αποταμίευσής σας, εκτιμώμενη επίτευξη: { $month }.
+cushion-target-never = Λείπουν { $missing }. Οι αποταμιεύσεις σας δεν αυξήθηκαν κατά την περίοδο: με αυτόν τον ρυθμό, το όριο αυτό δεν θα επιτευχθεί.
+cushion-mark-empty = Εξάντληση: { $month }
+cushion-period = Μέσος όρος { $count ->
+        [one] { $count } πλήρους μήνα
+       *[other] { $count } πλήρων μηνών
+    }. Περίοδος: { $from } – { $to }. { $transfers ->
+        [0] Καμία μεταφορά μεταξύ των λογαριασμών σας.
+        [one] Μία μεταφορά μεταξύ των λογαριασμών σας, εξαιρέθηκε.
+       *[other] { $transfers } μεταφορές μεταξύ των λογαριασμών σας, εξαιρέθηκαν.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = Στόχος αποταμίευσης
+window-goal-title = Στόχος αποταμίευσης
+goal-accounts-title = Οι λογαριασμοί που παρακολουθούνται
+goal-column-account = Λογαριασμός
+goal-column-balance = Πραγματικό υπόλοιπο
+goal-accounts-hint = Μια μεταφορά μεταξύ δύο παρακολουθούμενων λογαριασμών αλληλοαναιρείται· μια μεταφορά προς λογαριασμό που δεν παρακολουθείται μετράει ως εκροή.
+goal-period-label = Περίοδος αναφοράς
+goal-period-range = Εύρος ετών…
+goal-range-from = από
+goal-range-to = έως
+goal-question-title = Η ερώτησή σας
+goal-question-when = Πότε θα έχω αυτό το ποσό;
+goal-question-amount = Πόσα θα έχω σε αυτή την ημερομηνία;
+goal-question-effort = Πόσα να αποταμιεύω για να έχω αυτό το ποσό σε αυτή την ημερομηνία;
+goal-field-target = Ποσό-στόχος
+goal-field-date = Ημερομηνία-στόχος
+goal-field-rate = Ετήσιο επιτόκιο αποταμίευσης
+goal-field-extra = Κι αν αποταμίευα επιπλέον, ανά μήνα
+goal-options-hint = Κενά: χωρίς τόκους, τίποτα επιπλέον.
+goal-answer-title = Η απάντηση
+goal-chart-title = Το υπόλοιπό σας, χθες και αύριο
+goal-chart-hint = Συνεχής γραμμή: το πραγματικό υπόλοιπο των τελευταίων δώδεκα μηνών· διακεκομμένη: η προβολή· ανοιχτόχρωμη ζώνη: το εύρος ανάλογα με τους μήνες.
+goal-disclaimer = Μια προβολή βάσει του ιστορικού σας, όχι υπόσχεση: ένα απρόοπτο μπορεί να αλλάξει τα πάντα.
+goal-no-account = Επιλέξτε τουλάχιστον έναν λογαριασμό για παρακολούθηση.
+goal-no-month = Αυτή η περίοδος δεν έχει ακόμη κανέναν πλήρη μήνα.
+goal-invalid-target = Ένα ποσό προς επίτευξη, παρακαλώ.
+goal-invalid-date = Μια μελλοντική ημερομηνία, μέσα στα επόμενα πενήντα χρόνια, παρακαλώ.
+goal-invalid-rate = Ένα επιτόκιο από 0 έως 100 %, παρακαλώ.
+goal-invalid-extra = Αυτό το ποσό δεν είναι αναγνώσιμο: διορθώστε το για να γίνει ξανά ο υπολογισμός.
+goal-per-month = { $amount } ανά μήνα
+goal-tile-balance = Υπόλοιπο σήμερα
+goal-tile-rhythm = Μέσος ρυθμός
+goal-tile-target = Στόχος
+goal-tile-reached = Επίτευξη περίπου
+goal-tile-date = Ημερομηνία-στόχος
+goal-tile-projected = Προβλεπόμενο υπόλοιπο
+goal-tile-saved = Αποταμίευση έως τότε
+goal-tile-interest = Εκ των οποίων τόκοι
+goal-tile-needed = Προς αποταμίευση
+goal-when-already = Έχετε ήδη { $amount }: οι παρακολουθούμενοι λογαριασμοί σας ανέρχονται συνολικά σε { $balance }.
+goal-when-reached = Θα έχετε { $amount } σε { $months ->
+        [one] έναν μήνα
+       *[other] { $months } μήνες
+    }. Εκτιμώμενη επίτευξη: { $month }.
+goal-when-range = Ανάλογα με τους μήνες, εύρος: { $early } – { $late }.
+goal-when-range-open = Νωρίτερη εκτίμηση: { $early }· με αδύναμους μήνες, ο στόχος δεν θα επιτυγχανόταν.
+goal-when-never = Με αυτόν τον ρυθμό, δεν θα φτάσετε το ποσό των { $amount }.
+goal-zero = Το υπόλοιπό σας θα μηδενιζόταν. Εκτιμώμενη ημερομηνία: { $month }.
+goal-amount = { $month }: θα είχατε περίπου { $amount }.
+goal-amount-range = Ανάλογα με τους μήνες, μεταξύ { $low } και { $high }.
+goal-effort-more = Για να έχετε { $amount } (ημερομηνία-στόχος: { $month }), θα έπρεπε να αποταμιεύετε κατά μέσο όρο { $monthly } ανά μήνα, δηλαδή { $gap } περισσότερα από σήμερα.
+goal-effort-less = Για να έχετε { $amount } (ημερομηνία-στόχος: { $month }), θα αρκούσαν { $monthly } ανά μήνα, δηλαδή { $gap } λιγότερα από σήμερα: είστε μπροστά από τον στόχο.
+goal-effort-range = Ανάλογα με τους μήνες, η απόκλιση από τον ρυθμό σας θα κυμαινόταν από { $low } έως { $high } ανά μήνα.
+goal-chart-target = Στόχος: { $amount }
+goal-chart-today = Σήμερα
+goal-note-seasons = Η προβολή ακολουθεί τις εποχές: κάθε επόμενος μήνας παίρνει τον μέσο όρο των ίδιων μηνών της περιόδου.
+goal-note-range = Το εύρος προκύπτει από τους αδύναμους και τους ισχυρούς μήνες της περιόδου: το χαμηλότερο και το υψηλότερο τεταρτημόριο.
+goal-note-loan = Λήξη του δανείου «{ $label }»: { $month }. Στη συνέχεια, { $amount } επιπλέον ανά μήνα.
+goal-note-interest = Οι τόκοι υπολογίζονται κάθε μήνα με επιτόκιο { $rate } % ετησίως: μια προσέγγιση του κανόνα των δεκαπενθημέρων των λογαριασμών ταμιευτηρίου.
+goal-period = Ρυθμός υπολογισμένος σε { $count ->
+        [one] { $count } πλήρη μήνα
+       *[other] { $count } πλήρεις μήνες
+    }. Περίοδος: { $from } – { $to }. { $transfers ->
+        [0] Καμία μεταφορά μεταξύ των παρακολουθούμενων λογαριασμών σας.
+        [one] Μία μεταφορά μεταξύ των παρακολουθούμενων λογαριασμών σας, εξαιρέθηκε.
+       *[other] { $transfers } μεταφορές μεταξύ των παρακολουθούμενων λογαριασμών σας, εξαιρέθηκαν.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = Κι αν μείωνα…;
+window-cut-title = Κι αν μείωνα…;
+cut-axis-label = Ομαδοποίηση ανά
+cut-axis-category = Κατηγορίες
+cut-axis-payee = Αντισυμβαλλόμενοι
+cut-axis-budget-line = Κονδύλια προϋπολογισμού
+cut-table-title = Οι δαπάνες σας, κονδύλι προς κονδύλι
+cut-table-hint = Πληκτρολογήστε μια μείωση σε % ή σε { $sign } ανά μήνα στα κονδύλια που θέλετε να ελαφρύνετε. Μια μείωση δεν μπορεί να υπερβαίνει την ίδια τη δαπάνη.
+cut-column-monthly = Ανά μήνα
+cut-column-cut = Μείωση
+cut-column-after = Μετά
+cut-column-yearly = Όφελος ανά έτος
+cut-total = Σύνολο
+cut-horizon-label = Ορίζοντας
+cut-settings-title = Ρυθμίσεις
+cut-options-hint = Το επιτόκιο και το ποσό-στόχος είναι προαιρετικά.
+cut-report-button = Αναφορά PDF
+cut-chart-title = Το υπόλοιπό σας, χωρίς και με τις μειώσεις
+cut-chart-hint = Συνεχής γραμμή: το πραγματικό υπόλοιπο των τελευταίων δώδεκα μηνών· γκρι διακεκομμένη: η προβολή χωρίς μείωση· μπλε: με τις μειώσεις· πράσινο: τα χρήματα που κερδίζετε.
+cut-donut-title = Οι μηνιαίες δαπάνες σας μετά τη μείωση
+cut-donut-caption = ανά μήνα μετά τη μείωση
+cut-donut-others = Άλλα κονδύλια
+cut-donut-saved = Εξοικονόμηση
+cut-legend-with = Με τις μειώσεις
+cut-legend-without = Χωρίς μείωση
+cut-years = { $years ->
+        [one] { $years } χρόνος
+       *[other] { $years } χρόνια
+    }
+cut-headline-none = Πληκτρολογήστε μια μείωση στον πίνακα για να δείτε την επίδρασή της.
+cut-headline = Μειώνοντας { $count ->
+        [one] αυτό το κονδύλι
+       *[other] αυτά τα { $count } κονδύλια
+    }, θα βάζατε στην άκρη { $monthly } επιπλέον ανά μήνα, δηλαδή { $yearly } ετησίως.
+cut-tile-monthly = Όφελος ανά μήνα
+cut-tile-yearly = Όφελος ανά έτος
+cut-tile-horizon = Όφελος σε { $years ->
+        [one] { $years } χρόνο
+       *[other] { $years } χρόνια
+    }
+cut-tile-spending = Δαπάνες ανά μήνα
+cut-target-already = Έχετε ήδη { $amount }.
+cut-target-sooner = Εκτιμώμενη επίτευξη του ποσού των { $amount }: { $with } (χωρίς μειώσεις: { $without }), { $months ->
+        [0] όχι νωρίτερα
+        [one] έναν μήνα νωρίτερα
+       *[other] { $months } μήνες νωρίτερα
+    }.
+cut-target-only-with = Με αυτές τις μειώσεις, εκτιμώμενη επίτευξη του ποσού των { $amount }: { $with }· χωρίς αυτές, με τον τρέχοντα ρυθμό σας, ποτέ.
+cut-target-never = Ακόμη και με αυτές τις μειώσεις, δεν θα φτάνατε το ποσό των { $amount } με τον τρέχοντα ρυθμό σας.
+cut-note-seasons = Κάθε μείωση ακολουθεί τις εποχές του κονδυλίου της: ένα κονδύλι που βαραίνει κυρίως το καλοκαίρι αποδίδει κυρίως το καλοκαίρι.
+cut-note-capped = Μια μείωση που πληκτρολογήθηκε υπερέβαινε τη δαπάνη: περιορίστηκε στην ίδια τη δαπάνη.
+cut-invalid-cut = Αυτή η μείωση δεν είναι αναγνώσιμη: ένα ποσοστό από 0 έως 100 ή ένα ποσό ανά μήνα.
+cut-report-settings = Οι ρυθμίσεις
+cut-report-result = Το αποτέλεσμα
+cut-report-accounts = Οι λογαριασμοί που παρακολουθούνται
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = Προετοιμασία των διακοπών μου
+window-holiday-title = Προετοιμασία των διακοπών μου
+holiday-trip-title = Το ταξίδι
+holiday-field-trip = Είδος ταξιδιού
+holiday-trip-stay = Διαμονή
+holiday-trip-cruise = Κρουαζιέρα
+holiday-field-adults = Ενήλικες
+holiday-field-children = Παιδιά
+holiday-field-nights = Διάρκεια διαμονής, σε νύχτες
+holiday-field-days = Ημέρες
+holiday-field-months = Μήνες πριν από την αναχώρηση
+holiday-field-stops = Αριθμός λιμανιών προσέγγισης
+holiday-saved-title = Ήδη αποταμιευμένα
+holiday-saved-hint = Επιλέξτε τους λογαριασμούς όπου τα χρήματα των διακοπών έχουν ήδη μπει στην άκρη: το πραγματικό τους υπόλοιπο μετράει ως ήδη αποταμιευμένο.
+holiday-budget-title = Ο προϋπολογισμός
+holiday-budget-hint = Για κάθε κονδύλι, ένα ποσό, για ποιους ισχύει και για πόσο διάστημα. Ένα κενό κονδύλι δεν μετράει.
+holiday-optional-title = Προαιρετικές γραμμές
+holiday-result-title = Το αποτέλεσμα
+holiday-donut-title = Πού πηγαίνουν τα χρήματα του ταξιδιού
+holiday-donut-caption = για το ταξίδι
+holiday-child-label = Τιμή παιδιού
+holiday-count-label = Καμπίνες
+holiday-open = Άνοιγμα έργου…
+holiday-save = Αποθήκευση του έργου…
+holiday-pdf = Αναφορά PDF
+holiday-excel = Εξαγωγή σε Excel
+holiday-file-filter = Έργο διακοπών
+holiday-replace-question = Το άνοιγμα αυτού του έργου θα αντικαταστήσει ό,τι έχει πληκτρολογηθεί στο παράθυρο. Συνέχεια;
+holiday-file-saved = Το έργο αποθηκεύτηκε: { $file }
+holiday-file-opened = Το έργο άνοιξε: { $file }
+holiday-file-not-project = Αυτό το αρχείο δεν είναι έργο διακοπών του Radinus.
+holiday-file-too-recent = Αυτό το έργο προέρχεται από νεότερη έκδοση του Radinus: ενημερώστε το Radinus για να το ανοίξετε.
+holiday-file-failed = Δεν ήταν δυνατή η ανάγνωση ή η εγγραφή του αρχείου: { $reason }
+holiday-line-transport = Μεταφορά μετ' επιστροφής
+holiday-line-lodging = Διαμονή
+holiday-line-meals = Γεύματα και τρέχοντα έξοδα
+holiday-line-visits = Επισκέψεις και ψυχαγωγία
+holiday-line-port = Μετάβαση έως το λιμάνι
+holiday-line-cabins = Καμπίνες
+holiday-line-service = Χρέωση υπηρεσιών (φιλοδωρήματα)
+holiday-line-drinks = Πακέτο ποτών
+holiday-line-excursions = Εκδρομές στα λιμάνια προσέγγισης
+holiday-line-port-taxes = Λιμενικά τέλη
+holiday-line-wifi = Wifi εν πλω
+holiday-line-onboard = Έξοδα εν πλω και στα λιμάνια
+holiday-line-other = Άλλα έξοδα και απρόοπτα
+holiday-line-insurance = Ασφάλεια ακύρωσης
+holiday-line-stay-tax = Φόρος διαμονής
+holiday-line-car = Αυτοκίνητο στον προορισμό, καύσιμα και διόδια
+holiday-line-parking = Στάθμευση στο αεροδρόμιο ή στον σταθμό
+holiday-line-bank = Τραπεζικές χρεώσεις στο εξωτερικό
+holiday-line-formalities = Διατυπώσεις (διαβατήριο, βίζα, εμβόλια)
+holiday-line-pets = Φύλαξη κατοικιδίων
+holiday-span-trip = για τη διαμονή
+holiday-span-night = ανά νύχτα
+holiday-span-day = ανά ημέρα
+holiday-span-stop = ανά λιμάνι
+holiday-who-all = για όλους
+holiday-who-person = ανά άτομο
+holiday-who-adults = ανά ενήλικα
+holiday-cabins-count = { $count ->
+        [one] { $count } καμπίνα
+       *[other] { $count } καμπίνες
+    }
+holiday-days = { $days ->
+        [one] { $days } ημέρα
+       *[other] { $days } ημέρες
+    }
+holiday-invalid-count = Έναν ακέραιο αριθμό, παρακαλώ.
+holiday-invalid-amount = Αυτό το ποσό δεν είναι αναγνώσιμο: ένας θετικός αριθμός ή ένα ποσοστό από 0 έως 100.
+holiday-headline-empty = Πληκτρολογήστε τα ποσά του προϋπολογισμού για να δείτε πόσο θα κοστίσει το ταξίδι.
+holiday-headline-stay = Αυτή η διαμονή θα κόστιζε { $total } για { $people ->
+        [one] ένα άτομο
+       *[other] { $people } άτομα
+    } και { $nights ->
+        [0] καμία νύχτα
+        [one] μία νύχτα
+       *[other] { $nights } νύχτες
+    }.
+holiday-headline-cruise = Αυτή η κρουαζιέρα θα κόστιζε { $total } για { $people ->
+        [one] ένα άτομο
+       *[other] { $people } άτομα
+    } και { $nights ->
+        [0] καμία νύχτα
+        [one] μία νύχτα
+       *[other] { $nights } νύχτες
+    }.
+holiday-tile-total = Συνολικό κόστος
+holiday-tile-person = Ανά άτομο
+holiday-tile-person-day = Ανά άτομο ανά ημέρα
+holiday-tile-saved = Ήδη αποταμιευμένα
+holiday-tile-remaining = Απομένει να χρηματοδοτηθεί
+holiday-tile-monthly = Απαιτούμενη αποταμίευση
+holiday-remaining-none = Τίποτα: έχει καλυφθεί
+holiday-monthly-none = Τίποτα να βάλετε στην άκρη
+holiday-monthly-now = Αναχώρηση αυτόν τον μήνα
+holiday-note-days = Οι ημέρες είναι οι νύχτες συν μία: επτά νύχτες κάνουν οκτώ ημέρες.
+holiday-note-child = Ανά άτομο, ένα παιδί πληρώνει την τιμή παιδιού αν έχει δοθεί· αν είναι κενή, πληρώνει όπως ένας ενήλικας.
+holiday-note-percent = Ένα ποσοστό ασφάλειας εφαρμόζεται στα κύρια κονδύλια του ταξιδιού· αυτό των τραπεζικών χρεώσεων, στα έξοδα στον προορισμό.
+holiday-sheet-budget = Προϋπολογισμός
+holiday-sheet-result = Αποτέλεσμα
+holiday-column-line = Κονδύλι
+holiday-column-amount = Ποσό
+holiday-column-child = Τιμή παιδιού
+holiday-column-who = Για ποιους
+holiday-column-span = Για πόσο διάστημα
+holiday-column-cost = Κόστος
+holiday-disclaimer = Μια εκτίμηση βάσει των δικών σας ποσών: οι πραγματικές τιμές μπορεί να διαφέρουν.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = Έργο μείωσης
+cut-file-not-project = Αυτό το αρχείο δεν είναι έργο μείωσης του Radinus.
+cut-file-too-recent = Αυτό το έργο προέρχεται από νεότερη έκδοση του Radinus: ενημερώστε το Radinus για να το ανοίξετε.
+cut-sheet-items = Κονδύλια
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = Το βιβλιάριο του αυτοκινήτου μου
+window-car-title = Το βιβλιάριο του αυτοκινήτου μου
+car-unnamed = Το αυτοκίνητό μου
+car-sheet-title = Το αυτοκίνητο
+car-field-plate = Αριθμός κυκλοφορίας
+car-field-make = Μάρκα
+car-field-model = Μοντέλο
+car-field-engine = Κινητήρας
+car-field-first-hand = Πρώτο χέρι
+car-field-registered = Πρώτη άδεια κυκλοφορίας
+car-field-acquired = Ημερομηνία απόκτησης
+car-field-acquired-km = Χιλιόμετρα κατά την απόκτηση
+car-field-service = Σέρβις κάθε
+car-field-service-or = ή κάθε
+car-unit-months-short = μήνες
+car-unit-km = km
+car-tariff-title = Τιμολόγιο φόρτισης στο σπίτι
+car-tariff-hint = Αυτό το τιμολόγιο φυλάσσεται στο βιβλιάριο του αυτοκινήτου: δεν αλλάζει εκείνο των προτιμήσεων.
+car-tariff-reset = Επαναφορά του τιμολογίου των προτιμήσεων
+car-engine-petrol = Βενζίνη
+car-engine-diesel = Diesel
+car-engine-lpg = Υγραέριο (LPG)
+car-engine-e85 = E85 (βιοαιθανόλη)
+car-engine-hybrid = Υβριδικό
+car-engine-plug-in = Plug-in υβριδικό
+car-engine-electric = Ηλεκτρικό
+car-engine-hydrogen = Υδρογόνο
+car-energy-petrol = Βενζίνη
+car-energy-diesel = Πετρέλαιο κίνησης
+car-energy-lpg = Υγραέριο
+car-energy-e85 = E85
+car-energy-electricity = Ηλεκτρικό ρεύμα
+car-energy-hydrogen = Υδρογόνο
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = Ενέργεια
+car-rubric-upkeep = Τρέχουσα συντήρηση
+car-rubric-service = Σέρβις
+car-rubric-wear = Αναλώσιμα ανταλλακτικά
+car-rubric-tyres = Ελαστικά
+car-rubric-breakdown = Βλάβες
+car-rubric-insurance = Ασφάλιση
+car-rubric-inspection = Τεχνικός έλεγχος (ΚΤΕΟ)
+car-part-brake-pads = Τακάκια φρένων
+car-part-brake-discs = Δισκόπλακες φρένων
+car-part-timing-belt = Ιμάντας χρονισμού
+car-part-clutch = Συμπλέκτης
+car-part-battery-12v = Μπαταρία 12 V
+car-part-shock-absorbers = Αμορτισέρ
+car-part-wipers = Υαλοκαθαριστήρες
+car-part-spark-plugs = Μπουζί
+car-part-glow-plugs = Προθερμαντήρες
+car-part-particulate-filter = Φίλτρο σωματιδίων
+car-part-catalytic-converter = Καταλύτης
+car-part-fuel-cell-filter = Φίλτρο κυψέλης καυσίμου
+car-part-exhaust = Εξάτμιση
+car-part-other = Άλλο ανταλλακτικό…
+car-axle-all = Και τα τέσσερα ελαστικά
+car-axle-front = Εμπρός ελαστικά
+car-axle-rear = Πίσω ελαστικά
+car-verdict-pass = Επιτυχής
+car-verdict-counter = Επανέλεγχος
+car-charge-station = Σε σταθμό φόρτισης
+car-charge-home = Στο σπίτι
+car-slot-peak = Ώρες αιχμής
+car-slot-off-peak = Ώρες εκτός αιχμής
+car-entry-new = Νέα γραμμή
+car-entry-edit = Τροποποίηση της γραμμής
+car-field-date = Ημερομηνία
+car-field-km = Χιλιομετρητής
+car-field-rubric = Ενότητα
+car-field-amount = Ποσό
+car-field-garage = Συνεργείο ή πρατήριο
+car-field-note = Σημείωση
+car-field-energy = Ενέργεια
+car-field-quantity = Ποσότητα
+car-field-charge = Φόρτιση
+car-field-slot = Ώρα φόρτισης
+car-field-part = Ανταλλακτικό
+car-field-part-name = Όνομα του ανταλλακτικού
+car-field-axle = Ελαστικά που άλλαξαν
+car-field-verdict = Αποτέλεσμα
+car-field-months = Μήνες κάλυψης
+car-field-battery = Κατάσταση μπαταρίας
+car-home-amount-hint = Το ποσό μιας φόρτισης στο σπίτι υπολογίζεται με το τιμολόγιο του αυτοκινήτου.
+car-entry-add = Προσθήκη στο βιβλιάριο
+car-entry-update = Αποθήκευση της γραμμής
+car-entry-cancel = Ακύρωση
+car-entry-delete = Διαγραφή της γραμμής
+car-delete-question = Διαγραφή αυτής της γραμμής από το βιβλιάριο;
+car-from-operation = Λήψη από κίνηση…
+car-pick-account = Από ποιον λογαριασμό προέρχεται η δαπάνη;
+car-pick-operation = Ποια κίνηση;
+car-pick-take = Λήψη
+car-pick-none = Καμία δαπάνη σε αυτόν τον λογαριασμό.
+car-pick-taken = Η κίνηση μεταφέρθηκε: συμπληρώστε τον χιλιομετρητή και την ενότητα και, στη συνέχεια, προσθέστε τη γραμμή.
+car-history-title = Το ιστορικό
+car-filter-all = Όλες οι ενότητες
+car-history-empty = Καμία γραμμή προς το παρόν.
+car-history-hint = Κάντε κλικ σε μια γραμμή για να την τροποποιήσετε.
+car-column-date = Ημερομηνία
+car-column-km = Km
+car-column-rubric = Ενότητα
+car-column-detail = Λεπτομέρεια
+car-column-amount = Ποσό
+car-column-garage = Συνεργείο
+car-column-note = Σημείωση
+car-column-share = Μερίδιο
+car-column-per-km = Ανά km
+car-column-energy = Ενέργεια
+car-column-quantity = Ποσότητα
+car-column-price = Μέση τιμή
+car-column-consumption = Κατανάλωση
+car-column-part = Ανταλλακτικό
+car-column-changes = Αλλαγές
+car-column-last = Τελευταία αλλαγή
+car-column-life = Διάρκεια ζωής
+car-column-next = Επόμενη αλλαγή
+car-total = Σύνολο
+car-summary-title = Τι κοστίζει το αυτοκίνητο
+car-headline-empty = Συμπληρώστε την καρτέλα και, στη συνέχεια, προσθέστε μια πρώτη γραμμή: ένα γέμισμα, ένα σέρβις, έναν λογαριασμό συνεργείου…
+car-headline = Από τις { $since }, το αυτοκίνητό σας σάς κόστισε { $total }.
+car-headline-km = Από τις { $since }, το αυτοκίνητό σας σάς κόστισε { $total } για διανυθείσα απόσταση { $km }: { $cost } ανά χιλιόμετρο.
+car-tile-total = Συνολικό κόστος
+car-tile-month = Ανά μήνα
+car-tile-km = Ανά χιλιόμετρο
+car-tile-driven = Διανυθέντα χιλιόμετρα
+car-tile-consumption = Κατανάλωση
+car-tile-energy-km = Ενέργεια ανά χιλιόμετρο
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [one] { $months } μήνας
+       *[other] { $months } μήνες
+    }
+car-detail-battery = Μπαταρία: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = Ανά ενότητα
+car-energy-title = Η ενέργεια
+car-parts-title = Αναλώσιμα ανταλλακτικά
+car-tyres-title = Ελαστικά
+car-battery-title = Κατάσταση μπαταρίας
+car-years-title = Τι κόστισε το αυτοκίνητο κάθε χρόνο
+car-donut-title = Πού πηγαίνουν τα χρήματα
+car-donut-caption = συνολικά
+car-deadlines-title = Οι προθεσμίες
+car-deadlines-empty = Καμία προθεσμία προς το παρόν: σημειώστε ένα σέρβις, έναν τεχνικό έλεγχο, μια ασφάλιση ή δύο αλλαγές του ίδιου ανταλλακτικού.
+car-deadline-service = Σέρβις
+car-deadline-inspection = Τεχνικός έλεγχος ΚΤΕΟ
+car-deadline-counter = Επανέλεγχος ΚΤΕΟ
+car-deadline-insurance = Λήξη της ασφάλισης
+car-when-date = στις { $date }
+car-when-km = στα { $km }
+car-when-km-reached = στα { $km }, με τον ρυθμό σας κατά προσέγγιση: { $month }
+car-when-date-km = στις { $date } ή στα { $km }, όποιο έρθει πρώτο
+car-when-inspection-unknown = Σημειώστε τον τελευταίο τεχνικό έλεγχο για να μάθετε την ημερομηνία του επόμενου.
+car-tone-late = Εκπρόθεσμη
+car-tone-soon = Σύντομα
+car-note-since = Όλα μετρούν από την απόκτηση: την ημερομηνία και τα χιλιόμετρα που σημειώθηκαν στην καρτέλα.
+car-note-consumption = Η κατανάλωση μετριέται από γέμισμα σε γέμισμα: γεμίζετε πάντα το ρεζερβουάρ εντελώς και σημειώνετε κάθε φορά τον χιλιομετρητή.
+car-note-e85 = Ένα αυτοκίνητο E85 καίει ό,τι του βάζετε: τα χιλιόμετρα μετά από ένα γέμισμα μετρούν για το καύσιμο εκείνου του γεμίσματος.
+car-note-home = Μια φόρτιση στο σπίτι κοστολογείται με το τιμολόγιο του αυτοκινήτου την ημέρα που σημειώνεται και διατηρεί αυτό το κόστος.
+car-note-inspection = Ο τεχνικός έλεγχος ακολουθεί τον γαλλικό κανόνα: ο πρώτος εντός τεσσάρων ετών από την πρώτη άδεια κυκλοφορίας, έπειτα κάθε δύο χρόνια· ένας επανέλεγχος, εντός δύο μηνών.
+car-disclaimer = Οι προθεσμίες και οι διάρκειες ζωής είναι εκτιμήσεις που βγαίνουν από το βιβλιάριο: μόνο το βιβλίο σέρβις του κατασκευαστή είναι δεσμευτικό.
+car-invalid-date = Μια έγκυρη ημερομηνία, που να μην είναι στο μέλλον, παρακαλώ.
+car-invalid-acquired = Η ημερομηνία απόκτησης δεν μπορεί να προηγείται της πρώτης άδειας κυκλοφορίας.
+car-invalid-km = Μια ένδειξη χιλιομετρητή σε ακέραια χιλιόμετρα, παρακαλώ.
+car-invalid-amount = Αυτό το ποσό δεν είναι αναγνώσιμο.
+car-invalid-quantity = Πληκτρολογήστε την ποσότητα: λίτρα, kWh ή κιλά.
+car-invalid-part = Επιλέξτε το ανταλλακτικό που άλλαξε ή πληκτρολογήστε το όνομά του.
+car-invalid-rubric = Επιλέξτε μια ενότητα.
+car-invalid-months = Έναν ακέραιο αριθμό μηνών, παρακαλώ.
+car-invalid-battery = Μια κατάσταση μπαταρίας από 0 έως 100 %, παρακαλώ.
+car-open = Άνοιγμα βιβλιαρίου…
+car-save = Αποθήκευση του βιβλιαρίου…
+car-report-button = Φάκελος PDF
+car-file-filter = Βιβλιάριο αυτοκινήτου
+car-file-saved = Το βιβλιάριο αποθηκεύτηκε: { $file }
+car-file-opened = Το βιβλιάριο άνοιξε: { $file }
+car-file-not-logbook = Αυτό το αρχείο δεν είναι βιβλιάριο αυτοκινήτου του Radinus.
+car-file-too-recent = Αυτό το βιβλιάριο προέρχεται από νεότερη έκδοση του Radinus: ενημερώστε το Radinus για να το ανοίξετε.
+car-replace-question = Το άνοιγμα αυτού του βιβλιαρίου θα αντικαταστήσει εκείνο του παραθύρου. Συνέχεια;
+car-sheet-history = Βιβλιάριο
+car-sheet-summary = Σύνοψη
+
+analysis-history-hint = Όσο μεγαλύτερο είναι το ιστορικό σας, τόσο καλύτερη θα είναι αυτή η ανάλυση: ιδανικά, χρειάζεστε τουλάχιστον έναν χρόνο κινήσεων.
+
+# --- F48 — Μοιρασμός δαπάνης (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = Μοιρασμός δαπάνης
+window-sharing-title = Μοιρασμός δαπάνης
+sharing-question = Ποιος πληρώνει τι;
+sharing-setup-title = Ο μοιρασμός
+sharing-field-label = Τίτλος
+sharing-label-hint = Για παράδειγμα «Εστιατόριο 12/10» ή «Ταξίδι στη Βρετάνη 2027»: δίνει το όνομα στα αρχεία και στις αναφορές.
+sharing-field-total = Σύνολο
+sharing-total-hint = Αν μείνει κενό, το σύνολο είναι το άθροισμα των ειδών και των προσωπικών έξτρα του καθενός.
+sharing-field-rule = Κανόνας
+sharing-field-rounding = Στρογγυλοποίηση
+sharing-field-people = Άτομα
+sharing-mode-whole = Ένας κανόνας για όλη τη δαπάνη
+sharing-mode-item = Ένας κανόνας ανά είδος
+sharing-rule-equal = Ίσα μερίδια
+sharing-rule-parts = Ανά μερίδια
+sharing-rule-percent = Σε ποσοστά
+sharing-rule-income = Ανάλογα με τα εισοδήματα
+sharing-rounding-cent = Στο λεπτό
+sharing-rounding-euro = Στη μονάδα
+sharing-round-euro = Στρογγυλοποίηση στη μονάδα
+sharing-hide-incomes = Απόκρυψη των εισοδημάτων στις αναφορές και στην εξαγωγή
+sharing-people-title = Τα άτομα
+sharing-people-hint = Μία γραμμή ανά άτομο, μία στήλη ανά είδος: επιλέξτε ποιος συμμετέχει σε τι. Όλα τα υπόλοιπα είναι προαιρετικά. Κάποιος που αποχωρεί αφήνοντας την προκαταβολή του: ένα ακριβές ποσό ίσο με όσο έχει καταβάλει και κανένα τετραγωνάκι επιλεγμένο.
+sharing-add-person = Προσθήκη ατόμου
+sharing-person-default = Άτομο { $number }
+sharing-items-title = Τα είδη
+sharing-items-hint = Μόνο ό,τι δεν αφορά όλους, όπως το κρασί. Το υπόλοιπο του συνόλου πηγαίνει στο κοινό είδος.
+sharing-add-item = Προσθήκη είδους
+sharing-common = Κοινό
+sharing-payments-title = Οι πληρωμές
+sharing-payments-hint = Ποιος πλήρωσε, πόσο και πότε. Μια γραμμή χωρίς ποσό δεν υπολογίζεται ακόμη.
+sharing-payments-none = Καμία πληρωμή προς το παρόν.
+sharing-add-payment = Προσθήκη πληρωμής
+sharing-result-title = Το αποτέλεσμα
+sharing-balances-title = Πού βρίσκονται οι πληρωμές
+sharing-transfers-title = Προτεινόμενες μεταφορές
+sharing-delete = Διαγραφή
+sharing-delete-person-question = Αυτό το άτομο έχει πληρωμές: να διαγραφούν μαζί του;
+sharing-disclaimer = Το Radinus προτείνει έναν μοιρασμό: μεταξύ φίλων, ο καθένας είναι ελεύθερος να τακτοποιηθεί διαφορετικά.
+sharing-column-person = Άτομο
+sharing-column-household = Νοικοκυριό
+sharing-column-income = Εισόδημα
+sharing-column-parts = Μερίδια
+sharing-column-percent = %
+sharing-column-floor = Τουλάχιστον
+sharing-column-cap = Το πολύ
+sharing-column-fixed = Ακριβές ποσό
+sharing-column-alone = Προσωπικά έξτρα
+sharing-column-gift = Πλεόνασμα που προσφέρθηκε
+sharing-column-share = Μερίδιο
+sharing-column-typed = % που δόθηκε
+sharing-column-constraint = Τι ίσχυσε
+sharing-column-due = Πληρωτέο
+sharing-column-item = Είδος
+sharing-column-amount = Ποσό
+sharing-column-rule = Κανόνας
+sharing-column-participants = Συμμετέχοντες
+sharing-column-unit = Νοικοκυριό ή άτομο
+sharing-column-members = Μέλη
+sharing-column-paid = Πληρωμένο
+sharing-column-balance = Υπόλοιπο
+sharing-column-date = Ημερομηνία
+sharing-column-who = Ποιος
+sharing-column-label = Τίτλος
+sharing-help-household = Τα άτομα του ίδιου νοικοκυριού πληρώνουν μαζί: οι πληρωμές και τα ποσά που οφείλουν αθροίζονται και παίρνουν μία κοινή κατάσταση. Παράδειγμα: «Οικογένεια Μαρτίν» για τους γονείς και τα παιδιά.
+sharing-help-income = Χρησιμοποιείται μόνο από τον κανόνα «Ανάλογα με τα εισοδήματα»: όσο μεγαλύτερο το εισόδημα, τόσο μεγαλύτερο το μερίδιο. Πληκτρολογήστε το μηνιαίο εισόδημα.
+sharing-help-parts = Ένα άτομο με 2 μερίδια πληρώνει διπλάσια από ένα άτομο με 1 μερίδιο. Παράδειγμα: ενήλικας 1, παιδί 0,5.
+sharing-help-percent = Το μερίδιο της δαπάνης που πληρώνει το άτομο. Τα ποσοστά πρέπει να κάνουν 100 % συνολικά.
+sharing-help-floor = Το άτομο θα πληρώσει τουλάχιστον αυτό το ποσό, ακόμη κι αν το υπολογισμένο μερίδιό του είναι μικρότερο. Η διαφορά ελαφρύνει τους υπόλοιπους.
+sharing-help-cap = Το άτομο δεν θα πληρώσει ποτέ περισσότερο από αυτό το ποσό. Ό,τι δεν πληρώνει πέφτει στους υπόλοιπους συμμετέχοντες των ειδών του.
+sharing-help-fixed = Το άτομο πληρώνει ακριβώς αυτό το ποσό, ό,τι κι αν συμβεί, και το υπόλοιπο μοιράζεται στους άλλους. Παράδειγμα: κάποιος που αποχωρεί και αφήνει την προκαταβολή του.
+sharing-help-alone = Ό,τι πήρε το άτομο μόνο για τον εαυτό του, όπως ένα γλυκό ή έναν καφέ. Το πληρώνει ολόκληρο, επιπλέον του μεριδίου του.
+sharing-help-gift = Αν το άτομο έχει καταβάλει περισσότερα από το μερίδιό του: όταν είναι επιλεγμένο, το πλεόνασμα προσφέρεται στην ομάδα· όταν όχι, επιστρέφεται.
+sharing-help-items = Επιλέξτε τα άτομα που συμμετέχουν σε αυτό το είδος. Το Κοινό είναι ό,τι μένει από το σύνολο αφού αφαιρεθούν τα άλλα είδη.
+sharing-help-due = Όσα οφείλει συνολικά το άτομο: το μερίδιό του στα είδη, τα προσωπικά έξτρα και η στρογγυλοποίηση.
+sharing-help-share = Το ποσοστό του συνόλου που μοιράζεται, το οποίο αντιστοιχεί στο μερίδιο.
+sharing-help-typed = Το ποσοστό που δώσατε. Μπορεί να διαφέρει από το πραγματικό μερίδιο όταν ίσχυσε ελάχιστο, μέγιστο ή ακριβές ποσό.
+sharing-help-constraint = Δείχνει αν το μερίδιο του ατόμου άλλαξε λόγω ελάχιστου, μέγιστου, ακριβούς ποσού ή πλεονάσματος που προσφέρθηκε.
+sharing-help-item = Μόνο ό,τι δεν αφορά όλους, όπως το κρασί. Το υπόλοιπο του συνόλου πηγαίνει στο κοινό είδος, που μοιράζεται σε όσους είναι επιλεγμένοι σε αυτό.
+sharing-help-rule = Πώς μοιράζεται αυτό το είδος: ίσα μερίδια, ανά μερίδια, σε ποσοστά ή ανάλογα με τα εισοδήματα.
+sharing-help-paid = Όσα έχει ήδη καταβάλει το νοικοκυριό ή το άτομο, σύμφωνα με τις πληρωμές που καταχωρίστηκαν.
+sharing-help-balance = Ό,τι απομένει να πληρωθεί ή ό,τι καταβλήθηκε επιπλέον του μεριδίου. Παράδειγμα: «Απομένει να πληρωθεί: 61,54 €».
+sharing-advice-equal = { $count ->
+        [one] { $total } για ένα μόνο άτομο.
+       *[other] { $total } ÷ { $count } άτομα = { $amount } ο καθένας.
+    }
+sharing-advice-equal-varied = Σε ίσα μερίδια μεταξύ όσων συμμετέχουν, λαμβάνοντας υπόψη τα όρια και τις εξαιρέσεις.
+sharing-advice-parts = { $parts } μερίδια συνολικά: ένα μερίδιο αξίζει { $amount }.
+sharing-advice-parts-varied = Ο καθένας πληρώνει ανάλογα με τα μερίδιά του, λαμβάνοντας υπόψη τα όρια και τις εξαιρέσεις. Ένα κενό πεδίο μετράει για 1 μερίδιο.
+sharing-advice-percent-rest = Λείπουν { $rest } % μέχρι το 100 %.
+sharing-advice-percent-over = Τα ποσοστά ξεπερνούν το 100 % κατά { $over } %.
+sharing-advice-percent-ok = Τα ποσοστά δίνουν ακριβώς 100 %.
+sharing-advice-percent-nobody = Τα ποσοστά δίνουν ήδη 100 %: { $count ->
+        [one] { $names } δεν θα πλήρωνε τίποτα.
+       *[other] { $names } δεν θα πλήρωναν τίποτα.
+    }
+sharing-advice-income = Ο καθένας πληρώνει το { $rate } % του εισοδήματός του.
+sharing-advice-income-missing = Πληκτρολογήστε το εισόδημα του καθενός για να γίνει το μοίρασμα ανάλογα με τα εισοδήματα.
+sharing-advice-income-varied = Ο καθένας πληρώνει το ίδιο ποσοστό του εισοδήματός του, λαμβάνοντας υπόψη τα όρια και τις εξαιρέσεις.
+sharing-advice-empty = Πληκτρολογήστε το ποσό προς μοιρασμό.
+sharing-apply-advice = Χρήση των προτεινόμενων τιμών
+sharing-help-apply-advice = Συμπληρώνει τα κενά πεδία με τις γκρι τιμές. Τα πεδία που είναι ήδη συμπληρωμένα δεν αλλάζουν.
+sharing-from-incomes = Ποσοστά από τα εισοδήματα
+sharing-help-from-incomes = Αντικαθιστά τα ποσοστά με το μερίδιο κάθε εισοδήματος στο σύνολο των εισοδημάτων. Δίνουν 100 %.
+sharing-reset-percents = Νέο μοίρασμα από την αρχή
+sharing-help-reset-percents = Σβήνει τα ποσοστά και τα μοιράζει ισόποσα σε όλους. Χρήσιμο αφού προσθέσετε ένα άτομο.
+sharing-reset-percents-question = Να σβηστούν όλα τα ποσοστά και να μοιραστούν ισόποσα;
+sharing-open = Άνοιγμα έργου…
+sharing-save = Αποθήκευση του έργου…
+sharing-pdf-distribution = Κατανομή (PDF)
+sharing-pdf-payments = Κατάσταση πληρωμών (PDF)
+sharing-pdf-statements = Ατομικές καταστάσεις (PDF)…
+sharing-statements-everyone = Όλοι
+sharing-excel = Εξαγωγή σε Excel
+sharing-file-filter = Έργο μοιρασμού
+sharing-replace-question = Το άνοιγμα αυτού του έργου θα αντικαταστήσει ό,τι έχει πληκτρολογηθεί στο παράθυρο. Συνέχεια;
+sharing-file-saved = Το έργο αποθηκεύτηκε: { $file }
+sharing-file-opened = Το έργο άνοιξε: { $file }
+sharing-file-not-project = Αυτό το αρχείο δεν είναι έργο μοιρασμού του Radinus.
+sharing-file-too-recent = Αυτό το έργο προέρχεται από νεότερη έκδοση του Radinus: ενημερώστε το Radinus για να το ανοίξετε.
+sharing-file-failed = Δεν ήταν δυνατή η ανάγνωση ή η εγγραφή του αρχείου: { $reason }
+sharing-statements-replace-question = { $count ->
+        [one] Υπάρχει ήδη μία κατάσταση σε αυτόν τον φάκελο. Να αντικατασταθεί;
+       *[other] Υπάρχουν ήδη { $count } καταστάσεις σε αυτόν τον φάκελο. Να αντικατασταθούν;
+    }
+sharing-statements-written = { $count ->
+        [one] Γράφτηκε μία κατάσταση στον φάκελο «{ $folder }».
+       *[other] Γράφτηκαν { $count } καταστάσεις στον φάκελο «{ $folder }».
+    }
+sharing-too-many-people = Ένας μοιρασμός έχει το πολύ 40 άτομα.
+sharing-too-many-items = Ένας μοιρασμός έχει το πολύ 20 είδη.
+sharing-too-many-payments = Ένας μοιρασμός έχει το πολύ 400 πληρωμές.
+sharing-invalid-amount = Αυτό το ποσό δεν είναι αναγνώσιμο: χρειάζεται θετικός αριθμός.
+sharing-invalid-number = Αυτός ο αριθμός δεν είναι αναγνώσιμος: χρειάζεται θετικός αριθμός.
+sharing-invalid-percent = Ένα ποσοστό κυμαίνεται από 0 έως 100.
+sharing-invalid-date = Αυτή η ημερομηνία δεν είναι αναγνώσιμη.
+sharing-name-missing = Κάθε άτομο πρέπει να έχει όνομα.
+sharing-name-duplicate = Υπάρχει ήδη «{ $name }»: ξεχωρίστε τα, για παράδειγμα με ένα αρχικό γράμμα.
+sharing-floor-above-cap = Το ελάχιστο υπερβαίνει το μέγιστο.
+sharing-item-label-missing = Αυτό το είδος δεν έχει όνομα.
+sharing-items-above-total = Τα είδη και τα προσωπικά έξτρα του καθενός υπερβαίνουν το σύνολο κατά { $amount }.
+sharing-payment-person = Επιλέξτε ποιος πλήρωσε.
+sharing-percent-total = Τα ποσοστά δίνουν { $sum } %: πρέπει να δίνουν 100 %.
+sharing-percent-total-item = «{ $item }»: τα ποσοστά δίνουν { $sum } %: πρέπει να δίνουν 100 %.
+sharing-item-nobody = Κανείς δεν συμμετέχει στο «{ $item }».
+sharing-item-no-weight = Κανείς δεν συνεισφέρει στο «{ $item }»: όλοι οι συμμετέχοντες έχουν μηδέν.
+sharing-income-missing = Λείπει το εισόδημα: { $name }.
+sharing-fixed-above = Τα ακριβή ποσά υπερβαίνουν το προς μοιρασμό ποσό κατά { $amount }.
+sharing-floors-above = Τα ελάχιστα υπερβαίνουν το προς μοιρασμό ποσό κατά { $amount }.
+sharing-cap-alone = Μόνο { $name } συμμετέχει στο «{ $item }»: το μέγιστο δεν μπορεί να τηρηθεί.
+sharing-caps-short = Τα μέγιστα δεν αρκούν για να καλύψουν το ποσό: λείπουν { $amount }.
+sharing-impossible = Αυτοί οι όροι δεν μπορούν να τηρηθούν όλοι: χαλαρώστε ένα ελάχιστο ή ένα μέγιστο.
+sharing-constraint-floor = Έφτασε το ελάχιστο
+sharing-constraint-cap = Έφτασε το μέγιστο
+sharing-constraint-fixed = Ακριβές ποσό
+sharing-constraint-gift = Πλεόνασμα που προσφέρθηκε
+sharing-and = { $first } και { $last }
+sharing-outside = Εκτός ειδών
+sharing-alone = Προσωπικά έξτρα
+sharing-rounding = Στρογγυλοποίηση
+sharing-headline-empty = Προσθέστε τα άτομα που μοιράζονται τη δαπάνη.
+sharing-headline-no-amount = Πληκτρολογήστε το σύνολο ή τα είδη προς μοιρασμό.
+sharing-headline-equal = { $total } προς μοιρασμό: ο καθένας πληρώνει { $amount }.
+sharing-headline-range = { $total } προς μοιρασμό: από { $min } έως { $max } ανάλογα με το άτομο.
+sharing-participants = { $count ->
+        [0] Κανένας συμμετέχων
+        [one] Ένας συμμετέχων
+       *[other] { $count } συμμετέχοντες
+    }
+sharing-balance-due = Απομένει να πληρωθεί: { $amount }
+sharing-balance-over = Έχει καταβληθεί { $amount } περισσότερο από το μερίδιο
+sharing-balance-even = Τακτοποιημένο
+sharing-summary-collected = Πληρώθηκαν { $collected } από { $total }.
+sharing-summary-owing = { $count ->
+        [0] Όλοι είναι τακτοποιημένοι.
+        [one] Μόνο ένας οφείλει ακόμη { $amount }.
+       *[other] { $count } οφείλουν ακόμη { $amount } συνολικά.
+    }
+sharing-remaining-outside = Απομένει να πληρωθεί για τη δαπάνη: { $amount }
+sharing-remaining-reimburse = Επιστροφή σε { $name }: { $amount }
+sharing-all-settled = Όλα έχουν τακτοποιηθεί: κανείς δεν οφείλει τίποτα σε κανέναν.
+sharing-transfer = { $from } οφείλει { $amount } σε { $to }
+sharing-warning-over-paid = Οι πληρωμές υπερβαίνουν τη δαπάνη κατά { $amount }: ελέγξτε τα ποσά.
+sharing-note-income-zero = { $name } δεν πληρώνει τίποτα για { $items }: το εισόδημα είναι 0.
+sharing-note-excluded = { $name } δεν συμμετέχει στο «{ $item }»: το μερίδιο μοιράζεται στους υπόλοιπους.
+sharing-note-gift = Το πλεόνασμα που προσφέρθηκε από { $giver } μειώνει το μερίδιο των υπολοίπων: για { $name } έχουν πλέον καταβληθεί περισσότερα από το μερίδιο.
+sharing-note-outside = { $name } πληρώνει { $amount } εκτός των ειδών: το ποσό αφαιρείται από όσα μοιράζονται οι υπόλοιποι.
+sharing-note-keeper = Στρογγυλοποίηση στη μονάδα: { $name } κρατά τα λεπτά, ώστε το σύνολο να βγαίνει ακριβώς.
+sharing-report-distribution = Κατανομή
+sharing-report-sharing = Ο μοιρασμός
+sharing-report-who-pays = Ποιος πληρώνει τι
+sharing-report-items = Ανάλυση ανά είδος
+sharing-report-payments = Κατάσταση πληρωμών
+sharing-report-as-of = Κατάσταση στις { $date }
+sharing-report-balances = Μερίδιο, πληρωμένο, υπόλοιπο
+sharing-report-statement = Κατάσταση — { $name }
+sharing-report-your-share = Το μερίδιό σας
+sharing-statement-total = Σύνολο για το νοικοκυριό: { $amount }
+sharing-statement-pay = Πληρωτέο σε { $name }: { $amount }
+sharing-statement-receive = Εισπρακτέο από { $name }: { $amount }
+sharing-sheet-people = Άτομα
+sharing-sheet-items = Είδη
+sharing-sheet-result = Αποτέλεσμα
+sharing-sheet-payments = Πληρωμές
+sharing-sheet-balances = Επιστροφές

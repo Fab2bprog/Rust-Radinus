@@ -85,7 +85,15 @@ use rusqlite::{Connection, Result};
 /// entier, le numéro « nation » du WLangage (décision de Fabrice, 01/08/2026).
 /// Une base 1.9.3 restaurée passe donc de 9 à 10 en s'ouvrant. Chaîner une
 /// étape de plus dans [`migrate`] à chaque changement de forme du schéma.
-pub const CURRENT_SCHEMA_VERSION: i64 = 10;
+///
+/// **11 — la vérification** (Fabrice, 03/10/2026). `Operation.IDVerification`
+/// et sa table `Verification` : ce que l'utilisateur pense d'une écriture,
+/// à côté de ce que la banque en dit. Aucune étape écrite à la main : la
+/// colonne porte une valeur par défaut — 2, « Vérifiée » — donc
+/// `ensure_the_tables` l'ajoute seule à une base 10, et toutes les opérations
+/// déjà là sont vérifiées. La table manquante est créée, puis garnie par
+/// `FROZEN`.
+pub const CURRENT_SCHEMA_VERSION: i64 = 11;
 
 /// Brings `conn`'s schema up to [`CURRENT_SCHEMA_VERSION`], applying
 /// incremental migrations in order. Safe to call on every database open
@@ -484,6 +492,19 @@ const TABLES: &[TableDeclaration] = &[
         "#,
         indexes: &[],
     },
+    // Liste FERMEE, comme StatutOperation : 1=A verifier, 2=Verifiee,
+    // 3=Douteuse, 4=Contestee (Fabrice, 03/10/2026). Le libelle n'est qu'un
+    // secours : l'interface traduit par la clef.
+    TableDeclaration {
+        name: "Verification",
+        table: r#"
+        CREATE TABLE IF NOT EXISTS Verification (
+            IDVerification INTEGER PRIMARY KEY,
+            Libelle        TEXT NOT NULL
+        );
+        "#,
+        indexes: &[],
+    },
     TableDeclaration {
         name: "StatutCheque",
         table: r#"
@@ -629,7 +650,8 @@ const TABLES: &[TableDeclaration] = &[
             IDCheque          INTEGER NOT NULL DEFAULT 0,
             IDTiers           INTEGER NOT NULL DEFAULT 0,
             IDProjets         INTEGER NOT NULL DEFAULT 0,
-            EstComplement     INTEGER NOT NULL DEFAULT 0
+            EstComplement     INTEGER NOT NULL DEFAULT 0,
+            IDVerification    INTEGER NOT NULL DEFAULT 2
         );
         "#,
         indexes: &[
@@ -638,6 +660,7 @@ const TABLES: &[TableDeclaration] = &[
             r#"CREATE INDEX IF NOT EXISTS idx_operation_modeoperation ON Operation(IDModeOperation);"#,
             r#"CREATE INDEX IF NOT EXISTS idx_operation_affectation ON Operation(IDAffectation);"#,
             r#"CREATE INDEX IF NOT EXISTS idx_operation_statutoperation ON Operation(IDStatutOperation);"#,
+            r#"CREATE INDEX IF NOT EXISTS idx_operation_verification ON Operation(IDVerification);"#,
             r#"CREATE INDEX IF NOT EXISTS idx_operation_tiers ON Operation(IDTiers);"#,
             r#"CREATE INDEX IF NOT EXISTS idx_operation_projets ON Operation(IDProjets);"#,
             r#"CREATE INDEX IF NOT EXISTS idx_operation_cheque ON Operation(IDCheque);"#,
@@ -819,6 +842,7 @@ const FROZEN: &[(&str, Refill)] = &[
     ("TypeCompte", super::seed::seed_types_compte),
     ("StatutOperation", super::seed::seed_statuts_operation),
     ("StatutCheque", super::seed::seed_statuts_cheque),
+    ("Verification", super::seed::seed_verifications),
 ];
 
 /// Est-ce que cette table existe dans la base ouverte ?
@@ -1304,6 +1328,7 @@ mod tests {
         "Tiers",
         "TypeCategorie",
         "TypeCompte",
+        "Verification",
     ];
 
     /// The indexes that use `column`, as SQLite lists them. Dropping a column
@@ -1476,6 +1501,7 @@ mod tests {
             "Tiers.Libelle",
             "TypeCategorie.Libelle",
             "TypeCompte.Libelle",
+            "Verification.Libelle",
         ];
 
         let conn = Connection::open_in_memory().unwrap();
@@ -1596,6 +1622,63 @@ mod tests {
             .filter(|n| !n.starts_with("sqlite_"))
             .collect();
         assert_eq!(found, EXPECTED_TABLES);
+    }
+
+    /// **De la base 10 à la base 11** (Fabrice, 03/10/2026) : la colonne
+    /// `IDVerification` et la table `Verification` arrivent seules, les
+    /// opérations déjà là sont « Vérifiée », et rien d'autre n'a bougé.
+    #[test]
+    fn une_base_10_recoit_la_verification_et_ses_operations_sont_verifiees() {
+        let conn = Connection::open_in_memory().unwrap();
+        migrate(&conn).unwrap();
+        crate::database::seed::seed_initial_data(&conn).unwrap();
+
+        // On refait une base 10 : ni la colonne, ni la table, ni son index.
+        conn.execute_batch(
+            "INSERT INTO Compte (IDCompte, Libelle, IDTypeCompte, IDBanques)
+                 VALUES (1, 'CCP', 1, 1);
+             INSERT INTO Operation (IDOperation, Libelle, Date, Montant, IDCompte,
+                                    IDStatutOperation, DatePointage)
+                 VALUES (7, 'LOYER', '2026-01-05', -650000000, 1, 1, '2026-01-06');
+             DROP INDEX idx_operation_verification;
+             ALTER TABLE Operation DROP COLUMN IDVerification;
+             DROP TABLE Verification;
+             UPDATE Parametres SET VerDataBase = 10 WHERE IDParametres = 1;
+             PRAGMA user_version = 10;",
+        )
+        .unwrap();
+
+        let report = migrate(&conn).unwrap();
+        assert!(report.created.contains(&"Verification".to_string()), "{report:?}");
+        assert!(report.reseeded.contains(&"Verification".to_string()), "{report:?}");
+
+        let version: i64 = conn
+            .query_row("SELECT VerDataBase FROM Parametres WHERE IDParametres = 1", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(version, 11);
+        assert_eq!(CURRENT_SCHEMA_VERSION, 11);
+
+        let (label, amount, status, clearing, verification): (String, i64, i64, String, i64) = conn
+            .query_row(
+                "SELECT Libelle, Montant, IDStatutOperation, DatePointage, IDVerification
+                   FROM Operation WHERE IDOperation = 7",
+                [],
+                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
+            )
+            .unwrap();
+        assert_eq!(
+            (label.as_str(), amount, status, clearing.as_str(), verification),
+            ("LOYER", -650000000, 1, "2026-01-06", 2)
+        );
+
+        let labels: Vec<String> = conn
+            .prepare("SELECT Libelle FROM Verification ORDER BY IDVerification")
+            .unwrap()
+            .query_map([], |r| r.get(0))
+            .unwrap()
+            .collect::<Result<_>>()
+            .unwrap();
+        assert_eq!(labels, ["À vérifier", "Vérifiée", "Douteuse", "Contestée"]);
     }
 
     #[test]

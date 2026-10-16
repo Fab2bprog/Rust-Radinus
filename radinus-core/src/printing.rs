@@ -59,7 +59,7 @@ const REGULAR: &[u8] = include_bytes!("../fonts/Lato-Regular.ttf");
 const BOLD: &[u8] = include_bytes!("../fonts/Lato-Bold.ttf");
 
 /// Le nom de la famille tel que Typst la désignera dans le document.
-const FAMILY: &str = "Lato";
+pub(crate) const FAMILY: &str = "Lato";
 
 /// L'écureuil du bandeau de titre, extrait de l'état d'origine.
 ///
@@ -69,7 +69,7 @@ const LOGO: &[u8] = include_bytes!("../images/ecureuil.png");
 
 /// Le chemin sous lequel le document désigne l'écureuil. C'est le seul
 /// « fichier » que l'atelier accepte de servir.
-const LOGO_PATH: &str = "/ecureuil.png";
+pub(crate) const LOGO_PATH: &str = "/ecureuil.png";
 
 // ---------------------------------------------------------------------------
 // Ce qu'un état contient
@@ -277,7 +277,7 @@ impl World for Workshop {
 /// `[`, `@` —, autant de caractères que Typst interprète en mode contenu. En
 /// chaîne, il n'y a que deux caractères à protéger, et le libellé ressort tel
 /// qu'il est entré. C'est la même prudence que pour une requête préparée.
-fn quoted(text: &str) -> String {
+pub(crate) fn quoted(text: &str) -> String {
     let mut out = String::with_capacity(text.len() + 2);
     out.push('"');
     for c in text.chars() {
@@ -474,6 +474,40 @@ quoted(language.tag())
 
     out.push_str(TEMPLATE);
     out
+}
+
+/// **Compose une source Typst entière et rend les octets du PDF**, dans le
+/// même atelier fermé que les autres états : les deux fontes embarquées,
+/// l'écureuil, et rien du disque. Le rapport de la simulation de crédit
+/// (F41) écrit sa propre source et passe par ici.
+pub(crate) fn compose(source: String, ident: &str) -> Result<Vec<u8>, Failure> {
+    let workshop = Workshop::new(source);
+    let composed = typst::compile::<PagedDocument>(&workshop);
+    let document = composed.output.map_err(|errors| {
+        Failure::Typesetting(
+            errors
+                .iter()
+                .map(|error| error.message.to_string())
+                .collect::<Vec<_>>()
+                .join(" · "),
+        )
+    })?;
+    typst_pdf::pdf(
+        &document,
+        &PdfOptions {
+            ident: Smart::Custom(ident.to_string()),
+            ..Default::default()
+        },
+    )
+    .map_err(|errors| {
+        Failure::Writing(
+            errors
+                .iter()
+                .map(|error| error.message.to_string())
+                .collect::<Vec<_>>()
+                .join(" · "),
+        )
+    })
 }
 
 /// Compose l'état et rend les octets du PDF.

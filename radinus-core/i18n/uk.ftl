@@ -263,13 +263,16 @@ menu-accounts-checkbooks = Керування чековими книжками
 
 menu-statistics = Статистика
 menu-statistics-balance-chart = Графік зміни балансу
+menu-statistics-balance-analysis = Аналіз зміни балансу
 menu-statistics-by-category = Статистика за категоріями
 menu-statistics-by-assignment = Статистика за призначеннями
 menu-statistics-by-budget-line = Статистика за статтями бюджету
 menu-statistics-by-payment-mode = Статистика за способами оплати
 menu-statistics-by-payee = Статистика за контрагентами та продавцями
 menu-statistics-by-project = Статистика за проєктами
+menu-statistics-by-verification = Статистика за перевіркою
 menu-statistics-dashboard = Зведена панель операцій
+menu-statistics-crossed-balance = Перехресний баланс
 
 menu-budget = Бюджет
 menu-budget-entry = Введення бюджету
@@ -287,6 +290,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = Шаблони операцій
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = Інструменти
 menu-settings = Налаштування
 menu-settings-about-author = Про автора
 menu-settings-about-radinus = Про Radinus
@@ -449,6 +454,15 @@ operations-selection-total = Загальна сума вибраних опер
 
 operations-column-date = Дата
 operations-column-clearing-date = Дата звірки
+operations-column-status = Статус операції
+operation-status-pointed = Звірена
+operation-status-committed = Зарезервована
+operation-status-planned = Запланована
+operations-column-verification = Перевірка
+operation-verification-to-verify = До перевірки
+operation-verification-verified = Перевірена
+operation-verification-doubtful = Сумнівна
+operation-verification-disputed = Оскаржена
 operations-column-label = Опис
 operations-column-category = Категорія
 operations-column-assignment = Призначення
@@ -524,6 +538,9 @@ filter-all = Усі операції
 filter-pointed = Лише звірені операції
 filter-committed = Лише зарезервовані операції
 filter-planned = Лише заплановані операції
+filter-by-status = Фільтр за статусом
+filter-by-verification = Фільтр за перевіркою
+filter-show-all = Показати все
 
 # --- Картка операції (F03) --------------------------------------------
 # Написи взято зі знімка «Fiche operation transaction.png», друкарські
@@ -557,6 +574,7 @@ operation-field-direction = Тип операції:
 operation-field-amount = Сума
 operation-field-status = Статус операції
 operation-field-clearing-date = Дата звірки
+operation-field-verification = Перевірка
 operation-field-category = Категорія
 operation-field-assignment = Призначення
 operation-field-payment-mode = Спосіб
@@ -579,6 +597,10 @@ operation-nothing-to-show = Немає операцій для показу.
 operation-label-required = Опис операції обов’язковий.
 operation-date-required = Дата операції обов’язкова.
 operation-clearing-date-invalid = Дата звірки не є дійсною датою.
+operation-clearing-date-required = Проведена операція обов'язково повинна мати дату проведення.
+operation-clearing-date-question =
+    Проведена операція обов'язково повинна мати дату проведення.
+    Зберегти з датою операції — { $date }?
 operation-is-a-sub = Цей рядок — підоперація: її змінюють у її власній картці.
 operation-delete-form-open = Картку «{ $label }» відкрито. Закрийте її перед видаленням.
 
@@ -620,6 +642,7 @@ sub-operation-is-the-complement = Це Залишок: те, що лишилос
 sub-operation-of = Розподіл «{ $label }» ({ $amount })
 
 operations-pointed = { $count ->
+    [0] Немає операцій для звірки: виділені вже звірено.
     [one] Звірено { $count } операцію.
     [few] Звірено { $count } операції.
     [many] Звірено { $count } операцій.
@@ -635,6 +658,7 @@ operations-select-one = Виберіть лише одну операцію.
 operation-copy = Копію ще не збережено: поки що нічого не створено.
 operations-show-children = Показати всі підоперації
 operations-hide-children = Приховати всі підоперації
+operations-recurring-from = Створити періодичну операцію на основі цієї операції
 
 # --- Друге підтвердження небезпечного видалення -----------------------
 # Видалення банківського рахунку забирає всю його історію: «Так/Ні»
@@ -655,6 +679,7 @@ window-statistics-title = { $kind ->
     [payment-mode] Статистика за способами оплати
     [payee] Статистика за контрагентами та продавцями
     [project] Статистика за проєктами
+    [verification] Статистика за перевіркою
    *[category] Статистика за категоріями
 }
 
@@ -664,6 +689,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] СпосібОперації
     [payee] Контрагент
     [project] Проєкти
+    [verification] Перевірка
    *[category] НазваКатегорії
 }
 
@@ -673,6 +699,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] Без способу оплати
     [payee] Без контрагента
     [project] Без проєкту
+    [verification] До перевірки
    *[category] Без категорії
 }
 statistics-total = Разом
@@ -716,6 +743,19 @@ accounts-stats-multiselect-help = Інфо: використовуйте кла�
 statistics-year-question = За який рік ви хочете працювати? Radinus іде від { $first } до { $last }.
 statistics-year-choose = Вибрати рік
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = Перехресний баланс
+crossed-balance-window-name = Перехресний баланс
+crossed-balance-column = Категорія
+crossed-balance-no-data = Немає операцій за цей місяць для обраних рахунків.
+crossed-balance-month-question = З яким місяцем працювати? Число від { $first } до { $last }.
+crossed-balance-month-choose = Обрати місяць
+crossed-balance-next = Наступний місяць
+crossed-balance-previous = Попередній місяць
+
 # --- Експорт таблиць (клацання правою кнопкою) ------------------------
 # Це функція таблиці, а не вікна: вона є в усіх списків.
 
@@ -733,8 +773,16 @@ export-to-xml = Експорт до XML (.xml)
 # Меню «Експорт» вікна статистики: по одній вкладці на рік, з назвою
 # AN_2026. Порожніх років — за заданих положень перемикачів — там немає.
 export-menu = Експорт
+export-to = Експорт до
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = Копіювати клітинку
+copy-rows = Копіювати вибрані рядки
+copy-failed = Не вдалося скопіювати до буфера обміну.
 export-all-years-excel = Експортувати всі роки до Excel
 export-all-years-ods = Експортувати всі роки до LibreOffice Calc
+export-all-months-excel = Експортувати всі місяці показаного року в Excel
+export-all-months-ods = Експортувати всі місяці показаного року в LibreOffice Calc
 export-no-year = Жоден рік не містить операцій: експортувати нічого.
 export-years-done = Експортовано років: { $years } — до «{ $file }».
 export-to-json = Експорт до JSON (.json)
@@ -748,6 +796,7 @@ statistics-window-name = { $kind ->
     [payment-mode] Статистика за способами оплати
     [payee] Статистика за контрагентами та продавцями
     [project] Статистика за проєктами
+    [verification] Статистика за перевіркою
    *[category] Статистика за категоріями
 }
 statistics-detail-name = Деталізація статистики
@@ -790,6 +839,19 @@ curve-axis-balance = баланс
 curve-nothing = Не вибрано жодного рахунку: графік будувати нема з чого.
 curve-empty = Немає операцій за цей період.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = Аналіз динаміки балансу
+analysis-heading = Аналіз динаміки балансу
+analysis-hint = Проведіть по графіку, утримуючи кнопку миші, щоб побачити операції за цей період.
+analysis-zone = Зона:
+analysis-opening = Баланс на початок:
+analysis-closing = Баланс на кінець:
+analysis-variation = Зміна:
+analysis-detail-name = Аналіз балансу
+analysis-detail-none = У цій зоні немає жодної операції.
+
 # --- F05 — Швидка класифікація операцій ---------------------------------
 # Вікно, у якому класифікують **масово**: виділяють рядки, позначають
 # ознаки, які треба змінити, і застосовують їх разом — у пам'яті.
@@ -808,6 +870,7 @@ quick-check-payment-mode = Спосіб
 quick-check-payee = Контрагент
 quick-check-project = Проєкт
 quick-check-status = Статус
+quick-check-verification = Перевірка
 quick-column-date = Дата
 quick-column-label = Опис
 quick-column-amount = Сума
@@ -817,6 +880,7 @@ quick-column-payment-mode = Спосіб оплати
 quick-column-payee = Контрагент
 quick-column-project = Проєкти
 quick-column-status = Статус
+quick-column-verification = Перевірка
 # На Mac Ctrl + клацання — це клацання правою кнопкою: клавіша, що додає
 # до виділення, тут ⌘, і підказка має називати ту, яка справді працює.
 quick-multiselect-help = Інфо: використовуйте клацання мишею + клавішу [{ $modifier }] у таблиці, щоб вибрати кілька елементів
@@ -885,7 +949,7 @@ statement-no-match = Жоден рядок не відповідає фільт�
 statement-help = Інфо: використовуйте клацання мишею + клавішу [{ $modifier }] у таблиці, щоб вибрати кілька рядків
 statement-choose-account = Цей файл містить кілька рахунків. Який з них ви хочете імпортувати?
 statement-select-line = Виберіть щонайменше один рядок виписки.
-statement-title-open = Відкрити файл виписки (.ofx)
+statement-title-open = Відкрити файл виписки (OFX, QIF, CSV)
 statement-title-info = Відомості про відкритий файл
 statement-title-integrate = Додати вибране до рахунку
 statement-title-validate = Додати цю операцію до рахунку
@@ -897,6 +961,19 @@ statement-loaded = { $count ->
     [few] Прочитано { $count } рядки, з них { $known } уже є на вашому рахунку.
     [many] Прочитано { $count } рядків, з них { $known } уже є на вашому рахунку.
    *[other] Прочитано { $count } рядка, з них { $known } уже є на вашому рахунку.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] Прочитано рядків: { $count }; жоден не схожий на операцію, яка вже є на вашому рахунку.
+    [one] Прочитано рядків: { $count }, з них { $alike } схожий на операцію, яка вже є на вашому рахунку (та сама дата, той самий опис, та сама сума).
+    [few] Прочитано рядків: { $count }, з них { $alike } схожі на операції, які вже є на вашому рахунку (та сама дата, той самий опис, та сама сума).
+    [many] Прочитано рядків: { $count }, з них { $alike } схожі на операції, які вже є на вашому рахунку (та сама дата, той самий опис, та сама сума).
+   *[other] Прочитано рядків: { $count }, з них { $alike } схожі на операції, які вже є на вашому рахунку (та сама дата, той самий опис, та сама сума).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] Ще { $alike } схожий на операцію, яка вже є (та сама дата, той самий опис, та сама сума).
+    [few] Ще { $alike } схожі на операції, які вже є (та сама дата, той самий опис, та сама сума).
+    [many] Ще { $alike } схожі на операції, які вже є (та сама дата, той самий опис, та сама сума).
+   *[other] Ще { $alike } схожі на операції, які вже є (та сама дата, той самий опис, та сама сума).
 }
 statement-integrated = { $count ->
     [0] Нічого не додано: ці рядки вже є на вашому рахунку.
@@ -935,7 +1012,25 @@ statement-file-info =
     Рахунок із файлу: { $account }
     Період: з { $from } до { $to }
     Баланс, заявлений банком: { $balance }
-    { $count } операцій, з них { $known } уже є на вашому рахунку.
+statement-qif-question = Ніщо в цьому файлі не вказує, чи дату «{ $date }» записано як день/місяць чи як місяць/день. Вона означає:
+statement-qif-day-month = День { $day }, місяць { $month } (день/місяць)
+statement-qif-month-day = День { $day }, місяць { $month } (місяць/день)
+statement-qif-dates-mixed = У цьому файлі дати записано двома способами: «{ $first }» читається як день/місяць, «{ $second }» — як місяць/день. Файл не імпортується, щоб жодна дата не була спотворена.
+statement-qif-amounts-mixed = У цьому файлі суми записано двома способами: «{ $first }» з крапкою, «{ $second }» з комою. Файл не імпортується, щоб жодна сума не була спотворена.
+statement-qif-opening = Початковий баланс { $amount } на { $date }: це не операція, він не імпортується.
+statement-qif-opening-undated = Початковий баланс { $amount }: це не операція, він не імпортується.
+statement-qif-suspect = Рядок { $rank }, «{ $label }» ({ $amount }), схожий на початковий баланс: перевірте його перед додаванням.
+statement-qif-rejected = { $count ->
+    [one] { $count } нечитабельний рядок не імпортується: { $lines }.
+    [few] { $count } нечитабельні рядки не імпортуються: { $lines }.
+    [many] { $count } нечитабельних рядків не імпортуються: { $lines }.
+   *[other] { $count } нечитабельного рядка не імпортуються: { $lines }.
+}
+statement-qif-reason-date = дата
+statement-qif-reason-amount = сума
+statement-qif-reason-differ = суперечливі суми
+statement-qif-no-account = Цього рахунку більше немає у файлі: відкрийте файл знову.
+statement-balance-unknown = не вказано у файлі
 statement-group-identification = Ідентифікація операції
 statement-group-amount = Сума операції
 statement-group-classification = Класифікація операції для розрахунку статистики
@@ -1578,6 +1673,9 @@ password-show = Показати пароль
 password-remove-question = Зняти захист із цієї бази?
 password-mismatch = Два введення нового пароля різняться
 password-wrong = Пароль не підходить
+database-too-recent = Цю базу збережено новішою версією Radinus (версія бази { $found }; ця версія читає до версії { $supported }). Оновіть Radinus, щоб відкрити її.
+database-not-radinus = Цей файл не є базою Radinus.
+database-unreadable = Не вдалося прочитати базу: { $reason }
 password-close-first = Закрийте цю базу, перш ніж міняти її пароль
 password-now-protected = База захищена паролем
 password-now-clear = База більше не захищена
@@ -1816,6 +1914,11 @@ welcome-total-final = Підсумковий баланс
 welcome-total-real-detail = звірено + зарезервовано
 welcome-total-final-detail = звірено + зарезервовано + заплановано
 welcome-accounts = Ваші рахунки
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = Рахунки, враховані в підсумках: { $count } з { $total }
+welcome-tile-counted = Враховувати цей рахунок у підсумках
 welcome-tile-bank = У банку
 welcome-tile-real = Реальний
 welcome-tile-final = Підсумковий
@@ -1870,6 +1973,58 @@ preferences-leaf-zoom = Розмір відображення
 preferences-field-zoom = Збільшення:
 preferences-zoom-reset = Значення за замовчуванням
 preferences-zoom-hint = Усе збільшується разом: текст, піктограми, стовпці. Нижче 100 % на екрані вміщується більше. А рядок меню системи та його діалогові вікна підпорядковуються налаштуванням вашого комп'ютера, а не цим.
+preferences-branch-import = Імпорт
+preferences-leaf-verification = Перевірка
+preferences-field-verification = Імпортовані операції:
+preferences-verification-hint = «Перевірена»: ви довіряєте своєму банку, імпортована операція вважається правильною. «До перевірки»: кожна імпортована операція чекає на вашу перевірку; потім ви самі переводите її в «Перевірена» у списку операцій. Це налаштування діє лише для майбутніх імпортів.
+preferences-leaf-qif = Виписки QIF
+preferences-field-qif-order = Порядок дня і місяця:
+preferences-qif-order-ask = Питати мене щоразу
+preferences-qif-order-day-month = Завжди день/місяць (05/03 = 5 березня)
+preferences-qif-order-month-day = Завжди місяць/день (05/03 = 3 травня)
+preferences-qif-order-help = Використовується, лише якщо жодна дата у файлі не дозволяє визначити порядок. Щойно дата на кшталт 24/11 доводить порядок, вирішує файл, незалежно від цього налаштування.
+preferences-field-qif-label = Опис операції:
+preferences-qif-label-both = Контрагент + примітка
+preferences-qif-label-payee = Лише контрагент
+preferences-qif-label-memo = Лише примітка
+preferences-qif-label-help = Коли операція має і контрагента, і примітку. Якщо вона має лише одне з них, використовується саме воно, незалежно від цього налаштування.
+preferences-qif-hint = Ці налаштування діють для всіх виписок QIF, незалежно від того, яку базу відкрито. «Питати мене щоразу» — найнадійніший варіант: файл із неоднозначними датами ніколи не читається навмання.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = Відновити стовпці за замовчуванням
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = Показати/Приховати
+columns-colour = Розфарбувати стовпець:
+columns-colour-none = Без кольору
+columns-colour-red = Червоний
+columns-colour-orange = Помаранчевий
+columns-colour-pink = Рожевий
+columns-colour-pastel-green = Пастельно-зелений
+columns-colour-green = Зелений
+columns-colour-pastel-blue = Пастельно-синій
+columns-colour-blue = Синій
+columns-colour-pastel-yellow = Пастельно-жовтий
+columns-colour-yellow = Жовтий
+preferences-leaf-columns = Стовпці таблиць
+preferences-table-operations-list = Список операцій
+preferences-columns-reset = Скинути
+preferences-columns-reset-all = Скинути все
+preferences-columns-done = Стовпці повернулися до початкового розташування.
+preferences-columns-hint = Кожна таблиця запам'ятовує порядок стовпців, приховані вами стовпці та їхню ширину. «Скинути» одразу повертає їй початкове розташування.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = Скидання
+preferences-leaf-comfort = Налаштування зручності
+preferences-comfort-reset = Скинути налаштування зручності
+preferences-comfort-hint = Повертає до початкового стану стовпці всіх таблиць, порядок і прапорці рахунків у початковому вікні та розмір відображення. Мова, валюта й перевірка імпортованих операцій не змінюються.
+preferences-comfort-question = Скинути налаштування зручності? Стовпці таблиць, початкове вікно та розмір відображення повернуться до початкового стану.
+preferences-comfort-done = Налаштування зручності скинуто.
 
 # --- Шапка вікна привітання ----------------------------------------------
 #
@@ -1933,3 +2088,997 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = Ця програма надається без жодних гарантій, у межах, дозволених законом.
 licence-info = Офіційний текст відкриється у вашому браузері, на gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = Розрахунок кредиту
+window-loan-title = Розрахунок кредиту
+loan-tab-credit = Кредит
+loan-tab-afford = Чи зможу я його виплатити?
+loan-field-kind = Вид кредиту
+loan-kind-consumer = Споживчий кредит
+loan-kind-mortgage = Іпотека
+loan-field-amount = Сума кредиту
+loan-field-payment = Щомісячний платіж
+loan-field-months = Строк
+loan-field-rate = Фіксована ставка
+loan-field-fees = Комісія за оформлення
+loan-field-insurance = Страховка на місяць
+loan-unit-months = міс.
+loan-unit-percent = %
+loan-invalid-field = Це значення не є числом: виправте його, щоб перерахувати.
+loan-report-button = Звіт PDF
+loan-monthly-table = Таблиця по місяцях
+loan-months-count = { $count ->
+        [one] { $count } місяць
+        [few] { $count } місяці
+        [many] { $count } місяців
+       *[other] { $count } місяця
+    }
+loan-percent = { $value } %
+loan-notice-payment-too-low = Цей платіж не покриває відсотки: кредит ніколи не буде погашено. Строк залишається 600 місяців.
+loan-notice-too-long = Для цього платежу знадобилося б понад 600 місяців: строк залишається 600 місяців.
+loan-figure-payment = Щомісячний платіж
+loan-figure-payment-insured = Платіж зі страховкою
+loan-figure-taeg = Реальна річна ставка
+loan-figure-interest = Вартість відсотків
+loan-figure-insurance = Вартість страховки
+loan-figure-cost = Загальна вартість кредиту
+loan-figure-total-due = Загальна сума до сплати
+loan-figure-all-in = Усього сплачено, зі страховкою
+loan-part-capital = Сума кредиту
+loan-part-interest = Відсотки
+loan-part-fees = Комісія за оформлення
+loan-part-insurance = Страховка
+loan-donut-cost-caption = усього
+loan-chart-cost = Скільки коштує цей кредит
+loan-chart-capital = Залишок боргу
+loan-schedule-title = Графік платежів
+loan-schedule-yearly = Графік платежів за роками
+loan-column-number = №
+loan-column-year = Рік
+loan-column-date = Дата платежу
+loan-column-payment = Платіж
+loan-column-payments = Платежі
+loan-column-interest = Відсотки
+loan-column-capital = Основний борг
+loan-column-insurance = Страховка
+loan-column-remaining = Залишок боргу
+loan-history-label = Досліджуваний період
+loan-period-last-12 = Останні 12 місяців
+loan-accounts-title = Досліджувані рахунки
+loan-period-title = Період
+loan-column-account = Рахунок
+loan-column-bank = Банк
+loan-column-balance = Реальний залишок
+loan-unavailable-no-account = Позначте хоча б один рахунок, щоб дослідити вашу історію.
+loan-unavailable-no-month = У цьому періоді ще немає жодного повного місяця: оберіть інший.
+loan-verdict-title = Коротко
+loan-verdict-green = Посильно
+loan-verdict-orange = На межі
+loan-verdict-red = Ризиковано
+loan-verdict-no-income = За цей період немає доходів: боргове навантаження розрахувати неможливо.
+loan-check-debt-green = Боргове навантаження { $ratio }: нижче порогу цього методу ({ $green }).
+loan-check-debt-orange = Боргове навантаження { $ratio }: між { $green } і { $red }, на межі.
+loan-check-debt-red = Боргове навантаження { $ratio }: вище { $red }.
+loan-check-effort = Платіж { $payment } забирає { $share } того, що ви відкладаєте { $kind ->
+        [good] у добрий місяць
+        [hard] у важкий місяць
+       *[usual] у звичайний місяць
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] Добрий місяць
+        [hard] Важкий місяць
+       *[usual] Звичайний місяць
+    } нічого не залишає: платіж { $payment } ішов би з вашого запасу.
+loan-check-reserve-green = Ваш залишок лишається додатним до кінця кредиту.
+loan-check-reserve-red = Через цей кредит ваш залишок пішов би в мінус: { $month }.
+loan-check-reserve-sooner = Ваш залишок пішов би в мінус ({ $month }) на { $count ->
+        [one] { $count } місяць
+        [few] { $count } місяці
+        [many] { $count } місяців
+       *[other] { $count } місяця
+    } раніше, ніж без цього кредиту.
+loan-check-reserve-anyway = Ваш залишок пішов би в мінус і без цього кредиту (приблизно: { $month }); кредит майже нічого не змінює.
+loan-check-reserve-floor-green = Ваш залишок лишається вище страхового резерву ({ $floor }) до кінця кредиту.
+loan-check-reserve-floor-red = Через цей кредит ваш залишок опустився б нижче страхового резерву ({ $floor }): { $month }.
+loan-check-reserve-floor-sooner = Ваш залишок опустився б нижче страхового резерву ({ $floor }; { $month }) на { $count ->
+        [one] { $count } місяць
+        [few] { $count } місяці
+        [many] { $count } місяців
+       *[other] { $count } місяця
+    } раніше, ніж без цього кредиту.
+loan-check-reserve-floor-anyway = Ваш залишок опустився б нижче страхового резерву ({ $floor }) і без цього кредиту (приблизно: { $month }); кредит майже нічого не змінює.
+loan-warning-deficit = Увага: за цей період ваші витрати вже перевищують доходи в середньому на { $amount } на місяць, до будь-якого кредиту.
+loan-figure-reference = Заощадження { $kind ->
+        [good] у добрий місяць
+        [hard] у важкий місяць
+       *[usual] у звичайний місяць
+    }
+loan-figure-tipped = Місяці, які кредит відправив би в мінус
+loan-gauge-caption = боргове навантаження
+loan-figure-income = Середній дохід на місяць
+loan-figure-spending = Середні витрати на місяць
+loan-figure-saving = Середні заощадження на місяць
+loan-figure-running = Поточні кредити на місяць
+loan-figure-new = Новий платіж зі страховкою
+loan-figure-rest = На життя на місяць
+loan-figure-debt = Боргове навантаження
+loan-red-months-value = { $count } з { $total }
+loan-figure-balance-now = Реальний залишок сьогодні
+loan-figure-balance-end = Прогноз залишку наприкінці кредиту
+loan-chart-income = Куди йде ваш середній дохід
+loan-donut-income-caption = середній дохід
+loan-part-spending = Поточні витрати
+loan-part-running = Поточні кредити
+loan-part-new = Новий кредит
+loan-part-rest = Залишається
+loan-part-missing = Бракує
+loan-chart-history = Ваша історія з цим кредитом
+loan-chart-history-hint = Що залишилося б щомісяця після сплати платежу. Яскраво-червоним — місяці, які кредит відправив би в мінус; блідо-червоним — ті, що були в мінусі й без нього.
+loan-chart-projection = Прогноз вашого залишку
+loan-mark-loan-end = Кінець: { $label }
+loan-mark-negative = У мінусі
+loan-mark-floor = Нижче резерву
+loan-mark-floor-line = Страховий резерв
+loan-running-title = Враховані поточні кредити
+loan-running-column-label = Періодична операція
+loan-running-column-monthly = На місяць
+loan-running-column-end = Останній платіж
+loan-no-running = Серед ваших періодичних операцій не знайдено жодного поточного кредиту.
+loan-period-caption = { $from } – { $to } ({ $count ->
+        [one] { $count } місяць
+        [few] { $count } місяці
+        [many] { $count } місяців
+       *[other] { $count } місяця
+    })
+loan-transfers = { $count ->
+        [0] Переказів між позначеними рахунками не знайдено.
+        [one] Знайдено й виключено { $count } переказ між позначеними рахунками.
+        [few] Знайдено й виключено { $count } перекази між позначеними рахунками.
+        [many] Знайдено й виключено { $count } переказів між позначеними рахунками.
+       *[other] Знайдено й виключено { $count } переказу між позначеними рахунками.
+    }
+loan-method = Середні за повні місяці періоду, проведені та підтверджені операції, без переказів між позначеними рахунками.
+loan-report-title = Розрахунок кредиту
+loan-report-made-on = розрахунок від { $date }
+loan-disclaimer = Орієнтовний розрахунок без договірної сили. Обов'язковою є лише пропозиція банку.
+loan-tab-rules = Налаштування оцінки
+loan-method-optimistic = Оптимістичний
+loan-method-neutral = Нейтральний
+loan-method-severe = Суворий
+loan-method-line = Метод оцінки: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = Оцінка відповідає на три запитання, і кожен метод висуває свої вимоги. Оберіть той, що вам ближчий: оцінка на вкладці «Чи зможу я його виплатити?» йде за ним. Останній рядок припускає, що ваші витрати щороку зростають на вказаний відсоток; платіж не змінюється.
+loan-rule-row-debt = Допустиме боргове навантаження
+loan-rule-row-reference = Опорні заощадження
+loan-rule-row-share = Частка цих заощаджень, яку може забрати платіж
+loan-rule-row-floor = Поріг, нижче якого залишок не повинен опускатися
+loan-rule-row-sooner = Якщо залишок опускається нижче й без кредиту
+loan-rule-row-growth = Зростання ваших витрат на рік
+loan-rule-limits = зелений до { $green }, помаранчевий до { $red }
+loan-rule-reference = { $kind ->
+        [good] добрий місяць
+        [hard] важкий місяць
+       *[usual] звичайний місяць
+    }: { $amount }
+loan-rule-floor-zero = нуль
+loan-rule-floor-cushion = місяць витрат: { $amount }
+loan-rule-sooner = помаранчевий, якщо кредит наближає це на { $orange }, червоний — на { $red }
+loan-unit-percent-year = % на рік
+loan-method-optimistic-explain = Оптимістичний метод виходить із доброго місяця, допускає боргове навантаження до 40 % і не тримає резерву: він показує, що можливо, якщо все піде добре.
+loan-method-neutral-explain = Нейтральний метод виходить зі звичайного місяця й дотримується правила банків — 33–35 % боргового навантаження: це опорна оцінка.
+loan-method-severe-explain = Суворий метод виходить із важкого місяця й тримає місяць витрат у резерві на непередбачене: він показує, що витримає, навіть якщо все піде погано.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = Енергоспоживання електроприладу
+window-appliance-title = Енергоспоживання електроприладу
+appliance-device-title = Прилад
+appliance-on-title = Увімкнено
+appliance-standby-title = У режимі очікування
+appliance-field-on-watts = Потужність під час роботи
+appliance-field-on-hours = Час роботи на добу
+appliance-field-days = Днів використання на тиждень
+appliance-field-share = Частка роботи в пільгові години
+appliance-field-standby-watts = Потужність у режимі очікування
+appliance-field-standby-hours = Час у режимі очікування в день використання
+appliance-unit-watts = Вт
+appliance-unit-hours = год
+appliance-unit-days = з 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/кВт·год
+appliance-standby-hint = Якщо поле порожнє, режим очікування триває решту дня. У дні без використання прилад лишається увімкненим у розетку: увесь цей час вважається режимом очікування. Якщо прилад вимкнено з розетки, його споживання в режимі очікування — 0 Вт.
+appliance-contract-title = Ваш договір
+appliance-field-option = Тарифний план
+appliance-option-base = Однозонний (одна ціна)
+appliance-option-off-peak = Пікові / пільгові години
+appliance-field-base = Ціна за кВт·год
+appliance-field-peak = Ціна за кВт·год у пікові години
+appliance-field-off-peak = Ціна за кВт·год у пільгові години
+appliance-field-off-peak-hours = Пільгових годин на добу
+appliance-contract-hint = Ці ціни діють лише для цього розрахунку. Збережений тариф задається в розділі Налаштування › Параметри › Інструменти.
+appliance-contract-reset = Повернути збережений тариф
+appliance-period-day = За день
+appliance-period-month = За місяць
+appliance-period-year = За рік
+appliance-energy = { $value } кВт·год
+appliance-less-than = менше ніж { $amount }
+appliance-detail-title = Докладно за рік
+appliance-column-part = Стаття
+appliance-column-energy = Енергія
+appliance-column-cost = Вартість
+appliance-column-share = Частка
+appliance-line-on = Увімкнено
+appliance-line-standby = У режимі очікування
+appliance-line-on-peak = Увімкнено, пікові години
+appliance-line-on-off-peak = Увімкнено, пільгові години
+appliance-line-standby-peak = У режимі очікування, пікові години
+appliance-line-standby-off-peak = У режимі очікування, пільгові години
+appliance-line-total = Разом
+appliance-chart-title = Куди йдуть гроші
+appliance-chart-caption = на рік
+appliance-standby-sentence = Лише режим очікування коштує { $amount } на рік: { $share } від загальної вартості приладу.
+appliance-note-plate = Потужність, зазначена на приладі або в його інструкції, — це максимум: під час роботи більшість приладів споживає менше. Щоб отримати реальне значення, виміряйте її ватметром-розеткою та введіть його показання.
+appliance-note-subscription = Абонентська плата не враховується: її сплачують незалежно від того, увімкнено прилад у розетку чи ні.
+appliance-invalid-watts = Будь ласка, вкажіть потужність від 0 до 100 000 Вт.
+appliance-invalid-hours = Будь ласка, вкажіть час від 0 до 24 годин на добу.
+appliance-invalid-days = Будь ласка, вкажіть ціле число днів від 0 до 7.
+appliance-invalid-share = Будь ласка, вкажіть частку від 0 до 100 %.
+appliance-invalid-day-overflow = Робота й режим очікування разом перевищують 24 години на добу.
+appliance-invalid-price = Будь ласка, вкажіть ціну за кВт·год від 0 до 100.
+appliance-invalid-off-peak-hours = Будь ласка, вкажіть ціле число пільгових годин від 0 до 24.
+preferences-branch-tools = Інструменти
+preferences-leaf-electricity = Тариф на електроенергію
+preferences-electricity-blue = Повернутися до Tarif Bleu EDF
+preferences-electricity-hint = Тариф за вашим договором, який використовує інструмент «Енергоспоживання електроприладу». За замовчуванням: Tarif Bleu від EDF (Франція) станом на 1 серпня 2026 р., ціни з податками, лічильник від 3 до 6 кВА. Ці ціни часто змінюються в лютому та серпні: перепишіть їх зі свого рахунку.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = Моя фінансова подушка
+window-cushion-title = Моя фінансова подушка
+cushion-question = Якби ваші доходи припинилися завтра, на скільки місяців вистачило б ваших заощаджень?
+cushion-accounts-title = Ваші рахунки
+cushion-column-account = Рахунок
+cushion-column-balance = Реальний залишок
+cushion-column-savings = Заощадження
+cushion-column-spending = Витрати
+cushion-accounts-hint = «Заощадження»: гроші, на які ви розраховуєте у скрутний час. «Витрати»: рахунки, з яких сплачуються щоденні витрати.
+cushion-history-label = Аналізований період
+cushion-backup-label = Резервний дохід на місяць
+cushion-backup-hint = Те, що й надалі надходило б: допомога по безробіттю, зарплата чоловіка чи дружини… Порожньо: жодного доходу.
+cushion-categories-title = Враховані витрати
+cushion-categories-hint = Зніміть позначку з того, від чого ви відмовилися б у скрутний час.
+cushion-categories-empty = За цей період витрат немає.
+cushion-verdict-title = Ваша подушка
+cushion-targets-title = Пороги надійності
+cushion-projection-title = Ваші заощадження у скрутний час
+cushion-projection-hint = Скільки залишалося б щомісяця, якби ваші доходи припинилися сьогодні.
+cushion-note = Оцінка на основі вашої історії: витрати у скрутний місяць можуть відрізнятися від середніх.
+cushion-invalid-backup = Цю суму не вдається прочитати: виправте її, щоб перерахувати.
+cushion-no-spending-account = Позначте хоча б один рахунок «Витрати».
+cushion-no-month = У цьому періоді ще немає жодного повного місяця.
+cushion-months = { $value } міс.
+cushion-per-month = { $amount } на місяць
+cushion-figure-holds = Без обмежень
+cushion-gauge-caption = витрат покрито
+cushion-verdict-short = Менше трьох місяців: скрутний час швидко поставить вас у складне становище.
+cushion-verdict-fair = Від трьох до шести місяців: пристойна подушка, яку варто збільшити, якщо зможете.
+cushion-verdict-solid = Шість місяців і більше: ваша подушка надійна.
+cushion-verdict-holds = Ваш резервний дохід покриває ваші витрати: заощадження не танутимуть.
+cushion-verdict-nothing = За період немає врахованих витрат: покривати нічого.
+cushion-tile-savings = Доступні заощадження
+cushion-tile-spending = Враховані витрати
+cushion-tile-backup = Резервний дохід
+cushion-tile-burn = Заощадження танули б на
+cushion-tile-rhythm = Темп заощаджень
+cushion-burn-none = Нічого
+cushion-target-title = { $months } міс. витрат: { $amount }
+cushion-target-reached = Досягнуто.
+cushion-target-date = Бракує { $missing }. За вашого темпу заощаджень буде досягнуто приблизно до дати: { $month }.
+cushion-target-never = Бракує { $missing }. Ваші заощадження не зросли за період: за такого темпу цей поріг не буде досягнуто.
+cushion-mark-empty = Заощадження закінчаться: { $month }
+cushion-period = Середнє за { $count ->
+        [one] { $count } повний місяць
+        [few] { $count } повні місяці
+        [many] { $count } повних місяців
+       *[other] { $count } повних місяців
+    } (період: { $from } — { $to }). { $transfers ->
+        [0] Переказів між вашими рахунками немає.
+        [one] { $transfers } переказ між вашими рахунками виключено з розрахунку.
+        [few] { $transfers } перекази між вашими рахунками виключено з розрахунку.
+        [many] { $transfers } переказів між вашими рахунками виключено з розрахунку.
+       *[other] { $transfers } переказів між вашими рахунками виключено з розрахунку.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = Мета заощаджень
+window-goal-title = Мета заощаджень
+goal-accounts-title = Відстежувані рахунки
+goal-column-account = Рахунок
+goal-column-balance = Реальний залишок
+goal-accounts-hint = Переказ між двома відстежуваними рахунками взаємно компенсується; переказ на невідстежуваний рахунок вважається витратою.
+goal-period-label = Базовий період
+goal-period-range = Діапазон років…
+goal-range-from = з
+goal-range-to = до
+goal-question-title = Ваше запитання
+goal-question-when = Коли в мене буде ця сума?
+goal-question-amount = Скільки в мене буде на цю дату?
+goal-question-effort = Скільки відкладати, щоб на цю дату в мене була ця сума?
+goal-field-target = Цільова сума
+goal-field-date = Цільова дата
+goal-field-rate = Річна ставка за заощадженнями
+goal-field-extra = А якщо відкладати додатково, на місяць
+goal-options-hint = Порожньо: без відсотків, нічого додатково.
+goal-answer-title = Відповідь
+goal-chart-title = Ваш залишок: учора й завтра
+goal-chart-hint = Суцільна лінія: реальний залишок за останні дванадцять місяців; пунктир: прогноз; світла область: діапазон залежно від місяців.
+goal-disclaimer = Прогноз на основі вашої історії, а не обіцянка: будь-яка несподіванка може все змінити.
+goal-no-account = Позначте хоча б один рахунок для відстеження.
+goal-no-month = У цьому періоді ще немає жодного повного місяця.
+goal-invalid-target = Вкажіть цільову суму, будь ласка.
+goal-invalid-date = Вкажіть майбутню дату в межах найближчих п'ятдесяти років, будь ласка.
+goal-invalid-rate = Вкажіть ставку від 0 до 100%, будь ласка.
+goal-invalid-extra = Цю суму не вдається прочитати: виправте її, щоб перерахувати.
+goal-per-month = { $amount } на місяць
+goal-tile-balance = Залишок сьогодні
+goal-tile-rhythm = Середній темп
+goal-tile-target = Мета
+goal-tile-reached = Орієнтовний термін досягнення
+goal-tile-date = Цільова дата
+goal-tile-projected = Прогнозний залишок
+goal-tile-saved = Заощаджено до того часу
+goal-tile-interest = У тому числі відсотки
+goal-tile-needed = Потрібно відкладати
+goal-when-already = У вас уже є { $amount }: на відстежуваних рахунках загалом { $balance }.
+goal-when-reached = У вас буде { $amount } приблизно через { $months ->
+        [one] { $months } місяць
+        [few] { $months } місяці
+        [many] { $months } місяців
+       *[other] { $months } місяців
+    } ({ $month }).
+goal-when-range = Залежно від місяців: { $early } — { $late }.
+goal-when-range-open = Найраніше: приблизно { $early }; за слабких місяців мету не було б досягнуто.
+goal-when-never = За такого темпу ви не досягнете суми { $amount }.
+goal-zero = Ваш залишок упав би до нуля приблизно до дати: { $month }.
+goal-amount = { $month }: у вас було б близько { $amount }.
+goal-amount-range = Залежно від місяців: від { $low } до { $high }.
+goal-effort-more = Щоб на зазначену дату ({ $month }) у вас було { $amount }, потрібно відкладати в середньому { $monthly } на місяць, тобто на { $gap } більше, ніж зараз.
+goal-effort-less = Щоб на зазначену дату ({ $month }) у вас було { $amount }, вистачило б { $monthly } на місяць, тобто на { $gap } менше, ніж зараз: ви випереджаєте план.
+goal-effort-range = Залежно від місяців відхилення від вашого темпу становило б від { $low } до { $high } на місяць.
+goal-chart-target = Мета: { $amount }
+goal-chart-today = Сьогодні
+goal-note-seasons = Прогноз ураховує сезонність: для кожного майбутнього місяця береться середнє значення тих самих місяців періоду.
+goal-note-range = Діапазон будується за слабкими й сильними місяцями періоду: нижньою чвертю та верхньою чвертю.
+goal-note-loan = Кредит «{ $label }» закінчується ({ $month }): після цього — плюс { $amount } на місяць.
+goal-note-interest = Відсотки нараховуються щомісяця за ставкою { $rate }% річних: наближення правила півмісячних періодів для ощадних рахунків.
+goal-period = Темп розраховано за { $count ->
+        [one] { $count } повний місяць
+        [few] { $count } повні місяці
+        [many] { $count } повних місяців
+       *[other] { $count } повних місяців
+    } (період: { $from } — { $to }). { $transfers ->
+        [0] Переказів між відстежуваними рахунками немає.
+        [one] { $transfers } переказ між відстежуваними рахунками виключено з розрахунку.
+        [few] { $transfers } перекази між відстежуваними рахунками виключено з розрахунку.
+        [many] { $transfers } переказів між відстежуваними рахунками виключено з розрахунку.
+       *[other] { $transfers } переказів між відстежуваними рахунками виключено з розрахунку.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = А якщо скоротити…?
+window-cut-title = А якщо скоротити…?
+cut-axis-label = Групування
+cut-axis-category = Категорії
+cut-axis-payee = Контрагенти
+cut-axis-budget-line = Статті бюджету
+cut-table-title = Ваші витрати за статтями
+cut-table-hint = Введіть скорочення у % або в { $sign } на місяць для статей, які ви хотіли б зменшити. Скорочення не може перевищувати саму витрату.
+cut-column-monthly = На місяць
+cut-column-cut = Скорочення
+cut-column-after = Після
+cut-column-yearly = Економія на рік
+cut-total = Разом
+cut-horizon-label = Горизонт
+cut-settings-title = Налаштування
+cut-options-hint = Ставка й цільова сума необов'язкові.
+cut-report-button = Звіт PDF
+cut-chart-title = Ваш залишок без скорочень і з ними
+cut-chart-hint = Суцільна лінія: реальний залишок за останні дванадцять місяців; сірий пунктир: прогноз без скорочень; синім: зі скороченнями; зеленим: заощаджені гроші.
+cut-donut-title = Ваші витрати на місяць після скорочень
+cut-donut-caption = на місяць після скорочень
+cut-donut-others = Інші статті
+cut-donut-saved = Заощаджено
+cut-legend-with = Зі скороченнями
+cut-legend-without = Без скорочень
+cut-years = { $years ->
+        [one] { $years } рік
+        [few] { $years } роки
+        [many] { $years } років
+       *[other] { $years } року
+    }
+cut-headline-none = Введіть скорочення в таблиці, щоб побачити його ефект.
+cut-headline = Скоротивши { $count ->
+        [one] { $count } статтю
+        [few] { $count } статті
+        [many] { $count } статей
+       *[other] { $count } статті
+    }, ви відкладали б на { $monthly } більше на місяць, тобто { $yearly } на рік.
+cut-tile-monthly = Економія на місяць
+cut-tile-yearly = Економія на рік
+cut-tile-horizon = Економія за { $years ->
+        [one] { $years } рік
+        [few] { $years } роки
+        [many] { $years } років
+       *[other] { $years } року
+    }
+cut-tile-spending = Витрати на місяць
+cut-target-already = У вас уже є { $amount }.
+cut-target-sooner = Ви досягли б суми { $amount } приблизно до дати: { $with } (без скорочень: { $without }) — { $months ->
+        [0] без виграшу в часі
+        [one] на { $months } місяць раніше
+        [few] на { $months } місяці раніше
+        [many] на { $months } місяців раніше
+       *[other] на { $months } місяця раніше
+    }.
+cut-target-only-with = З цими скороченнями ви досягли б суми { $amount } приблизно до дати: { $with }; без них, за нинішнього темпу, — ніколи.
+cut-target-never = Навіть із цими скороченнями ви не досягли б суми { $amount } за нинішнього темпу.
+cut-note-seasons = Кожне скорочення враховує сезонність своєї статті: стаття, витрати за якою припадають переважно на літо, і економію дає переважно влітку.
+cut-note-capped = Одне з введених скорочень перевищувало витрату: його зменшено до розміру самої витрати.
+cut-invalid-cut = Це скорочення не вдається прочитати: вкажіть відсоток від 0 до 100 або суму на місяць.
+cut-report-settings = Налаштування
+cut-report-result = Результат
+cut-report-accounts = Відстежувані рахунки
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = Спланувати відпустку
+window-holiday-title = Спланувати відпустку
+holiday-trip-title = Подорож
+holiday-field-trip = Тип подорожі
+holiday-trip-stay = Відпочинок
+holiday-trip-cruise = Круїз
+holiday-field-adults = Дорослі
+holiday-field-children = Діти
+holiday-field-nights = Тривалість, у ночах
+holiday-field-days = Дні
+holiday-field-months = Місяців до від'їзду
+holiday-field-stops = Кількість портів заходу
+holiday-saved-title = Уже заощаджено
+holiday-saved-hint = Позначте рахунки, на яких уже відкладено гроші на відпустку: їхній реальний залишок вважається вже заощадженим.
+holiday-budget-title = Бюджет
+holiday-budget-hint = Для кожної статті — сума, на кого вона припадає і на який строк. Порожня стаття не враховується.
+holiday-optional-title = Необов'язкові статті
+holiday-result-title = Результат
+holiday-donut-title = Куди йдуть гроші на подорож
+holiday-donut-caption = на подорож
+holiday-child-label = Дитяча ціна
+holiday-count-label = Каюти
+holiday-open = Відкрити проєкт…
+holiday-save = Зберегти проєкт…
+holiday-pdf = Звіт PDF
+holiday-excel = Експорт в Excel
+holiday-file-filter = Проєкт відпустки
+holiday-replace-question = Відкриття цього проєкту замінить те, що введено у вікні. Продовжити?
+holiday-file-saved = Проєкт збережено: { $file }
+holiday-file-opened = Проєкт відкрито: { $file }
+holiday-file-not-project = Цей файл не є проєктом відпустки Radinus.
+holiday-file-too-recent = Цей проєкт створено в новішій версії Radinus: оновіть Radinus, щоб відкрити його.
+holiday-file-failed = Не вдалося прочитати або записати файл: { $reason }
+holiday-line-transport = Дорога туди й назад
+holiday-line-lodging = Проживання
+holiday-line-meals = Харчування й поточні витрати
+holiday-line-visits = Визначні місця й дозвілля
+holiday-line-port = Дорога до порту
+holiday-line-cabins = Каюти
+holiday-line-service = Сервісний збір (чайові)
+holiday-line-drinks = Пакет напоїв
+holiday-line-excursions = Екскурсії в портах заходу
+holiday-line-port-taxes = Портові збори
+holiday-line-wifi = Wi-Fi на борту
+holiday-line-onboard = Витрати на борту й на березі
+holiday-line-other = Інші й непередбачені витрати
+holiday-line-insurance = Страхування від скасування поїздки
+holiday-line-stay-tax = Туристичний збір
+holiday-line-car = Автомобіль на місці, пальне й платні дороги
+holiday-line-parking = Паркування в аеропорту чи на вокзалі
+holiday-line-bank = Банківські комісії за кордоном
+holiday-line-formalities = Формальності (паспорт, віза, щеплення)
+holiday-line-pets = Догляд за тваринами
+holiday-span-trip = за поїздку
+holiday-span-night = за ніч
+holiday-span-day = на день
+holiday-span-stop = за порт заходу
+holiday-who-all = на всіх
+holiday-who-person = на особу
+holiday-who-adults = на дорослого
+holiday-cabins-count = { $count ->
+        [one] { $count } каюта
+        [few] { $count } каюти
+        [many] { $count } кают
+       *[other] { $count } каюти
+    }
+holiday-days = { $days ->
+        [one] { $days } день
+        [few] { $days } дні
+        [many] { $days } днів
+       *[other] { $days } дня
+    }
+holiday-invalid-count = Введіть ціле число.
+holiday-invalid-amount = Цю суму не вдається прочитати: потрібне додатне число або відсоток від 0 до 100.
+holiday-headline-empty = Введіть суми бюджету, щоб побачити, скільки коштуватиме подорож.
+holiday-headline-stay = Цей відпочинок коштував би { $total } на { $people ->
+        [one] { $people } особу
+        [few] { $people } особи
+        [many] { $people } осіб
+       *[other] { $people } особи
+    } і { $nights ->
+        [0] 0 ночей
+        [one] { $nights } ніч
+        [few] { $nights } ночі
+        [many] { $nights } ночей
+       *[other] { $nights } ночі
+    }.
+holiday-headline-cruise = Цей круїз коштував би { $total } на { $people ->
+        [one] { $people } особу
+        [few] { $people } особи
+        [many] { $people } осіб
+       *[other] { $people } особи
+    } і { $nights ->
+        [0] 0 ночей
+        [one] { $nights } ніч
+        [few] { $nights } ночі
+        [many] { $nights } ночей
+       *[other] { $nights } ночі
+    }.
+holiday-tile-total = Загальна вартість
+holiday-tile-person = На особу
+holiday-tile-person-day = На особу на день
+holiday-tile-saved = Уже заощаджено
+holiday-tile-remaining = Залишилося зібрати
+holiday-tile-monthly = Потрібно відкладати
+holiday-remaining-none = Нічого: усе покрито
+holiday-monthly-none = Відкладати нічого не потрібно
+holiday-monthly-now = Від'їзд цього місяця
+holiday-note-days = Днів на один більше, ніж ночей: сім ночей — це вісім днів.
+holiday-note-child = У розрахунку на особу дитина платить дитячу ціну, якщо її вказано; якщо поле порожнє, вона платить як дорослий.
+holiday-note-percent = Відсоток страхування застосовується до основних статей подорожі, відсоток банківських комісій — до витрат на місці.
+holiday-sheet-budget = Бюджет
+holiday-sheet-result = Результат
+holiday-column-line = Стаття
+holiday-column-amount = Сума
+holiday-column-child = Дитяча ціна
+holiday-column-who = На кого
+holiday-column-span = На який строк
+holiday-column-cost = Вартість
+holiday-disclaimer = Оцінка на основі ваших власних сум: реальні ціни можуть відрізнятися.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = Проєкт скорочення витрат
+cut-file-not-project = Цей файл не є проєктом скорочення витрат Radinus.
+cut-file-too-recent = Цей проєкт створено в новішій версії Radinus: оновіть Radinus, щоб відкрити його.
+cut-sheet-items = Статті
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = Журнал мого автомобіля
+window-car-title = Журнал мого автомобіля
+car-unnamed = Мій автомобіль
+car-sheet-title = Автомобіль
+car-field-plate = Реєстраційний номер
+car-field-make = Марка
+car-field-model = Модель
+car-field-engine = Тип двигуна
+car-field-first-hand = Перший власник
+car-field-registered = Перша реєстрація
+car-field-acquired = Дата придбання
+car-field-acquired-km = Пробіг під час придбання
+car-field-service = ТО кожні
+car-field-service-or = або кожні
+car-unit-months-short = міс.
+car-unit-km = km
+car-tariff-title = Тариф на заряджання вдома
+car-tariff-hint = Цей тариф зберігається в журналі автомобіля: він не змінює тариф у налаштуваннях.
+car-tariff-reset = Узяти тариф із налаштувань
+car-engine-petrol = Бензин
+car-engine-diesel = Дизель
+car-engine-lpg = Газ (LPG)
+car-engine-e85 = E85 (біоетанол)
+car-engine-hybrid = Гібрид
+car-engine-plug-in = Підключуваний гібрид
+car-engine-electric = Електромобіль
+car-engine-hydrogen = Водень
+car-energy-petrol = Бензин
+car-energy-diesel = Дизельне паливо
+car-energy-lpg = Газ (LPG)
+car-energy-e85 = E85
+car-energy-electricity = Електроенергія
+car-energy-hydrogen = Водень
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = Енергія
+car-rubric-upkeep = Поточне обслуговування
+car-rubric-service = Планове ТО
+car-rubric-wear = Зношувані деталі
+car-rubric-tyres = Шини
+car-rubric-breakdown = Поломки
+car-rubric-insurance = Страховка
+car-rubric-inspection = Техогляд
+car-part-brake-pads = Гальмівні колодки
+car-part-brake-discs = Гальмівні диски
+car-part-timing-belt = Ремінь ГРМ
+car-part-clutch = Зчеплення
+car-part-battery-12v = Акумулятор 12 В
+car-part-shock-absorbers = Амортизатори
+car-part-wipers = Щітки склоочисника
+car-part-spark-plugs = Свічки запалювання
+car-part-glow-plugs = Свічки розжарювання
+car-part-particulate-filter = Сажовий фільтр
+car-part-catalytic-converter = Каталітичний нейтралізатор
+car-part-fuel-cell-filter = Фільтр паливного елемента
+car-part-exhaust = Вихлопна система
+car-part-other = Інша деталь…
+car-axle-all = Усі чотири шини
+car-axle-front = Передні шини
+car-axle-rear = Задні шини
+car-verdict-pass = Пройдено
+car-verdict-counter = Повторний огляд
+car-charge-station = На зарядній станції
+car-charge-home = Удома
+car-slot-peak = Пікові години
+car-slot-off-peak = Пільгові години
+car-entry-new = Новий запис
+car-entry-edit = Змінити запис
+car-field-date = Дата
+car-field-km = Пробіг
+car-field-rubric = Рубрика
+car-field-amount = Сума
+car-field-garage = СТО або АЗС
+car-field-note = Примітка
+car-field-energy = Енергія
+car-field-quantity = Кількість
+car-field-charge = Заряджання
+car-field-slot = Час заряджання
+car-field-part = Деталь
+car-field-part-name = Назва деталі
+car-field-axle = Замінені шини
+car-field-verdict = Результат
+car-field-months = Місяців покриття
+car-field-battery = Стан батареї
+car-home-amount-hint = Сума заряджання вдома розраховується за тарифом автомобіля.
+car-entry-add = Додати до журналу
+car-entry-update = Зберегти запис
+car-entry-cancel = Скасувати
+car-entry-delete = Видалити запис
+car-delete-question = Видалити цей запис із журналу?
+car-from-operation = Узяти операцію…
+car-pick-account = З якого рахунку ця витрата?
+car-pick-operation = Яка операція?
+car-pick-take = Узяти
+car-pick-none = На цьому рахунку немає витрат.
+car-pick-taken = Операцію взято: укажіть пробіг і рубрику, потім додайте запис.
+car-history-title = Історія
+car-filter-all = Усі рубрики
+car-history-empty = Записів поки немає.
+car-history-hint = Клацніть запис, щоб змінити його.
+car-column-date = Дата
+car-column-km = Км
+car-column-rubric = Рубрика
+car-column-detail = Подробиці
+car-column-amount = Сума
+car-column-garage = СТО
+car-column-note = Примітка
+car-column-share = Частка
+car-column-per-km = На км
+car-column-energy = Енергія
+car-column-quantity = Кількість
+car-column-price = Середня ціна
+car-column-consumption = Витрата
+car-column-part = Деталь
+car-column-changes = Заміни
+car-column-last = Остання заміна
+car-column-life = Термін служби
+car-column-next = Наступна заміна
+car-total = Разом
+car-summary-title = Скільки коштує автомобіль
+car-headline-empty = Заповніть картку, потім додайте перший запис: заправку, ТО, рахунок із СТО…
+car-headline = З { $since } ваш автомобіль обійшовся вам у { $total }.
+car-headline-km = З { $since } ваш автомобіль обійшовся вам у { $total } за { $km } пробігу: { $cost } за кілометр.
+car-tile-total = Загальна вартість
+car-tile-month = На місяць
+car-tile-km = За кілометр
+car-tile-driven = Пройдено кілометрів
+car-tile-consumption = Витрата
+car-tile-energy-km = Енергія на кілометр
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [one] { $months } місяць
+        [few] { $months } місяці
+        [many] { $months } місяців
+       *[other] { $months } місяця
+    }
+car-detail-battery = Батарея: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = За рубриками
+car-energy-title = Енергія
+car-parts-title = Зношувані деталі
+car-tyres-title = Шини
+car-battery-title = Стан батареї
+car-years-title = Скільки автомобіль коштував щороку
+car-donut-title = Куди йдуть гроші
+car-donut-caption = усього
+car-deadlines-title = Терміни
+car-deadlines-empty = Термінів поки немає: занотуйте ТО, техогляд, страховку або дві заміни однієї й тієї самої деталі.
+car-deadline-service = ТО
+car-deadline-inspection = Техогляд
+car-deadline-counter = Повторний техогляд
+car-deadline-insurance = Закінчення страховки
+car-when-date = дата: { $date }
+car-when-km = при пробігу { $km }
+car-when-km-reached = при пробігу { $km }; у вашому темпі це приблизно: { $month }
+car-when-date-km = дата: { $date } або при пробігу { $km }, залежно від того, що настане раніше
+car-when-inspection-unknown = Занотуйте останній техогляд, щоб дізнатися дату наступного.
+car-tone-late = Прострочено
+car-tone-soon = Незабаром
+car-note-since = Усе рахується від придбання: за датою та пробігом, указаними в картці.
+car-note-consumption = Витрата вимірюється від повного бака до повного бака: заправляйтеся до повного й щоразу записуйте пробіг.
+car-note-e85 = Автомобіль на E85 п'є те, що йому наллють: кілометри після заправки зараховуються на це паливо.
+car-note-home = Заряджання вдома оцінюється за тарифом автомобіля на день запису й зберігає цю вартість.
+car-note-inspection = Техогляд відповідає французькому правилу: перший — протягом чотирьох років після першої реєстрації, потім кожні два роки; повторний огляд — протягом двох місяців.
+car-disclaimer = Терміни й строки служби — це оцінки за даними журналу: достовірна лише сервісна книжка виробника.
+car-invalid-date = Введіть коректну дату, не пізнішу за сьогоднішню.
+car-invalid-acquired = Дата придбання не може бути раніше за першу реєстрацію.
+car-invalid-km = Введіть пробіг у цілих кілометрах.
+car-invalid-amount = Цю суму неможливо прочитати.
+car-invalid-quantity = Введіть кількість: літри, кВт·год або кілограми.
+car-invalid-part = Виберіть замінену деталь або введіть її назву.
+car-invalid-rubric = Виберіть рубрику.
+car-invalid-months = Введіть ціле число місяців.
+car-invalid-battery = Введіть стан батареї від 0 до 100 %.
+car-open = Відкрити журнал…
+car-save = Зберегти журнал…
+car-report-button = Звіт PDF
+car-file-filter = Журнал автомобіля
+car-file-saved = Журнал збережено: { $file }
+car-file-opened = Журнал відкрито: { $file }
+car-file-not-logbook = Цей файл не є журналом автомобіля Radinus.
+car-file-too-recent = Цей журнал створено в новішій версії Radinus: оновіть Radinus, щоб відкрити його.
+car-replace-question = Відкриття цього журналу замінить журнал у вікні. Продовжити?
+car-sheet-history = Журнал
+car-sheet-summary = Зведення
+
+analysis-history-hint = Чим довша ваша історія, тим кращим буде цей аналіз: в ідеалі потрібно щонайменше рік операцій.
+
+# --- F48 — Поділити витрату (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = Поділити витрату
+window-sharing-title = Поділити витрату
+sharing-question = Хто скільки платить?
+sharing-setup-title = Розподіл
+sharing-field-label = Назва
+sharing-label-hint = Наприклад «Ресторан 12/10» або «Поїздка до Бретані 2027»: за нею називаються файли та звіти.
+sharing-field-total = Усього
+sharing-total-hint = Якщо поле порожнє, сума дорівнює сумі позицій і власних додатків кожного.
+sharing-field-rule = Правило
+sharing-field-rounding = Округлення
+sharing-field-people = Люди
+sharing-mode-whole = Одне правило для всієї витрати
+sharing-mode-item = Одне правило для кожної позиції
+sharing-rule-equal = Рівні частки
+sharing-rule-parts = За частками
+sharing-rule-percent = У відсотках
+sharing-rule-income = Пропорційно до доходів
+sharing-rounding-cent = До центів
+sharing-rounding-euro = До цілої одиниці
+sharing-round-euro = Округлити до цілих одиниць
+sharing-hide-incomes = Приховати доходи у звітах та експорті
+sharing-people-title = Люди
+sharing-people-hint = Один рядок на людину, один стовпець на позицію: позначте, хто в чому бере участь. Усе інше необов'язкове. Якщо хтось відмовляється, залишаючи свій аванс: точна сума, що дорівнює внесеному, і жодної позначки.
+sharing-add-person = Додати людину
+sharing-person-default = Людина { $number }
+sharing-items-title = Позиції
+sharing-items-hint = Лише те, що стосується не всіх, наприклад вино. Решта суми йде у спільну позицію.
+sharing-add-item = Додати позицію
+sharing-common = Спільна
+sharing-payments-title = Платежі
+sharing-payments-hint = Хто заплатив, скільки і коли. Рядок без суми поки не враховується.
+sharing-payments-none = Поки що немає платежів.
+sharing-add-payment = Додати платіж
+sharing-result-title = Результат
+sharing-balances-title = Стан розрахунків
+sharing-transfers-title = Запропоновані перекази
+sharing-delete = Видалити
+sharing-delete-person-question = У цієї людини є платежі: видалити їх разом із нею?
+sharing-disclaimer = Radinus пропонує розподіл: між друзями кожен вільний домовитися інакше.
+sharing-column-person = Людина
+sharing-column-household = Домогосподарство
+sharing-column-income = Дохід
+sharing-column-parts = Частки
+sharing-column-percent = %
+sharing-column-floor = Щонайменше
+sharing-column-cap = Щонайбільше
+sharing-column-fixed = Точна сума
+sharing-column-alone = Власні додатки
+sharing-column-gift = Подарований надлишок
+sharing-column-share = Частка
+sharing-column-typed = Введені %
+sharing-column-constraint = Що спрацювало
+sharing-column-due = До сплати
+sharing-column-item = Позиція
+sharing-column-amount = Сума
+sharing-column-rule = Правило
+sharing-column-participants = Учасники
+sharing-column-unit = Домогосподарство або людина
+sharing-column-members = Члени
+sharing-column-paid = Сплачено
+sharing-column-balance = Баланс
+sharing-column-date = Дата
+sharing-column-who = Хто
+sharing-column-label = Назва
+sharing-help-household = Люди з одного домогосподарства розраховуються разом: їхні платежі та борги додаються, і вони отримують один звіт. Приклад: «Сім'я Мартен» для батьків і дітей.
+sharing-help-income = Потрібен лише для правила «Пропорційно до доходів»: чим вищий дохід, тим більша частка. Введіть місячний дохід.
+sharing-help-parts = Людина з 2 частками платить удвічі більше, ніж людина з 1 часткою. Приклад: дорослий 1, дитина 0,5.
+sharing-help-percent = Частка витрати, яку платить людина. Сума відсотків має дорівнювати 100 %.
+sharing-help-floor = Людина заплатить щонайменше цю суму, навіть якщо розрахована частка менша. Різниця зменшує частку інших.
+sharing-help-cap = Людина ніколи не заплатить більше за цю суму. Те, чого вона не платить, лягає на інших учасників її позицій.
+sharing-help-fixed = Точна сума, яку людина платить за будь-яких обставин; решту ділять між собою інші. Приклад: хтось відмовляється і залишає свій аванс.
+sharing-help-alone = Те, що людина взяла лише для себе, наприклад десерт або кава. Вона оплачує це повністю, додатково до своєї частки.
+sharing-help-gift = Якщо людина внесла більше за свою частку: з позначкою надлишок є подарунком групі, без позначки його повертають.
+sharing-help-items = Позначте людей, які беруть участь у цій позиції. Спільна — це те, що залишається від суми після вирахування інших позицій.
+sharing-help-due = Скільки людина має сплатити загалом: її частка позицій, власні додатки та округлення.
+sharing-help-share = Яку частину становить частка людини, у відсотках від суми, що ділиться.
+sharing-help-typed = Відсоток, який ви ввели. Він може відрізнятися від фактичної частки, якщо спрацював мінімум, максимум або точна сума.
+sharing-help-constraint = Показує, чи змінили частку людини мінімум, максимум, точна сума або подарований надлишок.
+sharing-help-item = Лише те, що стосується не всіх, наприклад вино. Решта суми йде у спільну позицію, яку ділять ті, хто в ній позначений.
+sharing-help-rule = Як ділиться ця позиція: рівні частки, за частками, у відсотках або пропорційно до доходів.
+sharing-help-paid = Скільки домогосподарство або людина вже внесли, згідно з введеними платежами.
+sharing-help-balance = Що ще залишилося сплатити, або скільки внесено понад частку. Приклад: «Залишилося сплатити: 61,54 €».
+sharing-advice-equal = { $count ->
+        [one] { $total } для однієї людини.
+        [few] { $total } ÷ { $count } особи = { $amount } з кожного.
+        [many] { $total } ÷ { $count } осіб = { $amount } з кожного.
+       *[other] { $total } ÷ { $count } особи = { $amount } з кожного.
+    }
+sharing-advice-equal-varied = Порівну між учасниками, з урахуванням обмежень і винятків.
+sharing-advice-parts = Усього часток: { $parts }. Одна частка — { $amount }.
+sharing-advice-parts-varied = Кожен платить за своїми частками, з урахуванням обмежень і винятків. Порожнє поле рахується як 1 частка.
+sharing-advice-percent-rest = До 100 % бракує { $rest } %.
+sharing-advice-percent-over = Відсотки перевищують 100 % на { $over } %.
+sharing-advice-percent-ok = Відсотки дають рівно 100 %.
+sharing-advice-percent-nobody = Відсотки вже дають 100 %: { $count ->
+        [one] { $names } нічого не заплатить.
+        [few] { $names } нічого не заплатять.
+        [many] { $names } нічого не заплатять.
+       *[other] { $names } нічого не заплатять.
+    }
+sharing-advice-income = Кожен платить { $rate } % свого доходу.
+sharing-advice-income-missing = Введіть дохід кожного, щоб поділити пропорційно до доходів.
+sharing-advice-income-varied = Кожен платить однакову частку свого доходу, з урахуванням обмежень і винятків.
+sharing-advice-empty = Введіть суму для розподілу.
+sharing-apply-advice = Взяти запропоновані значення
+sharing-help-apply-advice = Заповнює порожні поля значеннями, показаними сірим. Уже заповнені поля не змінюються.
+sharing-from-incomes = Відсотки за доходами
+sharing-help-from-incomes = Замінює відсотки часткою доходу кожного в загальній сумі доходів. Разом вони дають 100 %.
+sharing-reset-percents = Розподілити все заново
+sharing-help-reset-percents = Стирає відсотки й ділить їх порівну між усіма. Корисно після додавання людини.
+sharing-reset-percents-question = Стерти всі відсотки й розподілити їх порівну?
+sharing-open = Відкрити проєкт…
+sharing-save = Зберегти проєкт…
+sharing-pdf-distribution = Розподіл (PDF)
+sharing-pdf-payments = Стан платежів (PDF)
+sharing-pdf-statements = Індивідуальні виписки (PDF)…
+sharing-statements-everyone = Усі
+sharing-excel = Експорт в Excel
+sharing-file-filter = Проєкт розподілу
+sharing-replace-question = Відкриття цього проєкту замінить те, що введено у вікні. Продовжити?
+sharing-file-saved = Проєкт збережено: { $file }
+sharing-file-opened = Проєкт відкрито: { $file }
+sharing-file-not-project = Цей файл не є проєктом розподілу Radinus.
+sharing-file-too-recent = Цей проєкт створено в новішій версії Radinus: оновіть Radinus, щоб відкрити його.
+sharing-file-failed = Не вдалося прочитати або записати файл: { $reason }
+sharing-statements-replace-question = { $count ->
+        [one] У цій теці вже є { $count } виписка. Замінити?
+        [few] У цій теці вже є { $count } виписки. Замінити?
+        [many] У цій теці вже є { $count } виписок. Замінити?
+       *[other] У цій теці вже є { $count } виписки. Замінити?
+    }
+sharing-statements-written = { $count ->
+        [one] Записано { $count } виписку в «{ $folder }».
+        [few] Записано { $count } виписки в «{ $folder }».
+        [many] Записано { $count } виписок у «{ $folder }».
+       *[other] Записано { $count } виписки в «{ $folder }».
+    }
+sharing-too-many-people = У розподілі може бути щонайбільше 40 людей.
+sharing-too-many-items = У розподілі може бути щонайбільше 20 позицій.
+sharing-too-many-payments = У розподілі може бути щонайбільше 400 платежів.
+sharing-invalid-amount = Цю суму не вдається прочитати: потрібне додатне число.
+sharing-invalid-number = Це число не вдається прочитати: потрібне додатне число.
+sharing-invalid-percent = Відсоток може бути від 0 до 100.
+sharing-invalid-date = Цю дату не вдається прочитати.
+sharing-name-missing = Кожна людина повинна мати ім'я.
+sharing-name-duplicate = «{ $name }» уже є: розрізніть їх, наприклад ініціалом.
+sharing-floor-above-cap = Мінімум перевищує максимум.
+sharing-item-label-missing = Ця позиція не має назви.
+sharing-items-above-total = Позиції та власні додатки кожного перевищують суму на { $amount }.
+sharing-payment-person = Виберіть, хто заплатив.
+sharing-percent-total = Відсотки дають { $sum } %: має бути 100 %.
+sharing-percent-total-item = «{ $item }»: відсотки дають { $sum } %: має бути 100 %.
+sharing-item-nobody = Ніхто не бере участі в «{ $item }».
+sharing-item-no-weight = Ніхто нічого не вносить у «{ $item }»: усі її учасники мають нуль.
+sharing-income-missing = Бракує доходу: { $name }.
+sharing-fixed-above = Точні суми перевищують суму для розподілу на { $amount }.
+sharing-floors-above = Мінімуми перевищують суму для розподілу на { $amount }.
+sharing-cap-alone = { $name } — єдиний учасник «{ $item }»: максимум неможливо дотримати.
+sharing-caps-short = Максимумів недостатньо, щоб покрити суму: бракує { $amount }.
+sharing-impossible = Усі ці умови неможливо дотримати: послабте мінімум або максимум.
+sharing-constraint-floor = Мінімум досягнуто
+sharing-constraint-cap = Максимум досягнуто
+sharing-constraint-fixed = Точна сума
+sharing-constraint-gift = Подарований надлишок
+sharing-and = { $first } і { $last }
+sharing-outside = Поза позиціями
+sharing-alone = Власні додатки
+sharing-rounding = Округлення
+sharing-headline-empty = Додайте людей, які ділять витрату.
+sharing-headline-no-amount = Введіть суму або позиції для розподілу.
+sharing-headline-equal = { $total } для розподілу: кожен платить { $amount }.
+sharing-headline-range = { $total } для розподілу: від { $min } до { $max } залежно від людини.
+sharing-participants = { $count ->
+        [0] Немає учасників
+        [one] { $count } учасник
+        [few] { $count } учасники
+        [many] { $count } учасників
+       *[other] { $count } учасника
+    }
+sharing-balance-due = Залишилося сплатити: { $amount }
+sharing-balance-over = Внесено на { $amount } більше за свою частку
+sharing-balance-even = Усе сплачено
+sharing-summary-collected = Сплачено { $collected } із { $total }.
+sharing-summary-owing = { $count ->
+        [0] Усі розрахувалися.
+        [one] { $count } ще винен { $amount }.
+        [few] { $count } ще винні разом { $amount }.
+        [many] { $count } ще винні разом { $amount }.
+       *[other] { $count } ще винні разом { $amount }.
+    }
+sharing-remaining-outside = Залишилося сплатити за витратою: { $amount }
+sharing-remaining-reimburse = Повернути { $name }: { $amount }
+sharing-all-settled = Усе розраховано: ніхто нікому нічого не винен.
+sharing-transfer = { $from } має сплатити { $amount } на користь { $to }
+sharing-warning-over-paid = Платежі перевищують витрату на { $amount }: перевірте суми.
+sharing-note-income-zero = { $name } нічого не платить за { $items }: дохід дорівнює 0.
+sharing-note-excluded = { $name } не бере участі в «{ $item }»: частку розподілено між іншими.
+sharing-note-gift = Надлишок, подарований учасником { $giver }, зменшує частку інших: тепер { $name } має внесок більший за свою частку.
+sharing-note-outside = { $name } платить { $amount } поза своїми позиціями: цю суму віднято від того, що ділять інші.
+sharing-note-keeper = Округлено до цілих одиниць: { $name } залишає центи собі, щоб загальна сума зійшлася.
+sharing-report-distribution = Розподіл
+sharing-report-sharing = Розподіл
+sharing-report-who-pays = Хто скільки платить
+sharing-report-items = Деталі за позиціями
+sharing-report-payments = Стан платежів
+sharing-report-as-of = Станом на { $date }
+sharing-report-balances = Частка, сплачено, баланс
+sharing-report-statement = Виписка — { $name }
+sharing-report-your-share = Ваша частка
+sharing-statement-total = Усього для домогосподарства: { $amount }
+sharing-statement-pay = До сплати для { $name }: { $amount }
+sharing-statement-receive = До отримання від { $name }: { $amount }
+sharing-sheet-people = Люди
+sharing-sheet-items = Позиції
+sharing-sheet-result = Результат
+sharing-sheet-payments = Платежі
+sharing-sheet-balances = Повернення

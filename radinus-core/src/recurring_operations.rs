@@ -557,11 +557,16 @@ pub fn calendar(conn: &Connection, ids: &[i64]) -> Result<Vec<Occurrence>> {
 /// venir : le jour n'est pas fini.
 pub fn status_for(date: NaiveDate, today: NaiveDate) -> i64 {
     if date < today {
-        1
+        POINTED
     } else {
-        3
+        PLANNED
     }
 }
+
+/// Les deux statuts que [`status_for`] rend, nommés — la date de pointage se
+/// décide sur celui-ci, et `1` ou `3` au milieu d'un `match` ne dirait rien.
+const POINTED: i64 = 1;
+const PLANNED: i64 = 3;
 
 /// Ce que l'insertion a fait.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -598,7 +603,17 @@ pub fn insert(
             label: occurrence.label.clone(),
             payment_reference: String::new(),
             date: Some(occurrence.date),
-            clearing_date: Some(occurrence.date),
+            // **La date de pointage n'appartient qu'aux opérations pointées**
+            // (Fabrice, 21/08/2026, après des retours d'utilisateurs). Une
+            // échéance de novembre prochain naissait ici avec une date de
+            // pointage : elle affirmait que la banque l'avait passée, alors
+            // qu'elle n'a même pas eu lieu. Une échéance déjà passée entre en
+            // `Pointé` et porte donc sa date ; une échéance à venir n'a rien à
+            // dater.
+            clearing_date: match status_for(occurrence.date, today) {
+                POINTED => Some(occurrence.date),
+                _ => None,
+            },
             direction: if occurrence.amount < 0 {
                 crate::sub_operations::Direction::Debit
             } else {
@@ -611,6 +626,7 @@ pub fn insert(
             payment_mode_id: occurrence.payment_mode_id,
             payee_id: occurrence.payee_id,
             project_id: occurrence.project_id,
+            verification_id: None,
             comment: None,
         };
         let id = crate::operations::create_within(&tx, occurrence.account_id, &input)?;

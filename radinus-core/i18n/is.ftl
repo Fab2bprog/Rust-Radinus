@@ -250,13 +250,16 @@ menu-accounts-checkbooks = Umsjón tékkhefta
 
 menu-statistics = Tölfræði
 menu-statistics-balance-chart = Graf Þróun stöðu
+menu-statistics-balance-analysis = Greining Þróun stöðu
 menu-statistics-by-category = Tölfr. eftir flokkum
 menu-statistics-by-assignment = Tölfr. eftir úthlutunum
 menu-statistics-by-budget-line = Tölfr. eftir fjárhagsliðum
 menu-statistics-by-payment-mode = Tölfr. eftir greiðslumátum
 menu-statistics-by-payee = Tölfr. eftir mótaðilum og söluaðilum
 menu-statistics-by-project = Tölfr. eftir verkefnum
+menu-statistics-by-verification = Tölfr. eftir yfirferð
 menu-statistics-dashboard = Stjórnborð færslna
+menu-statistics-crossed-balance = Krossjöfnuður
 
 menu-budget = Fjárhagsáætlun
 menu-budget-entry = Skráning fjárhagsáætlunar
@@ -274,6 +277,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = Sniðmát færslna
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = Verkfæri
 menu-settings = Stillingar
 menu-settings-about-author = Um höfundinn
 menu-settings-about-radinus = Um Radinus
@@ -430,6 +435,15 @@ operations-selection-total = Heildarupphæð valinna færslna: { $amount }
 
 operations-column-date = Dags.
 operations-column-clearing-date = Afstemmingardags.
+operations-column-status = Staða færslu
+operation-status-pointed = Afstemmd
+operation-status-committed = Frátekin
+operation-status-planned = Áætluð
+operations-column-verification = Yfirferð
+operation-verification-to-verify = Óyfirfarin
+operation-verification-verified = Yfirfarin
+operation-verification-doubtful = Vafasöm
+operation-verification-disputed = Véfengd
 operations-column-label = Lýsing
 operations-column-category = Flokkur
 operations-column-assignment = Úthlutun
@@ -505,6 +519,9 @@ filter-all = Allar færslur
 filter-pointed = Aðeins afstemmdar færslur
 filter-committed = Aðeins fráteknar færslur
 filter-planned = Aðeins áætlaðar færslur
+filter-by-status = Sía eftir stöðu
+filter-by-verification = Sía eftir yfirferð
+filter-show-all = Sýna allt
 
 # --- Færsluspjald (F03) ----------------------------------------------
 # Heitin eru þau sem sjást á skjámyndinni „Fiche operation transaction.png“,
@@ -538,6 +555,7 @@ operation-field-direction = Tegund færslu:
 operation-field-amount = Upphæð
 operation-field-status = Staða færslu
 operation-field-clearing-date = Afstemmingardagur
+operation-field-verification = Yfirferð
 operation-field-category = Flokkur
 operation-field-assignment = Úthlutun
 operation-field-payment-mode = Máti
@@ -560,6 +578,10 @@ operation-nothing-to-show = Engar færslur til að sýna.
 operation-label-required = Lýsing færslunnar er nauðsynleg.
 operation-date-required = Dagsetning færslunnar er nauðsynleg.
 operation-clearing-date-invalid = Afstemmingardagurinn er ekki gild dagsetning.
+operation-clearing-date-required = Stemmd færsla verður að bera stemmingardagsetningu.
+operation-clearing-date-question =
+    Stemmd færsla verður að bera stemmingardagsetningu.
+    Viltu vista með dagsetningu færslunnar, { $date }?
 operation-is-a-sub = Þessi lína er undirfærsla: henni er breytt á hennar eigin spjaldi.
 operation-delete-form-open = Spjaldið fyrir „{ $label }“ er opið. Lokaðu því áður en þú eyðir.
 
@@ -598,6 +620,7 @@ sub-operation-is-the-complement = Þetta er Viðbótin: það sem eftir er að s
 sub-operation-of = Skipting „{ $label }“ ({ $amount })
 
 operations-pointed = { $count ->
+    [0] Engin færsla til að afstemma: valið er þegar afstemmt.
     [one] { $count } færsla afstemmd.
    *[other] { $count } færslur afstemmdar.
 }
@@ -611,6 +634,7 @@ operations-select-one = Veldu aðeins eina færslu.
 operation-copy = Afrit sem á eftir að vista: ekkert hefur enn verið búið til.
 operations-show-children = Sýna allar undirfærslur
 operations-hide-children = Fela allar undirfærslur
+operations-recurring-from = Búa til endurtekna færslu út frá þessari færslu
 
 # --- Önnur staðfesting á alvarlegri eyðingu --------------------------
 # Að eyða bankareikningi tekur alla sögu hans með sér: það er smellt á Já/Nei
@@ -631,6 +655,7 @@ window-statistics-title = { $kind ->
     [payment-mode] Tölfræði eftir greiðslumáta
     [payee] Tölfræði eftir mótaðila og söluaðila
     [project] Tölfræði eftir verkefni
+    [verification] Tölfræði eftir yfirferð
    *[category] Tölfræði eftir flokki
 }
 
@@ -640,6 +665,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] FærsluMáti
     [payee] Mótaðili
     [project] Verkefni
+    [verification] Yfirferð
    *[category] FlokksNafn
 }
 
@@ -649,6 +675,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] Án greiðslumáta
     [payee] Án mótaðila
     [project] Án verkefnis
+    [verification] Óyfirfarin
    *[category] Án flokks
 }
 statistics-total = Samtals
@@ -690,6 +717,19 @@ accounts-stats-multiselect-help = Uppl.: Notaðu músarsmell + [{ $modifier }]-l
 statistics-year-question = Hvaða ár viltu vinna með? Radinus nær frá { $first } til { $last }.
 statistics-year-choose = Velja ár
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = Krossjöfnuður
+crossed-balance-window-name = Krossjöfnuður
+crossed-balance-column = Flokkur
+crossed-balance-no-data = Engin færsla í þessum mánuði fyrir valda reikninga.
+crossed-balance-month-question = Hvaða mánuð viltu vinna með? Tala á milli { $first } og { $last }.
+crossed-balance-month-choose = Velja mánuð
+crossed-balance-next = Næsti mánuður
+crossed-balance-previous = Fyrri mánuður
+
 # --- Útflutningur taflna (hægrismellur) ------------------------------
 # Aðgerð töflunnar, ekki gluggans: allir listarnir hafa hana.
 
@@ -707,8 +747,16 @@ export-to-xml = Flytja út í XML (.xml)
 # Útflutningsvalmynd tölfræðigluggans: einn flipi á hvert ár, nefndur AN_2026.
 # Tómu árin — miðað við rofana eins og þeir standa — eru ekki með.
 export-menu = Útflutningur
+export-to = Flytja út í
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = Afrita reit
+copy-rows = Afrita valdar línur
+copy-failed = Ekki tókst að afrita á klippiborðið.
 export-all-years-excel = Flytja öll árin út í Excel
 export-all-years-ods = Flytja öll árin út í LibreOffice Calc
+export-all-months-excel = Flytja alla mánuði sýnda ársins út í Excel
+export-all-months-ods = Flytja alla mánuði sýnda ársins út í LibreOffice Calc
 export-no-year = Ekkert ár ber færslu: það er ekkert til að flytja út.
 export-years-done = { $years } ár flutt út í „{ $file }“.
 export-to-json = Flytja út í JSON (.json)
@@ -722,6 +770,7 @@ statistics-window-name = { $kind ->
     [payment-mode] Tölfræði eftir greiðslumáta
     [payee] Tölfræði eftir mótaðila og söluaðila
     [project] Tölfræði eftir verkefni
+    [verification] Tölfræði eftir yfirferð
    *[category] Tölfræði eftir flokki
 }
 statistics-detail-name = Nánar um tölfræðina
@@ -764,6 +813,19 @@ curve-axis-balance = staða
 curve-nothing = Enginn reikningur hefur verið valinn: það er ekkert graf til að teikna.
 curve-empty = Engar færslur á þessu tímabili.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = Greining á þróun stöðu
+analysis-heading = Greining á þróun stöðu
+analysis-hint = Dragðu yfir grafið með músarhnappinn niðri til að sjá færslur þess tímabils.
+analysis-zone = Svæði:
+analysis-opening = Upphafsstaða:
+analysis-closing = Lokastaða:
+analysis-variation = Breyting:
+analysis-detail-name = Stöðugreining
+analysis-detail-none = Engar færslur á þessu svæði.
+
 # --- F05 — Hraðflokkun færslna -----------------------------------------
 # Glugginn þar sem flokkað er **í hópum**: þú velur línur, hakar við þá
 # eiginleika sem á að breyta og beitir þeim í einu lagi — í minni.
@@ -783,6 +845,7 @@ quick-check-payment-mode = Máti
 quick-check-payee = Mótaðili
 quick-check-project = Verkefni
 quick-check-status = Staða
+quick-check-verification = Yfirferð
 quick-column-date = Dagsetning
 quick-column-label = Lýsing
 quick-column-amount = Upphæð
@@ -792,6 +855,7 @@ quick-column-payment-mode = Greiðslumáti
 quick-column-payee = Mótaðili
 quick-column-project = Verkefni
 quick-column-status = Staða
+quick-column-verification = Yfirferð
 # Á Mac er Ctrl + smellur hægrismellur: lykillinn sem bætir við val er þar
 # ⌘, og hjálpartextinn verður að nefna þann sem virkar í raun.
 quick-multiselect-help = Ábending: Notaðu músarsmell + [{ $modifier }]-lykilinn á töflunni til að velja marga hluti
@@ -852,7 +916,7 @@ statement-no-match = Engin lína samsvarar síunni.
 statement-help = Ábending: Notaðu músarsmell + [{ $modifier }]-lykilinn á töflunni til að velja margar línur
 statement-choose-account = Þessi skrá inniheldur marga reikninga. Hvern viltu flytja inn?
 statement-select-line = Veldu að minnsta kosti eina línu í reikningsyfirlitinu.
-statement-title-open = Opna reikningsyfirlitsskrá (.ofx)
+statement-title-open = Opna reikningsyfirlitsskrá (OFX, QIF, CSV)
 statement-title-info = Upplýsingar um opnu skrána
 statement-title-integrate = Fella valið inn í reikninginn
 statement-title-validate = Fella þessa færslu inn í reikninginn
@@ -861,6 +925,15 @@ statement-no-fitid = Aðvörun: þessi skrá gefur ekkert auðkenni (FITID) fyri
 statement-loaded = { $count ->
     [0] Þessi skrá inniheldur engar færslur fyrir þennan reikning.
    *[other] { $count } línur lesnar, þar af { $known } þegar til á reikningnum þínum.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] { $count } línur lesnar; engin þeirra líkist færslu sem er þegar til á reikningnum þínum.
+    [one] { $count } línur lesnar, þar af { $alike } sem líkist færslu sem er þegar til á reikningnum þínum (sama dagsetning, sama lýsing, sama upphæð).
+   *[other] { $count } línur lesnar, þar af { $alike } sem líkjast færslum sem eru þegar til á reikningnum þínum (sama dagsetning, sama lýsing, sama upphæð).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] { $alike } önnur lína líkist færslu sem er þegar til (sama dagsetning, sama lýsing, sama upphæð).
+   *[other] { $alike } aðrar línur líkjast færslum sem eru þegar til (sama dagsetning, sama lýsing, sama upphæð).
 }
 statement-integrated = { $count ->
     [0] Ekkert var fellt inn: þessar línur eru þegar á reikningnum þínum.
@@ -897,7 +970,23 @@ statement-file-info =
     Reikningur skrárinnar: { $account }
     Tímabil: frá { $from } til { $to }
     Staða samkvæmt bankanum: { $balance }
-    { $count } færslur, þar af { $known } þegar til á reikningnum þínum.
+statement-qif-question = Ekkert í þessari skrá segir til um hvort dagsetningin „{ $date }“ er skrifuð dagur/mánuður eða mánuður/dagur. Hún þýðir:
+statement-qif-day-month = Dagur { $day }, mánuður { $month } (dagur/mánuður)
+statement-qif-month-day = Dagur { $day }, mánuður { $month } (mánuður/dagur)
+statement-qif-dates-mixed = Þessi skrá skrifar dagsetningar sínar á tvo vegu: „{ $first }“ er lesin dagur/mánuður, „{ $second }“ mánuður/dagur. Hún er ekki flutt inn, svo að engin dagsetning verði röng.
+statement-qif-amounts-mixed = Þessi skrá skrifar upphæðir sínar á tvo vegu: „{ $first }“ með punkti, „{ $second }“ með kommu. Hún er ekki flutt inn, svo að engin upphæð verði röng.
+statement-qif-opening = Upphafsstaða { $amount } þann { $date }: þetta er ekki færsla, hún er ekki flutt inn.
+statement-qif-opening-undated = Upphafsstaða { $amount }: þetta er ekki færsla, hún er ekki flutt inn.
+statement-qif-suspect = Lína { $rank }, „{ $label }“ ({ $amount }), lítur út eins og upphafsstaða: athugaðu hana áður en þú fellir hana inn.
+statement-qif-rejected = { $count ->
+    [one] { $count } ólæsileg lína er ekki flutt inn: { $lines }.
+   *[other] { $count } ólæsilegar línur eru ekki fluttar inn: { $lines }.
+}
+statement-qif-reason-date = dagsetning
+statement-qif-reason-amount = upphæð
+statement-qif-reason-differ = misvísandi upphæðir
+statement-qif-no-account = Þessi reikningur er ekki lengur í skránni: opnaðu skrána aftur.
+statement-balance-unknown = ekki tilgreint í skránni
 statement-group-identification = Auðkenning færslunnar
 statement-group-amount = Upphæð færslunnar
 statement-group-classification = Flokkun færslunnar til útreiknings á tölfræði
@@ -1522,6 +1611,9 @@ password-show = Sýna lykilorðið
 password-remove-question = Fjarlægja vörnina af þessum gagnagrunni?
 password-mismatch = Innslættirnir tveir á nýja lykilorðinu eru ólíkir
 password-wrong = Lykilorðið gengur ekki
+database-too-recent = Þessi gagnagrunnur var vistaður með nýrri útgáfu af Radinus (útgáfa gagnagrunns { $found }; þessi útgáfa les allt að útgáfu { $supported }). Uppfærðu Radinus til að opna hann.
+database-not-radinus = Þessi skrá er ekki Radinus-gagnagrunnur.
+database-unreadable = Ekki tókst að lesa gagnagrunninn: { $reason }
 password-close-first = Lokaðu þessum gagnagrunni áður en þú breytir lykilorðinu
 password-now-protected = Gagnagrunnurinn er varinn með lykilorði
 password-now-clear = Gagnagrunnurinn er ekki lengur varinn
@@ -1754,6 +1846,11 @@ welcome-total-final = Lokastaða
 welcome-total-real-detail = afstemmt + frátekið
 welcome-total-final-detail = afstemmt + frátekið + áætlað
 welcome-accounts = Reikningarnir þínir
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = Reikningar taldir með í heildartölum: { $count } af { $total }
+welcome-tile-counted = Telja þennan reikning með í heildartölum
 welcome-tile-bank = Í banka
 welcome-tile-real = Raunstaða
 welcome-tile-final = Lokastaða
@@ -1808,6 +1905,58 @@ preferences-leaf-zoom = Stærð birtingar
 preferences-field-zoom = Stækkun:
 preferences-zoom-reset = Sjálfgefið gildi
 preferences-zoom-hint = Allt stækkar saman: textinn, táknmyndirnar, dálkarnir. Undir 100 % kemst meira fyrir á skjánum. Valmyndastika kerfisins og valgluggar þess fylgja hins vegar stillingum tölvunnar þinnar en ekki þessum.
+preferences-branch-import = Innflutningur
+preferences-leaf-verification = Yfirferð
+preferences-field-verification = Innfluttar færslur:
+preferences-verification-hint = „Yfirfarin“: þú treystir bankanum þínum, innflutt færsla telst rétt. „Óyfirfarin“: hver innflutt færsla bíður eftir yfirferð þinni; síðan setur þú hana sjálf(ur) á „Yfirfarin“ í færslulistanum. Þessi stilling gildir aðeins um innflutning héðan í frá.
+preferences-leaf-qif = QIF-reikningsyfirlit
+preferences-field-qif-order = Röð dags og mánaðar:
+preferences-qif-order-ask = Spyrja mig í hvert sinn
+preferences-qif-order-day-month = Alltaf dagur/mánuður (05/03 = 5. mars)
+preferences-qif-order-month-day = Alltaf mánuður/dagur (05/03 = 3. maí)
+preferences-qif-order-help = Er aðeins notað ef engin dagsetning í skránni sker úr um það. Um leið og dagsetning á borð við 24/11 sannar röðina ræður skráin, hver sem þessi stilling er.
+preferences-field-qif-label = Lýsing færslunnar:
+preferences-qif-label-both = Mótaðili + athugasemd
+preferences-qif-label-payee = Aðeins mótaðili
+preferences-qif-label-memo = Aðeins athugasemd
+preferences-qif-label-help = Þegar færsla ber bæði mótaðila og athugasemd. Ef hún ber aðeins annað þeirra er það notað, hver sem þessi stilling er.
+preferences-qif-hint = Þessar stillingar gilda um öll QIF-reikningsyfirlit, hvaða gagnagrunnur sem er opinn. „Spyrja mig í hvert sinn“ er öruggast: skrá með tvíræðum dagsetningum er aldrei lesin af handahófi.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = Endurheimta sjálfgefna dálka
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = Sýna/Fela
+columns-colour = Lita dálkinn:
+columns-colour-none = Enginn litur
+columns-colour-red = Rauður
+columns-colour-orange = Appelsínugulur
+columns-colour-pink = Bleikur
+columns-colour-pastel-green = Pastelgrænn
+columns-colour-green = Grænn
+columns-colour-pastel-blue = Pastelblár
+columns-colour-blue = Blár
+columns-colour-pastel-yellow = Pastelgulur
+columns-colour-yellow = Gulur
+preferences-leaf-columns = Dálkar taflna
+preferences-table-operations-list = Færslulisti
+preferences-columns-reset = Endurstilla
+preferences-columns-reset-all = Endurstilla allt
+preferences-columns-done = Dálkarnir eru komnir aftur í upprunalega uppsetningu.
+preferences-columns-hint = Hver tafla man röð dálka sinna, þá sem þú felur og breidd þeirra. „Endurstilla“ færir töflunni upprunalega uppsetningu strax.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = Endurstilling
+preferences-leaf-comfort = Þægindastillingar
+preferences-comfort-reset = Endurstilla þægindastillingar
+preferences-comfort-hint = Endurstillir dálka allra taflna, röð og gátreiti reikninganna í upphafsglugganum og stærð birtingar. Tungumál, gjaldmiðill og yfirferð innfluttra færslna er látið ósnert.
+preferences-comfort-question = Endurstilla þægindastillingar? Dálkar taflna, upphafsglugginn og stærð birtingar fara aftur í upprunalegt horf.
+preferences-comfort-done = Þægindastillingar hafa verið endurstilltar.
 
 # --- Borðinn á velkomstsíðunni -------------------------------------------
 #
@@ -1872,3 +2021,945 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = Þessi hugbúnaður er veittur án nokkurrar ábyrgðar, að því marki sem lög leyfa.
 licence-info = Opinberi textinn opnast í vafranum þínum, á gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = Lánareiknivél
+window-loan-title = Lánareiknivél
+loan-tab-credit = Lánið
+loan-tab-afford = Get ég greitt það til baka?
+loan-field-kind = Tegund láns
+loan-kind-consumer = Neytendalán
+loan-kind-mortgage = Húsnæðislán
+loan-field-amount = Lánsfjárhæð
+loan-field-payment = Mánaðarleg greiðsla
+loan-field-months = Lánstími
+loan-field-rate = Fastir vextir
+loan-field-fees = Lántökugjald
+loan-field-insurance = Trygging á mánuði
+loan-unit-months = mánuðir
+loan-unit-percent = %
+loan-invalid-field = Þetta gildi er ekki tala: leiðréttu það til að reikna aftur.
+loan-report-button = PDF-skýrsla
+loan-monthly-table = Tafla mánuð fyrir mánuð
+loan-months-count = { $count ->
+        [one] { $count } mánuður
+       *[other] { $count } mánuðir
+    }
+loan-percent = { $value } %
+loan-notice-payment-too-low = Þessi greiðsla dugar ekki fyrir vöxtunum: lánið yrði aldrei greitt upp. Lánstíminn helst 600 mánuðir.
+loan-notice-too-long = Þessi greiðsla myndi krefjast meira en 600 mánaða: lánstíminn helst 600 mánuðir.
+loan-figure-payment = Mánaðarleg greiðsla
+loan-figure-payment-insured = Greiðsla með tryggingu
+loan-figure-taeg = Árleg hlutfallstala kostnaðar
+loan-figure-interest = Vaxtakostnaður
+loan-figure-insurance = Tryggingakostnaður
+loan-figure-cost = Heildarkostnaður lánsins
+loan-figure-total-due = Heildarfjárhæð til greiðslu
+loan-figure-all-in = Endurgreitt alls, með tryggingu
+loan-part-capital = Lánsfjárhæð
+loan-part-interest = Vextir
+loan-part-fees = Lántökugjald
+loan-part-insurance = Trygging
+loan-donut-cost-caption = alls
+loan-chart-cost = Hvað lánið kostar
+loan-chart-capital = Eftirstöðvar
+loan-schedule-title = Greiðsluáætlun
+loan-schedule-yearly = Greiðsluáætlun, ár fyrir ár
+loan-column-number = Nr.
+loan-column-year = Ár
+loan-column-date = Gjalddagi
+loan-column-payment = Greiðsla
+loan-column-payments = Greiðslur
+loan-column-interest = Vextir
+loan-column-capital = Afborgun
+loan-column-insurance = Trygging
+loan-column-remaining = Eftirstöðvar
+loan-history-label = Tímabil til skoðunar
+loan-period-last-12 = Síðustu 12 mánuðir
+loan-accounts-title = Reikningar til skoðunar
+loan-period-title = Tímabil
+loan-column-account = Reikningur
+loan-column-bank = Banki
+loan-column-balance = Raunstaða
+loan-unavailable-no-account = Hakaðu við að minnsta kosti einn reikning til að skoða söguna þína.
+loan-unavailable-no-month = Þetta tímabil hefur engan heilan mánuð enn: veldu annað.
+loan-verdict-title = Í stuttu máli
+loan-verdict-green = Gerlegt
+loan-verdict-orange = Tæpt
+loan-verdict-red = Áhættusamt
+loan-verdict-no-income = Engar tekjur á tímabilinu: ekki er hægt að reikna skuldahlutfallið.
+loan-check-debt-green = Skuldahlutfall { $ratio }: undir viðmiði þessarar aðferðar, { $green }.
+loan-check-debt-orange = Skuldahlutfall { $ratio }: á milli { $green } og { $red }, á mörkunum.
+loan-check-debt-red = Skuldahlutfall { $ratio }: yfir { $red }.
+loan-check-effort = Greiðslan upp á { $payment } tekur { $share } af því sem þú leggur til hliðar { $kind ->
+        [good] í góðum mánuði
+        [hard] í erfiðum mánuði
+       *[usual] í venjulegum mánuði
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] Góður mánuður
+        [hard] Erfiður mánuður
+       *[usual] Venjulegur mánuður
+    } skilur ekkert eftir: greiðslan upp á { $payment } yrði tekin af varasjóðnum þínum.
+loan-check-reserve-green = Staðan þín helst jákvæð til loka lánsins.
+loan-check-reserve-red = Staðan þín færi undir núll í { $month }, vegna þessa láns.
+loan-check-reserve-sooner = Staðan þín færi undir núll í { $month }, { $count ->
+        [one] einum mánuði
+       *[other] { $count } mánuðum
+    } fyrr en án lánsins.
+loan-check-reserve-anyway = Staðan þín færi undir núll um { $month } jafnvel án lánsins, sem breytir litlu.
+loan-check-reserve-floor-green = Staðan þín helst yfir öryggisvarasjóðnum ({ $floor }) til loka lánsins.
+loan-check-reserve-floor-red = Staðan þín færi undir öryggisvarasjóðinn ({ $floor }) í { $month }, vegna þessa láns.
+loan-check-reserve-floor-sooner = Staðan þín færi undir öryggisvarasjóðinn ({ $floor }) í { $month }, { $count ->
+        [one] einum mánuði
+       *[other] { $count } mánuðum
+    } fyrr en án lánsins.
+loan-check-reserve-floor-anyway = Staðan þín færi undir öryggisvarasjóðinn ({ $floor }) um { $month } jafnvel án lánsins, sem breytir litlu.
+loan-warning-deficit = Athugið: á þessu tímabili eru útgjöld þín þegar { $amount } hærri en tekjurnar á mánuði að meðaltali, fyrir nokkurt lán.
+loan-figure-reference = Sparnaður { $kind ->
+        [good] í góðum mánuði
+        [hard] í erfiðum mánuði
+       *[usual] í venjulegum mánuði
+    }
+loan-figure-tipped = Mánuðir sem lánið setti í mínus
+loan-gauge-caption = skuldahlutfall
+loan-figure-income = Meðaltekjur á mánuði
+loan-figure-spending = Meðalútgjöld á mánuði
+loan-figure-saving = Meðalsparnaður á mánuði
+loan-figure-running = Núverandi lán á mánuði
+loan-figure-new = Ný greiðsla, með tryggingu
+loan-figure-rest = Til að lifa af á mánuði
+loan-figure-debt = Skuldahlutfall
+loan-red-months-value = { $count } af { $total }
+loan-figure-balance-now = Raunstaða í dag
+loan-figure-balance-end = Áætluð staða í lok láns
+loan-chart-income = Hvert meðaltekjurnar þínar fara
+loan-donut-income-caption = meðaltekjur
+loan-part-spending = Dagleg útgjöld
+loan-part-running = Núverandi lán
+loan-part-new = Nýtt lán
+loan-part-rest = Afgangur
+loan-part-missing = Vantar
+loan-chart-history = Sagan þín með þessu láni
+loan-chart-history-hint = Það sem hefði verið eftir hvern mánuð eftir greiðsluna. Skærrautt: mánuðirnir sem lánið setti í mínus; fölrautt: þeir sem voru þegar í mínus án þess.
+loan-chart-projection = Áætluð staða þín
+loan-mark-loan-end = Lok: { $label }
+loan-mark-negative = Í mínus
+loan-mark-floor = Undir varasjóði
+loan-mark-floor-line = Öryggisvarasjóður
+loan-running-title = Núverandi lán sem tekin eru með
+loan-running-column-label = Endurtekin færsla
+loan-running-column-monthly = Á mánuði
+loan-running-column-end = Síðasta greiðsla
+loan-no-running = Ekkert núverandi lán fannst meðal endurtekinna færslna þinna.
+loan-period-caption = frá { $from } til { $to } ({ $count ->
+        [one] { $count } mánuður
+       *[other] { $count } mánuðir
+    })
+loan-transfers = { $count ->
+        [0] Engin millifærsla milli hakaðra reikninga þinna fannst.
+        [one] Ein millifærsla milli hakaðra reikninga þinna fannst og var tekin frá.
+       *[other] { $count } millifærslur milli hakaðra reikninga þinna fundust og voru teknar frá.
+    }
+loan-method = Meðaltöl yfir heila mánuði tímabilsins, afstemmdar og skuldbundnar færslur, án millifærslna milli hakaðra reikninga þinna.
+loan-report-title = Lánaútreikningur
+loan-report-made-on = útreikningur frá { $date }
+loan-disclaimer = Leiðbeinandi útreikningur án samningsgildis. Aðeins tilboð bankans er bindandi.
+loan-tab-rules = Stillingar matsins
+loan-method-optimistic = Bjartsýn
+loan-method-neutral = Hlutlaus
+loan-method-severe = Ströng
+loan-method-line = Matsaðferð: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = Matið svarar þremur spurningum og hver aðferð gerir sínar eigin kröfur. Veldu þá sem hentar þér: matið á flipanum „Get ég greitt það til baka?“ fylgir henni. Síðasta línan gerir ráð fyrir að útgjöld þín hækki árlega um tilgreint hlutfall; greiðslan helst óbreytt.
+loan-rule-row-debt = Viðunandi skuldahlutfall
+loan-rule-row-reference = Viðmiðunarsparnaður
+loan-rule-row-share = Hlutfall sparnaðarins sem greiðslan má taka
+loan-rule-row-floor = Mörk sem staðan má ekki fara undir
+loan-rule-row-sooner = Ef staðan fer undir þau jafnvel án lánsins
+loan-rule-row-growth = Hækkun útgjalda þinna á ári
+loan-rule-limits = grænt upp að { $green }, appelsínugult upp að { $red }
+loan-rule-reference = { $kind ->
+        [good] góður mánuður
+        [hard] erfiður mánuður
+       *[usual] venjulegur mánuður
+    }: { $amount }
+loan-rule-floor-zero = núll
+loan-rule-floor-cushion = útgjöld eins mánaðar: { $amount }
+loan-rule-sooner = appelsínugult ef lánið flýtir því um { $orange }, rautt um { $red }
+loan-unit-percent-year = % á ári
+loan-method-optimistic-explain = Bjartsýna aðferðin gerir ráð fyrir góðum mánuði, samþykkir skuldahlutfall allt að 40 % og heldur engum varasjóði: hún sýnir hvað er mögulegt ef allt gengur vel.
+loan-method-neutral-explain = Hlutlausa aðferðin gerir ráð fyrir venjulegum mánuði og fylgir reglu bankanna, 33 til 35 % skuldahlutfalli: hún er viðmiðunarmatið.
+loan-method-severe-explain = Stranga aðferðin gerir ráð fyrir erfiðum mánuði og heldur útgjöldum eins mánaðar í varasjóði fyrir óvæntum útgjöldum: hún sýnir hvað heldur jafnvel þótt illa gangi.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = Orkunotkun raftækis
+window-appliance-title = Orkunotkun raftækis
+appliance-device-title = Tækið
+appliance-on-title = Í gangi
+appliance-standby-title = Í biðstöðu
+appliance-field-on-watts = Afl í notkun
+appliance-field-on-hours = Notkunartími á dag
+appliance-field-days = Notkunardagar á viku
+appliance-field-share = Hlutfall notkunartíma utan álagstíma
+appliance-field-standby-watts = Afl í biðstöðu
+appliance-field-standby-hours = Biðstöðutími á hvern notkunardag
+appliance-unit-watts = W
+appliance-unit-hours = h
+appliance-unit-days = af 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/kWh
+appliance-standby-hint = Ef reiturinn er auður varir biðstaðan það sem eftir er dags. Á dögum án notkunar er tækið áfram í sambandi: allur sá tími telst biðstaða. Sé það tekið úr sambandi er biðstöðuaflið 0 W.
+appliance-contract-title = Samningurinn þinn
+appliance-field-option = Gjaldskrárleið
+appliance-option-base = Grunnur (eitt verð)
+appliance-option-off-peak = Álagstími / utan álagstíma
+appliance-field-base = Verð á kWh
+appliance-field-peak = Verð á kWh á álagstíma
+appliance-field-off-peak = Verð á kWh utan álagstíma
+appliance-field-off-peak-hours = Klukkustundir utan álagstíma á dag
+appliance-contract-hint = Þessi verð gilda aðeins fyrir þennan útreikning. Vistuð gjaldskrá er stillt í Stillingar › Kjörstillingar › Verkfæri.
+appliance-contract-reset = Nota vistuðu gjaldskrána aftur
+appliance-period-day = Á dag
+appliance-period-month = Á mánuði
+appliance-period-year = Á ári
+appliance-energy = { $value } kWh
+appliance-less-than = minna en { $amount }
+appliance-detail-title = Sundurliðun fyrir eitt ár
+appliance-column-part = Liður
+appliance-column-energy = Orka
+appliance-column-cost = Kostnaður
+appliance-column-share = Hlutfall
+appliance-line-on = Í gangi
+appliance-line-standby = Í biðstöðu
+appliance-line-on-peak = Í gangi, álagstími
+appliance-line-on-off-peak = Í gangi, utan álagstíma
+appliance-line-standby-peak = Í biðstöðu, álagstími
+appliance-line-standby-off-peak = Í biðstöðu, utan álagstíma
+appliance-line-total = Samtals
+appliance-chart-title = Hvert peningarnir fara
+appliance-chart-caption = á ári
+appliance-standby-sentence = Biðstaðan ein kostar { $amount } á ári: { $share } af kostnaði tækisins.
+appliance-note-plate = Aflið sem skráð er á tækið eða í leiðbeiningum þess er hámark: í notkun nota flest tæki minna. Til að fá raunverulega tölu skaltu mæla það með orkumæli í innstungu og skrá það sem hann sýnir.
+appliance-note-subscription = Fastagjaldið er ekki talið með: það er greitt hvort sem tækið er í sambandi eða ekki.
+appliance-invalid-watts = Vinsamlegast sláðu inn afl frá 0 til 100.000 W.
+appliance-invalid-hours = Vinsamlegast sláðu inn tíma frá 0 til 24 klukkustunda á dag.
+appliance-invalid-days = Vinsamlegast sláðu inn heila tölu daga, frá 0 til 7.
+appliance-invalid-share = Vinsamlegast sláðu inn hlutfall frá 0 til 100%.
+appliance-invalid-day-overflow = Notkunartími og biðstaða eru samtals meira en 24 klukkustundir á dag.
+appliance-invalid-price = Vinsamlegast sláðu inn verð á kWh frá 0 til 100.
+appliance-invalid-off-peak-hours = Vinsamlegast sláðu inn heila tölu klukkustunda utan álagstíma, frá 0 til 24.
+preferences-branch-tools = Verkfæri
+preferences-leaf-electricity = Rafmagnsgjaldskrá
+preferences-electricity-blue = Aftur í Tarif Bleu frá EDF
+preferences-electricity-hint = Gjaldskrá samningsins þíns, sem verkfærið „Orkunotkun raftækis“ notar. Sjálfgefið: Tarif Bleu frá EDF (Frakkland) 1. ágúst 2026, verð með sköttum, mælir 3 til 6 kVA. Þessi verð breytast oft í febrúar og ágúst: afritaðu verðin af reikningnum þínum.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = Varasjóðurinn minn
+window-cushion-title = Varasjóðurinn minn
+cushion-question = Ef tekjurnar þínar hættu á morgun, hve marga mánuði myndi sparnaðurinn þinn duga?
+cushion-accounts-title = Reikningarnir þínir
+cushion-column-account = Reikningur
+cushion-column-balance = Raunstaða
+cushion-column-savings = Sparnaður
+cushion-column-spending = Útgjöld
+cushion-accounts-hint = „Sparnaður“: peningarnir sem þú myndir treysta á ef illa færi. „Útgjöld“: reikningarnir sem dagleg útgjöld eru greidd af.
+cushion-history-label = Tímabil til skoðunar
+cushion-backup-label = Varatekjur á mánuði
+cushion-backup-hint = Það sem héldi áfram að berast: atvinnuleysisbætur, laun maka… Autt: engar tekjur.
+cushion-categories-title = Útgjöld sem tekin eru með
+cushion-categories-hint = Taktu hakið af því sem þú myndir skera niður ef illa færi.
+cushion-categories-empty = Engin útgjöld á þessu tímabili.
+cushion-verdict-title = Varasjóðurinn þinn
+cushion-targets-title = Varúðarmörkin
+cushion-projection-title = Sparnaðurinn þinn ef illa fer
+cushion-projection-hint = Það sem eftir væri í hverjum mánuði ef tekjurnar þínar hættu í dag.
+cushion-note = Mat byggt á sögu þinni: útgjöld í erfiðum mánuði geta vikið frá meðaltalinu.
+cushion-invalid-backup = Ekki er hægt að lesa þessa upphæð: leiðréttu hana til að reikna aftur.
+cushion-no-spending-account = Hakaðu við að minnsta kosti einn „Útgjöld“-reikning.
+cushion-no-month = Þetta tímabil inniheldur enn engan heilan mánuð.
+cushion-months = { $value } mán.
+cushion-per-month = { $amount } á mánuði
+cushion-figure-holds = Engin takmörk
+cushion-gauge-caption = af útgjöldum dekkuð
+cushion-verdict-short = Minna en þrír mánuðir: áfall myndi fljótt koma þér í vanda.
+cushion-verdict-fair = Milli þriggja og sex mánaða: þokkalegur varasjóður sem vert er að efla ef þú getur.
+cushion-verdict-solid = Sex mánuðir eða meira: varasjóðurinn þinn er traustur.
+cushion-verdict-holds = Varatekjurnar þínar duga fyrir útgjöldunum: sparnaðurinn myndi ekki minnka.
+cushion-verdict-nothing = Engin útgjöld tekin með á tímabilinu: það er ekkert að dekka.
+cushion-tile-savings = Tiltækur sparnaður
+cushion-tile-spending = Útgjöld tekin með
+cushion-tile-backup = Varatekjur
+cushion-tile-burn = Sparnaðurinn myndi minnka um
+cushion-tile-rhythm = Sparnaðarhraði
+cushion-burn-none = Ekkert
+cushion-target-title = Útgjöld í { $months } mánuði: { $amount }
+cushion-target-reached = Náð.
+cushion-target-date = Það vantar { $missing }. Á núverandi sparnaðarhraða næst markið um það bil: { $month }.
+cushion-target-never = Það vantar { $missing }. Sparnaðurinn þinn óx ekki á tímabilinu: á þessum hraða nást þessi mörk ekki.
+cushion-mark-empty = Uppurið: { $month }
+cushion-period = Meðaltal { $count ->
+        [one] { $count } heils mánaðar
+       *[other] { $count } heilla mánaða
+    }. Tímabil: { $from } – { $to }. { $transfers ->
+        [0] Engar millifærslur milli reikninganna þinna.
+        [one] { $transfers } millifærsla milli reikninganna þinna, undanskilin.
+       *[other] { $transfers } millifærslur milli reikninganna þinna, undanskildar.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = Sparnaðarmarkmið
+window-goal-title = Sparnaðarmarkmið
+goal-accounts-title = Reikningar sem fylgst er með
+goal-column-account = Reikningur
+goal-column-balance = Raunstaða
+goal-accounts-hint = Millifærsla milli tveggja reikninga sem fylgst er með jafnast út; millifærsla á reikning sem ekki er fylgst með telst til útgjalda.
+goal-period-label = Viðmiðunartímabil
+goal-period-range = Árabil…
+goal-range-from = frá
+goal-range-to = til
+goal-question-title = Spurningin þín
+goal-question-when = Hvenær mun ég eiga þessa upphæð?
+goal-question-amount = Hvað mun ég eiga á þessum degi?
+goal-question-effort = Hve mikið þarf ég að spara til að eiga þessa upphæð á þessum degi?
+goal-field-target = Markupphæð
+goal-field-date = Markdagsetning
+goal-field-rate = Ársvextir sparnaðarins
+goal-field-extra = En ef ég sparaði meira, á mánuði
+goal-options-hint = Autt: engir vextir, ekkert aukalega.
+goal-answer-title = Svarið
+goal-chart-title = Staðan þín, í gær og á morgun
+goal-chart-hint = Heil lína: raunstaða síðustu tólf mánaða; punktalína: spáin; ljóst svæði: bilið eftir mánuðum.
+goal-disclaimer = Spá byggð á sögu þinni, ekki loforð: óvæntur atburður getur breytt öllu.
+goal-no-account = Hakaðu við að minnsta kosti einn reikning til að fylgjast með.
+goal-no-month = Þetta tímabil inniheldur enn engan heilan mánuð.
+goal-invalid-target = Sláðu inn upphæð sem á að ná.
+goal-invalid-date = Veldu dagsetningu fram í tímann, innan næstu fimmtíu ára.
+goal-invalid-rate = Sláðu inn vexti frá 0 til 100%.
+goal-invalid-extra = Ekki er hægt að lesa þessa upphæð: leiðréttu hana til að reikna aftur.
+goal-per-month = { $amount } á mánuði
+goal-tile-balance = Staða í dag
+goal-tile-rhythm = Meðalhraði
+goal-tile-target = Markmið
+goal-tile-reached = Næst um það bil
+goal-tile-date = Markdagsetning
+goal-tile-projected = Áætluð staða
+goal-tile-saved = Sparað fram að því
+goal-tile-interest = Þar af vextir
+goal-tile-needed = Þarf að spara
+goal-when-already = Þú átt nú þegar { $amount }: reikningarnir sem þú fylgist með nema samtals { $balance }.
+goal-when-reached = Þú munt eiga { $amount } eftir { $months ->
+        [one] { $months } mánuð
+       *[other] { $months } mánuði
+    }, um það bil: { $month }.
+goal-when-range = Breytilegt eftir mánuðum: í fyrsta lagi { $early }, í síðasta lagi { $late }.
+goal-when-range-open = Í fyrsta lagi um það bil: { $early }. Með slökum mánuðum næðist markmiðið ekki.
+goal-when-never = Á þessum hraða nærðu ekki { $amount }.
+goal-zero = Staðan þín færi niður í núll um það bil: { $month }.
+goal-amount = { $month }: þú ættir um það bil { $amount }.
+goal-amount-range = Breytilegt eftir mánuðum: á bilinu { $low } til { $high }.
+goal-effort-more = Markmið { $amount }, dagsetning: { $month }. Þú þyrftir að spara að meðaltali { $monthly } á mánuði, þ.e. { $gap } meira en nú.
+goal-effort-less = Markmið { $amount }, dagsetning: { $month }. { $monthly } á mánuði myndu duga, þ.e. { $gap } minna en nú: þú ert á undan áætlun.
+goal-effort-range = Breytilegt eftir mánuðum: munurinn frá núverandi hraða væri frá { $low } til { $high } á mánuði.
+goal-chart-target = Markmið: { $amount }
+goal-chart-today = Í dag
+goal-note-seasons = Spáin fylgir árstíðunum: hver komandi mánuður fær meðaltal sömu mánaða á tímabilinu.
+goal-note-range = Bilið byggist á slökustu og sterkustu mánuðum tímabilsins: lægsta fjórðungnum og hæsta fjórðungnum.
+goal-note-loan = Láninu „{ $label }“ lýkur: { $month }. Eftir það { $amount } meira á mánuði.
+goal-note-interest = Vextir reiknaðir mánaðarlega, ársvextir { $rate }%: nálgun á hálfsmánaðarreglu sparireikninga.
+goal-period = Hraði reiknaður út frá { $count ->
+        [one] { $count } heilum mánuði
+       *[other] { $count } heilum mánuðum
+    }. Tímabil: { $from } – { $to }. { $transfers ->
+        [0] Engar millifærslur milli reikninganna sem þú fylgist með.
+        [one] { $transfers } millifærsla milli reikninganna sem þú fylgist með, undanskilin.
+       *[other] { $transfers } millifærslur milli reikninganna sem þú fylgist með, undanskildar.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = Hvað ef ég drægi úr…?
+window-cut-title = Hvað ef ég drægi úr…?
+cut-axis-label = Flokka eftir
+cut-axis-category = Flokkar
+cut-axis-payee = Mótaðilar
+cut-axis-budget-line = Fjárhagsliðir
+cut-table-title = Útgjöldin þín, lið fyrir lið
+cut-table-hint = Sláðu inn lækkun í % eða í { $sign } á mánuði á þá liði sem þú vilt létta á. Lækkun getur ekki verið meiri en útgjöldin sjálf.
+cut-column-monthly = Á mánuði
+cut-column-cut = Lækkun
+cut-column-after = Eftir
+cut-column-yearly = Ávinningur á ári
+cut-total = Samtals
+cut-horizon-label = Spátímabil
+cut-settings-title = Stillingar
+cut-options-hint = Vextir og markupphæð eru valfrjáls.
+cut-report-button = PDF-skýrsla
+cut-chart-title = Staðan þín, án og með lækkunum
+cut-chart-hint = Heil lína: raunstaða síðustu tólf mánaða; grá punktalína: spáin án lækkana; blátt: með þeim; grænt: féð sem sparast.
+cut-donut-title = Útgjöldin þín á mánuði eftir lækkun
+cut-donut-caption = á mánuði eftir lækkun
+cut-donut-others = Aðrir liðir
+cut-donut-saved = Sparað
+cut-legend-with = Með lækkunum
+cut-legend-without = Án lækkana
+cut-years = { $years ->
+        [one] { $years } ár
+       *[other] { $years } ár
+    }
+cut-headline-none = Sláðu inn lækkun í töfluna til að sjá áhrifin.
+cut-headline = Með því að lækka { $count ->
+        [one] { $count } lið
+       *[other] { $count } liði
+    } myndirðu leggja { $monthly } meira fyrir á mánuði, þ.e. { $yearly } á ári.
+cut-tile-monthly = Ávinningur á mánuði
+cut-tile-yearly = Ávinningur á ári
+cut-tile-horizon = Ávinningur á { $years ->
+        [one] { $years } ári
+       *[other] { $years } árum
+    }
+cut-tile-spending = Útgjöld á mánuði
+cut-target-already = Þú átt nú þegar { $amount }.
+cut-target-sooner = Þú næðir { $amount } um það bil: { $with } (án lækkana: { $without }), { $months ->
+        [0] þ.e. ekki fyrr
+        [one] þ.e. { $months } mánuði fyrr
+       *[other] þ.e. { $months } mánuðum fyrr
+    }.
+cut-target-only-with = Með þessum lækkunum næðir þú { $amount } um það bil: { $with }; án þeirra, á núverandi hraða, aldrei.
+cut-target-never = Jafnvel með þessum lækkunum næðir þú ekki { $amount } á núverandi hraða.
+cut-note-seasons = Hver lækkun fylgir árstíðum síns liðar: liður sem vegur mest á sumrin sparar mest á sumrin.
+cut-note-capped = Innslegin lækkun var meiri en útgjöldin: hún hefur verið færð niður að útgjöldunum sjálfum.
+cut-invalid-cut = Ekki er hægt að lesa þessa lækkun: prósenta frá 0 til 100, eða upphæð á mánuði.
+cut-report-settings = Stillingarnar
+cut-report-result = Niðurstaðan
+cut-report-accounts = Reikningar sem fylgst er með
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = Undirbúa fríið mitt
+window-holiday-title = Undirbúa fríið mitt
+holiday-trip-title = Ferðin
+holiday-field-trip = Tegund ferðar
+holiday-trip-stay = Dvöl
+holiday-trip-cruise = Skemmtisigling
+holiday-field-adults = Fullorðnir
+holiday-field-children = Börn
+holiday-field-nights = Lengd dvalar, í nóttum
+holiday-field-days = Dagar
+holiday-field-months = Mánuðir fram að brottför
+holiday-field-stops = Fjöldi viðkomuhafna
+holiday-saved-title = Þegar sparað
+holiday-saved-hint = Hakaðu við reikningana þar sem fríféð er þegar lagt til hliðar: raunstaða þeirra telst sem þegar sparað fé.
+holiday-budget-title = Fjárhagsáætlunin
+holiday-budget-hint = Fyrir hvern lið: upphæð, fyrir hverja hún gildir og hve lengi. Tómur liður telst ekki með.
+holiday-optional-title = Valfrjálsar línur
+holiday-result-title = Niðurstaðan
+holiday-donut-title = Hvert ferðaféð fer
+holiday-donut-caption = fyrir ferðina
+holiday-child-label = Barnaverð
+holiday-count-label = Káetur
+holiday-open = Opna verkefni…
+holiday-save = Vista verkefnið…
+holiday-pdf = PDF-skýrsla
+holiday-excel = Flytja út í Excel
+holiday-file-filter = Ferðaverkefni
+holiday-replace-question = Ef þetta verkefni er opnað kemur það í stað þess sem slegið hefur verið inn í gluggann. Halda áfram?
+holiday-file-saved = Verkefni vistað: { $file }
+holiday-file-opened = Verkefni opnað: { $file }
+holiday-file-not-project = Þessi skrá er ekki ferðaverkefni úr Radinus.
+holiday-file-too-recent = Þetta verkefni kemur úr nýrri útgáfu af Radinus: uppfærðu Radinus til að opna það.
+holiday-file-failed = Ekki tókst að lesa eða skrifa skrána: { $reason }
+holiday-line-transport = Ferðir fram og til baka
+holiday-line-lodging = Gisting
+holiday-line-meals = Máltíðir og dagleg útgjöld
+holiday-line-visits = Heimsóknir og afþreying
+holiday-line-port = Ferð að höfninni
+holiday-line-cabins = Káetur
+holiday-line-service = Þjónustugjald (þjórfé)
+holiday-line-drinks = Drykkjapakki
+holiday-line-excursions = Skoðunarferðir í viðkomuhöfnum
+holiday-line-port-taxes = Hafnargjöld
+holiday-line-wifi = Wi-Fi um borð
+holiday-line-onboard = Útgjöld um borð og í viðkomuhöfnum
+holiday-line-other = Annar kostnaður og óvænt útgjöld
+holiday-line-insurance = Forfallatrygging
+holiday-line-stay-tax = Gistináttaskattur
+holiday-line-car = Bíll á staðnum, eldsneyti og vegtollar
+holiday-line-parking = Bílastæði við flugvöll eða lestarstöð
+holiday-line-bank = Bankagjöld erlendis
+holiday-line-formalities = Formsatriði (vegabréf, vegabréfsáritun, bólusetningar)
+holiday-line-pets = Gæsla gæludýra
+holiday-span-trip = fyrir dvölina
+holiday-span-night = á nótt
+holiday-span-day = á dag
+holiday-span-stop = á viðkomuhöfn
+holiday-who-all = fyrir alla
+holiday-who-person = á mann
+holiday-who-adults = á fullorðinn
+holiday-cabins-count = { $count ->
+        [one] { $count } káeta
+       *[other] { $count } káetur
+    }
+holiday-days = { $days ->
+        [one] { $days } dagur
+       *[other] { $days } dagar
+    }
+holiday-invalid-count = Sláðu inn heila tölu.
+holiday-invalid-amount = Ekki er hægt að lesa þessa upphæð: jákvæð tala, eða prósenta frá 0 til 100.
+holiday-headline-empty = Sláðu inn upphæðir fjárhagsáætlunarinnar til að sjá hvað ferðin mun kosta.
+holiday-headline-stay = Þessi dvöl myndi kosta { $total } fyrir { $people ->
+        [one] { $people } mann
+       *[other] { $people } manns
+    } og { $nights ->
+        [0] enga nótt
+        [one] { $nights } nótt
+       *[other] { $nights } nætur
+    }.
+holiday-headline-cruise = Þessi skemmtisigling myndi kosta { $total } fyrir { $people ->
+        [one] { $people } mann
+       *[other] { $people } manns
+    } og { $nights ->
+        [0] enga nótt
+        [one] { $nights } nótt
+       *[other] { $nights } nætur
+    }.
+holiday-tile-total = Heildarkostnaður
+holiday-tile-person = Á mann
+holiday-tile-person-day = Á mann á dag
+holiday-tile-saved = Þegar sparað
+holiday-tile-remaining = Eftir að fjármagna
+holiday-tile-monthly = Nauðsynlegur sparnaður
+holiday-remaining-none = Ekkert: allt er fjármagnað
+holiday-monthly-none = Ekkert þarf að leggja til hliðar
+holiday-monthly-now = Brottför í þessum mánuði
+holiday-note-days = Dagarnir eru næturnar plús einn: sjö nætur gera átta daga.
+holiday-note-child = Á mann greiðir barn barnaverðið ef það er gefið upp; ef reiturinn er tómur greiðir það eins og fullorðinn.
+holiday-note-percent = Tryggingaprósenta reiknast af helstu liðum ferðarinnar; prósenta bankagjalda af útgjöldum á staðnum.
+holiday-sheet-budget = Fjárhagsáætlun
+holiday-sheet-result = Niðurstaða
+holiday-column-line = Liður
+holiday-column-amount = Upphæð
+holiday-column-child = Barnaverð
+holiday-column-who = Fyrir hverja
+holiday-column-span = Hve lengi
+holiday-column-cost = Kostnaður
+holiday-disclaimer = Mat byggt á þínum eigin upphæðum: raunverð getur verið annað.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = Sparnaðarverkefni
+cut-file-not-project = Þessi skrá er ekki sparnaðarverkefni úr Radinus.
+cut-file-too-recent = Þetta verkefni kemur úr nýrri útgáfu af Radinus: uppfærðu Radinus til að opna það.
+cut-sheet-items = Liðir
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = Bílabókin mín
+window-car-title = Bílabókin mín
+car-unnamed = Bíllinn minn
+car-sheet-title = Bíllinn
+car-field-plate = Skráningarnúmer
+car-field-make = Tegund
+car-field-model = Gerð
+car-field-engine = Orkugjafi
+car-field-first-hand = Fyrsti eigandi
+car-field-registered = Fyrsta skráning
+car-field-acquired = Kaupdagur
+car-field-acquired-km = Kílómetrastaða við kaup
+car-field-service = Þjónustuskoðun á
+car-field-service-or = eða á
+car-unit-months-short = mán.
+car-unit-km = km
+car-tariff-title = Gjaldskrá heimahleðslu
+car-tariff-hint = Þessi gjaldskrá er geymd í bílabókinni: hún breytir ekki gjaldskránni í kjörstillingunum.
+car-tariff-reset = Nota gjaldskrána úr kjörstillingunum
+car-engine-petrol = Bensín
+car-engine-diesel = Dísil
+car-engine-lpg = Gas (LPG)
+car-engine-e85 = E85 (etanól)
+car-engine-hybrid = Tvinnbíll
+car-engine-plug-in = Tengiltvinnbíll
+car-engine-electric = Rafmagn
+car-engine-hydrogen = Vetni
+car-energy-petrol = Bensín
+car-energy-diesel = Dísilolía
+car-energy-lpg = Gas (LPG)
+car-energy-e85 = E85
+car-energy-electricity = Rafmagn
+car-energy-hydrogen = Vetni
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = Orka
+car-rubric-upkeep = Almennt viðhald
+car-rubric-service = Þjónustuskoðun
+car-rubric-wear = Slithlutir
+car-rubric-tyres = Dekk
+car-rubric-breakdown = Bilanir
+car-rubric-insurance = Trygging
+car-rubric-inspection = Aðalskoðun
+car-part-brake-pads = Bremsuklossar
+car-part-brake-discs = Bremsudiskar
+car-part-timing-belt = Tímareim
+car-part-clutch = Kúpling
+car-part-battery-12v = 12 V rafgeymir
+car-part-shock-absorbers = Höggdeyfar
+car-part-wipers = Rúðuþurrkur
+car-part-spark-plugs = Kerti
+car-part-glow-plugs = Glóðarkerti
+car-part-particulate-filter = Sótagnasía
+car-part-catalytic-converter = Hvarfakútur
+car-part-fuel-cell-filter = Sía efnarafals
+car-part-exhaust = Pústkerfi
+car-part-other = Annar hlutur…
+car-axle-all = Öll fjögur dekkin
+car-axle-front = Framdekk
+car-axle-rear = Afturdekk
+car-verdict-pass = Án athugasemda
+car-verdict-counter = Endurskoðun
+car-charge-station = Á hleðslustöð
+car-charge-home = Heima
+car-slot-peak = Álagstími
+car-slot-off-peak = Utan álagstíma
+car-entry-new = Ný lína
+car-entry-edit = Breyta línunni
+car-field-date = Dagsetning
+car-field-km = Kílómetrastaða
+car-field-rubric = Flokkur
+car-field-amount = Upphæð
+car-field-garage = Verkstæði eða stöð
+car-field-note = Athugasemd
+car-field-energy = Orka
+car-field-quantity = Magn
+car-field-charge = Hleðsla
+car-field-slot = Hleðslutími
+car-field-part = Hlutur
+car-field-part-name = Heiti hlutarins
+car-field-axle = Dekk sem skipt var um
+car-field-verdict = Niðurstaða
+car-field-months = Mánuðir sem falla undir
+car-field-battery = Ástand rafhlöðunnar
+car-home-amount-hint = Upphæð heimahleðslu er reiknuð út frá gjaldskrá bílsins.
+car-entry-add = Bæta í bókina
+car-entry-update = Vista línuna
+car-entry-cancel = Hætta við
+car-entry-delete = Eyða línunni
+car-delete-question = Eyða þessari línu úr bókinni?
+car-from-operation = Sækja færslu…
+car-pick-account = Af hvaða reikningi eru útgjöldin?
+car-pick-operation = Hvaða færsla?
+car-pick-take = Sækja
+car-pick-none = Engin útgjöld á þessum reikningi.
+car-pick-taken = Færsla sótt: fylltu út kílómetrastöðuna og flokkinn og bættu svo línunni við.
+car-history-title = Sagan
+car-filter-all = Allir flokkar
+car-history-empty = Engar línur enn.
+car-history-hint = Smelltu á línu til að breyta henni.
+car-column-date = Dagsetning
+car-column-km = Km
+car-column-rubric = Flokkur
+car-column-detail = Nánar
+car-column-amount = Upphæð
+car-column-garage = Verkstæði
+car-column-note = Athugasemd
+car-column-share = Hlutfall
+car-column-per-km = Á km
+car-column-energy = Orka
+car-column-quantity = Magn
+car-column-price = Meðalverð
+car-column-consumption = Eyðsla
+car-column-part = Hlutur
+car-column-changes = Skipti
+car-column-last = Síðustu skipti
+car-column-life = Endingartími
+car-column-next = Næstu skipti
+car-total = Samtals
+car-summary-title = Hvað bíllinn kostar
+car-headline-empty = Fylltu út upplýsingar um bílinn og bættu svo við fyrstu línunni: áfyllingu, þjónustuskoðun, reikningi frá verkstæði…
+car-headline = Frá { $since } hefur bíllinn þinn kostað þig { $total }.
+car-headline-km = Frá { $since } hefur bíllinn þinn kostað þig { $total } fyrir { $km } akstur: { $cost } á kílómetra.
+car-tile-total = Heildarkostnaður
+car-tile-month = Á mánuði
+car-tile-km = Á kílómetra
+car-tile-driven = Eknir kílómetrar
+car-tile-consumption = Eyðsla
+car-tile-energy-km = Orka á kílómetra
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [one] { $months } mánuður
+       *[other] { $months } mánuðir
+    }
+car-detail-battery = Rafhlaða: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = Eftir flokkum
+car-energy-title = Orkan
+car-parts-title = Slithlutir
+car-tyres-title = Dekk
+car-battery-title = Ástand rafhlöðunnar
+car-years-title = Hvað bíllinn kostaði á hverju ári
+car-donut-title = Hvert peningarnir fara
+car-donut-caption = alls
+car-deadlines-title = Það sem er fram undan
+car-deadlines-empty = Ekkert fram undan enn: skráðu þjónustuskoðun, aðalskoðun, tryggingu eða tvenn skipti á sama hlut.
+car-deadline-service = Þjónustuskoðun
+car-deadline-inspection = Aðalskoðun
+car-deadline-counter = Endurskoðun eftir aðalskoðun
+car-deadline-insurance = Lok tryggingar
+car-when-date = þann { $date }
+car-when-km = við { $km }
+car-when-km-reached = við { $km }, á þínum hraða um það bil: { $month }
+car-when-date-km = þann { $date } eða við { $km }, hvort sem kemur fyrr
+car-when-inspection-unknown = Skráðu síðustu aðalskoðun til að vita dagsetningu þeirrar næstu.
+car-tone-late = Komið fram yfir
+car-tone-soon = Bráðum
+car-note-since = Allt er talið frá kaupunum: dagsetningunni og kílómetrastöðunni sem skráð eru í upplýsingum um bílinn.
+car-note-consumption = Eyðsla er mæld frá fullum tanki til fulls tanks: fylltu tankinn alveg og skráðu kílómetrastöðuna í hvert sinn.
+car-note-e85 = E85-bíll drekkur það sem honum er gefið: kílómetrarnir eftir áfyllingu teljast á það eldsneyti.
+car-note-home = Heimahleðsla er verðlögð eftir gjaldskrá bílsins þann dag sem hún er skráð og heldur þeim kostnaði.
+car-note-inspection = Aðalskoðun fylgir frönsku reglunni: sú fyrsta innan fjögurra ára frá fyrstu skráningu, síðan á tveggja ára fresti; endurskoðun innan tveggja mánaða.
+car-disclaimer = Dagsetningar og endingartímar eru áætlanir byggðar á bókinni: aðeins þjónustubók framleiðandans er bindandi.
+car-invalid-date = Gilda dagsetningu sem er ekki í framtíðinni, takk.
+car-invalid-acquired = Kaupdagur getur ekki verið á undan fyrstu skráningu.
+car-invalid-km = Kílómetrastöðu í heilum kílómetrum, takk.
+car-invalid-amount = Ekki er hægt að lesa þessa upphæð.
+car-invalid-quantity = Sláðu inn magnið: lítra, kWh eða kíló.
+car-invalid-part = Veldu hlutinn sem skipt var um, eða sláðu inn heiti hans.
+car-invalid-rubric = Veldu flokk.
+car-invalid-months = Heila tölu mánaða, takk.
+car-invalid-battery = Ástand rafhlöðu frá 0 til 100 %, takk.
+car-open = Opna bók…
+car-save = Vista bókina…
+car-report-button = PDF-skýrsla
+car-file-filter = Bílabók
+car-file-saved = Bók vistuð: { $file }
+car-file-opened = Bók opnuð: { $file }
+car-file-not-logbook = Þessi skrá er ekki bílabók úr Radinus.
+car-file-too-recent = Þessi bók kemur úr nýrri útgáfu af Radinus: uppfærðu Radinus til að opna hana.
+car-replace-question = Ef þessi bók er opnuð kemur hún í stað bókarinnar í glugganum. Halda áfram?
+car-sheet-history = Bók
+car-sheet-summary = Samantekt
+
+analysis-history-hint = Því lengri sem saga þín er, því betri verður þessi greining: best er að hafa færslur í að minnsta kosti eitt ár.
+
+# --- F48 — Skipta útgjöldum (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = Skipta útgjöldum
+window-sharing-title = Skipta útgjöldum
+sharing-question = Hver borgar hvað?
+sharing-setup-title = Skiptingin
+sharing-field-label = Heiti
+sharing-label-hint = Til dæmis „Veitingastaður 12/10“ eða „Bretagne-ferð 2027“: það nefnir skrárnar og skýrslurnar.
+sharing-field-total = Heildarupphæð
+sharing-total-hint = Ef reiturinn er tómur er heildarupphæðin summa liðanna og eigin viðbóta hvers og eins.
+sharing-field-rule = Regla
+sharing-field-rounding = Námundun
+sharing-field-people = Fólk
+sharing-mode-whole = Ein regla fyrir öll útgjöldin
+sharing-mode-item = Ein regla fyrir hvern lið
+sharing-rule-equal = Jafnir hlutir
+sharing-rule-parts = Eftir hlutföllum
+sharing-rule-percent = Eftir prósentum
+sharing-rule-income = Í hlutfalli við tekjur
+sharing-rounding-cent = Að næsta senti
+sharing-rounding-euro = Að heilli einingu
+sharing-round-euro = Námunda að heilum einingum
+sharing-hide-incomes = Fela tekjur í skýrslum og útflutningi
+sharing-people-title = Fólkið
+sharing-people-hint = Ein lína fyrir hvern einstakling, einn dálkur fyrir hvern lið: hakaðu við hver tekur þátt í hverju. Allt annað er valfrjálst. Sá sem hættir við en skilur eftir staðfestingargjaldið sitt: nákvæm upphæð sem jafngildir því sem hann greiddi, og enginn reitur merktur.
+sharing-add-person = Bæta við einstaklingi
+sharing-person-default = Einstaklingur { $number }
+sharing-items-title = Liðirnir
+sharing-items-hint = Aðeins það sem varðar ekki alla, eins og vínið. Afgangur heildarupphæðarinnar fer á sameiginlega liðinn.
+sharing-add-item = Bæta við lið
+sharing-common = Sameiginlegt
+sharing-payments-title = Greiðslurnar
+sharing-payments-hint = Hver borgaði, hve mikið og hvenær. Lína án upphæðar telst ekki með enn.
+sharing-payments-none = Engar greiðslur enn.
+sharing-add-payment = Bæta við greiðslu
+sharing-result-title = Niðurstaðan
+sharing-balances-title = Staða greiðslna
+sharing-transfers-title = Tillögur að millifærslum
+sharing-delete = Eyða
+sharing-delete-person-question = Þessi einstaklingur á greiðslur: eyða þeim með honum?
+sharing-disclaimer = Radinus leggur til skiptingu: meðal vina getur hver og einn samið á annan hátt.
+sharing-column-person = Einstaklingur
+sharing-column-household = Heimili
+sharing-column-income = Tekjur
+sharing-column-parts = Hlutar
+sharing-column-percent = %
+sharing-column-floor = Að minnsta kosti
+sharing-column-cap = Í mesta lagi
+sharing-column-fixed = Nákvæm upphæð
+sharing-column-alone = Eigin viðbætur
+sharing-column-gift = Gefin umframgreiðsla
+sharing-column-share = Hlutur
+sharing-column-typed = Innslegin %
+sharing-column-constraint = Hvað gilti
+sharing-column-due = Til greiðslu
+sharing-column-item = Liður
+sharing-column-amount = Upphæð
+sharing-column-rule = Regla
+sharing-column-participants = Þátttakendur
+sharing-column-unit = Heimili eða einstaklingur
+sharing-column-members = Meðlimir
+sharing-column-paid = Greitt
+sharing-column-balance = Staða
+sharing-column-date = Dagsetning
+sharing-column-who = Hver
+sharing-column-label = Heiti
+sharing-help-household = Fólk á sama heimili gerir upp saman: greiðslur þeirra og það sem þau skulda leggst saman og þau fá eitt yfirlit. Dæmi: „Martin-fjölskyldan“ fyrir foreldrana og börnin.
+sharing-help-income = Notað aðeins í reglunni „Í hlutfalli við tekjur“: því hærri sem tekjurnar eru, því stærri er hluturinn. Sláðu inn mánaðartekjur.
+sharing-help-parts = Einstaklingur með 2 hluta borgar tvöfalt meira en einstaklingur með 1 hlut. Dæmi: fullorðinn 1, barn 0,5.
+sharing-help-percent = Hlutur útgjaldanna sem einstaklingurinn borgar. Prósenturnar þurfa að vera samtals 100 %.
+sharing-help-floor = Einstaklingurinn borgar að minnsta kosti þessa upphæð, jafnvel þótt reiknaður hlutur hans sé lægri. Mismunurinn léttir á hinum.
+sharing-help-cap = Einstaklingurinn borgar aldrei meira en þessa upphæð. Það sem hann borgar ekki lendir á hinum þátttakendum í liðum hans.
+sharing-help-fixed = Einstaklingurinn borgar þessa nákvæmu upphæð, hvað sem á dynur, og afgangurinn skiptist á milli hinna. Dæmi: sá sem hættir við og skilur eftir staðfestingargjaldið sitt.
+sharing-help-alone = Það sem einstaklingurinn tók eingöngu fyrir sjálfan sig, eins og eftirrétt eða kaffi. Hann borgar það að fullu, til viðbótar við hlut sinn.
+sharing-help-gift = Ef einstaklingurinn borgaði meira en hlut sinn: hakað við þýðir að umframgreiðslan er gjöf til hópsins, ekki hakað við að hún er greidd honum til baka.
+sharing-help-items = Hakaðu við þá sem taka þátt í þessum lið. Sameiginlegi liðurinn er það sem er eftir af heildarupphæðinni þegar hinir liðirnir hafa verið dregnir frá.
+sharing-help-due = Það sem einstaklingurinn skuldar samtals: hlutur hans í liðunum, eigin viðbætur og námundun.
+sharing-help-share = Hvað hlutur hans nemur í prósentum af upphæðinni sem skipt er.
+sharing-help-typed = Prósentan sem þú slóst inn. Hún getur verið önnur en raunverulegur hlutur þegar lágmark, hámark eða nákvæm upphæð réð.
+sharing-help-constraint = Sýnir hvort lágmark, hámark, nákvæm upphæð eða gefin umframgreiðsla breytti hlut einstaklingsins.
+sharing-help-item = Aðeins það sem varðar ekki alla, eins og vínið. Afgangur heildarupphæðarinnar fer á sameiginlega liðinn og skiptist á milli þeirra sem eru merktir í honum.
+sharing-help-rule = Hvernig þessum lið er skipt: í jafna hluti, eftir hlutföllum, eftir prósentum eða í hlutfalli við tekjur.
+sharing-help-paid = Það sem heimilið eða einstaklingurinn hefur þegar greitt, samkvæmt innslegnum greiðslum.
+sharing-help-balance = Það sem er eftir að greiða, eða það sem hefur verið greitt umfram hlut. Dæmi: „Eftir að greiða: 61,54 €“.
+sharing-advice-equal = { $count ->
+        [1] { $total } fyrir einn einstakling.
+        [one] { $total } ÷ { $count } = { $amount } á mann.
+       *[other] { $total } ÷ { $count } = { $amount } á mann.
+    }
+sharing-advice-equal-varied = Jafnir hlutar á milli þeirra sem taka þátt, að teknu tilliti til lágmarka, hámarka og útilokana.
+sharing-advice-parts = Samtals { $parts } hlutar: einn hlutur jafngildir { $amount }.
+sharing-advice-parts-varied = Hver greiðir eftir sínum hlutum, að teknu tilliti til lágmarka, hámarka og útilokana. Tómur reitur telst sem 1 hlutur.
+sharing-advice-percent-rest = { $rest } % vantar upp á 100 %.
+sharing-advice-percent-over = Prósenturnar fara { $over } % fram úr 100 %.
+sharing-advice-percent-ok = Prósenturnar eru samtals 100 %.
+sharing-advice-percent-nobody = Prósenturnar eru þegar orðnar 100 %: { $count ->
+        [1] { $names } myndi ekkert greiða.
+        [one] { $names } myndu ekkert greiða.
+       *[other] { $names } myndu ekkert greiða.
+    }
+sharing-advice-income = Hver greiðir { $rate } % af tekjum sínum.
+sharing-advice-income-missing = Sláðu inn tekjur hvers og eins til að skipta í hlutfalli við tekjur.
+sharing-advice-income-varied = Hver greiðir sama hlutfall af tekjum sínum, að teknu tilliti til lágmarka, hámarka og útilokana.
+sharing-advice-empty = Sláðu inn upphæðina sem á að skipta.
+sharing-apply-advice = Nota tillögugildin
+sharing-help-apply-advice = Fyllir tómu reitina með gráu gildunum. Reitir sem þegar eru útfylltir breytast ekki.
+sharing-from-incomes = Prósentur eftir tekjum
+sharing-help-from-incomes = Setur í stað prósentnanna hlut hverra tekna af heildartekjunum. Þær eru samtals 100 %.
+sharing-reset-percents = Skipta öllu upp á nýtt
+sharing-help-reset-percents = Hreinsar prósenturnar og skiptir þeim jafnt á milli allra. Gagnlegt eftir að einstaklingi hefur verið bætt við.
+sharing-reset-percents-question = Hreinsa allar prósenturnar og skipta þeim jafnt?
+sharing-open = Opna verkefni…
+sharing-save = Vista verkefnið…
+sharing-pdf-distribution = Skipting (PDF)
+sharing-pdf-payments = Staða greiðslna (PDF)
+sharing-pdf-statements = Einstaklingsyfirlit (PDF)…
+sharing-statements-everyone = Allir
+sharing-excel = Flytja út í Excel
+sharing-file-filter = Skiptiverkefni
+sharing-replace-question = Ef þetta verkefni er opnað kemur það í stað þess sem slegið hefur verið inn í gluggann. Halda áfram?
+sharing-file-saved = Verkefni vistað: { $file }
+sharing-file-opened = Verkefni opnað: { $file }
+sharing-file-not-project = Þessi skrá er ekki skiptiverkefni úr Radinus.
+sharing-file-too-recent = Þetta verkefni kemur úr nýrri útgáfu af Radinus: uppfærðu Radinus til að opna það.
+sharing-file-failed = Ekki tókst að lesa eða skrifa skrána: { $reason }
+sharing-statements-replace-question = { $count ->
+        [one] { $count } yfirlit er þegar til í þessari möppu. Skipta því út?
+       *[other] { $count } yfirlit eru þegar til í þessari möppu. Skipta þeim út?
+    }
+sharing-statements-written = { $count ->
+        [one] { $count } yfirlit skrifað í „{ $folder }“.
+       *[other] { $count } yfirlit skrifuð í „{ $folder }“.
+    }
+sharing-too-many-people = Í skiptingu geta mest verið 40 manns.
+sharing-too-many-items = Í skiptingu geta mest verið 20 liðir.
+sharing-too-many-payments = Í skiptingu geta mest verið 400 greiðslur.
+sharing-invalid-amount = Ekki er hægt að lesa þessa upphæð: jákvæð tala.
+sharing-invalid-number = Ekki er hægt að lesa þessa tölu: jákvæð tala.
+sharing-invalid-percent = Prósenta er á bilinu 0 til 100.
+sharing-invalid-date = Ekki er hægt að lesa þessa dagsetningu.
+sharing-name-missing = Hver einstaklingur verður að hafa nafn.
+sharing-name-duplicate = „{ $name }“ er þegar til: aðgreindu þau, til dæmis með upphafsstaf.
+sharing-floor-above-cap = Lágmarkið er hærra en hámarkið.
+sharing-item-label-missing = Þessi liður hefur ekkert heiti.
+sharing-items-above-total = Liðirnir og eigin viðbætur hvers og eins fara { $amount } fram úr heildarupphæðinni.
+sharing-payment-person = Veldu hver borgaði.
+sharing-percent-total = Prósenturnar eru samtals { $sum } %: þær þurfa að vera 100 %.
+sharing-percent-total-item = „{ $item }“: prósenturnar eru samtals { $sum } %: þær þurfa að vera 100 %.
+sharing-item-nobody = Enginn tekur þátt í „{ $item }“.
+sharing-item-no-weight = Enginn vegur neitt í „{ $item }“: allir þátttakendur hans eru á núlli.
+sharing-income-missing = Tekjur { $name } vantar.
+sharing-fixed-above = Nákvæmu upphæðirnar fara { $amount } fram úr upphæðinni sem á að skipta.
+sharing-floors-above = Lágmörkin fara { $amount } fram úr upphæðinni sem á að skipta.
+sharing-cap-alone = { $name } er sá eini sem tekur þátt í „{ $item }“: ekki er hægt að virða hámark hans.
+sharing-caps-short = Hámörkin duga ekki til að dekka upphæðina: { $amount } vantar.
+sharing-impossible = Ekki er hægt að virða öll þessi skilyrði: slakaðu á lágmarki eða hámarki.
+sharing-constraint-floor = Lágmarki náð
+sharing-constraint-cap = Hámarki náð
+sharing-constraint-fixed = Nákvæm upphæð
+sharing-constraint-gift = Gefin umframgreiðsla
+sharing-and = { $first } og { $last }
+sharing-outside = Utan liða
+sharing-alone = Eigin viðbætur
+sharing-rounding = Námundun
+sharing-headline-empty = Bættu við fólkinu sem skiptir útgjöldunum.
+sharing-headline-no-amount = Sláðu inn heildarupphæðina eða liðina sem á að skipta.
+sharing-headline-equal = { $total } til skiptingar: hver greiðir { $amount }.
+sharing-headline-range = { $total } til skiptingar: frá { $min } til { $max } eftir einstaklingum.
+sharing-participants = { $count ->
+        [0] Enginn þátttakandi
+        [one] { $count } þátttakandi
+       *[other] { $count } þátttakendur
+    }
+sharing-balance-due = Eftir að greiða: { $amount }
+sharing-balance-over = Hefur greitt { $amount } umfram hlut sinn
+sharing-balance-even = Uppgert
+sharing-summary-collected = { $collected } greitt af { $total }.
+sharing-summary-owing = { $count ->
+        [0] Allir hafa gert upp.
+        [one] Aðeins { $count } skuldar enn { $amount }.
+       *[other] { $count } skulda enn { $amount } samtals.
+    }
+sharing-remaining-outside = Eftir að greiða af útgjöldunum: { $amount }
+sharing-remaining-reimburse = Til endurgreiðslu til { $name }: { $amount }
+sharing-all-settled = Allt er uppgert: enginn skuldar neinum neitt.
+sharing-transfer = { $from } skuldar { $to } { $amount }
+sharing-warning-over-paid = Greiðslurnar fara { $amount } fram úr útgjöldunum: athugaðu upphæðirnar.
+sharing-note-income-zero = { $name } greiðir ekkert af { $items }: tekjur viðkomandi eru 0.
+sharing-note-excluded = { $name } tekur ekki þátt í „{ $item }“: hlutur viðkomandi dreifist á hina.
+sharing-note-gift = Umframgreiðslan sem { $giver } gaf lækkar hlut hinna: { $name } hefur nú greitt meira en sinn hlut.
+sharing-note-outside = { $name } greiðir { $amount } utan liða sinna: upphæðin dregst frá því sem hinir skipta.
+sharing-note-keeper = Námundað að heilum einingum: { $name } heldur sentunum, svo að heildarupphæðin standist nákvæmlega.
+sharing-report-distribution = Skipting
+sharing-report-sharing = Skiptingin
+sharing-report-who-pays = Hver borgar hvað
+sharing-report-items = Sundurliðun eftir liðum
+sharing-report-payments = Staða greiðslna
+sharing-report-as-of = Staða þann { $date }
+sharing-report-balances = Hlutur, greitt, staða
+sharing-report-statement = Yfirlit — { $name }
+sharing-report-your-share = Þinn hluti
+sharing-statement-total = Samtals fyrir heimilið: { $amount }
+sharing-statement-pay = Til greiðslu til { $name }: { $amount }
+sharing-statement-receive = Til innheimtu frá { $name }: { $amount }
+sharing-sheet-people = Fólk
+sharing-sheet-items = Liðir
+sharing-sheet-result = Niðurstaða
+sharing-sheet-payments = Greiðslur
+sharing-sheet-balances = Endurgreiðslur

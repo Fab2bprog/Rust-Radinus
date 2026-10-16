@@ -230,6 +230,139 @@ pub fn value_at(curve: &Curve, day: NaiveDate) -> i64 {
 }
 
 
+// --- La zone : ce qui explique un morceau de courbe -----------------------
+//
+// F40, « Analyse Évolution du solde » (Fabrice, 05/10/2026). La courbe dit que
+// le solde a chuté tel jour ; elle ne dit pas pourquoi. L'utilisateur trace
+// une zone sur le graphique — deux dates — et la fenêtre lui montre les
+// opérations qui s'y trouvent.
+//
+// **Ce module tient les deux bouts** : la zone est calculée ici, à côté de la
+// courbe, sur la même définition du solde — les trois reports du compte plus
+// ses opérations de premier niveau, sans filtre de statut. C'est ce qui
+// garantit que la variation annoncée est, au centime, la somme des lignes
+// montrées. Deux définitions dans deux modules auraient fini par diverger, et
+// une fenêtre d'analyse dont le détail ne retombe pas sur le total ne sert
+// plus à rien.
+
+/// Une opération de la zone, et le compte qui la porte : la zone peut couvrir
+/// plusieurs comptes, et le tableau doit dire lequel.
+#[derive(Debug, Clone)]
+pub struct ZoneOperation {
+    pub account_id: i64,
+    pub account_label: String,
+    pub operation: crate::operations::OperationRow,
+}
+
+/// Ce qui s'est passé entre deux dates, bornes comprises, sur des comptes.
+#[derive(Debug, Clone)]
+pub struct Zone {
+    /// **Le solde à la fin de la veille du premier jour** (tranché avec
+    /// Fabrice, 05/10/2026) : ce qu'on avait avant que la zone commence.
+    pub opening: i64,
+    /// Le solde au soir du dernier jour.
+    pub closing: i64,
+    /// La somme des débits de la zone, négative ou nulle.
+    pub debit: i64,
+    /// La somme des crédits, positive ou nulle.
+    pub credit: i64,
+    /// **Les opérations mères**, et elles seules : c'est l'écriture de la
+    /// banque qui fait bouger le solde, pas la façon dont on l'a ventilée.
+    /// Dans l'ordre du temps, puis de la clef.
+    pub operations: Vec<ZoneOperation>,
+}
+
+impl Zone {
+    /// De combien le solde a bougé sur la zone. C'est `closing - opening`, et
+    /// c'est aussi `debit + credit` — les deux lectures de la même chose.
+    pub fn variation(&self) -> i64 {
+        self.closing - self.opening
+    }
+}
+
+/// La zone `from`–`to` des comptes choisis.
+///
+/// Un compte qui n'existe pas est ignoré, comme pour les courbes. Une zone à
+/// l'envers ou sans compte est vide et plate.
+pub fn zone(conn: &Connection, accounts: &[i64], from: NaiveDate, to: NaiveDate) -> Result<Zone> {
+    let mut built = Zone {
+        opening: 0,
+        closing: 0,
+        debit: 0,
+        credit: 0,
+        operations: Vec::new(),
+    };
+    if to < from {
+        return Ok(built);
+    }
+
+    // Un compte cité deux fois ne compte qu'une fois.
+    let mut seen: Vec<i64> = Vec::new();
+    for account in accounts {
+        if seen.contains(account) {
+            continue;
+        }
+        seen.push(*account);
+
+        let found: Option<(String, i64)> = match conn.query_row(
+            "SELECT Libelle, ReportPointe + ReportEngage + ReportPrevu
+             FROM Compte WHERE IDCompte = ?1",
+            [account],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        ) {
+            Ok(row) => Some(row),
+            Err(rusqlite::Error::QueryReturnedNoRows) => None,
+            Err(other) => return Err(other),
+        };
+        let Some((label, carried)) = found else {
+            continue;
+        };
+
+        // Tout ce qui précède la zone : la même requête que la courbe.
+        let before: i64 = conn.query_row(
+            "SELECT COALESCE(SUM(Montant), 0)
+             FROM Operation
+             WHERE IDCompte = ?1 AND IDOperationParent = 0
+               AND Date IS NOT NULL AND Date < ?2",
+            rusqlite::params![account, from.to_string()],
+            |row| row.get(0),
+        )?;
+        built.opening += carried + before;
+
+        let mut statement = conn.prepare(&format!(
+            "{select}
+             WHERE o.IDCompte = ?1 AND o.IDOperationParent = 0
+               AND o.Date IS NOT NULL AND o.Date >= ?2 AND o.Date <= ?3
+             ORDER BY o.Date, o.IDOperation",
+            select = crate::operations::SELECT_ROW,
+        ))?;
+        let rows = statement.query_map(
+            rusqlite::params![account, from.to_string(), to.to_string()],
+            crate::operations::read_row,
+        )?;
+        for row in rows {
+            let (operation, _) = row?;
+            if operation.amount < 0 {
+                built.debit += operation.amount;
+            } else {
+                built.credit += operation.amount;
+            }
+            built.operations.push(ZoneOperation {
+                account_id: *account,
+                account_label: label.clone(),
+                operation,
+            });
+        }
+    }
+
+    built.closing = built.opening + built.debit + built.credit;
+    // Plusieurs comptes : leurs opérations se mêlent dans l'ordre du temps.
+    built
+        .operations
+        .sort_by_key(|entry| (entry.operation.date, entry.operation.id));
+    Ok(built)
+}
+
 // --- Le millésime, et le décalage d'un an --------------------------------
 //
 // Deux règles données par Fabrice le 26/07/2026, après qu'il eut lui-même
@@ -435,6 +568,117 @@ mod tests {
             .iter()
             .find(|curve| curve.label == label)
             .unwrap_or_else(|| panic!("courbe « {label} » absente"))
+    }
+
+    /// **La zone retombe sur la courbe, au centime** (Fabrice, 05/10/2026 :
+    /// « au fur et à mesure que l'on maintient le clic en avançant on colore
+    /// une zone, et à ce moment-là le détail des opérations apparaît »). Le
+    /// solde d'ouverture est celui de la veille au soir, celui de clôture
+    /// celui du dernier jour, et la somme des lignes montrées est la
+    /// variation : une analyse dont le détail ne retombe pas sur le total ne
+    /// sert à rien.
+    #[test]
+    fn la_zone_explique_exactement_ce_que_la_courbe_montre() {
+        let conn = database();
+        add(&conn, 1, 1, "2026-01-05", -30 * EURO, 0);
+        add(&conn, 2, 1, "2026-03-10", -20 * EURO, 0);
+        add(&conn, 3, 1, "2026-03-10", 5 * EURO, 0);
+        add(&conn, 4, 1, "2026-03-12", 200 * EURO, 0);
+        add(&conn, 5, 1, "2026-03-20", -7 * EURO, 0);
+        add(&conn, 6, 2, "2026-03-11", -40 * EURO, 0);
+        add(&conn, 7, 2, "2026-04-02", 9 * EURO, 0);
+        // Une ventilation : elle ne déplace pas l'argent du compte.
+        add(&conn, 8, 1, "2026-03-10", -12 * EURO, 2);
+        // Une opération sans date n'est pas dans la courbe ; elle n'est pas
+        // dans la zone non plus.
+        conn.execute(
+            "INSERT INTO Operation (IDOperation, Libelle, Montant, IDCompte,
+                                    IDStatutOperation, IDOperationParent)
+             VALUES (9, 'SANS DATE', -999000000, 1, 3, 0)",
+            [],
+        )
+        .unwrap();
+
+        let built = curves(&conn, &[1, 2], "2026-01-01", "2026-12-31");
+        let total = curve(&built, "Total");
+
+        for (from, to) in [
+            ("2026-03-10", "2026-03-12"),
+            ("2026-03-10", "2026-03-10"),
+            ("2026-01-01", "2026-12-31"),
+            ("2026-02-01", "2026-02-28"),
+            ("2026-03-11", "2026-04-02"),
+        ] {
+            let found = zone(&conn, &[1, 2], day(from), day(to)).expect("zone");
+            let eve = day(from).pred_opt().expect("la veille");
+            // La veille du premier jour de la période, la courbe ne dit rien :
+            // elle commence au premier. Le solde d'avant, c'est ce qu'elle
+            // vaudrait si on la faisait partir plus tôt.
+            let earlier = curves(&conn, &[1, 2], "2025-01-01", "2026-12-31");
+            assert_eq!(found.opening, value_at(curve(&earlier, "Total"), eve), "{from}–{to}");
+            assert_eq!(found.closing, value_at(total, day(to)), "{from}–{to}");
+            let listed: i64 = found.operations.iter().map(|one| one.operation.amount).sum();
+            assert_eq!(listed, found.variation(), "{from}–{to}");
+            assert_eq!(found.debit + found.credit, found.variation(), "{from}–{to}");
+            assert!(found.debit <= 0 && found.credit >= 0);
+        }
+
+        // Les mères seulement, tous comptes mêlés, dans l'ordre du temps.
+        let found = zone(&conn, &[1, 2], day("2026-03-10"), day("2026-03-12")).unwrap();
+        let ids: Vec<i64> = found.operations.iter().map(|one| one.operation.id).collect();
+        assert_eq!(ids, vec![2, 3, 6, 4]);
+        let accounts: Vec<&str> = found
+            .operations
+            .iter()
+            .map(|one| one.account_label.as_str())
+            .collect();
+        assert_eq!(accounts, vec!["CCP", "CCP", "Livret A", "CCP"]);
+        assert_eq!(found.opening, (100 - 30 + 500) * EURO);
+        assert_eq!(found.debit, -60 * EURO);
+        assert_eq!(found.credit, 205 * EURO);
+        assert_eq!(found.closing, (570 + 145) * EURO);
+
+        // Un seul compte : la zone ne regarde que lui.
+        let alone = zone(&conn, &[2], day("2026-03-10"), day("2026-03-12")).unwrap();
+        assert_eq!(alone.operations.len(), 1);
+        assert_eq!(alone.opening, 500 * EURO);
+        assert_eq!(alone.closing, 460 * EURO);
+    }
+
+    /// Aucun statut n'est écarté : la courbe suit le solde final, la zone aussi.
+    #[test]
+    fn la_zone_garde_tous_les_statuts() {
+        let conn = database();
+        for (id, status) in [(1, 1), (2, 2), (3, 3)] {
+            conn.execute(
+                "INSERT INTO Operation (IDOperation, Libelle, Date, Montant, IDCompte,
+                                        IDStatutOperation, IDOperationParent)
+                 VALUES (?1, 'OP', '2026-05-05', -1000000, 1, ?2, 0)",
+                [id, status],
+            )
+            .unwrap();
+        }
+        let found = zone(&conn, &[1], day("2026-05-01"), day("2026-05-31")).unwrap();
+        assert_eq!(found.operations.len(), 3);
+        assert_eq!(found.variation(), -3 * EURO);
+    }
+
+    /// Une zone à l'envers, sans compte, ou sur un compte disparu : vide, et
+    /// rien ne casse. Un compte cité deux fois ne compte qu'une fois.
+    #[test]
+    fn une_zone_sans_rien_est_vide() {
+        let conn = database();
+        add(&conn, 1, 1, "2026-01-05", -30 * EURO, 0);
+        let backwards = zone(&conn, &[1], day("2026-02-01"), day("2026-01-01")).unwrap();
+        assert!(backwards.operations.is_empty());
+        assert_eq!(backwards.variation(), 0);
+        let nobody = zone(&conn, &[], day("2026-01-01"), day("2026-12-31")).unwrap();
+        assert!(nobody.operations.is_empty() && nobody.opening == 0);
+        let gone = zone(&conn, &[77], day("2026-01-01"), day("2026-12-31")).unwrap();
+        assert!(gone.operations.is_empty() && gone.opening == 0);
+        let twice = zone(&conn, &[1, 1], day("2026-01-01"), day("2026-12-31")).unwrap();
+        assert_eq!(twice.operations.len(), 1);
+        assert_eq!(twice.opening, 100 * EURO);
     }
 
     /// **Les trous se remplissent, et en escalier** : c'est la règle de

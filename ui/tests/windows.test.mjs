@@ -140,6 +140,7 @@ const OPERATIONS = {
       has_comment: true, comment: "Marché du dimanche", has_attachment: false, check_number: "",
       category_id: 1, assignment_id: 2, payment_mode_id: 3, payee_id: 4, project_id: 0,
       parent_id: 0, child_count: 2, is_complement: false,
+      is_pointed: true, status_id: 1, verification_id: 2,
     },
     {
       id: 2, label: "Alimentation", date: "05/01/2026", clearing_date: "05/01/2026",
@@ -150,6 +151,7 @@ const OPERATIONS = {
       has_comment: false, comment: "", has_attachment: false, check_number: "",
       category_id: 1, assignment_id: 2, payment_mode_id: 3, payee_id: 0, project_id: 0,
       parent_id: 1, child_count: 0, is_complement: false,
+      is_pointed: true, status_id: 1, verification_id: 2,
     },
     {
       id: 3, label: "Complément", date: "05/01/2026", clearing_date: "05/01/2026",
@@ -160,16 +162,18 @@ const OPERATIONS = {
       has_comment: false, comment: "", has_attachment: false, check_number: "",
       category_id: 1, assignment_id: 2, payment_mode_id: 3, payee_id: 0, project_id: 0,
       parent_id: 1, child_count: 0, is_complement: true,
+      is_pointed: true, status_id: 1, verification_id: 2,
     },
     {
       id: 4, label: "SALAIRE", date: "28/01/2026", clearing_date: "28/01/2026",
-      date_value: "2026-01-28", clearing_date_value: "2026-01-28", balance_value: 3145400000,
+      date_value: "2026-01-28", clearing_date_value: "2026-01-28", balance_value: 0,
       month: "janvier", category: "Salaire", assignment: "Monsieur",
       payment_mode: "Virement", payee: "", project: "",
-      debit: "", credit: "2\u202f216,71 €", balance: "3\u202f145,40 €", amount: 2216710000,
+      debit: "", credit: "2\u202f216,71 €", balance: "", amount: 2216710000,
       has_comment: false, comment: "", has_attachment: true, check_number: "",
       category_id: 5, assignment_id: 1, payment_mode_id: 2, payee_id: 0, project_id: 0,
       parent_id: 0, child_count: 0, is_complement: false,
+      is_pointed: false, status_id: 3, verification_id: 3,
     },
   ],
   debit: "-17\u202f967,28 €",
@@ -599,6 +603,14 @@ const UI_TEXTS = {
   "operations-to": "Date fin",
   "operations-column-date": "Date",
   "operations-column-clearing-date": "Date Pointage",
+  "operations-column-status": "Statut opération",
+  "operations-column-verification": "Vérification",
+  "operation-field-verification": "Vérification",
+  "preferences-branch-display": "Affichage",
+  "preferences-branch-import": "Importation",
+  "preferences-leaf-verification": "Vérification",
+  "preferences-field-verification": "Opérations importées :",
+  "preferences-saved": "Préférences enregistrées.",
   "operations-column-label": "Libelle",
   "operations-column-category": "Categorie",
   "operations-column-assignment": "Affectation",
@@ -655,6 +667,7 @@ const UI_TEXTS = {
   "journal-empty": "Aucune opération technique n'a encore été effectuée depuis l'ouverture du logiciel.",
   "journal-help": "Le journal ne garde que la dernière opération technique : sauvegarde, restauration, réparation ou effacement.",
   "window-journal-title": "Journal de la dernière opération technique",
+  "window-balances-title": "Soldes de vos comptes",
   "window-attachments-title": "Pièces jointes de l'opération",
   "attachment-none": "Cette opération ne porte aucune pièce jointe.",
   "attachment-title-add": "Joindre un document à cette opération",
@@ -685,6 +698,9 @@ const UI_TEXTS = {
   "period-today": "Aujourd'hui",
   "filter-all": "Toutes les opérations",
   "filter-pointed": "Uniquement les opérations pointées",
+  "filter-by-status": "Filtre Statut",
+  "filter-by-verification": "Filtre Vérification",
+  "filter-show-all": "Afficher tout",
   "filter-committed": "Uniquement les opérations engagées",
   "filter-planned": "Uniquement les opérations prévues",
   "month-january": "janvier",
@@ -733,6 +749,8 @@ const UI_TEXTS = {
   "operation-label-required": "Le libellé de l'opération est obligatoire.",
   "operation-date-required": "La date de l'opération est obligatoire.",
   "operation-clearing-date-invalid": "La date de pointage n'est pas une date valide.",
+  "operation-clearing-date-required":
+    "Une opération pointée doit obligatoirement porter une date de pointage.",
   "operation-is-a-sub":
     "Cette ligne est une sous-opération : elle se modifie depuis sa fiche à elle.",
   "operation-title-comment": "Commentaire de l'opération",
@@ -754,9 +772,20 @@ const UI_TEXTS = {
   "operation-copy": "Copie à enregistrer : rien n'est encore créé.",
   "operations-show-children": "Afficher toutes les sous-opérations",
   "operations-hide-children": "Masquer toutes les sous-opérations",
+  "operations-recurring-from":
+    "Créer une opération périodique à partir de cette opération",
   "statistics-axis-column": "NomCategorie",
   "statistics-unclassified": "Sans catégorie",
   "statistics-total": "Total",
+  "crossed-balance-column": "Categorie",
+  "crossed-balance-window-name": "Bilan croisé",
+  "crossed-balance-no-data": "Aucune opération sur ce mois pour les comptes choisis.",
+  "crossed-balance-month-choose": "Choisir le mois",
+  "crossed-balance-next": "Mois suivant",
+  "crossed-balance-previous": "Mois précédent",
+  "export-all-months-excel": "Exporter tous les mois de l'année affichée vers Excel",
+  "export-all-months-ods":
+    "Exporter tous les mois de l'année affichée vers LibreOffice Calc",
   "statistics-sum": "Somme",
   "statistics-cumulative": "Cumul",
   "statistics-no-account": "Aucun compte n'a été choisi : la statistique ne porte sur rien.",
@@ -790,6 +819,14 @@ const UI_TEXTS = {
   "dashboard-no-account": "Aucun compte n'a été choisi : le tableau de bord ne porte sur rien.",
   "dashboard-enlarge": "Ouvrir en grand",
   "curve-heading": "Evolution du solde par jour",
+  "analysis-heading": "Analyse de l'évolution du solde",
+  "analysis-hint": "Tracez une zone sur le graphique, bouton de la souris enfoncé, pour voir les opérations de cette période.",
+  "analysis-zone": "Zone :",
+  "analysis-opening": "Solde au début :",
+  "analysis-closing": "Solde à la fin :",
+  "analysis-variation": "Variation :",
+  "analysis-detail-name": "Analyse du solde",
+  "analysis-detail-none": "Aucune opération dans cette zone.",
   "curve-menu-period": "Période",
   "curve-total": "Total",
   "curve-from": "Date début :",
@@ -807,6 +844,638 @@ const UI_TEXTS = {
   "export-to-xml": "Exporter vers XML (.xml)",
   "export-to-json": "Exporter vers JSON (.json)",
   "export-menu": "Export",
+  "export-to": "Exporter vers",
+  "copy-cell": "Copier la cellule",
+  "copy-rows": "Copier les lignes sélectionnées",
+  "copy-failed": "La copie dans le presse-papiers a échoué.",
+  "columns-reset": "Rétablir les colonnes par défaut",
+  "columns-show-hide": "Afficher/Masquer",
+  "columns-colour": "Colorer la colonne :",
+  "columns-colour-none": "Aucune couleur",
+  "columns-colour-red": "Rouge",
+  "columns-colour-orange": "Orange",
+  "columns-colour-pink": "Rose",
+  "columns-colour-pastel-green": "Vert pastel",
+  "columns-colour-green": "Vert",
+  "columns-colour-pastel-blue": "Bleu pastel",
+  "columns-colour-blue": "Bleu",
+  "columns-colour-pastel-yellow": "Jaune pastel",
+  "columns-colour-yellow": "Jaune",
+  "preferences-leaf-columns": "Colonnes des tableaux",
+  "preferences-columns-reset": "Réinitialiser",
+  "preferences-columns-reset-all": "Tout réinitialiser",
+  "preferences-columns-done": "Les colonnes ont retrouvé leur disposition d'origine.",
+  "preferences-columns-hint": "Chaque tableau retient l'ordre de ses colonnes.",
+  "welcome-tile-counted": "Compter ce compte dans les totaux",
+  "window-loan-title": "Simulation de crédit",
+  "loan-tab-credit": "Le crédit",
+  "loan-tab-afford": "Puis-je le rembourser ?",
+  "loan-field-kind": "Type de crédit",
+  "loan-field-amount": "Montant emprunté",
+  "loan-field-payment": "Mensualité",
+  "loan-field-months": "Durée",
+  "loan-field-rate": "Taux débiteur fixe",
+  "loan-field-fees": "Frais de dossier",
+  "loan-field-insurance": "Assurance par mois",
+  "loan-unit-months": "mois",
+  "loan-unit-percent": "%",
+  "loan-invalid-field": "Cette valeur n'est pas un nombre : corrigez-la pour relancer le calcul.",
+  "loan-report-button": "Rapport PDF",
+  "loan-monthly-table": "Tableau mois par mois",
+  "loan-chart-cost": "Ce que coûte ce crédit",
+  "loan-chart-capital": "Capital restant dû",
+  "loan-schedule-title": "Tableau d'amortissement",
+  "loan-column-number": "N°",
+  "loan-column-date": "Échéance",
+  "loan-column-payment": "Mensualité",
+  "loan-column-interest": "Intérêts",
+  "loan-column-capital": "Capital",
+  "loan-column-insurance": "Assurance",
+  "loan-column-remaining": "Capital restant dû",
+  "loan-history-label": "Période étudiée",
+  "loan-accounts-title": "Comptes étudiés",
+  "loan-column-account": "Compte",
+  "loan-column-bank": "Banque",
+  "loan-column-balance": "Solde réel",
+  "loan-running-title": "Crédits en cours retenus",
+  "loan-running-column-label": "Opération périodique",
+  "loan-running-column-monthly": "Par mois",
+  "loan-running-column-end": "Dernière échéance",
+  "loan-verdict-title": "En résumé",
+  "loan-chart-income": "Où va votre revenu moyen",
+  "loan-chart-history": "Votre historique avec ce crédit",
+  "loan-chart-history-hint": "Ce qui serait resté chaque mois, la mensualité payée. En rouge, les mois qui auraient fini dans le rouge.",
+  "loan-chart-projection": "Votre solde projeté",
+  "loan-tab-rules": "Réglages du jugement",
+  "loan-unit-percent-year": "% par an",
+  "loan-disclaimer": "Simulation indicative, sans valeur contractuelle. Seule l'offre de la banque fait foi.",
+  "window-appliance-title": "Consommation d'un appareil électrique",
+  "appliance-device-title": "L'appareil",
+  "appliance-on-title": "Allumé",
+  "appliance-standby-title": "En veille",
+  "appliance-field-on-watts": "Puissance en marche",
+  "appliance-field-on-hours": "Durée de marche par jour",
+  "appliance-field-days": "Jours d'utilisation par semaine",
+  "appliance-field-share": "Part de la marche en heures creuses",
+  "appliance-field-standby-watts": "Puissance en veille",
+  "appliance-field-standby-hours": "Durée de veille par jour d'utilisation",
+  "appliance-unit-watts": "W",
+  "appliance-unit-hours": "h",
+  "appliance-unit-days": "sur 7",
+  "appliance-unit-percent": "%",
+  "appliance-unit-price": "{ $sign }/kWh",
+  "appliance-standby-hint": "Laissée vide, la veille dure le reste de la journée. Les jours sans usage, l'appareil reste branché : tout ce temps compte en veille. Débranché, sa veille est de 0 W.",
+  "appliance-contract-title": "Votre contrat",
+  "appliance-field-option": "Option tarifaire",
+  "appliance-option-base": "Base (un seul prix)",
+  "appliance-option-off-peak": "Heures pleines / Heures creuses",
+  "appliance-field-base": "Prix du kWh",
+  "appliance-field-peak": "Prix du kWh en heures pleines",
+  "appliance-field-off-peak": "Prix du kWh en heures creuses",
+  "appliance-field-off-peak-hours": "Heures creuses par jour",
+  "appliance-contract-hint": "Ces prix ne valent que pour ce calcul. Le tarif enregistré se règle dans Paramètres › Préférences › Outils.",
+  "appliance-contract-reset": "Reprendre le tarif enregistré",
+  "appliance-period-day": "Par jour",
+  "appliance-period-month": "Par mois",
+  "appliance-period-year": "Par an",
+  "appliance-energy": "{ $value } kWh",
+  "appliance-less-than": "moins de { $amount }",
+  "appliance-detail-title": "Le détail sur un an",
+  "appliance-column-part": "Poste",
+  "appliance-column-energy": "Énergie",
+  "appliance-column-cost": "Coût",
+  "appliance-column-share": "Part",
+  "appliance-line-on": "Allumé",
+  "appliance-line-standby": "En veille",
+  "appliance-line-on-peak": "Allumé, heures pleines",
+  "appliance-line-on-off-peak": "Allumé, heures creuses",
+  "appliance-line-standby-peak": "En veille, heures pleines",
+  "appliance-line-standby-off-peak": "En veille, heures creuses",
+  "appliance-line-total": "Total",
+  "appliance-chart-title": "Où part l'argent",
+  "appliance-chart-caption": "par an",
+  "appliance-standby-sentence": "La veille seule coûte { $amount } par an : { $share } de ce que coûte l'appareil.",
+  "appliance-note-plate": "La puissance inscrite sur l'appareil ou dans sa notice est un maximum : en marche, la plupart des appareils consomment moins. Pour un chiffre réel, mesurez-le avec une prise wattmètre et reportez ce qu'elle indique.",
+  "appliance-note-subscription": "L'abonnement n'est pas compté : on le paie, que l'appareil soit branché ou non.",
+  "window-cushion-title": "Mon matelas de sécurité",
+  "cushion-question": "Si vos revenus s'arrêtaient demain, combien de mois tiendriez-vous avec votre épargne ?",
+  "cushion-accounts-title": "Vos comptes",
+  "cushion-column-account": "Compte",
+  "cushion-column-balance": "Solde réel",
+  "cushion-column-savings": "Épargne",
+  "cushion-column-spending": "Dépenses",
+  "cushion-accounts-hint": "« Épargne » : l'argent sur lequel vous comptez en cas de coup dur. « Dépenses » : les comptes d'où partent les dépenses du quotidien.",
+  "cushion-history-label": "Période étudiée",
+  "cushion-backup-label": "Revenu de secours par mois",
+  "cushion-backup-hint": "Ce qui continuerait d'arriver : allocation chômage, salaire du conjoint… Vide : aucun revenu.",
+  "cushion-categories-title": "Les dépenses retenues",
+  "cushion-categories-hint": "Décochez ce que vous couperiez en cas de coup dur.",
+  "cushion-categories-empty": "Aucune dépense sur cette période.",
+  "cushion-verdict-title": "Votre matelas",
+  "cushion-targets-title": "Les seuils de prudence",
+  "cushion-projection-title": "Votre épargne en cas de coup dur",
+  "cushion-projection-hint": "Ce qui resterait chaque mois si vos revenus s'arrêtaient aujourd'hui.",
+  "cushion-note": "Une estimation tirée de votre historique : les dépenses d'un mois difficile peuvent différer de la moyenne.",
+  "window-goal-title": "Objectif Épargne",
+  "goal-accounts-title": "Les comptes suivis",
+  "goal-column-account": "Compte",
+  "goal-column-balance": "Solde réel",
+  "goal-accounts-hint": "Un virement entre deux comptes suivis s'annule ; un virement vers un compte non suivi compte comme une sortie.",
+  "goal-period-label": "Période de référence",
+  "goal-period-range": "Plage d'années…",
+  "goal-range-from": "de",
+  "goal-range-to": "à",
+  "goal-question-title": "Votre question",
+  "goal-question-when": "Quand aurai-je ce montant ?",
+  "goal-question-amount": "Combien aurai-je à cette date ?",
+  "goal-question-effort": "Combien épargner pour avoir ce montant à cette date ?",
+  "goal-field-target": "Montant visé",
+  "goal-field-date": "Date visée",
+  "goal-field-rate": "Taux annuel de l'épargne",
+  "goal-field-extra": "Et si j'épargnais en plus, par mois",
+  "goal-options-hint": "Vides : aucun intérêt, rien de plus.",
+  "goal-answer-title": "La réponse",
+  "goal-chart-title": "Votre solde, hier et demain",
+  "goal-chart-hint": "En trait plein, le solde réel des douze derniers mois ; en pointillés, la projection ; en clair, la fourchette selon les mois.",
+  "goal-disclaimer": "Une projection tirée de votre historique, pas une promesse : un imprévu peut tout changer.",
+  "window-cut-title": "Et si je réduisais… ?",
+  "cut-axis-label": "Classer par",
+  "cut-axis-category": "Catégories",
+  "cut-axis-payee": "Tiers",
+  "cut-axis-budget-line": "Postes budgétaires",
+  "cut-table-title": "Vos dépenses, poste par poste",
+  "cut-column-monthly": "Par mois",
+  "cut-column-cut": "Réduction",
+  "cut-column-after": "Après",
+  "cut-column-yearly": "Gain par an",
+  "cut-total": "Total",
+  "cut-horizon-label": "Horizon",
+  "cut-settings-title": "Réglages",
+  "cut-options-hint": "Le taux et le montant visé sont facultatifs.",
+  "cut-report-button": "Rapport PDF",
+  "cut-chart-title": "Votre solde, sans et avec les réductions",
+  "cut-chart-hint": "En trait plein, le solde réel des douze derniers mois ; en pointillés gris, la projection sans réduction ; en bleu, avec ; en vert, l'argent gagné.",
+  "cut-donut-title": "Vos dépenses par mois après réduction",
+  "cut-donut-caption": "après réduction",
+  "cut-donut-others": "Autres postes",
+  "cut-donut-saved": "Économisé",
+  "cut-legend-with": "Avec les réductions",
+  "cut-legend-without": "Sans réduction",
+  "cut-years": "{ $years -> [one] { $years } an *[other] { $years } ans }",
+  "cut-headline-none": "Tapez une réduction dans le tableau pour en voir l'effet.",
+  "cut-headline": "En réduisant { $count -> [one] ce poste *[other] ces { $count } postes }, vous mettriez de côté { $monthly } de plus par mois, soit { $yearly } par an.",
+  "cut-tile-monthly": "Gain par mois",
+  "cut-tile-yearly": "Gain par an",
+  "cut-tile-horizon": "Gain sur { $years -> [one] { $years } an *[other] { $years } ans }",
+  "cut-tile-spending": "Dépenses par mois",
+  "cut-target-already": "Vous avez déjà { $amount }.",
+  "cut-target-sooner": "Vous atteindriez { $amount } vers { $with } au lieu de { $without } : { $months -> [0] pas plus tôt [one] un mois plus tôt *[other] { $months } mois plus tôt }.",
+  "cut-target-only-with": "Avec ces réductions, vous atteindriez { $amount } vers { $with } ; sans elles, à votre rythme actuel, jamais.",
+  "cut-target-never": "Même avec ces réductions, vous n'atteindriez pas { $amount } à votre rythme actuel.",
+  "cut-note-seasons": "Chaque réduction suit les saisons de son poste : un poste qui pèse surtout l'été rapporte surtout l'été.",
+  "cut-note-capped": "Une réduction tapée dépassait la dépense : elle a été ramenée à la dépense elle-même.",
+  "cut-invalid-cut": "Cette réduction n'est pas lisible : un pourcentage de 0 à 100, ou un montant par mois.",
+  "cut-report-settings": "Les réglages",
+  "cut-report-result": "Le résultat",
+  "cut-report-accounts": "Comptes suivis",
+  "window-holiday-title": "Préparer mes vacances",
+  "holiday-trip-title": "Le voyage",
+  "holiday-field-trip": "Type de voyage",
+  "holiday-trip-stay": "Séjour",
+  "holiday-trip-cruise": "Croisière",
+  "holiday-field-adults": "Adultes",
+  "holiday-field-children": "Enfants",
+  "holiday-field-nights": "Durée du séjour, en nuits",
+  "holiday-field-days": "Jours",
+  "holiday-field-months": "Mois avant le départ",
+  "holiday-field-stops": "Nombre d'escales",
+  "holiday-saved-title": "Déjà épargné",
+  "holiday-saved-hint": "Cochez les comptes où l'argent des vacances est déjà mis de côté : leur solde réel compte comme déjà épargné.",
+  "holiday-budget-title": "Le budget",
+  "holiday-budget-hint": "Pour chaque poste, un montant, pour qui il vaut et pour combien de temps. Vide, un poste ne compte pas.",
+  "holiday-optional-title": "Lignes facultatives",
+  "holiday-result-title": "Le résultat",
+  "holiday-donut-title": "Où part l'argent du voyage",
+  "holiday-donut-caption": "pour le voyage",
+  "holiday-child-label": "Prix enfant",
+  "holiday-count-label": "Cabines",
+  "holiday-open": "Ouvrir un projet…",
+  "cut-file-filter": "Projet de réduction",
+  "menu-tools-car": "Carnet de ma voiture",
+  "window-car-title": "Carnet de ma voiture",
+  "car-unnamed": "Ma voiture",
+  "car-sheet-title": "La voiture",
+  "car-field-plate": "Immatriculation",
+  "car-field-make": "Marque",
+  "car-field-model": "Modèle",
+  "car-field-engine": "Motorisation",
+  "car-field-first-hand": "Première main",
+  "car-field-registered": "Première mise en circulation",
+  "car-field-acquired": "Date d'acquisition",
+  "car-field-acquired-km": "Kilométrage à l'acquisition",
+  "car-field-service": "Révision tous les",
+  "car-field-service-or": "ou tous les",
+  "car-unit-months-short": "mois",
+  "car-unit-km": "km",
+  "car-tariff-title": "Tarif de la recharge à la maison",
+  "car-tariff-hint": "Ce tarif est gardé dans le carnet de la voiture : il ne change pas celui des préférences.",
+  "car-tariff-reset": "Reprendre le tarif des préférences",
+  "car-engine-petrol": "Essence",
+  "car-engine-diesel": "Diesel",
+  "car-engine-lpg": "GPL",
+  "car-engine-e85": "E85 (superéthanol)",
+  "car-engine-hybrid": "Hybride",
+  "car-engine-plug-in": "Hybride rechargeable",
+  "car-engine-electric": "Électrique",
+  "car-engine-hydrogen": "Hydrogène",
+  "car-energy-petrol": "Essence",
+  "car-energy-diesel": "Gazole",
+  "car-energy-lpg": "GPL",
+  "car-energy-e85": "E85",
+  "car-energy-electricity": "Électricité",
+  "car-energy-hydrogen": "Hydrogène",
+  "car-unit-litre": "L",
+  "car-unit-kwh": "kWh",
+  "car-unit-kg": "kg",
+  "car-rubric-energy": "Énergie",
+  "car-rubric-upkeep": "Entretien courant",
+  "car-rubric-service": "Révision",
+  "car-rubric-wear": "Pièces d'usure",
+  "car-rubric-tyres": "Pneus",
+  "car-rubric-breakdown": "Pannes",
+  "car-rubric-insurance": "Assurance",
+  "car-rubric-inspection": "Contrôle technique",
+  "car-part-brake-pads": "Plaquettes de frein",
+  "car-part-brake-discs": "Disques de frein",
+  "car-part-timing-belt": "Courroie de distribution",
+  "car-part-clutch": "Embrayage",
+  "car-part-battery-12v": "Batterie 12 V",
+  "car-part-shock-absorbers": "Amortisseurs",
+  "car-part-wipers": "Essuie-glaces",
+  "car-part-spark-plugs": "Bougies d'allumage",
+  "car-part-glow-plugs": "Bougies de préchauffage",
+  "car-part-particulate-filter": "Filtre à particules",
+  "car-part-catalytic-converter": "Pot catalytique",
+  "car-part-fuel-cell-filter": "Filtre de la pile à combustible",
+  "car-part-exhaust": "Échappement",
+  "car-part-other": "Autre pièce…",
+  "car-axle-all": "Les quatre pneus",
+  "car-axle-front": "Pneus avant",
+  "car-axle-rear": "Pneus arrière",
+  "car-verdict-pass": "Favorable",
+  "car-verdict-counter": "Contre-visite",
+  "car-charge-station": "À une borne",
+  "car-charge-home": "À la maison",
+  "car-slot-peak": "Heures pleines",
+  "car-slot-off-peak": "Heures creuses",
+  "car-entry-new": "Nouvelle ligne",
+  "car-entry-edit": "Modifier la ligne",
+  "car-field-date": "Date",
+  "car-field-km": "Compteur",
+  "car-field-rubric": "Rubrique",
+  "car-field-amount": "Montant",
+  "car-field-garage": "Garage ou station",
+  "car-field-note": "Note",
+  "car-field-energy": "Énergie",
+  "car-field-quantity": "Quantité",
+  "car-field-charge": "Recharge",
+  "car-field-slot": "Heure de recharge",
+  "car-field-part": "Pièce",
+  "car-field-part-name": "Nom de la pièce",
+  "car-field-axle": "Pneus changés",
+  "car-field-verdict": "Résultat",
+  "car-field-months": "Mois couverts",
+  "car-field-battery": "État de la batterie",
+  "car-home-amount-hint": "Le montant d'une recharge à la maison se calcule avec le tarif de la voiture.",
+  "car-entry-add": "Ajouter au carnet",
+  "car-entry-update": "Enregistrer la ligne",
+  "car-entry-cancel": "Annuler",
+  "car-entry-delete": "Supprimer la ligne",
+  "car-delete-question": "Supprimer cette ligne du carnet ?",
+  "car-from-operation": "Prendre une opération…",
+  "car-pick-account": "De quel compte vient la dépense ?",
+  "car-pick-operation": "Quelle opération ?",
+  "car-pick-take": "Prendre",
+  "car-pick-none": "Aucune dépense dans ce compte.",
+  "car-pick-taken": "Opération reprise : complétez le compteur et la rubrique, puis ajoutez la ligne.",
+  "car-history-title": "L'historique",
+  "car-filter-all": "Toutes les rubriques",
+  "car-history-empty": "Aucune ligne pour l'instant.",
+  "car-history-hint": "Cliquez une ligne pour la modifier.",
+  "car-column-date": "Date",
+  "car-column-km": "Km",
+  "car-column-rubric": "Rubrique",
+  "car-column-detail": "Détail",
+  "car-column-amount": "Montant",
+  "car-column-garage": "Garage",
+  "car-column-note": "Note",
+  "car-column-share": "Part",
+  "car-column-per-km": "Au km",
+  "car-column-energy": "Énergie",
+  "car-column-quantity": "Quantité",
+  "car-column-price": "Prix moyen",
+  "car-column-consumption": "Consommation",
+  "car-column-part": "Pièce",
+  "car-column-changes": "Changements",
+  "car-column-last": "Dernier changement",
+  "car-column-life": "Durée de vie",
+  "car-column-next": "Prochain changement",
+  "car-total": "Total",
+  "car-summary-title": "Ce que coûte la voiture",
+  "car-headline-empty": "Remplissez la fiche, puis ajoutez une première ligne : un plein, une révision, une facture de garage…",
+  "car-tile-total": "Coût total",
+  "car-tile-month": "Par mois",
+  "car-tile-km": "Au kilomètre",
+  "car-tile-driven": "Kilomètres parcourus",
+  "car-tile-consumption": "Consommation",
+  "car-tile-energy-km": "Énergie au kilomètre",
+  "car-rubrics-title": "Par rubrique",
+  "car-energy-title": "L'énergie",
+  "car-parts-title": "Pièces d'usure",
+  "car-tyres-title": "Pneus",
+  "car-battery-title": "État de la batterie",
+  "car-years-title": "Ce que la voiture a coûté chaque année",
+  "car-donut-title": "Où part l'argent",
+  "car-donut-caption": "en tout",
+  "car-deadlines-title": "Les échéances",
+  "car-deadlines-empty": "Aucune échéance pour l'instant : notez une révision, un contrôle technique, une assurance, ou deux changements d'une même pièce.",
+  "car-deadline-service": "Révision",
+  "car-deadline-inspection": "Contrôle technique",
+  "car-deadline-counter": "Contre-visite du contrôle technique",
+  "car-deadline-insurance": "Fin de l'assurance",
+  "car-when-inspection-unknown": "Notez le dernier contrôle technique pour connaître la date du prochain.",
+  "car-tone-late": "Dépassée",
+  "car-tone-soon": "Bientôt",
+  "car-note-since": "Tout se compte depuis l'acquisition : la date et le compteur notés sur la fiche.",
+  "car-note-consumption": "La consommation se mesure de plein à plein : faites le plein complet et notez le compteur à chaque fois.",
+  "car-note-e85": "Une voiture E85 boit ce qu'on lui donne : les kilomètres qui suivent un plein comptent pour son carburant.",
+  "car-note-home": "Une recharge à la maison est chiffrée au tarif de la voiture le jour où elle est notée, et garde ce coût.",
+  "car-note-inspection": "Le contrôle technique suit la règle française : le premier dans les quatre ans de la mise en circulation, puis tous les deux ans ; une contre-visite, dans les deux mois.",
+  "car-disclaimer": "Les échéances et les durées de vie sont des estimations tirées du carnet : seul le carnet d'entretien du constructeur fait foi.",
+  "car-invalid-date": "Une date valide, qui n'est pas dans le futur, s'il vous plaît.",
+  "car-invalid-acquired": "La date d'acquisition ne peut pas précéder la mise en circulation.",
+  "car-invalid-km": "Un compteur en kilomètres entiers, s'il vous plaît.",
+  "car-invalid-amount": "Ce montant n'est pas lisible.",
+  "car-invalid-quantity": "Tapez la quantité : litres, kWh ou kilos.",
+  "car-invalid-part": "Choisissez la pièce changée, ou tapez son nom.",
+  "car-invalid-rubric": "Choisissez une rubrique.",
+  "car-invalid-months": "Un nombre entier de mois, s'il vous plaît.",
+  "car-invalid-battery": "Un état de batterie de 0 à 100 %, s'il vous plaît.",
+  "car-open": "Ouvrir un carnet…",
+  "car-save": "Enregistrer le carnet…",
+  "car-report-button": "Dossier PDF",
+  "car-file-filter": "Carnet de voiture",
+  "car-file-not-logbook": "Ce fichier n'est pas un carnet de voiture de Radinus.",
+  "car-file-too-recent": "Ce carnet vient d'une version plus récente de Radinus : mettez Radinus à jour pour l'ouvrir.",
+  "car-replace-question": "Ouvrir ce carnet remplacera celui de la fenêtre. Continuer ?",
+  "car-sheet-history": "Carnet",
+  "car-sheet-summary": "Synthèse",
+  "holiday-save": "Enregistrer le projet…",
+  "holiday-pdf": "Rapport PDF",
+  "holiday-excel": "Exporter vers Excel",
+  "holiday-file-filter": "Projet de vacances",
+  "holiday-replace-question": "Ouvrir ce projet remplacera ce qui est tapé dans la fenêtre. Continuer ?",
+  "holiday-file-saved": "Projet enregistré : { $file }",
+  "holiday-file-opened": "Projet ouvert : { $file }",
+  "holiday-file-not-project": "Ce fichier n'est pas un projet de vacances de Radinus.",
+  "holiday-file-too-recent": "Ce projet vient d'une version plus récente de Radinus : mettez Radinus à jour pour l'ouvrir.",
+  "holiday-file-failed": "Le fichier n'a pas pu être lu ou écrit : { $reason }",
+  "holiday-line-transport": "Transport aller-retour",
+  "holiday-line-lodging": "Hébergement",
+  "holiday-line-meals": "Repas et dépenses courantes",
+  "holiday-line-visits": "Visites et loisirs",
+  "holiday-line-port": "Acheminement jusqu'au port",
+  "holiday-line-cabins": "Cabines",
+  "holiday-line-service": "Forfait service (pourboires)",
+  "holiday-line-drinks": "Forfait boissons",
+  "holiday-line-excursions": "Excursions aux escales",
+  "holiday-line-port-taxes": "Taxes portuaires",
+  "holiday-line-wifi": "Wifi à bord",
+  "holiday-line-onboard": "Dépenses à bord et aux escales",
+  "holiday-line-other": "Autres frais et imprévus",
+  "holiday-line-insurance": "Assurance annulation",
+  "holiday-line-stay-tax": "Taxe de séjour",
+  "holiday-line-car": "Voiture sur place, carburant et péages",
+  "holiday-line-parking": "Parking de l'aéroport ou de la gare",
+  "holiday-line-bank": "Frais bancaires à l'étranger",
+  "holiday-line-formalities": "Formalités (passeport, visa, vaccins)",
+  "holiday-line-pets": "Garde des animaux",
+  "holiday-span-trip": "pour le séjour",
+  "holiday-span-night": "par nuit",
+  "holiday-span-day": "par jour",
+  "holiday-span-stop": "par escale",
+  "holiday-who-all": "pour tous",
+  "holiday-who-person": "par personne",
+  "holiday-who-adults": "par adulte",
+  "holiday-cabins-count": "{ $count -> [one] { $count } cabine *[other] { $count } cabines }",
+  "holiday-days": "{ $days -> [one] { $days } jour *[other] { $days } jours }",
+  "holiday-invalid-count": "Un nombre entier, s'il vous plaît.",
+  "holiday-invalid-amount": "Ce montant n'est pas lisible : un nombre positif, ou un pourcentage de 0 à 100.",
+  "holiday-headline-empty": "Tapez les montants du budget pour voir ce que coûtera le voyage.",
+  "holiday-headline-stay": "Ce séjour coûterait { $total } pour { $people -> [one] une personne *[other] { $people } personnes } et { $nights -> [0] aucune nuit [one] une nuit *[other] { $nights } nuits }.",
+  "holiday-headline-cruise": "Cette croisière coûterait { $total } pour { $people -> [one] une personne *[other] { $people } personnes } et { $nights -> [0] aucune nuit [one] une nuit *[other] { $nights } nuits }.",
+  "holiday-tile-total": "Coût total",
+  "holiday-tile-person": "Par personne",
+  "holiday-tile-person-day": "Par personne et par jour",
+  "holiday-tile-saved": "Déjà épargné",
+  "holiday-tile-remaining": "Reste à financer",
+  "holiday-tile-monthly": "Épargne nécessaire",
+  "holiday-remaining-none": "Rien : c'est couvert",
+  "holiday-monthly-none": "Rien à mettre de côté",
+  "holiday-monthly-now": "Départ ce mois-ci",
+  "holiday-note-days": "Les jours sont les nuits plus une : sept nuits font huit jours.",
+  "holiday-note-child": "Par personne, un enfant paie le prix enfant s'il est donné ; vide, il paie comme un adulte.",
+  "holiday-note-percent": "Un pourcentage d'assurance porte sur les postes principaux du voyage ; celui des frais bancaires, sur les dépenses faites sur place.",
+  "holiday-sheet-budget": "Budget",
+  "holiday-sheet-result": "Résultat",
+  "holiday-column-line": "Poste",
+  "holiday-column-amount": "Montant",
+  "holiday-column-child": "Prix enfant",
+  "holiday-column-who": "Pour qui",
+  "holiday-column-span": "Pour combien de temps",
+  "holiday-column-cost": "Coût",
+  "holiday-disclaimer": "Une estimation tirée de vos propres montants : les prix réels peuvent varier.",
+  "goal-no-account": "Cochez au moins un compte à suivre.",
+  "goal-no-month": "Cette période n'a encore aucun mois complet.",
+  "goal-invalid-target": "Un montant à atteindre, s'il vous plaît.",
+  "goal-invalid-date": "Une date à venir, dans les cinquante prochaines années, s'il vous plaît.",
+  "goal-invalid-rate": "Un taux de 0 à 100 %, s'il vous plaît.",
+  "goal-invalid-extra": "Ce montant n'est pas lisible : corrigez-le pour relancer le calcul.",
+  "goal-per-month": "{ $amount } par mois",
+  "goal-tile-balance": "Solde aujourd'hui",
+  "goal-tile-rhythm": "Rythme moyen",
+  "goal-tile-target": "Objectif",
+  "goal-tile-reached": "Atteint vers",
+  "goal-tile-date": "Date visée",
+  "goal-tile-projected": "Solde projeté",
+  "goal-tile-saved": "Épargné d'ici là",
+  "goal-tile-interest": "Dont intérêts",
+  "goal-tile-needed": "À épargner",
+  "goal-when-already": "Vous avez déjà { $amount } : vos comptes suivis totalisent { $balance }.",
+  "goal-when-reached": "Vous aurez { $amount } vers { $month }, dans { $months -> [one] un mois *[other] { $months } mois }.",
+  "goal-when-range": "Selon les mois, entre { $early } et { $late }.",
+  "goal-when-range-open": "Au plus tôt vers { $early } ; avec des mois faibles, l'objectif ne serait pas atteint.",
+  "goal-when-never": "À ce rythme, vous n'atteindrez pas { $amount }.",
+  "goal-zero": "Votre solde tomberait à zéro vers { $month }.",
+  "goal-amount": "En { $month }, vous auriez environ { $amount }.",
+  "goal-amount-range": "Selon les mois, entre { $low } et { $high }.",
+  "goal-effort-more": "Pour avoir { $amount } en { $month }, il faudrait épargner en moyenne { $monthly } par mois, soit { $gap } de plus qu'aujourd'hui.",
+  "goal-effort-less": "Pour avoir { $amount } en { $month }, { $monthly } par mois suffiraient, soit { $gap } de moins qu'aujourd'hui : vous êtes en avance.",
+  "goal-effort-range": "Selon les mois, l'écart avec votre rythme irait de { $low } à { $high } par mois.",
+  "goal-chart-target": "Objectif : { $amount }",
+  "goal-chart-today": "Aujourd'hui",
+  "goal-note-seasons": "La projection suit les saisons : chaque mois à venir reprend la moyenne des mêmes mois de la période.",
+  "goal-note-range": "La fourchette vient des mois faibles et des mois forts de la période : le quart le plus bas et le quart le plus haut.",
+  "goal-note-loan": "Le crédit « { $label } » se termine en { $month } : { $amount } par mois de plus ensuite.",
+  "goal-note-interest": "Intérêts comptés chaque mois au taux de { $rate } % par an : une approximation de la règle des quinzaines des livrets.",
+  "goal-period": "Rythme calculé sur { $count -> [one] { $count } mois complet *[other] { $count } mois complets }, de { $from } à { $to }. { $transfers -> [0] Aucun virement entre vos comptes suivis. [one] Un virement entre vos comptes suivis, neutralisé. *[other] { $transfers } virements entre vos comptes suivis, neutralisés. }",
+  "cushion-invalid-backup": "Ce montant n'est pas lisible : corrigez-le pour relancer le calcul.",
+  "cushion-no-spending-account": "Cochez au moins un compte « Dépenses ».",
+  "cushion-no-month": "Cette période n'a encore aucun mois complet.",
+  "cushion-months": "{ $value } mois",
+  "cushion-per-month": "{ $amount } par mois",
+  "cushion-figure-holds": "Sans limite",
+  "cushion-gauge-caption": "de dépenses couvertes",
+  "cushion-verdict-short": "Moins de trois mois : un coup dur vous mettrait vite en difficulté.",
+  "cushion-verdict-fair": "Entre trois et six mois : un matelas correct, à étoffer si vous le pouvez.",
+  "cushion-verdict-solid": "Six mois ou plus : votre matelas est solide.",
+  "cushion-verdict-holds": "Votre revenu de secours couvre vos dépenses : votre épargne ne fondrait pas.",
+  "cushion-verdict-nothing": "Aucune dépense retenue sur la période : il n'y a rien à couvrir.",
+  "cushion-tile-savings": "Épargne disponible",
+  "cushion-tile-spending": "Dépenses retenues",
+  "cushion-tile-backup": "Revenu de secours",
+  "cushion-tile-burn": "L'épargne fondrait de",
+  "cushion-tile-rhythm": "Rythme d'épargne",
+  "cushion-burn-none": "Rien",
+  "cushion-target-title": "{ $months } mois de dépenses : { $amount }",
+  "cushion-target-reached": "Atteint.",
+  "cushion-target-date": "Il manque { $missing }. À votre rythme d'épargne, atteint vers { $month }.",
+  "cushion-target-never": "Il manque { $missing }. Votre épargne n'a pas grossi sur la période : à ce rythme, ce seuil ne sera pas atteint.",
+  "cushion-mark-empty": "À sec : { $month }",
+  // F48 — « Partager une dépense » (Fabrice, 11/10/2026, P-71).
+  "sharing-add-item": "Ajouter un poste",
+  "sharing-add-payment": "Ajouter un règlement",
+  "sharing-add-person": "Ajouter une personne",
+  "sharing-balances-title": "Où en sont les règlements",
+  "sharing-column-alone": "Ses extras",
+  "sharing-column-amount": "Montant",
+  "sharing-column-balance": "Solde",
+  "sharing-column-cap": "Au maximum",
+  "sharing-column-constraint": "Ce qui a joué",
+  "sharing-column-date": "Date",
+  "sharing-column-due": "À payer",
+  "sharing-column-fixed": "Montant exact",
+  "sharing-column-floor": "Au minimum",
+  "sharing-column-gift": "Surplus offert",
+  "sharing-column-household": "Foyer",
+  "sharing-column-income": "Revenu",
+  "sharing-column-item": "Poste",
+  "sharing-column-label": "Libellé",
+  "sharing-column-members": "Membres",
+  "sharing-column-paid": "Réglé",
+  "sharing-column-parts": "Parts",
+  "sharing-column-percent": "%",
+  "sharing-column-person": "Personne",
+  "sharing-column-rule": "Règle",
+  "sharing-column-share": "Part",
+  "sharing-column-typed": "% tapé",
+  "sharing-column-unit": "Foyer ou personne",
+  "sharing-column-who": "Qui",
+  "sharing-common": "Commun",
+  "sharing-delete": "Supprimer",
+  "sharing-delete-person-question": "Cette personne a des règlements : les supprimer avec elle ?",
+  "sharing-disclaimer": "Radinus propose un partage : entre amis, chacun reste libre de s'arranger autrement.",
+  "sharing-excel": "Exporter vers Excel",
+  "sharing-field-label": "Libellé",
+  "sharing-field-rule": "Règle",
+  "sharing-field-total": "Total",
+  "sharing-file-filter": "Projet de partage",
+  "sharing-hide-incomes": "Masquer les revenus dans les rapports et l'export",
+  "sharing-items-hint": "Seulement ce qui ne concerne pas tout le monde, comme le vin. Le reste du total va dans le poste commun.",
+  "sharing-items-title": "Les postes",
+  "sharing-label-hint": "Par exemple « Restaurant du 12/10 » ou « Voyage Bretagne 2027 » : il nomme les fichiers et les rapports.",
+  "sharing-mode-item": "Une règle par poste",
+  "sharing-mode-whole": "Une règle pour toute la dépense",
+  "sharing-open": "Ouvrir un projet…",
+  "sharing-payments-hint": "Qui a payé, combien, et quand. Une ligne sans montant ne compte pas encore.",
+  "sharing-payments-title": "Les règlements",
+  "sharing-pdf-distribution": "Répartition (PDF)",
+  "sharing-pdf-payments": "État des paiements (PDF)",
+  "sharing-pdf-statements": "Relevés individuels (PDF)…",
+  "sharing-people-hint": "Une ligne par personne, une colonne par poste : cochez qui participe à quoi. Tout le reste est facultatif. Quelqu'un qui se désiste en laissant son acompte : un montant exact égal à ce qu'il a versé, et aucune case cochée.",
+  "sharing-people-title": "Les personnes",
+  "sharing-question": "Qui paie quoi ?",
+  "sharing-replace-question": "Ouvrir ce projet remplacera ce qui est saisi dans la fenêtre. Continuer ?",
+  "sharing-result-title": "Le résultat",
+  "sharing-round-euro": "Arrondir à l'euro",
+  "sharing-rule-equal": "Parts égales",
+  "sharing-rule-income": "Au prorata des revenus",
+  "sharing-rule-parts": "Par parts",
+  "sharing-rule-percent": "En pourcentages",
+  "sharing-save": "Enregistrer le projet…",
+  "sharing-setup-title": "Le partage",
+  "sharing-statements-everyone": "Tout le monde",
+  "sharing-total-hint": "Vide, le total est la somme des postes et des extras de chacun.",
+  "sharing-transfers-title": "Les virements proposés",
+  "sharing-help-household": "Les personnes d'un même foyer règlent ensemble : leurs paiements et ce qu'elles doivent s'additionnent, et elles reçoivent un seul relevé. Exemple : « Famille Martin » pour les parents et les enfants.",
+  "sharing-help-income": "Ne sert qu'à la règle « au prorata des revenus » : plus le revenu est élevé, plus la part est grande. Tapez le revenu mensuel.",
+  "sharing-help-parts": "Une personne à 2 parts paie deux fois plus qu'une personne à 1 part. Exemple : adulte 1, enfant 0,5.",
+  "sharing-help-percent": "La part de la dépense que paie la personne. Les pourcentages doivent faire 100 % au total.",
+  "sharing-help-floor": "La personne paiera au moins ce montant, même si sa part calculée est plus petite. La différence allège les autres.",
+  "sharing-help-cap": "La personne ne paiera jamais plus que ce montant. Ce qu'elle ne paie pas retombe sur les autres participants de ses postes.",
+  "sharing-help-fixed": "La personne paie ce montant, quoi qu'il arrive, et le reste se partage entre les autres. Exemple : quelqu'un qui se désiste et laisse son acompte.",
+  "sharing-help-alone": "Ce que la personne a pris pour elle seule, comme un dessert ou un café. Elle le paie entièrement, en plus de sa part.",
+  "sharing-help-gift": "Si la personne a versé plus que sa part : coché, le surplus est un cadeau au groupe ; décoché, on le lui rend.",
+  "sharing-help-items": "Cochez les personnes qui participent à ce poste. Le Commun, c'est ce qui reste du total une fois les autres postes retirés.",
+  "sharing-help-due": "Ce que la personne doit au total : sa part des postes, ses extras et l'arrondi.",
+  "sharing-help-share": "Ce que sa part représente, en pourcentage de la somme partagée.",
+  "sharing-help-typed": "Le pourcentage que vous avez tapé. Il peut différer de la part réelle quand un minimum, un maximum ou un montant exact a joué.",
+  "sharing-help-constraint": "Indique si la part de la personne a été modifiée par un minimum, un maximum, un montant exact ou un surplus offert.",
+  "sharing-help-item": "Seulement ce qui ne concerne pas tout le monde, comme le vin. Le reste du total va dans le Commun, partagé entre ceux qui y sont cochés.",
+  "sharing-help-rule": "Comment ce poste se partage : à parts égales, par parts, en pourcentages ou au prorata des revenus.",
+  "sharing-help-paid": "Ce que le foyer ou la personne a déjà versé, d'après les règlements saisis.",
+  "sharing-help-balance": "Ce qui reste à régler, ou ce qui a été versé en plus de la part. Exemple : « Reste à régler : 61,54 € ».",
+  "sharing-apply-advice": "Reprendre les valeurs conseillées",
+  "sharing-help-apply-advice": "Remplit les cases vides avec les valeurs en gris. Les cases déjà remplies ne changent pas.",
+  "sharing-from-incomes": "Pourcentages d'après les revenus",
+  "sharing-help-from-incomes": "Remplace les pourcentages par la part de chaque revenu dans le total des revenus. Ils font 100 %.",
+  "sharing-reset-percents": "Tout répartir à nouveau",
+  "sharing-help-reset-percents": "Efface les pourcentages et les répartit à parts égales entre tous. Utile après avoir ajouté une personne.",
+  "sharing-reset-percents-question": "Effacer tous les pourcentages et les répartir à parts égales ?",
+  "window-sharing-title": "Partager une dépense",
+  // La phrase sur l'historique (Fabrice, 10/10/2026), dans la barre
+  // d'information des quatre outils qui font une moyenne sur l'historique.
+  "analysis-history-hint": "Plus votre historique est long, meilleure sera cette analyse : l'idéal est d'avoir au moins un an d'opérations.",
+  "cushion-period": "Moyenne de { $count -> [one] { $count } mois complet *[other] { $count } mois complets }, de { $from } à { $to }. { $transfers -> [0] Aucun virement entre vos comptes. [one] Un virement entre vos comptes, mis de côté. *[other] { $transfers } virements entre vos comptes, mis de côté. }",
+  "appliance-invalid-watts": "Une puissance de 0 à 100 000 W, s'il vous plaît.",
+  "appliance-invalid-hours": "Une durée de 0 à 24 heures par jour, s'il vous plaît.",
+  "appliance-invalid-days": "Un nombre entier de jours, de 0 à 7, s'il vous plaît.",
+  "appliance-invalid-share": "Une part de 0 à 100 %, s'il vous plaît.",
+  "appliance-invalid-day-overflow": "La marche et la veille dépassent 24 heures par jour.",
+  "appliance-invalid-price": "Un prix du kWh de 0 à 100, s'il vous plaît.",
+  "appliance-invalid-off-peak-hours": "Un nombre entier d'heures creuses, de 0 à 24, s'il vous plaît.",
+  "preferences-branch-tools": "Outils",
+  "preferences-leaf-electricity": "Tarif d'électricité",
+  "preferences-electricity-blue": "Revenir au Tarif Bleu EDF",
+  "preferences-electricity-hint": "Le tarif de votre contrat, repris par l'outil « Consommation d'un appareil électrique ». Par défaut : le Tarif Bleu d'EDF au 1er août 2026, prix TTC, compteur de 3 à 6 kVA. Ces prix changent souvent en février et en août : recopiez ceux de votre facture.",
+  "preferences-leaf-qif": "Relevés QIF",
+  "preferences-field-qif-order": "Ordre du jour et du mois :",
+  "preferences-qif-order-ask": "Me demander à chaque fois",
+  "preferences-qif-order-day-month": "Toujours jour/mois (05/03 = 5 mars)",
+  "preferences-qif-order-month-day": "Toujours mois/jour (05/03 = 3 mai)",
+  "preferences-qif-order-help": "Ne sert que si aucune date du fichier ne permet de trancher. Dès qu'une date comme 24/11 prouve l'ordre, c'est le fichier qui décide, quel que soit ce réglage.",
+  "preferences-field-qif-label": "Libellé de l'opération :",
+  "preferences-qif-label-both": "Tiers + mémo",
+  "preferences-qif-label-payee": "Tiers seul",
+  "preferences-qif-label-memo": "Mémo seul",
+  "preferences-qif-label-help": "Quand une opération porte à la fois un tiers et un mémo. Si elle n'en porte qu'un, c'est celui-là qui sert, quel que soit ce réglage.",
+  "preferences-qif-hint": "Ces réglages valent pour tous les relevés QIF, quelle que soit la base ouverte. « Me demander à chaque fois » est le plus sûr : un fichier dont les dates sont ambiguës n'est jamais lu au hasard.",
+  "preferences-branch-reset": "Réinitialisation",
+  "preferences-leaf-comfort": "Réglages de confort",
+  "preferences-comfort-reset": "Réinitialiser les réglages de confort",
+  "preferences-comfort-hint": "Remet d'origine les colonnes, l'accueil et la taille.",
+  "preferences-comfort-question": "Réinitialiser les réglages de confort ?",
+  "preferences-comfort-done": "Les réglages de confort ont été réinitialisés.",
   "export-all-years-excel": "Exporter toutes les années vers Excel",
   "export-all-years-ods": "Exporter toutes les années vers LibreOffice Calc",
   "export-no-year": "Aucune année ne porte d'opération : il n'y a rien à exporter.",
@@ -835,7 +1504,7 @@ const UI_TEXTS = {
   "statement-help": "Info : Utilisez Clic Souris + touche [CMD] sur le tableau pour sélectionner plusieurs lignes",
   "statement-choose-account": "Ce fichier contient plusieurs comptes. Lequel voulez-vous importer ?",
   "statement-select-line": "Sélectionnez au moins une ligne du relevé.",
-  "statement-title-open": "Ouvrir un fichier de relevé (.ofx)",
+  "statement-title-open": "Ouvrir un fichier de relevé (OFX, QIF, CSV)",
   "statement-title-info": "Informations sur le fichier ouvert",
   "statement-title-integrate": "Intégrer la sélection dans le compte",
   "statement-title-validate": "Intégrer cette opération dans le compte",
@@ -902,6 +1571,7 @@ const UI_TEXTS = {
   "quick-check-payee": "Tiers",
   "quick-check-project": "Projet",
   "quick-check-status": "Status",
+  "quick-check-verification": "Vérification",
   "quick-column-date": "Date",
   "quick-column-label": "Libelle",
   "quick-column-amount": "Montant",
@@ -911,6 +1581,7 @@ const UI_TEXTS = {
   "quick-column-payee": "Tiers",
   "quick-column-project": "Projets",
   "quick-column-status": "Status",
+  "quick-column-verification": "Vérification",
   "quick-multiselect-help": "Info : Utilisez Clic Souris + touche [CMD] sur le tableau pour sélectionner plusieurs éléments",
   "quick-none": "Aucune opération sur cette période.",
   "quick-select-lines": "Sélectionnez au moins une ligne, et cochez au moins une caractéristique.",
@@ -925,6 +1596,49 @@ const UI_TEXTS = {
 
 /// La matrice que le noyau rend à F20 : deux catégories qui portent quelque
 /// chose, une vide, et la ligne des non classées.
+/// Ce que Rust rend pour le bilan croisé (F39) : les catégories en lignes, les
+/// affectations en colonnes, sur un mois. Une case à zéro **remplie** — le
+/// crédit et le débit qui s'annulent — et une case vide, pour que les deux
+/// couleurs se distinguent.
+const CROSSED = {
+  columns: [
+    { id: 2, label: "Famille" },
+    { id: 3, label: "Animaux" },
+    { id: 0, label: "Sans affectation" },
+  ],
+  rows: [
+    {
+      id: 1, label: "Alimentation",
+      cells: ["-100,00 €", "", "0,00 €"],
+      cell_values: [-100000000, 0, 0],
+      filled: [true, false, true],
+      total: "-100,00 €", total_value: -100000000, total_filled: true, is_empty: false,
+    },
+    {
+      id: 5, label: "Salaire",
+      cells: ["2 216,71 €", "", ""],
+      cell_values: [2216710000, 0, 0],
+      filled: [true, false, false],
+      total: "2 216,71 €", total_value: 2216710000, total_filled: true, is_empty: false,
+    },
+    {
+      id: 0, label: "Sans catégorie",
+      cells: ["", "", ""],
+      cell_values: [0, 0, 0],
+      filled: [false, false, false],
+      total: "", total_value: 0, total_filled: false, is_empty: true,
+    },
+  ],
+  sum: ["2 116,71 €", "", "0,00 €"],
+  sum_values: [2116710000, 0, 0],
+  sum_filled: [true, false, true],
+  sum_total: "2 116,71 €",
+  sum_total_value: 2116710000,
+  has_data: true,
+  period: "09/2026",
+  accounts: "2 comptes",
+};
+
 const MATRIX = {
   rows: [
     {
@@ -1008,6 +1722,7 @@ const OPERATION = {
   attachments: "Aucune pièce jointe",
   parent_id: 0,
   child_count: 0,
+  verification_id: 4,
 };
 
 /// What Rust answers for another nomenclature — whole sentences, as Fluent
@@ -1036,6 +1751,12 @@ const UI_TEXTS_BY_KIND = {
     "statistics-axis-column": "Projets",
     "statistics-unclassified": "Sans projet",
     "statistics-window-name": "Statistiques par projet",
+  },
+  // Le septième axe, qui n'est pas une nomenclature (03/10/2026).
+  verification: {
+    "statistics-axis-column": "Vérification",
+    "statistics-unclassified": "À vérifier",
+    "statistics-window-name": "Statistiques par vérification",
   },
   payee: {
     "statistics-axis-column": "Tiers",
@@ -1068,11 +1789,12 @@ const DELETED_TEXTS = {
 };
 
 /// Installs a stub of Tauri's bridge that records every call.
-function bridge({ startupError = null, needsConfirmation = true, plainQuestion = false, slowLoadMs = 0, refusedDeletion = false, duplicateName = null, accountRefusal = null, manyOperations = false, scatteredChildren = false, operationRefusal = null, operationIsASub = false, operationComment = "", subIsComplement = false, missingParent = false, exportCancelled = false, exportFails = null, noYear = false, pickCancelled = false, fileAccounts = ["123456A789"], pickedIsCsv = false, referenceTaken = false, accountGone = false } = {}) {
+function bridge({ startupError = null, needsConfirmation = true, plainQuestion = false, slowLoadMs = 0, refusedDeletion = false, duplicateName = null, accountRefusal = null, manyOperations = false, scatteredChildren = false, operationRefusal = null, operationIsASub = false, operationDatelessButPointed = false, operationComment = "", subIsComplement = false, missingParent = false, exportCancelled = false, exportFails = null, noYear = false, pickCancelled = false, fileAccounts = ["123456A789"], pickedIsCsv = false, pickedIsQif = false, qifAmbiguous = false, qifAccounts = ["releve.qif"], referenceTaken = false, accountGone = false, storedLayout = null, databaseOpen = true, clipboardRefuses = "nothing", manyAccounts = false, storedWelcome = null, loanUnavailable = false } = {}) {
   return `
     const OPERATION_JSON = ${JSON.stringify(JSON.stringify(OPERATION))};
     const SUB_OPERATION_JSON = ${JSON.stringify(JSON.stringify(SUB_OPERATION))};
     const MATRIX_JSON = ${JSON.stringify(JSON.stringify(MATRIX))};
+    const CROSSED_JSON = ${JSON.stringify(JSON.stringify(CROSSED))};
     const TEXTS_JSON = ${JSON.stringify(JSON.stringify(UI_TEXTS))};
     const TEXTS_BY_KIND = ${JSON.stringify(JSON.stringify(UI_TEXTS_BY_KIND))};
     const OPERATIONS_JSON = ${JSON.stringify(JSON.stringify(OPERATIONS))};
@@ -1085,8 +1807,120 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
         payee: ["1 tiers supprimé.", "tiers supprimés."],
       }),
     )};
+    // F48 — les conseils du partage (P-72), grossièrement : une phrase par
+    // règle, les cases vides d'un pourcentage reçoivent le reste à parts
+    // égales, une part vide vaut 1. C'est la fenêtre qu'on éprouve.
+    const sharingAdvice = (input, euros) => {
+      const none = { sentence: "", warn: false, items: [], suggested: [], from_incomes: [] };
+      const people = input.people;
+      if (people.length === 0) return none;
+      const number = (text) => (text.trim() === "" ? null : Number(text.replace(",", ".")));
+      const figure = (value) => String(Math.round(value * 100) / 100).replace(".", ",");
+      const money = (text) => number(text.replace(/[\\s\\u202f.]/g, "")) ?? 0;
+      const carved = input.items.reduce((sum, item) => sum + money(item.amount), 0);
+      const total = input.total.trim() === "" ? carved : money(input.total);
+      const rule = (ruleKey, amount, takers, typed, item) => {
+        if (ruleKey === "equal") return [euros(amount) + " ÷ " + takers.length + " personnes = " + euros(amount / takers.length) + " chacun.", false, []];
+        if (ruleKey === "parts") return ["Chacun paie selon ses parts.", false, takers.filter((p, i) => typed[i] === null).map((p) => ({ person: p.id, item, value: "1" }))];
+        if (ruleKey === "income") {
+          if (takers.some((p) => p.income.trim() === "")) return ["Tapez le revenu de chacun pour partager au prorata des revenus.", false, []];
+          const all = takers.reduce((sum, p) => sum + money(p.income), 0);
+          return ["Chacun paie " + figure((amount / all) * 100) + " % de son revenu.", false, []];
+        }
+        const sum = typed.reduce((all, value) => all + (value ?? 0), 0);
+        const empty = takers.filter((p, i) => typed[i] === null);
+        const rest = Math.round((100 - sum) * 100) / 100;
+        if (rest > 0) return ["Il manque " + figure(rest) + " % pour arriver à 100 %.", false, empty.map((p) => ({ person: p.id, item, value: figure(rest / empty.length) }))];
+        if (rest < 0) return ["Les pourcentages dépassent 100 % de " + figure(-rest) + " %.", true, []];
+        const nobody = takers.filter((p, i) => !(typed[i] > 0)).map((p) => p.name);
+        if (nobody.length > 0) return ["Les pourcentages font déjà 100 % : " + nobody.join(", ") + " ne paierait rien.", true, []];
+        return ["Les pourcentages font bien 100 %.", false, []];
+      };
+      if (input.mode === "whole") {
+        const typed = people.map((p) => (input.rule === "parts" ? number(p.parts) : input.rule === "percent" ? number(p.percent) : null));
+        const [sentence, warn, suggested] = rule(input.rule, total, people, typed, null);
+        let fromIncomes = [];
+        if (input.rule === "percent" && people.every((p) => p.income.trim() !== "")) {
+          const all = people.reduce((sum, p) => sum + money(p.income), 0);
+          fromIncomes = people.map((p) => ({ person: p.id, item: null, value: figure((money(p.income) / all) * 100) }));
+        }
+        return { sentence, warn, items: [], suggested, from_incomes: fromIncomes };
+      }
+      const advice = { sentence: "", warn: false, items: [], suggested: [], from_incomes: [] };
+      for (const item of [Object.assign({}, input.common, { amount: String(total - carved) })].concat(input.items)) {
+        const cellOf = (p) => item.cells.find((cell) => cell.person === p.id) ?? { takes: true, value: "" };
+        const takers = people.filter((p) => cellOf(p).takes);
+        const typed = takers.map((p) => number(cellOf(p).value));
+        const [sentence, warn, suggested] = rule(item.rule, money(item.amount), takers, typed, item.id);
+        advice.items.push({ id: item.id, sentence, warn });
+        advice.suggested.push(...suggested);
+      }
+      return advice;
+    };
     window.__calls = [];
     window.__closed = false;
+    // F47 — le carnet de la voiture, tel que Rust le tiendrait : une fiche,
+    // des lignes, et ce qui reste à enregistrer. Le faux pont écrit le carnet
+    // grossièrement ; c'est la fenêtre qu'on éprouve, pas le noyau.
+    const carEmpty = () => ({
+      car: { plate: "", make: "", model: "", engine: "petrol", first_hand: false, registered: "", acquired: "", acquired_km: "", service_months: "12", service_km: "",
+             tariff: { option: "base", base: "0,2001", peak: "0,2142", off_peak: "0,1589", off_peak_hours: "8" } },
+      rows: [], next: 1, unsaved: false,
+    });
+    window.__car = carEmpty();
+    const carChoices = (engine) => {
+      const electric = engine === "electric";
+      const plugIn = engine === "plug-in";
+      return {
+        engines: [["petrol", "Essence"], ["diesel", "Diesel"], ["e85", "E85 (superéthanol)"], ["plug-in", "Hybride rechargeable"], ["electric", "Électrique"]].map(([key, label]) => ({ key, label })),
+        rubrics: [["energy", "Énergie"], ["upkeep", "Entretien courant"], ["service", "Révision"], ["wear", "Pièces d'usure"], ["tyres", "Pneus"], ["breakdown", "Pannes"], ["insurance", "Assurance"], ["inspection", "Contrôle technique"]].map(([key, label]) => ({ key, label })),
+        energies: electric ? [{ key: "electricity", label: "Électricité", unit: "kWh" }]
+          : plugIn ? [{ key: "petrol", label: "Essence", unit: "L" }, { key: "electricity", label: "Électricité", unit: "kWh" }]
+          : engine === "e85" ? [{ key: "e85", label: "E85", unit: "L" }, { key: "petrol", label: "Essence", unit: "L" }]
+          : [{ key: "petrol", label: "Essence", unit: "L" }],
+        parts: [{ key: "known:brake-pads", label: "Plaquettes de frein" }, { key: "known:timing-belt", label: "Courroie de distribution" }, { key: "other", label: "Autre pièce…" }],
+        axles: [{ key: "all", label: "Les quatre pneus" }, { key: "front", label: "Pneus avant" }, { key: "rear", label: "Pneus arrière" }],
+        verdicts: [{ key: "pass", label: "Favorable" }, { key: "counter", label: "Contre-visite" }],
+        charges: [{ key: "station", label: "À une borne" }, { key: "home", label: "À la maison" }],
+        slots: [{ key: "off-peak", label: "Heures creuses" }, { key: "peak", label: "Heures pleines" }],
+        rechargeable: electric || plugIn,
+        battery: electric || plugIn,
+        off_peak: window.__car.car.tariff.option === "off-peak",
+        sign: "€",
+        price_unit: "€/kWh",
+      };
+    };
+    const carRubric = { energy: "Énergie", upkeep: "Entretien courant", service: "Révision", wear: "Pièces d'usure", tyres: "Pneus", breakdown: "Pannes", insurance: "Assurance", inspection: "Contrôle technique" };
+    const carView = () => {
+      const state = window.__car;
+      const name = [state.car.make, state.car.model].filter((part) => part).join(" ");
+      const title = [name, state.car.plate].filter((part) => part).join(" · ") || "Ma voiture";
+      const rows = state.rows.slice().reverse().map((row) => ({
+        id: row.id, date: row.fields.date.split("-").reverse().join("/"), km: row.fields.km, rubric: carRubric[row.fields.rubric], rubric_key: row.fields.rubric,
+        colour: "#24506e", detail: row.fields.rubric === "energy" ? "Essence · " + row.fields.quantity + " L" : "", amount: row.fields.amount + " €",
+        garage: row.fields.garage, note: row.fields.note, fields: row.fields,
+      }));
+      return {
+        car: state.car,
+        choices: carChoices(state.car.engine),
+        written: {
+          title,
+          headline: rows.length === 0 ? "Remplissez la fiche, puis ajoutez une première ligne : un plein, une révision, une facture de garage…" : "Depuis mars 2020, votre voiture vous a coûté " + rows.length + " lignes.",
+          tiles: [{ label: "Coût total", value: "—" }, { label: "Au kilomètre", value: "—" }],
+          total: "0,00 €",
+          energy: rows.some((row) => row.rubric_key === "energy") ? [{ label: "Essence", quantity: "40 L", amount: "70,00 €", price: "1,750 € / L", consumption: "—", per_km: "—" }] : [],
+          parts: [], tyres: [], battery: [],
+          deadlines: state.car.registered ? [{ label: "Contrôle technique", when: "le 15/03/2024", tone: "late", badge: "Dépassée" }, { label: "Fin de l'assurance", when: "le 01/01/2027", tone: "later", badge: "" }] : [],
+          deadlines_empty: "Aucune échéance pour l'instant.",
+          rows,
+          years: "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart loan-chart--bars' viewBox='0 0 680 250'></svg>",
+          donut: "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart loan-chart--donut' viewBox='0 0 500 220'></svg>",
+          notes: ["Tout se compte depuis l'acquisition."],
+        },
+        unsaved: state.unsaved,
+        empty: state.rows.length === 0 && !state.car.plate && !state.car.make,
+      };
+    };
     // Ce que Rust rend à F17 : les lignes, et les trois montants du pied. Le
     // solde du compte suit ce qui a été intégré, si bien que l'écart tombe à
     // zéro quand tout est entré — comme le noyau le garantit.
@@ -1219,6 +2053,31 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
             date: '2022-06-19', clearing_date: '2022-06-20', amount: -34530000,
             amount_text: '-34,53 €', cheque_id: 0, cheque_reference: '/' },
         ];
+    // Le presse-papiers. Ce qu'une fenêtre y écrit se relit dans
+    // window.__clipboard ; clipboardRefuses fait échouer le chemin moderne
+    // ("modern"), ou les deux ("both"), pour vérifier le repli et l'aveu.
+    window.__clipboard = [];
+    window.__copiedTheOldWay = 0;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: (text) => {
+          if (${JSON.stringify(clipboardRefuses)} !== "nothing") {
+            return Promise.reject(new Error("refusé"));
+          }
+          window.__clipboard.push(text);
+          return Promise.resolve();
+        },
+      },
+    });
+    document.execCommand = (command) => {
+      if (command !== "copy" || ${JSON.stringify(clipboardRefuses)} === "both") {
+        return false;
+      }
+      window.__copiedTheOldWay += 1;
+      window.__clipboard.push(document.activeElement.value);
+      return true;
+    };
     window.__TAURI_INTERNALS__ = {
       transformCallback: (callback) => callback,
       metadata: {
@@ -1238,6 +2097,173 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
           return Promise.resolve(1);
         }
         switch (command) {
+          // F47 — « Carnet de ma voiture » (10/10/2026).
+          case "car_view":
+            return Promise.resolve(carView());
+          case "car_set_car": {
+            window.__carSet = (window.__carSet ?? []).concat([args.car]);
+            if (args.car.acquired_km.trim() !== "" && !/^[0-9 ]+$/.test(args.car.acquired_km)) {
+              return Promise.resolve({ invalid: "acquired-km", message: "Un compteur en kilomètres entiers, s'il vous plaît.", view: carView() });
+            }
+            window.__car.car = args.car;
+            window.__car.unsaved = true;
+            return Promise.resolve({ invalid: null, message: null, view: carView() });
+          }
+          case "car_put_entry": {
+            window.__carPut = (window.__carPut ?? []).concat([args]);
+            const entry = args.entry;
+            if (entry.rubric === "energy" && entry.quantity.trim() === "") {
+              return Promise.resolve({ invalid: "quantity", message: "Tapez la quantité : litres, kWh ou kilos.", view: carView() });
+            }
+            if (entry.rubric === "wear" && entry.part === "other" && entry.part_name.trim() === "") {
+              return Promise.resolve({ invalid: "part-name", message: "Choisissez la pièce changée, ou tapez son nom.", view: carView() });
+            }
+            const state = window.__car;
+            const kept = state.rows.find((row) => row.id === args.id);
+            if (kept) {
+              kept.fields = entry;
+            } else {
+              state.rows.push({ id: state.next, fields: entry });
+              state.next += 1;
+            }
+            state.unsaved = true;
+            return Promise.resolve({ invalid: null, message: null, view: carView() });
+          }
+          case "car_delete_entry":
+            window.__car.rows = window.__car.rows.filter((row) => row.id !== args.id);
+            window.__car.unsaved = true;
+            return Promise.resolve(carView());
+          case "car_reset_tariff":
+            window.__carReset = true;
+            return Promise.resolve(carView());
+          case "car_expenses":
+            window.__carExpenses = args.account;
+            return Promise.resolve([
+              { id: 9, text: "01/09/2026 · TOTAL · Station Total · 65,40 €", fields: { date: "2026-09-01", km: "", rubric: "", amount: "65,40", garage: "Station Total", note: "TOTAL", energy: "", quantity: "", charge: "", slot: "", part: "", part_name: "", axle: "", verdict: "", months: "", battery: "" } },
+              { id: 8, text: "12/08/2026 · GARAGE · 250,00 €", fields: { date: "2026-08-12", km: "", rubric: "", amount: "250,00", garage: "", note: "GARAGE", energy: "", quantity: "", charge: "", slot: "", part: "", part_name: "", axle: "", verdict: "", months: "", battery: "" } },
+            ]);
+          case "print_car_report":
+            window.__carPrinted = true;
+            return Promise.resolve("Le rapport est prêt : /tmp/Carnet de ma voiture.pdf");
+          case "export_car":
+            window.__carExported = args;
+            return Promise.resolve("Exporté vers « Carnet.xlsx »");
+          case "save_car_logbook":
+            window.__carSaved = args;
+            window.__car.unsaved = false;
+            return Promise.resolve("Carnet enregistré : Peugeot 208.json");
+          case "load_car_logbook": {
+            window.__carLoaded = (window.__carLoaded ?? 0) + 1;
+            const opened = carEmpty();
+            opened.car.plate = "EF-456-GH";
+            opened.car.make = "Renault";
+            opened.car.model = "Zoé";
+            opened.car.engine = "electric";
+            opened.rows = [{ id: 1, fields: { date: "2026-05-02", km: "41000", rubric: "service", amount: "180,00", garage: "Garage du Centre", note: "", energy: "", quantity: "", charge: "station", slot: "", part: "", part_name: "", axle: "", verdict: "", months: "", battery: "93" } }];
+            opened.next = 2;
+            window.__car = opened;
+            return Promise.resolve({ view: carView(), message: "Carnet ouvert : Zoé.json" });
+          }
+          case "close_car_logbook":
+            window.__carClosed = (window.__carClosed ?? 0) + 1;
+            window.__car = carEmpty();
+            return Promise.resolve(null);
+          // F48 — « Partager une dépense » (11/10/2026). Un partage grossier à
+          // parts égales : c'est la fenêtre qu'on éprouve, pas le calcul.
+          case "sharing_compute": {
+            const input = args.input;
+            window.__sharingAsked = (window.__sharingAsked ?? []).concat([input]);
+            const next = "Personne " + (input.people.length + 1);
+            const euros = (value) => value.toFixed(2).replace(".", ",") + " €";
+            const advice = sharingAdvice(input, euros);
+            const blank = input.people.find((person) => person.name.trim() === "");
+            if (blank) {
+              return Promise.resolve({ invalid: "name-" + blank.id, message: "Chaque personne doit avoir un nom.", written: null, next_name: next, advice });
+            }
+            const amount = (text) => Number((text || "0").replace(",", ".")) || 0;
+            const carved = input.items.map((item) => amount(item.amount)).concat(input.people.map((person) => amount(person.alone)));
+            let itemsTotal = 0;
+            for (const value of carved) {
+              itemsTotal += value;
+            }
+            const total = input.total.trim() === "" ? itemsTotal : amount(input.total);
+            const commonAmount = total - itemsTotal;
+            const items = [Object.assign({}, input.common, { id: 0, label: "Commun", amount: String(commonAmount) })].concat(input.items);
+            const due = {};
+            const cells = [];
+            for (const item of items) {
+              const takers = input.people.filter((person) => (item.cells.find((cell) => cell.person === person.id) ?? { takes: true }).takes);
+              for (const person of takers) {
+                const share = amount(item.amount) / takers.length;
+                due[person.id] = (due[person.id] ?? 0) + share;
+                cells.push({ person: person.id, item: item.id, amount: euros(share) });
+              }
+            }
+            const paid = {};
+            for (const payment of input.payments) {
+              paid[payment.person] = (paid[payment.person] ?? 0) + amount(payment.amount);
+            }
+            const dues = input.people.map((person) => Math.round((due[person.id] ?? 0) * 100));
+            const low = Math.min(...dues) / 100;
+            const high = Math.max(...dues) / 100;
+            return Promise.resolve({
+              invalid: null,
+              message: null,
+              next_name: next,
+              advice,
+              written: {
+                headline:
+                  input.people.length === 0
+                    ? "Ajoutez les personnes qui partagent la dépense."
+                    : low === high
+                      ? euros(total) + " à partager : chacun paie " + euros(low) + "."
+                      : euros(total) + " à partager : de " + euros(low) + " à " + euros(high) + " selon chacun.",
+                tone: input.people.length === 0 ? "none" : "good",
+                common: euros(commonAmount),
+                people: input.people.map((person) => ({ id: person.id, name: person.name, due: euros(due[person.id] ?? 0), share: "", typed: "", constraint: person.fixed ? "Montant fixe" : "", alone: "", outside: "", rounding: "", detail: "" })),
+                cells,
+                items: items.map((item) => ({ id: item.id, label: item.label, amount: euros(amount(item.amount)), participants: "" })),
+                units: input.people.map((person) => ({ key: "person-" + person.id, name: person.name, members: "", due: euros(due[person.id] ?? 0), paid: euros(paid[person.id] ?? 0), balance: "Reste à régler : " + euros((due[person.id] ?? 0) - (paid[person.id] ?? 0)), tone: "due" })),
+                summary: input.people.length === 0 || total === 0 ? [] : ["0,00 € réglés sur " + euros(total) + "."],
+                transfers: [],
+                notes: [],
+                warning: null,
+              },
+            });
+          }
+          case "print_sharing_report":
+            window.__sharingPrinted = (window.__sharingPrinted ?? []).concat([args]);
+            return Promise.resolve("Le rapport est prêt : /tmp/Partage.pdf");
+          case "pick_sharing_folder":
+            window.__sharingPicked = args;
+            return Promise.resolve({ folder: "/tmp/Relevés", question: "2 relevés existent déjà dans ce dossier. Les remplacer ?" });
+          case "write_sharing_statements":
+            window.__sharingWritten = args;
+            return Promise.resolve("2 relevés écrits dans « Relevés ».");
+          case "export_sharing":
+            window.__sharingExported = args;
+            return Promise.resolve("Exporté vers « Week-end.xlsx »");
+          case "save_sharing_project":
+            window.__sharingSaved = args;
+            return Promise.resolve("Projet enregistré : Week-end.json");
+          case "load_sharing_project":
+            window.__sharingLoaded = (window.__sharingLoaded ?? 0) + 1;
+            return Promise.resolve({
+              input: {
+                label: "Week-end", total: "300,00", mode: "whole", rule: "equal", rounding: "cent", show_incomes: false,
+                people: [
+                  { id: 1, name: "Léa", household: "", income: "", parts: "", percent: "", floor: "", cap: "", fixed: "", alone: "", gift: false },
+                  { id: 2, name: "Paul", household: "", income: "", parts: "", percent: "", floor: "", cap: "", fixed: "", alone: "", gift: false },
+                ],
+                common: { id: 0, label: "", amount: "", rule: "equal", cells: [{ person: 1, takes: true, value: "" }, { person: 2, takes: true, value: "" }] },
+                items: [],
+                payments: [{ id: 1, person: 2, amount: "100,00", date: "2027-01-15", label: "acompte" }],
+              },
+              message: "Projet ouvert : Week-end.json",
+            });
+          case "close_sharing":
+            window.__sharingClosed = (window.__sharingClosed ?? 0) + 1;
+            return Promise.resolve(null);
           case "ui_texts":
             return Promise.resolve({
               ...JSON.parse(TEXTS_JSON),
@@ -1300,12 +2326,35 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
             return Promise.resolve(
               ${pickCancelled}
                 ? null
-                : {
+                : ${pickedIsQif}
+                  ? { path: "/tmp/releve.qif", kind: "qif", accounts: ${JSON.stringify(qifAccounts)} }
+                  : {
                     path: ${pickedIsCsv} ? "/tmp/releve.csv" : "/tmp/releve.ofx",
                     kind: ${pickedIsCsv} ? "csv" : "ofx",
                     accounts: ${pickedIsCsv} ? [] : ${JSON.stringify(fileAccounts)},
                   },
             );
+          // Le QIF (15/10/2026) : la question de l'ordre des dates quand le
+          // fichier ne le prouve pas, puis le même relevé que l'OFX — sans
+          // FITID, sans solde du fichier.
+          case "statement_load_qif": {
+            window.__qifLoads = (window.__qifLoads ?? []).concat([args]);
+            if (${qifAmbiguous} && args.order === null) {
+              return Promise.resolve({
+                question: {
+                  text: "Rien dans ce fichier ne dit si la date « 05/03/2023 » s'écrit jour/mois ou mois/jour. Elle veut dire :",
+                  choices: ["Jour 5, mois 3 (jour/mois)", "Jour 3, mois 5 (mois/jour)"],
+                  keys: ["day-month", "month-day"],
+                },
+                view: null,
+              });
+            }
+            window.__statementRows = statementLines().map((row) => ({ ...row, fitid_known: false }));
+            const view = statementView(
+              "3 lignes lues ; aucune ne ressemble à une opération déjà présente dans votre compte. Solde initial de 2 140,50 € au 03/02/2025 : ce n'est pas une opération, il n'est pas importé.",
+            );
+            return Promise.resolve({ question: null, view: { ...view, file_balance: "", difference: "", has_fitid_column: false } });
+          }
           case "statement_load": {
             window.__statementLoaded = args;
             window.__statementRows = statementLines();
@@ -1409,9 +2458,9 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               amount, amount_text: money(amount),
               category: "Non précisé", assignment: "Non précisé",
               payment_mode: "Carte bancaire", payee: "Non précisé",
-              project: "Non précisé", status: "Pointé",
+              project: "Non précisé", status: "Pointé", verification: "Vérifiée",
               category_id: 0, assignment_id: 0, payment_mode_id: 3,
-              payee_id: 0, project_id: 0, status_id: 1,
+              payee_id: 0, project_id: 0, status_id: 1, verification_id: 2,
             });
             window.__quickRows =
               args.accountId === 1
@@ -1460,6 +2509,9 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               payee: [{ f: "payee", n: { 0: "Non précisé", 4: "Système U" } }],
               project: [{ f: "project", n: { 0: "Non précisé" } }],
               status: [{ f: "status", n: { 1: "Pointé", 2: "Engagé", 3: "Prévu" } }],
+              verification: [
+                { f: "verification", n: { 1: "À vérifier", 2: "Vérifiée", 3: "Douteuse", 4: "Contestée" } },
+              ],
             };
             let touched = 0;
             for (const row of window.__quickRows ?? []) {
@@ -1517,6 +2569,82 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
             });
           case "set_operation_nomenclature":
             return Promise.resolve(true);
+          case "set_operation_status":
+            return Promise.resolve(true);
+          case "set_operation_verification":
+            return Promise.resolve(true);
+          case "set_operations_verification":
+            return Promise.resolve(args.ids.length);
+          case "set_operations_status":
+            return Promise.resolve(args.ids.length);
+          case "list_operation_verifications":
+            return Promise.resolve([
+              { id: 1, label: "À vérifier" },
+              { id: 2, label: "Vérifiée" },
+              { id: 3, label: "Douteuse" },
+              { id: 4, label: "Contestée" },
+            ]);
+          case "preferences_import_verification":
+            return Promise.resolve(window.__importVerification ?? 2);
+          case "save_preferences_import_verification":
+            window.__importVerification = args.verificationId;
+            return Promise.resolve(null);
+          case "database_is_open":
+            return Promise.resolve(${databaseOpen});
+          // Les réglages QIF (15/10/2026) : la configuration du logiciel,
+          // tenue par la page.
+          case "preferences_qif":
+            return Promise.resolve(window.__qifPreferences ?? { order: "ask", label: "both" });
+          case "save_preferences_qif":
+            window.__qifPreferences = { order: args.order, label: args.label };
+            window.__qifSaves = (window.__qifSaves ?? 0) + 1;
+            return Promise.resolve(null);
+          // La disposition des tableaux. La « base » est une variable de la
+          // page : ce qu'on y enregistre se relit, comme dans la vraie.
+          case "windows_with_table_layouts":
+            return Promise.resolve([
+              { name: "operations-list", label: "Liste des opérations" },
+              { name: "statistics-category", label: "Stat par catégories" },
+              { name: "crossed-balance", label: "Bilan croisé" },
+            ]);
+          case "table_layout":
+            if (window.__layout === undefined) {
+              window.__layout = ${JSON.stringify(storedLayout)};
+            }
+            window.__layoutAsked = args.table;
+            return Promise.resolve(window.__layout);
+          case "save_table_layout":
+            window.__layout = args.layout;
+            return Promise.resolve(true);
+          case "reset_table_layout":
+          case "reset_window_table_layouts":
+          case "reset_all_table_layouts":
+            window.__layout = null;
+            return Promise.resolve(null);
+          // Les réglages de confort : les colonnes, l'accueil et la taille
+          // reviennent d'un coup. La « taille » est une variable de la page.
+          case "reset_comfort_settings":
+            window.__layout = null;
+            window.__welcomeStored = { order: [], excluded: [] };
+            window.__zoom = 1;
+            return Promise.resolve(null);
+          case "save_welcome_accounts":
+            window.__welcomeStored = { order: args.order, excluded: args.excluded };
+            return Promise.resolve(null);
+          case "preferences_currency":
+            return Promise.resolve({
+              choice: "EUR", custom: "", system: "€",
+              zoom: window.__zoom ?? 1, zoom_min: 0.8, zoom_max: 1.6, zoom_step: 0.05, zoom_default: 1,
+            });
+          case "save_preferences_currency":
+            return Promise.resolve(null);
+          case "available_languages":
+            return Promise.resolve([
+              { code: 5, tag: "fr", name: "Français" },
+              { code: 3, tag: "en", name: "English" },
+            ]);
+          case "current_language":
+            return Promise.resolve({ code: 5, tag: "fr", name: "Français" });
           case "list_operation_statuses":
             return Promise.resolve([
               { id: 1, label: "Pointé" },
@@ -1529,18 +2657,32 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
             if (${operationIsASub}) {
               operation.parent_id = 7;
             }
+            if (${operationDatelessButPointed}) {
+              operation.clearing_date = "";
+            }
             return Promise.resolve(operation);
           }
           case "operation_attachments_text":
             return Promise.resolve(
               args.count === 0 ? "Aucune pièce jointe" : args.count + " pièces jointes",
             );
+          case "clearing_date_question": {
+            const [y, m, d] = String(args.date).split("-");
+            return Promise.resolve(
+              "Une opération pointée doit obligatoirement porter une date de pointage.\\n" +
+                "Voulez-vous enregistrer avec la date de l'opération, le " +
+                d + "/" + m + "/" + y + " ?",
+            );
+          }
           case "operation_refusal":
             return Promise.resolve(${JSON.stringify(operationRefusal)});
           case "create_operation":
             return Promise.resolve(77);
           case "update_operation":
             return Promise.resolve(true);
+          case "open_recurring_form_from_operation":
+            window.__openedRecurring = args;
+            return Promise.resolve();
           case "open_operation_form":
             window.__openedForm = args;
             return Promise.resolve();
@@ -1588,6 +2730,38 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               "Crédits montants " + on(s.credits),
             ]);
           }
+          case "crossed_balance":
+            window.__crossedAsked = args;
+            return Promise.resolve(JSON.parse(CROSSED_JSON));
+          case "crossed_balance_detail":
+            window.__crossedDetailAsked = args;
+            return Promise.resolve([
+              { ...JSON.parse(OPERATIONS_JSON).rows[0], parent_id: 0 },
+            ]);
+          case "crossed_balance_step": {
+            // Décembre bascule sur janvier de l'année suivante, et janvier sur
+            // décembre de l'année précédente — la règle est au noyau.
+            let y = args.year;
+            let m = args.month;
+            if (args.forward) {
+              m === 12 ? ((y += 1), (m = 1)) : (m += 1);
+            } else {
+              m === 1 ? ((y -= 1), (m = 12)) : (m -= 1);
+            }
+            return Promise.resolve([y, m]);
+          }
+          case "crossed_balance_month_prompt":
+            return Promise.resolve({
+              question: "Sur quel mois voulez-vous travailler ? Un nombre entre 1 et 12.",
+              first: 1,
+              last: 12,
+            });
+          case "close_crossed_balance":
+            window.__closed = true;
+            return Promise.resolve();
+          case "open_crossed_balance":
+            window.__openedCrossed = args;
+            return Promise.resolve();
           case "axis_statistics":
             window.__statsAsked = args;
             return Promise.resolve(JSON.parse(MATRIX_JSON));
@@ -1821,13 +2995,33 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               { id: 2, label: "Livret", bank: "La Banque Postale",
                 balance_bank_value: 23422810000, balance_real_value: 23422810000,
                 balance_final_value: 23422810000 },
-            ].map((row) => ({
+            ].concat(${manyAccounts} ? [3, 4, 5, 6, 7, 8].map((id) => ({
+              id, label: "Compte " + id, bank: "Banque",
+              balance_bank_value: id * 100000000, balance_real_value: id * 100000000,
+              balance_final_value: id * 100000000,
+            })) : []).map((row) => ({
               ...row,
               balance_bank: money(row.balance_bank_value),
               balance_real: money(row.balance_real_value),
               balance_final: money(row.balance_final_value),
             }));
-            const sum = (key) => rows.reduce((total, row) => total + row[key], 0);
+            // L'ordre et les cases, comme le noyau les applique : les comptes
+            // rangés d'abord, les autres à la suite ; un compte décoché reste
+            // montré et sort des totaux.
+            if (window.__welcomeStored === undefined) {
+              window.__welcomeStored = ${JSON.stringify(storedWelcome)} || { order: [], excluded: [] };
+            }
+            const wished = window.__welcomeStored;
+            const rank = (row) => {
+              const at = wished.order.indexOf(row.id);
+              return at < 0 ? wished.order.length : at;
+            };
+            rows.sort((a, b) => rank(a) - rank(b));
+            for (const row of rows) {
+              row.included = !wished.excluded.includes(row.id);
+            }
+            const counted = rows.filter((row) => row.included);
+            const sum = (key) => counted.reduce((total, row) => total + row[key], 0);
             return Promise.resolve({
               accounts: rows,
               total_bank: money(sum("balance_bank_value")),
@@ -1836,7 +3030,9 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               total_bank_value: sum("balance_bank_value"),
               total_real_value: sum("balance_real_value"),
               total_final_value: sum("balance_final_value"),
-              accounts_line: "2 comptes ouverts",
+              accounts_line: counted.length === rows.length
+                ? rows.length + " comptes ouverts"
+                : "Comptes comptés dans les totaux : " + counted.length + " sur " + rows.length,
               month: shown,
               previous_month: shift(shown, -1),
               next_month: shift(shown, 1),
@@ -1897,6 +3093,23 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               curves: [ccp, livret, total],
               lowest: 70000000, highest: 660000000,
               year: Number(args.from.slice(0, 4)),
+            });
+          }
+          case "balance_zone": {
+            // La zone : son résumé, et deux opérations mères sur deux comptes.
+            // Une zone d'un seul jour est vide, pour vérifier ce cas aussi.
+            window.__zoneAsked = args;
+            window.__zonesAsked = (window.__zonesAsked ?? 0) + 1;
+            const rows = JSON.parse(OPERATIONS_JSON).rows.slice(0, 2).map((row, rank) => ({
+              ...row, parent_id: 0, child_count: 0, account: rank === 0 ? "CCP" : "Livret A",
+            }));
+            const empty = args.from === args.to;
+            return Promise.resolve({
+              opening: "600,00 €", closing: empty ? "600,00 €" : "570,00 €",
+              variation: empty ? "0,00 €" : "-30,00 €",
+              debit: empty ? "0,00 €" : "-100,00 €", credit: empty ? "0,00 €" : "70,00 €",
+              variation_value: empty ? 0 : -30000000,
+              rows: empty ? [] : rows,
             });
           }
           case "shift_period": {
@@ -2494,6 +3707,446 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
             window.__closed = true;
             window.__closedLabel = args.label;
             return Promise.resolve();
+          // F41 — la simulation de crédit (08/10/2026). Le faux pont tient la
+          // règle des curseurs à taux nul, pour vérifier les coutures et non
+          // le calcul, qui est éprouvé dans le noyau : la durée suit la
+          // mensualité, la mensualité suit le montant et la durée.
+          case "loan_choices":
+            return Promise.resolve({
+              kinds: [
+                { key: "consumer", label: "Crédit à la consommation" },
+                { key: "mortgage", label: "Crédit immobilier" },
+              ],
+              histories: [
+                { key: "last-12", label: "12 derniers mois" },
+                { key: "2026", label: "2026" },
+                { key: "2025", label: "2025" },
+              ],
+              years: [2026, 2025, 2024, 2023, 2022, 2021],
+              accounts: [
+                { id: 1, label: "CCP", bank: "La Banque Postale", balance: "1 549,81 €", balance_value: 1549810000 },
+                { id: 2, label: "Livret", bank: "La Banque Postale", balance: "-12,00 €", balance_value: -12000000 },
+              ],
+              sign: "€",
+            });
+          case "loan_defaults":
+            window.__loanDefaultsAsked = args.kind;
+            return Promise.resolve(args.kind === "mortgage"
+              ? { amount: "200000,00", months: "240", rate: "3,50", fees: "0,00", insurance: "0,00" }
+              : { amount: "10000,00", months: "48", rate: "6,00", fees: "0,00", insurance: "0,00" });
+          case "loan_simulate": {
+            const asked = args.request;
+            window.__loanAsked = (window.__loanAsked ?? []).concat([asked]);
+            const read = (text) => Number(String(text).replace(/\s/g, "").replace(",", "."));
+            if (!Number.isFinite(read(asked.amount)) || String(asked.amount).trim() === "") {
+              return Promise.resolve({ invalid: "amount" });
+            }
+            for (const [rank, key] of ["optimistic", "neutral", "severe"].entries()) {
+              const typed = String(asked.growth[rank] ?? "").trim();
+              if (typed !== "" && !/^\\d{1,2}$/.test(typed)) {
+                return Promise.resolve({ invalid: "growth-" + key });
+              }
+            }
+            const amount = read(asked.amount);
+            let months = Math.max(1, Math.round(read(asked.months)));
+            if (asked.moved === "payment") {
+              months = Math.ceil(amount / Math.max(read(asked.payment), 1));
+            }
+            const payment = Math.round((amount / months) * 100) / 100;
+            const text = (value) => value.toFixed(2).replace(".", ",") + " €";
+            const plain = (value) => value.toFixed(2).replace(".", ",");
+            const dues = Array.from({ length: months }, (_, rank) => ({
+              number: rank + 1, date: "08/11/2026", date_value: "2026-11-08",
+              payment: text(payment), interest: "0,00 €", capital: text(payment), insurance: "0,00 €",
+              remaining: text(amount - payment * (rank + 1)),
+              payment_value: payment * 1e6, interest_value: 0, capital_value: payment * 1e6,
+              insurance_value: 0, remaining_value: (amount - payment * (rank + 1)) * 1e6,
+            }));
+            const ratio = Math.round((payment / 2600) * 1000) / 10;
+            const verdict = ratio <= 33 ? "green" : ratio <= 35 ? "orange" : "red";
+            const svg = (name, extra) => "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart " + name + "' viewBox='0 0 320 226'>" + (extra ?? "") + "</svg>";
+            const angle = Math.min(ratio / 60, 1) * 180;
+            const ticked = asked.accounts.length > 0;
+            return Promise.resolve({
+              invalid: null,
+              kind: asked.kind,
+              amount_field: plain(amount), payment_field: plain(payment),
+              rate_field: asked.rate, fees_field: asked.fees || "0,00", insurance_field: asked.insurance || "0,00",
+              months, months_text: months + " mois",
+              amount_euros: amount, amount_min: 500, amount_max: asked.kind === "mortgage" ? 500000 : 75000, amount_step: 100,
+              months_min: 6, months_max: 84,
+              payment_euros: payment, payment_min: Math.floor(amount / 84), payment_max: Math.ceil(amount / 6),
+              notice: months > 84 ? "Cette mensualité demanderait plus de 600 mois." : null,
+              figures: [
+                { label: "Mensualité", value: text(payment), tone: "" },
+                { label: "Mensualité assurance comprise", value: text(payment), tone: "" },
+                { label: "TAEG", value: "0,00 %", tone: "" },
+                { label: "Coût des intérêts", value: "0,00 €", tone: "" },
+                { label: "Coût de l'assurance", value: "0,00 €", tone: "" },
+                { label: "Coût total du crédit", value: "0,00 €", tone: "" },
+                { label: "Montant total dû", value: text(amount), tone: "" },
+                { label: "Total remboursé, assurance comprise", value: text(amount), tone: "" },
+              ],
+              dues,
+              cost_donut: svg("loan-chart--donut"),
+              capital_curve: svg("loan-chart--line"),
+              analysis: (${loanUnavailable} || !ticked) ? null : {
+                verdict, verdict_word: { green: "Jouable", orange: "Serré", red: "Risqué" }[verdict],
+                checks: [
+                  { tone: verdict === "green" ? "good" : verdict === "orange" ? "warn" : "bad", text: "Endettement de " + ratio + " %, comptes " + asked.accounts.join("+") + "." },
+                  { tone: "good", text: "La mensualité prend peu de votre épargne." },
+                  { tone: "good", text: "Votre solde reste positif jusqu'à la fin du crédit." },
+                ],
+                warning: asked.history === "2025" ? "Attention : sur cette période, vos dépenses dépassent déjà vos revenus." : null,
+                method_key: asked.method,
+                method_line: "Méthode de jugement : " + { optimistic: "Optimiste", neutral: "Neutre", severe: "Sévère" }[asked.method],
+                methods: ["optimistic", "neutral", "severe"].map((key, rank) => ({
+                  key,
+                  name: ["Optimiste", "Neutre", "Sévère"][rank],
+                  verdict: ["green", "orange", "red"][rank],
+                  verdict_word: ["Jouable", "Serré", "Risqué"][rank],
+                  values: ["v0-" + key, "v1-" + key, "v2-" + key, "v3-" + key, "v4-" + key],
+                  growth: Number(asked.growth[rank] || [0, 2, 3][rank]),
+                  explanation: "Explication " + key,
+                })),
+                rule_rows: ["Endettement accepté", "Épargne de référence", "Part", "Seuil", "Si le solde", "Hausse de vos dépenses par an"],
+                rules_intro: "Le verdict répond à trois questions.",
+                verdicts_line: "Optimiste : Jouable · Neutre : Serré · Sévère : Risqué",
+                gauge: svg("loan-chart--gauge", "<g class='gauge-needle' data-angle='" + angle.toFixed(2) + "' transform='rotate(" + angle.toFixed(2) + " 160 150)'><path d='M 40 150 L 170 150'/></g>"),
+                figures: [
+                  { label: "Revenus moyens par mois", value: "2 600,00 €", tone: "" },
+                  { label: "Reste à vivre par mois", value: text(600 - payment), tone: payment > 600 ? "bad" : "good" },
+                  { label: "Taux d'endettement", value: ratio + " %", tone: verdict === "green" ? "good" : verdict === "orange" ? "warn" : "bad" },
+                ],
+                income_donut: svg("loan-chart--donut"),
+                bars: svg("loan-chart--bars"),
+                projection: svg("loan-chart--line"),
+                loans: asked.history === "2025" ? [{ label: "PRET AUTO", monthly: "180,00 €", end: "05/09/2027" }] : [],
+                loans_empty: "Aucun crédit en cours reconnu parmi vos opérations périodiques.",
+                period: "de octobre 2025 à septembre 2026 (12 mois)",
+                transfers: "Aucun virement entre vos comptes cochés n'a été reconnu.",
+                method: "Moyennes sur les mois complets de la période.",
+              },
+              unavailable: (${loanUnavailable} || !ticked) ? "Cochez au moins un compte pour étudier votre historique." : null,
+            });
+          }
+          case "print_loan_report":
+            window.__loanPrinted = args;
+            return Promise.resolve("Le rapport est prêt : /tmp/Simulation de crédit.pdf");
+          case "close_loan_simulation":
+            window.__loanClosed = true;
+            return Promise.resolve(null);
+          // F42 — la consommation d'un appareil électrique (09/10/2026). Le
+          // faux pont garde le tarif enregistré et fait un calcul grossier :
+          // c'est la fenêtre qu'on éprouve, le noyau a ses propres tests.
+          case "electricity_tariff":
+            return Promise.resolve({
+              fields: window.__savedTariff ?? { option: "base", base: "0,2001", peak: "0,2142", off_peak: "0,1589", off_peak_hours: "8" },
+              price_unit: "€/kWh",
+            });
+          case "electricity_blue_tariff":
+            return Promise.resolve({
+              fields: { option: "base", base: "0,2001", peak: "0,2142", off_peak: "0,1589", off_peak_hours: "8" },
+              price_unit: "€/kWh",
+            });
+          case "save_preferences_electricity": {
+            const price = /^\\d+([,.]\\d+)?$/;
+            if (!price.test(args.tariff.base) || !price.test(args.tariff.peak) || !price.test(args.tariff.off_peak)) {
+              return Promise.reject("Un prix du kWh de 0 à 100, s'il vous plaît.");
+            }
+            window.__savedTariff = args.tariff;
+            return Promise.resolve(null);
+          }
+          case "appliance_compute": {
+            const asked = args.request;
+            window.__applianceAsked = (window.__applianceAsked ?? []).concat([asked]);
+            const read = (text) => (text.trim() === "" ? 0 : Number(text.replace(",", ".")));
+            for (const [name, id] of [["on_watts", "on-watts"], ["on_hours", "on-hours"], ["days", "days"], ["standby_watts", "standby-watts"]]) {
+              if (Number.isNaN(read(asked.usage[name]))) {
+                return Promise.resolve({ invalid: id, message: "Une puissance de 0 à 100 000 W, s'il vous plaît.", written: null });
+              }
+            }
+            const onHours = read(asked.usage.on_hours);
+            const standbyHours = asked.usage.standby_hours.trim() === "" ? 24 - onHours : read(asked.usage.standby_hours);
+            if (onHours + standbyHours > 24) {
+              return Promise.resolve({ invalid: "standby-hours", message: "La marche et la veille dépassent 24 heures par jour.", written: null });
+            }
+            const days = read(asked.usage.days);
+            const price = read(asked.tariff.option === "base" ? asked.tariff.base : asked.tariff.peak);
+            const onYear = read(asked.usage.on_watts) * onHours * days / 1000 * 365 / 7;
+            const standbyYear = read(asked.usage.standby_watts) * (standbyHours * days + 24 * (7 - days)) / 1000 * 365 / 7;
+            const euros = (kwh) => (kwh * price).toFixed(2).replace(".", ",") + " €";
+            const energy = (kwh) => kwh.toFixed(2).replace(".", ",") + " kWh";
+            const year = onYear + standbyYear;
+            const offPeak = asked.tariff.option === "off-peak";
+            const parts = offPeak
+              ? [["Allumé, heures pleines", onYear, "#24506e"], ["Allumé, heures creuses", 0, "#8eb2cb"], ["En veille, heures pleines", standbyYear, "#c39a3c"], ["En veille, heures creuses", 0, "#d9b77a"]]
+              : [["Allumé", onYear, "#24506e"], ["En veille", standbyYear, "#c39a3c"]];
+            return Promise.resolve({
+              invalid: null,
+              message: null,
+              written: {
+                periods: [["Par jour", 365], ["Par mois", 12], ["Par an", 1]].map(([label, by]) => ({ label, cost: euros(year / by), energy: energy(year / by) })),
+                lines: parts.map(([label, kwh, colour]) => ({ label, energy: energy(kwh), cost: euros(kwh), share: "50 %", colour, total: false }))
+                  .concat([{ label: "Total", energy: energy(year), cost: euros(year), share: "100 %", colour: "", total: true }]),
+                donut: "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart loan-chart--donut' viewBox='0 0 500 220'></svg>",
+                standby_hours: String(24 - onHours),
+                standby_sentence: standbyYear > 0 ? "La veille seule coûte " + euros(standbyYear) + " par an : 50 % de ce que coûte l'appareil." : null,
+              },
+            });
+          }
+          case "close_appliance_cost":
+            window.__applianceClosed = true;
+            return Promise.resolve(null);
+          // F43 — le matelas de sécurité (09/10/2026). Le faux pont compte
+          // grossièrement : 6 000 € d'épargne par livret coché, 1 500 € de
+          // dépenses par mois, dont 300 € de loisirs (902).
+          case "cushion_choices":
+            return Promise.resolve({
+              accounts: [
+                { id: 1, label: "CCP", bank: "La Poste", balance: "1 549,81 €", savings: false, spending: true },
+                { id: 2, label: "Livret A", bank: "La Poste", balance: "6 000,00 €", savings: true, spending: false },
+                { id: 3, label: "PEL", bank: "La Poste", balance: "9 000,00 €", savings: false, spending: false },
+              ],
+              histories: [{ key: "last-12", label: "12 derniers mois" }, { key: "2026", label: "2026" }, { key: "2025", label: "2025" }],
+              years: [2026, 2025, 2024, 2023, 2022, 2021],
+              sign: "€",
+            });
+          case "cushion_compute": {
+            const asked = args.request;
+            window.__cushionAsked = (window.__cushionAsked ?? []).concat([asked]);
+            if (!/^[0-9 ,.\u202f]*$/.test(asked.backup)) {
+              return Promise.resolve({ invalid: "backup", message: "Ce montant n'est pas lisible : corrigez-le pour relancer le calcul.", written: null });
+            }
+            if (asked.spending.length === 0) {
+              return Promise.resolve({ invalid: null, message: "Cochez au moins un compte « Dépenses ».", written: null });
+            }
+            const savings = asked.savings.includes(2) ? 6000 : 0;
+            const spending = 1500 - (asked.excluded.includes(902) ? 300 : 0);
+            const backup = asked.backup.trim() === "" ? 0 : Number(asked.backup.replace(/[ \u202f]/g, "").replace(",", "."));
+            const burn = spending - backup;
+            const cover = burn > 0 ? savings / burn : null;
+            const tone = cover === null || cover >= 6 ? "good" : cover >= 3 ? "warn" : "bad";
+            const euros = (value) => value.toFixed(2).replace(".", ",") + " €";
+            return Promise.resolve({
+              invalid: null,
+              message: null,
+              written: {
+                verdict: cover === null ? "Votre revenu de secours couvre vos dépenses : votre épargne ne fondrait pas." : tone === "good" ? "Six mois ou plus : votre matelas est solide." : tone === "warn" ? "Entre trois et six mois : un matelas correct, à étoffer si vous le pouvez." : "Moins de trois mois : un coup dur vous mettrait vite en difficulté.",
+                tone,
+                gauge: "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart loan-chart--gauge' viewBox='0 0 320 226'><g class='gauge-needle' data-angle='60.00' transform='rotate(60.00 160 150)'><path d='M 40 150 L 170 150'/></g><text>" + (cover === null ? "Sans limite" : cover.toFixed(1).replace(".", ",") + " mois") + "</text></svg>",
+                tiles: [{ label: "Épargne disponible", value: euros(savings) }, { label: "Dépenses retenues", value: euros(spending) + " par mois" }],
+                targets: burn > 0 ? [3, 6].map((months) => ({ title: months + " mois de dépenses : " + euros(months * burn), status: savings >= months * burn ? "Atteint." : "Il manque " + euros(months * burn - savings) + ".", reached: savings >= months * burn })) : [],
+                projection: "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart loan-chart--line' viewBox='0 0 680 250'></svg>",
+                categories: [
+                  { id: 901, label: "Courses", monthly: "1 200,00 € par mois", kept: !asked.excluded.includes(901) },
+                  { id: 902, label: "Loisirs", monthly: "300,00 € par mois", kept: !asked.excluded.includes(902) },
+                ],
+                period: "Moyenne de 12 mois complets, d'octobre 2025 à septembre 2026. 12 virements entre vos comptes, non comptés comme dépenses.",
+              },
+            });
+          }
+          case "close_safety_cushion":
+            window.__cushionClosed = true;
+            return Promise.resolve(null);
+          // F44 — l'objectif d'épargne (10/10/2026). Le faux pont répond en
+          // gros : 6 000 € suivis, 200 € par mois.
+          case "goal_choices":
+            return Promise.resolve({
+              accounts: [
+                { id: 1, label: "CCP", bank: "La Poste", balance: "1 549,81 €", ticked: false },
+                { id: 2, label: "Livret A", bank: "La Poste", balance: "6 000,00 €", ticked: true },
+              ],
+              histories: [{ key: "last-12", label: "12 derniers mois" }, { key: "2026", label: "2026" }, { key: "2025", label: "2025" }],
+              years: [2026, 2025, 2024, 2023, 2022, 2021],
+              months: ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
+              month: 10,
+              year: 2027,
+              sign: "€",
+            });
+          case "goal_compute": {
+            const asked = args.request;
+            window.__goalAsked = (window.__goalAsked ?? []).concat([asked]);
+            const refuse = (field, message) => Promise.resolve({ invalid: field, message, written: null });
+            if (asked.accounts.length === 0) {
+              return Promise.resolve({ invalid: null, message: "Cochez au moins un compte à suivre.", written: null });
+            }
+            const target = Number(asked.target.replace(/[ \u202f]/g, "").replace(",", "."));
+            if (asked.question !== "amount" && (asked.target.trim() === "" || Number.isNaN(target))) {
+              return refuse("target", "Un montant à atteindre, s'il vous plaît.");
+            }
+            if (asked.question !== "when" && !/^[0-9]{4}$/.test(asked.year.trim())) {
+              return refuse("year", "Une date à venir, dans les cinquante prochaines années, s'il vous plaît.");
+            }
+            if (asked.rate.trim() !== "" && Number.isNaN(Number(asked.rate.replace(",", ".")))) {
+              return refuse("rate", "Un taux de 0 à 100 %, s'il vous plaît.");
+            }
+            const headline = asked.question === "when"
+              ? "Vous aurez " + asked.target + " € vers mai 2027, dans 7 mois."
+              : asked.question === "amount"
+                ? "En " + asked.month + "/" + asked.year + ", vous auriez environ 8 400,00 €."
+                : "Pour avoir " + asked.target + " € en " + asked.month + "/" + asked.year + ", il faudrait épargner en moyenne 420,00 € par mois, soit 220,00 € de plus qu'aujourd'hui.";
+            return Promise.resolve({
+              invalid: null,
+              message: null,
+              written: {
+                headline,
+                range: "Selon les mois, entre mars 2027 et août 2027.",
+                tone: asked.question === "effort" ? "warn" : "good",
+                tiles: [{ label: "Solde aujourd'hui", value: "6 000,00 €" }, { label: "Rythme moyen", value: "+200,00 € par mois" }, { label: "Objectif", value: "10 000,00 €" }, { label: "Épargné d'ici là", value: "1 400,00 €" }],
+                chart: "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart loan-chart--line' viewBox='0 0 760 270'></svg>",
+                notes: ["La projection suit les saisons : chaque mois à venir reprend la moyenne des mêmes mois de la période."],
+                period: "Rythme calculé sur 12 mois complets, d'octobre 2025 à septembre 2026. Aucun virement entre vos comptes suivis.",
+              },
+            });
+          }
+          case "close_savings_goal":
+            window.__goalClosed = true;
+            return Promise.resolve(null);
+          // F45 — « Et si je réduisais… ? » (10/10/2026). Le faux pont réduit
+          // grossièrement : deux catégories, 1 700 € et 425 € par mois.
+          case "cut_choices":
+            return Promise.resolve({
+              accounts: [
+                { id: 1, label: "CCP", bank: "La Poste", balance: "1 549,81 €" },
+                { id: 2, label: "Livret A", bank: "La Poste", balance: "6 000,00 €" },
+              ],
+              histories: [{ key: "last-12", label: "12 derniers mois" }, { key: "2026", label: "2026" }, { key: "2025", label: "2025" }],
+              years: [2026, 2025, 2024, 2023, 2022, 2021],
+              axes: [{ key: "category", label: "Catégories" }, { key: "payee", label: "Tiers" }, { key: "budget-line", label: "Postes budgétaires" }],
+              sign: "€",
+              hint: "Tapez une réduction en % ou en € par mois sur les postes que vous voudriez alléger.",
+            });
+          case "cut_compute": {
+            const asked = args.request;
+            window.__cutAsked = (window.__cutAsked ?? []).concat([asked]);
+            for (const cut of asked.cuts) {
+              if (!/^[0-9]+([,.][0-9]+)?$/.test(cut.value.trim())) {
+                return Promise.resolve({ invalid: "cut-" + cut.id, message: "Cette réduction n'est pas lisible : un pourcentage de 0 à 100, ou un montant par mois.", written: null });
+              }
+            }
+            if (asked.accounts.length === 0) {
+              return Promise.resolve({ invalid: null, message: "Cochez au moins un compte à suivre.", written: null });
+            }
+            const items = asked.axis === "payee"
+              ? [{ id: 31, label: "Supermarché", monthly: 900 }]
+              : [{ id: 902, label: "Courses", monthly: 1700 }, { id: 901, label: "Restaurants", monthly: 425 }];
+            const euros = (value) => value.toFixed(2).replace(".", ",") + " €";
+            let total = 0;
+            const rows = items.map((item) => {
+              const cut = asked.cuts.find((one) => one.id === item.id);
+              const value = cut ? Number(cut.value.replace(",", ".")) : 0;
+              const saved = cut ? Math.min(item.monthly, cut.unit === "percent" ? item.monthly * value / 100 : value) : 0;
+              total += saved;
+              return { id: item.id, label: item.label, monthly: euros(item.monthly), cut: saved > 0 ? "−" + cut.value : "", after: euros(item.monthly - saved), yearly: saved > 0 ? "+" + euros(saved * 12) : "", capped: cut !== undefined && cut.unit === "amount" && value > item.monthly, reduced: saved > 0 };
+            });
+            const count = rows.filter((row) => row.reduced).length;
+            return Promise.resolve({
+              invalid: null,
+              message: null,
+              written: {
+                headline: count === 0 ? "Tapez une réduction dans le tableau pour en voir l'effet." : "En réduisant ces " + count + " postes, vous mettriez de côté " + euros(total) + " de plus par mois, soit " + euros(total * 12) + " par an.",
+                tone: count === 0 ? "none" : "good",
+                tiles: [{ label: "Gain par mois", value: euros(total) }, { label: "Gain par an", value: euros(total * 12) }],
+                rows,
+                total: { id: -1, label: "Total", monthly: "2 125,00 €", cut: "", after: "", yearly: "", capped: false, reduced: count > 0 },
+                target: asked.target.trim() === "" ? null : "Vous atteindriez " + asked.target + " € vers juillet 2027 au lieu de février 2028 : 7 mois plus tôt.",
+                years: asked.years + " ans",
+                chart: "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart loan-chart--line' viewBox='0 0 760 270'></svg>",
+                donut: "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart loan-chart--donut' viewBox='0 0 500 220'></svg>",
+                notes: ["Chaque réduction suit les saisons de son poste."],
+                period: "Rythme calculé sur 12 mois complets.",
+              },
+            });
+          }
+          case "print_cut_report":
+            window.__cutPrinted = args.request;
+            return Promise.resolve("Le rapport est prêt : /tmp/Et si je réduisais.pdf");
+          case "export_cut":
+            window.__cutExported = args;
+            return Promise.resolve("Exporté vers « Et si je réduisais.xlsx »");
+          case "save_cut_project":
+            window.__cutSaved = args;
+            return Promise.resolve("Projet enregistré : Et si je réduisais.json");
+          case "load_cut_project":
+            window.__cutLoaded = (window.__cutLoaded ?? 0) + 1;
+            return Promise.resolve({
+              history: "range", from: 2023, to: 2025, axis: "category", years: 3, rate: "1,5", target: "8000,00",
+              accounts: ["Livret A"], account_ids: [2],
+              cuts: [{ id: 902, value: "100,00", unit: "amount" }],
+              message: "Projet ouvert : Restaurants.json",
+            });
+          case "close_spending_cut":
+            window.__cutClosed = (window.__cutClosed ?? 0) + 1;
+            return Promise.resolve(null);
+          // F46 — « Préparer mes vacances » (10/10/2026). Un catalogue réduit
+          // et un calcul grossier : c'est la fenêtre qu'on éprouve.
+          case "holiday_choices": {
+            const span = (key, label) => ({ key, label });
+            return Promise.resolve({
+              accounts: [
+                { id: 1, label: "CCP", bank: "La Poste", balance: "1 549,81 €" },
+                { id: 2, label: "Livret vacances", bank: "La Poste", balance: "800,00 €" },
+              ],
+              catalog: [
+                { key: "transport", label: "Transport aller-retour", stay: true, cruise: false, optional: false, who: "choice", default_who: "person", spans: [span("trip", "pour le séjour")], units: [span("amount", "€")] },
+                { key: "lodging", label: "Hébergement", stay: true, cruise: false, optional: false, who: "choice", default_who: "all", spans: [span("night", "par nuit"), span("trip", "pour le séjour")], units: [span("amount", "€")] },
+                { key: "cabins", label: "Cabines", stay: false, cruise: true, optional: false, who: "cabins", default_who: "all", spans: [span("trip", "pour le séjour")], units: [span("amount", "€")] },
+                { key: "insurance", label: "Assurance annulation", stay: true, cruise: true, optional: true, who: "choice", default_who: "all", spans: [span("trip", "pour le séjour")], units: [span("percent", "%"), span("amount", "€")] },
+                { key: "stay-tax", label: "Taxe de séjour", stay: true, cruise: false, optional: true, who: "adults", default_who: "all", spans: [span("night", "par nuit")], units: [span("amount", "€")] },
+              ],
+              sign: "€",
+            });
+          }
+          case "holiday_compute": {
+            const input = args.input;
+            window.__holidayAsked = (window.__holidayAsked ?? []).concat([{ input, accounts: args.accounts }]);
+            for (const line of input.lines) {
+              if (line.amount.trim() !== "" && !/^[0-9]+([,.][0-9]+)?$/.test(line.amount.trim())) {
+                return Promise.resolve({ invalid: "amount-" + line.key, message: "Ce montant n'est pas lisible : un nombre positif, ou un pourcentage de 0 à 100.", written: null });
+              }
+            }
+            const total = input.lines
+              .filter((line) => line.amount.trim() !== "" && line.unit !== "percent")
+              .reduce((sum, line) => sum + Number(line.amount.replace(",", ".")), 0);
+            const saved = args.accounts.includes(2) ? 800 : 0;
+            const euros = (value) => value.toFixed(2).replace(".", ",") + " €";
+            return Promise.resolve({
+              invalid: null,
+              message: null,
+              written: {
+                headline: total === 0 ? "Tapez les montants du budget pour voir ce que coûtera le voyage." : "Ce séjour coûterait " + euros(total) + " pour " + (input.adults + input.children) + " personnes.",
+                tiles: [
+                  { label: "Par personne", value: euros(total / (input.adults + input.children)) },
+                  { label: "Déjà épargné", value: euros(saved) },
+                  { label: "Reste à financer", value: euros(Math.max(total - saved, 0)) },
+                ],
+                costs: input.lines.map((line) => ({ key: line.key, cost: line.amount.trim() === "" ? "" : euros(Number(line.amount.replace(",", "."))), share: "", colour: "#24506e" })),
+                donut: "<svg xmlns='http://www.w3.org/2000/svg' class='loan-chart loan-chart--donut' viewBox='0 0 500 220'></svg>",
+                days: (Number(input.nights || 0) + 1) + " jours",
+                notes: ["Les jours sont les nuits plus une : sept nuits font huit jours."],
+              },
+            });
+          }
+          case "print_holiday_report":
+            window.__holidayPrinted = args;
+            return Promise.resolve("Le rapport est prêt : /tmp/Préparer mes vacances.pdf");
+          case "export_holiday":
+            window.__holidayExported = args;
+            return Promise.resolve("Exporté vers « Préparer mes vacances.xlsx »");
+          case "save_holiday_project":
+            window.__holidaySaved = args;
+            return Promise.resolve("Projet enregistré : Préparer mes vacances.json");
+          case "load_holiday_project":
+            window.__holidayLoaded = (window.__holidayLoaded ?? 0) + 1;
+            return Promise.resolve({
+              input: { trip: "cruise", adults: 2, children: 1, nights: "7", months: "5", stops: "4", lines: [{ key: "cabins", amount: "2400,00", child: "", who: "all", span: "trip", unit: "amount", count: "1" }] },
+              accounts: [2],
+              message: "Projet ouvert : Croisière.json",
+            });
+          case "close_holiday":
+            window.__holidayClosed = (window.__holidayClosed ?? 0) + 1;
+            return Promise.resolve(null);
           default:
             return Promise.resolve(null);
         }
@@ -2518,6 +4171,13 @@ const executablePath = process.env.RADINUS_CHROMIUM ?? "/opt/pw-browsers/chromiu
 const browser = await chromium.launch(
   fs.existsSync(executablePath) ? { executablePath } : {},
 );
+
+/// Ouvre le sous-menu « Afficher/Masquer » du menu des colonnes, et l'y
+/// laisse : un clic sur son entrée le tient ouvert sans avoir à le survoler.
+async function openChecks(page) {
+  await page.click('.context-menu--columns [data-menu="show-hide"] > .context-menu__entry--opener');
+  await page.waitForTimeout(60);
+}
 
 async function openWindow(page, url, options) {
   const errors = [];
@@ -2563,8 +4223,18 @@ async function openWindow(page, url, options) {
         "operation-form.html": "?mode=M&id=1&account=1",
         "sub-operation-form.html": "?mode=M&id=2",
         "statistics.html": "?axis=category&accounts=1,2&year=2026",
+        "crossed-balance.html": "?accounts=1,2&year=2026&month=9",
         "dashboard.html": "?accounts=1,2",
         "balance-curves.html": "?accounts=1,2",
+        "balance-analysis.html": "?accounts=1,2",
+        "loan-simulation.html": "",
+        "appliance-cost.html": "",
+        "safety-cushion.html": "",
+        "savings-goal.html": "",
+        "spending-cut.html": "",
+        "holiday.html": "",
+        "car-logbook.html": "",
+        "sharing.html": "",
         "quick-classification.html": "?account=1",
         "statement-import.html": "?account=1",
         "statement-form.html": "?account=1&rank=1",
@@ -2629,7 +4299,7 @@ async function openWindow(page, url, options) {
 
   // Multiple selection with the Cmd/Ctrl modifier.
   await page.click(".list__row >> nth=0");
-  await page.click(".list__row >> nth=2", { modifiers: ["Control"] });
+  await page.click(".list__row >> nth=2", { modifiers: ["Meta"] });
   check(
     "liste : sélection multiple",
     (await page.locator('.list__row[aria-selected="true"]').count()) === 2,
@@ -3360,6 +5030,63 @@ async function openWindow(page, url, options) {
     JSON.stringify(await page.evaluate(() => window.__ouvert)) === "[]",
     JSON.stringify(await page.evaluate(() => window.__ouvert)),
   );
+
+  // **Le menu du clic droit**, qui manquait ici depuis l'origine (Fabrice,
+  // 07/10/2026 : « aucun moyen de faire un copier de cellule ou de ligne,
+  // aucun moyen d'exporter le tableau […] absence totale de menu
+  // contextuel »). La fenêtre utilisait le tableau commun sans le brancher.
+  const total = page.locator(".list__row").last();
+  await total.locator(".list__cell >> nth=1").click({ button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "soldes : le clic droit ouvre le menu — les deux copies, un trait, puis les dix exports",
+    (await page.locator(".context-menu").count()) === 1 &&
+      (await page.locator(".context-menu > .context-menu__entry--head").allTextContents()).join("|") ===
+        "Copier la cellule|Copier les lignes sélectionnées" &&
+      (await page.locator(".context-menu > .context-menu__entry:not(.context-menu__entry--head)").count()) === 10 &&
+      (await page.locator(".context-menu > .context-menu__entry:not(.context-menu__entry--head) >> nth=0").textContent()) ===
+        "Exporter vers Excel (.xlsx)",
+  );
+  await page.click('.context-menu [data-head="copy-cell"]');
+  await page.waitForTimeout(150);
+  check(
+    "soldes : « Copier la cellule » copie un solde en nombre pur — celui du TOTAL",
+    (await page.evaluate(() => window.__clipboard.join("|"))) === "24972,62",
+    await page.evaluate(() => window.__clipboard.join("|")),
+  );
+  await page.locator(".list__row").first().click();
+  await page.keyboard.down("Meta");
+  await total.click();
+  await page.keyboard.up("Meta");
+  await page.locator(".list__row >> nth=0 >> .list__cell >> nth=0").click({ button: "right" });
+  await page.click('.context-menu [data-head="copy-rows"]');
+  await page.waitForTimeout(150);
+  const lines = (await page.evaluate(() => window.__clipboard.slice(-1)[0])).split("\n").map((line) => line.split("\t"));
+  check(
+    "soldes : « Copier les lignes sélectionnées » copie le compte et le TOTAL, quatre cellules chacun",
+    lines.length === 2 && lines.every((line) => line.length === 4) &&
+      lines[1][0] === "TOTAL" && lines[1][3] === "24972,62" && !lines[0][1].includes("€"),
+    JSON.stringify(lines),
+  );
+  await page.locator(".list__row >> nth=0 >> .list__cell >> nth=0").click({ button: "right" });
+  await page.click(".context-menu > .context-menu__entry:not(.context-menu__entry--head) >> nth=0");
+  await page.waitForTimeout(250);
+  const exported = await page.evaluate(() => window.__exported);
+  check(
+    "soldes : l'export porte le nom de la fenêtre, ses quatre colonnes, et la ligne TOTAL",
+    exported.path.endsWith("Soldes de vos comptes.xlsx") &&
+      exported.sheet.name === "Soldes de vos comptes" &&
+      exported.sheet.rows.length === 4 &&
+      exported.sheet.rows[0].length === 4 &&
+      exported.sheet.rows[3][0].text === "TOTAL",
+    JSON.stringify([exported.path, exported.sheet.rows.length]),
+  );
+  check(
+    "soldes : les soldes s'exportent en nombres, pour qu'un tableur les additionne",
+    exported.sheet.rows.slice(1).every((row) => row.slice(1).every((cell) => !String(cell.text ?? "").includes("€"))) &&
+      JSON.stringify(exported.sheet.rows[3][3]).includes("24972620000"),
+    JSON.stringify(exported.sheet.rows[3]),
+  );
   await page.close();
 }
 
@@ -3557,6 +5284,80 @@ async function openWindow(page, url, options) {
 
   // Everything folded at the start (author's ruling): only the mothers show.
   check("opérations : tout est replié au départ", (await page.locator(".list__row").count()) === 2);
+
+  // **La date parasite se voit, et se voit aussi sélectionnée** (Fabrice,
+  // 25/08/2026). SALAIRE n'est pas pointée et porte pourtant une date de
+  // pointage : elle est marquée. Les deux lignes pointées ne le sont pas.
+  check(
+    "opérations : seule la date d'une ligne non pointée est marquée",
+    (await page.locator(".list__cell--faded").count()) === 1,
+  );
+
+  // **Et elle ne montre aucun solde** (Fabrice, 25/08/2026). Le solde de la
+  // colonne est celui de la banque : une ligne que la banque n'a pas passée
+  // n'en a pas, et une case vide le dit mieux qu'un zéro. Le même langage que
+  // les sous-opérations, qui n'en portent pas non plus.
+  const soldes = await page.evaluate(() => {
+    const read = (label) => {
+      const row = Array.from(document.querySelectorAll(".list__row")).find((line) =>
+        line.textContent.includes(label),
+      );
+      const cells = Array.from(row.querySelectorAll(".list__cell"));
+      // Quatre colonnes portent la marque des nombres : débit, crédit, solde,
+      // puis le numéro de chèque. Le solde est la troisième.
+      const numeric = cells.filter((cell) => cell.classList.contains("list__cell--numeric"));
+      return numeric[2].textContent.trim();
+    };
+    return { pointee: read("SALAIRE"), autre: read("COURSES") };
+  });
+  check(
+    "opérations : une ligne non pointée n'affiche aucun solde",
+    soldes.pointee === "",
+    JSON.stringify(soldes),
+  );
+  check(
+    "opérations : une ligne pointée, elle, l'affiche",
+    soldes.autre !== "",
+    JSON.stringify(soldes),
+  );
+  const faded = page.locator(".list__cell--faded").first();
+  check("opérations : la date parasite est en italique", 
+    (await faded.evaluate((cell) => getComputedStyle(cell).fontStyle)) === "italic");
+  const plain = await faded.evaluate((cell) => getComputedStyle(cell).color);
+
+  // Sélectionnée, elle change de gris : sur le fond bleu de la sélection,
+  // l'ancien gris clair disparaissait purement et simplement.
+  await page.click(".list__row >> nth=1");
+  await page.waitForTimeout(80);
+  const chosen = await faded.evaluate((cell) => getComputedStyle(cell).color);
+  check("opérations : la ligne est bien sélectionnée",
+    (await page.locator('.list__row[aria-selected="true"]').count()) === 1);
+  check(
+    "opérations : sélectionnée, la date parasite change de gris",
+    chosen !== plain,
+    `${plain} -> ${chosen}`,
+  );
+  // Et ce gris-là contraste vraiment avec le fond de la sélection (#9eafba) :
+  // le rapport de l'un à l'autre doit dépasser 3 pour rester lisible.
+  const ratio = await faded.evaluate((cell) => {
+    const channel = (v) => {
+      const c = v / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    };
+    const luminance = ([r, g, b]) =>
+      0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+    const read = (text) => text.match(/\d+/g).slice(0, 3).map(Number);
+    const text = luminance(read(getComputedStyle(cell).color));
+    const back = luminance([158, 175, 186]);
+    const [high, low] = text > back ? [text, back] : [back, text];
+    return (high + 0.05) / (low + 0.05);
+  });
+  check(
+    "opérations : et elle reste lisible sur le fond de la sélection",
+    ratio >= 3,
+    String(ratio),
+  );
+  await page.click(".list__row >> nth=1", { modifiers: ["Meta"] });
   check("opérations : la mère qui a des filles porte un « + »", (await page.locator(".list__fold").count()) === 1);
   check(
     "opérations : celle qui n'en a pas n'en porte pas",
@@ -3577,7 +5378,7 @@ async function openWindow(page, url, options) {
   );
   check(
     "opérations : une fille ne porte pas de solde",
-    (await page.locator(".list__row >> nth=1 >> .list__cell >> nth=12").textContent()) === "",
+    (await page.locator(".list__row >> nth=1 >> .list__cell >> nth=14").textContent()) === "",
   );
 
   // Folding again puts them away.
@@ -3751,8 +5552,8 @@ async function openWindow(page, url, options) {
   await page.click(".list__row >> nth=0");
   await page.waitForTimeout(150);
   check(
-    "nomenclature : cinq listes déroulantes sur la ligne choisie",
-    (await page.locator(".list__combo").count()) === 5,
+    "nomenclature : cinq listes déroulantes sur la ligne choisie, plus le statut et la vérification",
+    (await page.locator(".list__combo").count()) === 7,
   );
   check(
     "nomenclature : et sur elle seule",
@@ -3760,16 +5561,16 @@ async function openWindow(page, url, options) {
   );
   check(
     "nomenclature : la liste montre la valeur de la ligne",
-    (await page.locator(".list__combo").first().inputValue()) === "1",
+    (await page.locator(".list__combo >> nth=2").inputValue()) === "1",
   );
   check(
     "nomenclature : « Non précisé » est en tête",
-    (await page.locator(".list__combo").first().locator("option").first().textContent()) ===
+    (await page.locator(".list__combo >> nth=2").locator("option").first().textContent()) ===
       "Non précisé",
   );
 
   // Choosing writes straight to the database.
-  await page.selectOption(".list__combo >> nth=0", "5");
+  await page.selectOption(".list__combo >> nth=2", "5");
   await page.waitForTimeout(200);
   check(
     "nomenclature : choisir écrit la valeur",
@@ -3785,6 +5586,135 @@ async function openWindow(page, url, options) {
     await page.evaluate(() => {
       const names = window.__calls.map(([c]) => c);
       return names.lastIndexOf("list_operations") > names.indexOf("set_operation_nomenclature");
+    }),
+  );
+
+  // **La colonne « Statut opération »** (Fabrice, 01/10/2026) : entre la date
+  // de pointage et le libellé, le mot sur chaque ligne, la liste déroulante
+  // sur la ligne choisie seulement.
+  const titles = await page.locator(".list__title-text").allTextContents();
+  check(
+    "statut : la colonne est entre « Date Pointage » et « Libellé »",
+    titles[2] === "Date Pointage" && titles[3] === "Statut opération",
+    JSON.stringify(titles.slice(0, 5)),
+  );
+  const statusOf = (label) =>
+    page.evaluate((wanted) => {
+      const row = Array.from(document.querySelectorAll(".list__row")).find((line) =>
+        line.textContent.includes(wanted),
+      );
+      // Sur la ligne choisie, la case porte la liste : on lit le choix fait.
+      const cell = row.querySelectorAll(".list__cell")[3];
+      const combo = cell.querySelector("select");
+      return combo ? combo.selectedOptions[0].textContent.trim() : cell.textContent.trim();
+    }, label);
+  check("statut : une ligne pointée dit « Pointé »", (await statusOf("COURSES")) === "Pointé");
+  check("statut : une ligne prévue dit « Prévu »", (await statusOf("SALAIRE")) === "Prévu");
+  await page.click(".list__row >> nth=0");
+  await page.waitForTimeout(150);
+  check(
+    "statut : la liste déroulante montre le statut de la ligne",
+    (await page.locator(".list__row[aria-selected='true'] .list__combo >> nth=0").inputValue()) === "1",
+  );
+  check(
+    "statut : trois choix, pointé, engagé, prévu",
+    (await page
+      .locator(".list__row[aria-selected='true'] .list__combo >> nth=0")
+      .locator("option")
+      .allTextContents()).join("|") === "Pointé|Engagé|Prévu",
+  );
+  await page.selectOption(".list__row[aria-selected='true'] .list__combo >> nth=0", "3");
+  await page.waitForTimeout(200);
+  check(
+    "statut : choisir écrit le statut, et seulement lui",
+    await page.evaluate(() =>
+      window.__calls.some(
+        ([command, args]) => command === "set_operation_status" && args.id === 1 && args.statusId === 3,
+      ),
+    ),
+  );
+  check(
+    "statut : et la liste est relue",
+    await page.evaluate(() => {
+      const names = window.__calls.map(([c]) => c);
+      return names.lastIndexOf("list_operations") > names.indexOf("set_operation_status");
+    }),
+  );
+
+  // **La colonne « Vérification »** (Fabrice, 03/10/2026) : juste après le
+  // statut, le mot et sa couleur sur chaque ligne, la liste déroulante sur la
+  // ligne choisie. Ce que l'utilisateur pense de l'écriture — le statut, lui,
+  // dit ce que la banque en a fait.
+  check(
+    "vérification : la colonne suit « Statut opération »",
+    titles[4] === "Vérification" && titles[5] !== "Vérification",
+    JSON.stringify(titles.slice(0, 6)),
+  );
+  const verificationOf = (label) =>
+    page.evaluate((wanted) => {
+      const row = Array.from(document.querySelectorAll(".list__row")).find((line) =>
+        line.textContent.includes(wanted),
+      );
+      const cell = row.querySelectorAll(".list__cell")[4];
+      const combo = cell.querySelector("select");
+      const marked = combo ?? cell;
+      return {
+        word: combo ? combo.selectedOptions[0].textContent.trim() : cell.textContent.trim(),
+        key: marked.dataset.verification,
+        colour: getComputedStyle(marked).color,
+      };
+    }, label);
+  const doubtful = await verificationOf("SALAIRE");
+  check(
+    "vérification : une écriture douteuse le dit, en orange",
+    doubtful.word === "Douteuse" && doubtful.key === "3" && doubtful.colour === "rgb(179, 92, 0)",
+    JSON.stringify(doubtful),
+  );
+  const verified = await verificationOf("COURSES");
+  check(
+    "vérification : la ligne choisie montre la sienne dans sa liste, en vert",
+    verified.word === "Vérifiée" && verified.key === "2" && verified.colour === "rgb(30, 107, 36)",
+    JSON.stringify(verified),
+  );
+  check(
+    "vérification : quatre choix, dans l'ordre de leur clef",
+    (await page
+      .locator(".list__row[aria-selected='true'] .list__combo >> nth=1")
+      .locator("option")
+      .allTextContents()).join("|") === "À vérifier|Vérifiée|Douteuse|Contestée",
+  );
+  await page.selectOption(".list__row[aria-selected='true'] .list__combo >> nth=1", "4");
+  await page.waitForTimeout(200);
+  check(
+    "vérification : choisir écrit la vérification, et rien d'autre",
+    await page.evaluate(
+      () =>
+        window.__calls.some(
+          ([command, args]) =>
+            command === "set_operation_verification" && args.id === 1 && args.verificationId === 4,
+        ) &&
+        window.__calls.filter(([command]) => command === "set_operation_status").length === 1,
+    ),
+  );
+  check(
+    "vérification : et la liste est relue",
+    await page.evaluate(() => {
+      const names = window.__calls.map(([c]) => c);
+      return names.lastIndexOf("list_operations") > names.indexOf("set_operation_verification");
+    }),
+  );
+
+  // **Un débit reste rouge**, où que soit sa colonne. La règle visait « la
+  // onzième cellule » et a cessé de le trouver quand une colonne est venue se
+  // glisser devant (01/10/2026) : la cellule se nomme désormais elle-même.
+  check(
+    "opérations : un débit est écrit en rouge",
+    await page.evaluate(() => {
+      const row = Array.from(document.querySelectorAll(".list__row")).find((line) =>
+        line.textContent.includes("COURSES"),
+      );
+      const debit = row.querySelector(".list__cell--debit");
+      return debit.textContent.includes("-100,00") && getComputedStyle(debit).color === "rgb(204, 0, 0)";
     }),
   );
 
@@ -3804,6 +5734,18 @@ async function openWindow(page, url, options) {
   check(
     "nomenclature : quatre listes seulement sur une sous-opération",
     (await page.locator(".list__combo").count()) === 4,
+  );
+  check(
+    "vérification : une sous-opération n'offre pas de liste, elle montre celle de sa mère",
+    (await page.locator(".list__row[aria-selected='true'] .list__cell >> nth=4").textContent()).trim() ===
+      "Vérifiée" &&
+      (await page.locator(".list__row[aria-selected='true'] .list__cell >> nth=4 >> .list__combo").count()) === 0,
+  );
+  check(
+    "statut : une sous-opération n'offre pas de statut, elle montre celui de sa mère",
+    (await page.locator(".list__row[aria-selected='true'] .list__cell >> nth=3").textContent()).trim() ===
+      "Pointé" &&
+      (await page.locator(".list__row[aria-selected='true'] .list__cell >> nth=3 >> .list__combo").count()) === 0,
   );
   await page.close();
 }
@@ -3974,7 +5916,7 @@ async function openWindow(page, url, options) {
 
   check(
     "période : chaque année offre toute l'année et douze mois",
-    (await page.locator(".window-menu__submenu >> nth=0 >> button").count()) === 13,
+    (await page.locator('[data-menu="period"] .window-menu__submenu >> nth=0 >> button').count()) === 13,
   );
 
   // « Aujourd'hui »: the two bounds are today.
@@ -4003,9 +5945,9 @@ async function openWindow(page, url, options) {
   // A month of the current year: the first to the last day of that month.
   await page.locator(".window-menu__entry", { hasText: "Période" }).click();
   await page.waitForTimeout(120);
-  await page.locator(".window-menu__nest >> nth=1 >> .window-menu__choice--parent").click();
+  await page.locator('[data-menu="period"] .window-menu__nest >> nth=1 >> .window-menu__choice--parent').click();
   await page.waitForTimeout(120);
-  await page.locator(".window-menu__submenu >> nth=1 >> button", { hasText: "février" }).click();
+  await page.locator('[data-menu="period"] .window-menu__submenu >> nth=1 >> button', { hasText: "février" }).click();
   await page.waitForTimeout(200);
   const year = today.getFullYear();
   const lastOfFebruary = new Date(year, 2, 0).getDate();
@@ -4059,44 +6001,173 @@ async function openWindow(page, url, options) {
 }
 
 {
-  // The Filtre menu: four choices, one status each (author's request,
-  // 25/07/2026). The filter is applied by the core, so the foot of the window
-  // always adds up exactly what the table shows.
+  // Le menu Filtre (Fabrice, 05/10/2026) : « Toutes les opérations », un
+  // trait, puis « Filtre Statut » et « Filtre Vérification », chacun avec son
+  // sous-menu. Un seul choix par sous-menu, les deux se combinent, et le
+  // filtre est appliqué par le noyau — le pied de la fenêtre additionne
+  // toujours ce que le tableau montre.
   const page = await browser.newPage();
   await openWindow(page, "http://localhost:4173/ui/windows/operations-list.html?account=1");
-  await page.locator(".window-menu__entry", { hasText: "Filtre" }).click();
-  await page.waitForTimeout(120);
+  const menu = page.locator(".window-menu__entry", { hasText: "Filtre" });
+  const lastAsked = () =>
+    page.evaluate(() => {
+      const asked = window.__calls.filter(([c]) => c === "list_operations");
+      const { status, verification } = asked[asked.length - 1][1];
+      return `${status}/${verification}`;
+    });
+  const ticked = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('[data-menu="filter"] .window-menu__choice--chosen')]
+        .map((button) => button.dataset.key)
+        .join("|"),
+    );
+  const pick = async (opener, choice) => {
+    await menu.click();
+    await page.locator('[data-menu="filter"] .window-menu__choice--parent', { hasText: opener }).hover();
+    await page.waitForTimeout(80);
+    await page
+      .locator('[data-menu="filter"] .window-menu__nest', { hasText: opener })
+      .locator(".window-menu__submenu .window-menu__choice", { hasText: choice })
+      .click();
+    await page.waitForTimeout(200);
+  };
 
-  await page.locator(".window-menu__choice", { hasText: "pointées" }).click();
-  await page.waitForTimeout(200);
+  await menu.click();
+  await page.waitForTimeout(120);
   check(
-    "filtre : le statut choisi part avec la demande",
-    await page.evaluate(() =>
-      window.__calls.some(([c, args]) => c === "list_operations" && args.status === 1),
-    ),
-  );
-  // The name of the menu never changes; a tick marks where one stands in it.
-  check(
-    "filtre : le nom du menu ne change pas",
-    (await page.locator(".window-menu__entry", { hasText: "Filtre" }).count()) === 1,
-  );
-  check(
-    "filtre : une encoche marque l'option choisie",
+    "filtre : « Toutes les opérations », un trait, puis les deux filtres",
     await page.evaluate(() => {
-      const chosen = document.querySelectorAll(
-        '[data-menu="filter"] .window-menu__choice--chosen',
+      const pieces = [...document.querySelector('[data-menu="filter"]').children].map((piece) =>
+        piece.matches("hr") ? "—" : piece.matches(".window-menu__nest") ? piece.firstElementChild.textContent : piece.textContent,
       );
-      return chosen.length === 1 && chosen[0].dataset.key === "filter-pointed";
+      return pieces.join("|") === "Toutes les opérations|—|Filtre Statut|Filtre Vérification";
     }),
   );
+  check(
+    "filtre : au départ, « Toutes les opérations » est cochée, et « Afficher tout » dans chaque sous-menu",
+    (await ticked()) === "filter-all|filter-status-all|filter-verification-all",
+    await ticked(),
+  );
+  check(
+    "filtre : les sous-menus attendent qu'on y vienne",
+    (await page.locator('[data-menu="filter"] .window-menu__submenu >> visible=true').count()) === 0,
+  );
+  await page.locator('[data-menu="filter"] .window-menu__choice--parent', { hasText: "Filtre Statut" }).hover();
+  await page.waitForTimeout(80);
+  check(
+    "filtre : « Filtre Statut » offre pointées, engagées, prévues",
+    (await page.locator('[data-menu="filter"] .window-menu__nest >> nth=0 >> .window-menu__submenu .window-menu__choice').allTextContents()).join("|") ===
+      "Afficher tout|Uniquement les opérations pointées|Uniquement les opérations engagées|Uniquement les opérations prévues" &&
+      (await page.locator('[data-menu="filter"] .window-menu__nest >> nth=0 >> .window-menu__submenu > *').evaluateAll(
+        (pieces) => pieces[1].matches("hr.window-menu__rule"),
+      )),
+  );
+  await page.locator('[data-menu="filter"] .window-menu__choice--parent', { hasText: "Filtre Vérification" }).hover();
+  await page.waitForTimeout(80);
+  const words = await page.evaluate(() =>
+    [...document.querySelectorAll('[data-menu="filter"] .window-menu__nest:last-child .window-menu__submenu .window-menu__choice')].map(
+      (button) => `${button.textContent}:${getComputedStyle(button).color}`,
+    ),
+  );
+  check(
+    "filtre : « Filtre Vérification » offre les quatre vérifications de la base, dans leur couleur",
+    words.map((word) => word.split(":")[0]).join("|") ===
+      "Afficher tout|À vérifier|Vérifiée|Douteuse|Contestée" &&
+      words[0].endsWith(words[1].split(":")[1]) &&
+      words[2].endsWith("rgb(30, 107, 36)") &&
+      words[3].endsWith("rgb(179, 92, 0)") &&
+      words[4].endsWith("rgb(192, 0, 0)"),
+    words.join(" "),
+  );
+  await page.keyboard.press("Escape");
+  await page.mouse.click(900, 500);
 
-  await page.locator(".window-menu__entry", { hasText: "Filtre" }).click();
+  // Un statut.
+  await pick("Filtre Statut", "pointées");
+  check("filtre : le statut choisi part avec la demande", (await lastAsked()) === "1/null", await lastAsked());
+  check(
+    "filtre : le menu s'est refermé, et son nom n'a pas changé",
+    (await page.locator('[data-menu="filter"]').isHidden()) && (await menu.count()) === 1,
+  );
+  check(
+    "filtre : l'encoche est sur le choix et sur l'entrée de son sous-menu — plus sur « Toutes »",
+    (await ticked()) === "filter-by-status|filter-pointed|filter-verification-all",
+    await ticked(),
+  );
+  // Un seul par sous-menu.
+  await pick("Filtre Statut", "engagées");
+  check(
+    "filtre : un autre statut remplace le premier",
+    (await lastAsked()) === "2/null" && (await ticked()) === "filter-by-status|filter-committed|filter-verification-all",
+    `${await lastAsked()} ${await ticked()}`,
+  );
+  // Les deux se combinent.
+  await pick("Filtre Vérification", "À vérifier");
+  check(
+    "filtre : la vérification s'ajoute au statut — deux éléments cochés, un par sous-menu",
+    (await lastAsked()) === "2/1" &&
+      (await ticked()) === "filter-by-status|filter-committed|filter-by-verification|filter-verification-1",
+    `${await lastAsked()} ${await ticked()}`,
+  );
+  await pick("Filtre Vérification", "Douteuse");
+  check(
+    "filtre : une autre vérification remplace la première, le statut reste",
+    (await lastAsked()) === "2/3",
+    await lastAsked(),
+  );
+  // Un second clic sur un choix coché le décoche, sans toucher à l'autre.
+  await pick("Filtre Statut", "engagées");
+  check(
+    "filtre : recliquer un choix coché le lève — l'autre filtre tient",
+    (await lastAsked()) === "null/3" &&
+      (await ticked()) === "filter-status-all|filter-by-verification|filter-verification-3",
+    `${await lastAsked()} ${await ticked()}`,
+  );
+  // « Toutes les opérations » décoche tout.
+  await pick("Filtre Statut", "prévues");
+  await menu.click();
   await page.locator(".window-menu__choice", { hasText: "Toutes les opérations" }).click();
   await page.waitForTimeout(200);
   check(
-    "filtre : « Toutes les opérations » lève le filtre",
+    "filtre : « Toutes les opérations » lève les deux filtres d'un coup",
+    (await lastAsked()) === "null/null" &&
+      (await ticked()) === "filter-all|filter-status-all|filter-verification-all",
+    `${await lastAsked()} ${await ticked()}`,
+  );
+
+  // « Afficher tout » : lever un seul filtre, sans avoir à deviner le second
+  // clic (Fabrice : « j'ai peur que les utilisateurs âgés ne comprennent pas
+  // si on ne le met pas »).
+  await pick("Filtre Statut", "pointées");
+  await pick("Filtre Vérification", "Contestée");
+  await pick("Filtre Statut", "Afficher tout");
+  check(
+    "filtre : « Afficher tout » du statut lève le statut, et lui seul",
+    (await lastAsked()) === "null/4" &&
+      (await ticked()) === "filter-status-all|filter-by-verification|filter-verification-4",
+    `${await lastAsked()} ${await ticked()}`,
+  );
+  await pick("Filtre Statut", "prévues");
+  await pick("Filtre Vérification", "Afficher tout");
+  check(
+    "filtre : « Afficher tout » de la vérification lève la vérification, et elle seule",
+    (await lastAsked()) === "3/null" &&
+      (await ticked()) === "filter-by-status|filter-planned|filter-verification-all",
+    `${await lastAsked()} ${await ticked()}`,
+  );
+  await pick("Filtre Statut", "Afficher tout");
+  check(
+    "filtre : les deux levés un à un, « Toutes les opérations » retrouve son encoche",
+    (await lastAsked()) === "null/null" &&
+      (await ticked()) === "filter-all|filter-status-all|filter-verification-all",
+    `${await lastAsked()} ${await ticked()}`,
+  );
+  check(
+    "filtre : il y a toujours une encoche, et une seule, dans chaque sous-menu",
     await page.evaluate(() =>
-      window.__calls.some(([c, args]) => c === "list_operations" && args.status === null),
+      [...document.querySelectorAll('[data-menu="filter"] .window-menu__submenu')].every(
+        (nested) => nested.querySelectorAll(".window-menu__choice--chosen").length === 1,
+      ),
     ),
   );
   await page.close();
@@ -4131,13 +6202,14 @@ async function openWindow(page, url, options) {
     (await page.locator(".list__filter-input:visible").count()) === 0,
   );
 
-  // The fourth column, « Libelle ».
-  await page.locator(".list__title >> nth=3 >> .list__filter-toggle").click();
+  // The sixth column, « Libelle » — after « Statut opération » and
+  // « Vérification ».
+  await page.locator(".list__title >> nth=5 >> .list__filter-toggle").click();
   await page.waitForTimeout(150);
   const aligned = await page.evaluate(() => {
-    const header = document.querySelectorAll(".list__title")[3].getBoundingClientRect();
+    const header = document.querySelectorAll(".list__title")[5].getBoundingClientRect();
     const field = document
-      .querySelectorAll(".list__filter-input")[3]
+      .querySelectorAll(".list__filter-input")[5]
       .getBoundingClientRect();
     const first = document.querySelectorAll(".list__title")[0].getBoundingClientRect();
     return {
@@ -4150,7 +6222,7 @@ async function openWindow(page, url, options) {
   check("entonnoir : et pas sous la première", aligned.notUnderTheFirst, JSON.stringify(aligned));
 
   // Closing it again puts the row away.
-  await page.locator(".list__title >> nth=3 >> .list__filter-toggle").click();
+  await page.locator(".list__title >> nth=5 >> .list__filter-toggle").click();
   await page.waitForTimeout(150);
   await page.close();
 }
@@ -4599,7 +6671,23 @@ async function openWindow(page, url, options) {
   );
   check(
     "fiche opération : les cinq nomenclatures sont des listes déroulantes",
-    (await page.locator("select.form__field").count()) === 7,
+    // Les cinq, plus le type, le statut et la vérification.
+    (await page.locator("select.form__field").count()) === 8,
+  );
+  // **La vérification** (Fabrice, 03/10/2026) : le quatrième choix de la
+  // base, lu avec l'opération, dans sa couleur — ici une écriture contestée.
+  check(
+    "fiche opération : la vérification de l'opération est montrée, dans sa couleur",
+    (await page.inputValue("#verification")) === "4" &&
+      (await page.locator("#verification-label").textContent()) === "Vérification" &&
+      (await page.evaluate(
+        () => getComputedStyle(document.getElementById("verification")).color,
+      )) === "rgb(192, 0, 0)",
+  );
+  check(
+    "fiche opération : elle offre les quatre vérifications",
+    (await page.locator("#verification option").allTextContents()).join("|") ===
+      "À vérifier|Vérifiée|Douteuse|Contestée",
   );
 
   // Its words come from Fluent, never from the page.
@@ -4859,6 +6947,111 @@ async function openWindow(page, url, options) {
   check(
     "fiche opération : le commentaire fait partie de la réserve",
     (await page.evaluate(() => window.__operationDirty)) === true,
+  );
+  await page.close();
+}
+
+// **Le refus du pointage sans date est un panneau, pas une phrase en bas de
+// fenêtre** (Fabrice, 25/08/2026 : « on ne le voie pas du tout si tu l'affiche
+// comme cela »). Et le panneau propose l'issue : enregistrer avec la date de
+// l'opération.
+{
+  const page = await browser.newPage();
+  await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/operation-form.html?mode=M&account=1&id=1",
+    {
+      operationRefusal:
+        "Une opération pointée doit obligatoirement porter une date de pointage.",
+    },
+  );
+  await page.click("#save");
+  await page.waitForTimeout(200);
+  check(
+    "fiche opération : le pointage sans date ouvre un panneau",
+    (await page.locator(".dialog").count()) === 1,
+  );
+  const question = (await page.locator(".dialog__question").textContent()) ?? "";
+  check(
+    "fiche opération : le panneau porte la phrase de refus",
+    question.includes("doit obligatoirement porter une date de pointage"),
+  );
+  check(
+    "fiche opération : et propose la date de l'opération, en clair",
+    question.includes("21/01/2026"),
+  );
+  // Non : on reste sur la fiche, rien n'est écrit.
+  await page.click(".dialog__button:not(.dialog__button--primary)");
+  await page.waitForTimeout(150);
+  check(
+    "fiche opération : Non referme le panneau",
+    (await page.locator(".dialog").count()) === 0,
+  );
+  check(
+    "fiche opération : Non n'enregistre rien",
+    (await page.evaluate(() => window.__closed)) !== true &&
+      (await page.locator("#info-message").textContent()) !== "Opération modifiée.",
+  );
+  await page.close();
+}
+
+// Oui : la date de l'opération entre dans le champ, et l'enregistrement suit.
+{
+  const page = await browser.newPage();
+  await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/operation-form.html?mode=M&account=1&id=1",
+    {
+      operationRefusal:
+        "Une opération pointée doit obligatoirement porter une date de pointage.",
+    },
+  );
+  await page.click("#save");
+  await page.waitForTimeout(200);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(250);
+  check(
+    "fiche opération : Oui pose la date de l'opération dans le champ",
+    (await page.inputValue("#clearing-date")) === "2026-01-21",
+  );
+  await page.close();
+}
+
+// **Une opération pointée sans date de pointage** — la base héritée, l'archive
+// restaurée. La fiche propose la date de l'opération plutôt que d'opposer un
+// refus à quelqu'un venu corriger un libellé (Fabrice, 25/08/2026).
+{
+  const page = await browser.newPage();
+  await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/operation-form.html?mode=M&account=1&id=1",
+    { operationDatelessButPointed: true },
+  );
+  check(
+    "fiche opération : une opération pointée sans date en propose une",
+    (await page.inputValue("#clearing-date")) === "2026-01-21",
+  );
+  // La proposition n'est pas une modification de l'utilisateur : elle entre
+  // dans la réserve avec le reste, et consulter une fiche puis la fermer
+  // n'écrit rien.
+  check(
+    "fiche opération : la date proposée ne réclame pas d'être enregistrée",
+    (await page.evaluate(() => window.__operationDirty)) !== true,
+  );
+  await page.close();
+}
+
+// **La lecture seule ne propose rien** : elle montre ce que la base contient.
+{
+  const page = await browser.newPage();
+  await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/operation-form.html?mode=L&account=1&id=1",
+    { operationDatelessButPointed: true },
+  );
+  check(
+    "fiche opération : en lecture seule, la date vide le reste",
+    (await page.inputValue("#clearing-date")) === "",
   );
   await page.close();
 }
@@ -5130,7 +7323,7 @@ async function openWindow(page, url, options) {
   // donne à lire (04_SPECIFICATIONS_FENETRES.md, F02).
   check(
     "liste opérations : le commentaire se lit au survol",
-    (await page.locator(".list__row >> nth=0 >> .list__cell >> nth=13").getAttribute("title")) ===
+    (await page.locator(".list__row >> nth=0 >> .list__cell >> nth=15").getAttribute("title")) ===
       "Marché du dimanche",
   );
 
@@ -5164,6 +7357,70 @@ async function openWindow(page, url, options) {
   check(
     "liste opérations : « masquer » les replie toutes",
     (await page.locator(".list__row").count()) === 2,
+  );
+
+  // **Créer une opération périodique à partir de cette opération** (Fabrice,
+  // 25/08/2026) : en bas du menu Divers, derrière un trait.
+  await page.locator(".window-menu__entry", { hasText: "Divers" }).first().click();
+  await page.waitForTimeout(120);
+  check(
+    "liste opérations : le menu Divers porte un trait de séparation",
+    (await page.locator('[data-menu="misc"] .window-menu__rule').count()) === 1,
+  );
+  const entries = await page.evaluate(() =>
+    Array.from(
+      document.querySelectorAll('[data-menu="misc"] .window-menu__choice'),
+    ).map((choice) => choice.textContent),
+  );
+  check(
+    "liste opérations : l'entrée périodique est la dernière du menu",
+    entries[entries.length - 1] ===
+      "Créer une opération périodique à partir de cette opération",
+    JSON.stringify(entries),
+  );
+
+  // Sans sélection, elle refuse — et n'ouvre rien. La ligne choisie plus haut
+  // dans ce bloc est d'abord relâchée.
+  // ⌘ et non Ctrl (10/10/2026) : sur macOS, Ctrl + clic est un clic droit,
+  // qui ouvrait le menu contextuel et laissait le menu Divers fermé. Radinus
+  // accepte les deux pour la sélection ; seul ⌘ se comporte pareil partout.
+  await page.keyboard.down("Meta");
+  for (const index of [0, 1]) {
+    const row = page.locator(".list__row").nth(index);
+    if ((await row.getAttribute("aria-selected")) === "true") {
+      await row.click({ modifiers: ["Meta"] });
+    }
+  }
+  await page.keyboard.up("Meta");
+  await page.waitForTimeout(80);
+  check(
+    "liste opérations : plus rien n'est sélectionné",
+    (await page.locator('.list__row[aria-selected="true"]').count()) === 0,
+  );
+  await page.locator(".window-menu__entry", { hasText: "Divers" }).first().click();
+  await page.waitForTimeout(120);
+  await page.click('[data-menu="misc"] >> text=Créer une opération périodique');
+  await page.waitForTimeout(150);
+  check(
+    "liste opérations : sans sélection, aucune fiche périodique ne s'ouvre",
+    (await page.evaluate(() => window.__openedRecurring)) === undefined,
+  );
+  check(
+    "liste opérations : et la fenêtre le dit",
+    (await page.locator("#info-bar").textContent())?.includes("sélectionner"),
+  );
+
+  // Sur une opération, la fiche périodique s'ouvre sur elle.
+  await page.click(".list__row >> nth=0");
+  await page.locator(".window-menu__entry", { hasText: "Divers" }).first().click();
+  await page.waitForTimeout(120);
+  await page.click('[data-menu="misc"] >> text=Créer une opération périodique');
+  await page.waitForTimeout(150);
+  check(
+    "liste opérations : la fiche périodique s'ouvre sur l'opération choisie",
+    JSON.stringify(await page.evaluate(() => window.__openedRecurring)) ===
+      JSON.stringify({ id: 1 }),
+    JSON.stringify(await page.evaluate(() => window.__openedRecurring)),
   );
   await page.close();
 }
@@ -5205,7 +7462,111 @@ async function openWindow(page, url, options) {
     "fiche opération : et ne modifie pas l'originale",
     await page.evaluate(() => !window.__calls.some(([c]) => c === "update_operation")),
   );
+  // **La copie d'une écriture contestée n'est pas contestée** : c'est une
+  // opération que l'on saisit, donc vérifiée. Et c'est ce qui est écrit.
+  check(
+    "fiche opération : une copie naît « Vérifiée », quelle que soit l'originale",
+    await page.evaluate(() => {
+      const sent = window.__calls.find(([c]) => c === "create_operation");
+      return sent[1].operation.verification_id === 2;
+    }),
+  );
   await page.close();
+}
+
+// --- Préférences : la vérification des opérations importées --------------
+{
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/preferences.html");
+  check(
+    "préférences : une branche « Importation » porte la feuille « Vérification »",
+    (await page.locator(".tree__branch").allTextContents()).join("|") ===
+      "Affichage|Importation|Outils|Réinitialisation" &&
+      (await page.locator('.tree__leaf[data-leaf="verification"]').textContent()) === "Vérification",
+  );
+  await page.locator('.tree__leaf[data-leaf="verification"]').click();
+  await page.waitForTimeout(100);
+  check(
+    "préférences : deux réponses seulement, « Vérifiée » d'abord — le défaut",
+    (await page.locator("#verification option").allTextContents()).join("|") ===
+      "Vérifiée|À vérifier" && (await page.inputValue("#verification")) === "2",
+  );
+  await page.selectOption("#verification", "1");
+  await page.click("#save");
+  await page.waitForTimeout(250);
+  check(
+    "préférences : enregistrer écrit le choix, et la fenêtre le garde",
+    (await page.evaluate(() => window.__importVerification)) === 1 &&
+      (await page.inputValue("#verification")) === "1",
+  );
+  check(
+    "préférences : la vérification part avant la devise, qui fait relire la fenêtre",
+    await page.evaluate(() => {
+      const names = window.__calls.map(([c]) => c);
+      return (
+        names.indexOf("save_preferences_import_verification") <
+        names.indexOf("save_preferences_currency")
+      );
+    }),
+  );
+  await page.close();
+}
+
+// --- L'ascenseur horizontal du détail, statistiques et bilan croisé -------
+{
+  // **Le détail du bas déborde au lieu de se serrer** (Fabrice, 03/10/2026 :
+  // « dans le tableau des détails qui liste les opérations, il n'y a pas non
+  // plus d'ascenseur horizontal »). Les sept statistiques partagent une liste,
+  // le bilan croisé en a une copie : les deux sont tenues ici. Large, rien ne
+  // dépasse ; étroite, les lignes gardent leur largeur plancher, débordent, et
+  // l'en-tête les suit au pixel près.
+  for (const [name, url] of [
+    ["statistiques", "statistics.html?axis=category&accounts=1,2&year=2026"],
+    ["bilan croisé", "crossed-balance.html?accounts=1,2&year=2026&month=9"],
+  ]) {
+    const page = await browser.newPage({ viewport: { width: 1700, height: 900 } });
+    await openWindow(page, `http://localhost:4173/ui/windows/${url}`);
+    await page.click(".matrix__row >> nth=1 >> .matrix__cell >> nth=0");
+    await page.waitForTimeout(250);
+    const sideways = () =>
+      page.evaluate(() => {
+        const rows = document.getElementById("rows");
+        const line = rows.querySelector(".list__row");
+        return {
+          content: rows.scrollWidth,
+          frame: rows.clientWidth,
+          rows: rows.querySelectorAll(".list__row").length,
+          floor: line ? line.style.minWidth : "",
+        };
+      });
+    const wide = await sideways();
+    await page.setViewportSize({ width: 900, height: 900 });
+    await page.waitForTimeout(150);
+    const narrow = await sideways();
+    check(
+      `${name} : le détail tient dans une fenêtre large`,
+      wide.rows > 0 && wide.content <= wide.frame + 1,
+      JSON.stringify(wide),
+    );
+    check(
+      `${name} : rétrécie, le détail déborde et son ascenseur vient`,
+      narrow.floor !== "" && narrow.content > narrow.frame + 50,
+      JSON.stringify(narrow),
+    );
+    await page.evaluate(() => {
+      const rows = document.getElementById("rows");
+      rows.scrollLeft = 90;
+      rows.dispatchEvent(new Event("scroll"));
+    });
+    await page.waitForTimeout(100);
+    check(
+      `${name} : et l'en-tête du détail suit les lignes`,
+      (await page.evaluate(() => document.getElementById("header").style.transform)) ===
+        "translateX(-90px)",
+      await page.evaluate(() => document.getElementById("header").style.transform),
+    );
+    await page.close();
+  }
 }
 
 // --- F06, troisième usage : choisir plusieurs comptes -------------------
@@ -5544,8 +7905,8 @@ async function openWindow(page, url, options) {
   await page.click(".list--detail .list__row >> nth=0");
   await page.waitForTimeout(150);
   check(
-    "détail : la ligne choisie porte les cinq menus de classement",
-    (await page.locator(".list--detail .list__row >> nth=0 >> .list__combo").count()) === 5,
+    "détail : la ligne choisie porte les cinq menus de classement, et la vérification",
+    (await page.locator(".list--detail .list__row >> nth=0 >> .list__combo").count()) === 6,
   );
   check(
     "détail : et les autres lignes restent du texte",
@@ -5553,8 +7914,35 @@ async function openWindow(page, url, options) {
   );
   check(
     "détail : le menu s'ouvre sur le classement actuel de la ligne",
-    (await page.locator(".list--detail .list__row >> nth=0 >> .list__combo >> nth=0").inputValue()) ===
+    (await page.locator(".list--detail .list__row >> nth=0 >> .list__combo >> nth=1").inputValue()) ===
       "1",
+  );
+
+  // **La colonne « Vérification » du détail** (Fabrice, 03/10/2026) : entre
+  // le libellé et la catégorie, dans les sept statistiques — on est ici dans
+  // celle des catégories. Le mot dans sa couleur, la liste sur la ligne
+  // choisie.
+  const detailTitles = await page.locator(".list--detail .list__title-text").allTextContents();
+  check(
+    "détail : la vérification est entre le libellé et la catégorie",
+    detailTitles[2] === "Libelle" && detailTitles[3] === "Vérification",
+    JSON.stringify(detailTitles.slice(0, 5)),
+  );
+  const chosenVerification = page.locator(
+    ".list--detail .list__row >> nth=0 >> .list__combo >> nth=0",
+  );
+  check(
+    "détail : la ligne choisie montre sa vérification dans sa liste, en vert",
+    (await chosenVerification.inputValue()) === "2" &&
+      (await chosenVerification.locator("option").allTextContents()).join("|") ===
+        "À vérifier|Vérifiée|Douteuse|Contestée" &&
+      (await chosenVerification.evaluate((combo) => getComputedStyle(combo).color)) ===
+        "rgb(30, 107, 36)",
+  );
+  check(
+    "détail : les autres lignes la montrent en toutes lettres",
+    (await page.locator(".list--detail .list__row >> nth=1 >> .list__cell >> nth=3").textContent()) ===
+      "Vérifiée",
   );
 
   // Une sous-opération n'a pas de mode de paiement à elle : quatre menus, pas
@@ -5573,7 +7961,7 @@ async function openWindow(page, url, options) {
   const before = await page.evaluate(
     () => window.__calls.filter(([command]) => command === "axis_statistics").length,
   );
-  await page.selectOption(".list--detail .list__row >> nth=0 >> .list__combo >> nth=0", "5");
+  await page.selectOption(".list--detail .list__row >> nth=0 >> .list__combo >> nth=1", "5");
   await page.waitForTimeout(300);
   check(
     "détail : choisir une catégorie l'écrit sur l'opération",
@@ -5593,11 +7981,36 @@ async function openWindow(page, url, options) {
       () => window.__calls.filter(([command]) => command === "axis_statistics").length,
     )) > before,
   );
+  // **La fenêtre n'a plus à prévenir** (Fabrice, 25/08/2026) : c'est le
+  // contrôleur qui diffuse le changement, à l'endroit où l'écriture a lieu.
+  // Elle ne doit donc plus demander cette diffusion — un test croisé de Rust
+  // vérifie, lui, que l'écriture prévient bien.
   check(
-    "détail : et prévient la liste des opérations, qui montre les mêmes",
+    "détail : la fenêtre ne prévient plus elle-même",
     await page.evaluate(() =>
-      window.__calls.some(([command]) => command === "notify_operations_changed"),
+      window.__calls.every(([command]) => command !== "notify_operations_changed"),
     ),
+  );
+  // Et la vérification, par le même geste : écrite, puis tout est recalculé —
+  // dans la statistique par vérification, l'opération change de ligne.
+  await page.click(".list--detail .list__row >> nth=0");
+  await page.waitForTimeout(150);
+  const beforeVerifying = await page.evaluate(
+    () => window.__calls.filter(([command]) => command === "axis_statistics").length,
+  );
+  await page.selectOption(".list--detail .list__row >> nth=0 >> .list__combo >> nth=0", "3");
+  await page.waitForTimeout(300);
+  check(
+    "détail : choisir une vérification l'écrit sur l'opération, et refait le calcul",
+    (await page.evaluate(() =>
+      window.__calls.some(
+        ([command, args]) =>
+          command === "set_operation_verification" && args.id === 1 && args.verificationId === 3,
+      ),
+    )) &&
+      (await page.evaluate(
+        () => window.__calls.filter(([command]) => command === "axis_statistics").length,
+      )) > beforeVerifying,
   );
   check(
     "détail : les menus proposent ce qui existe, pas une saisie libre",
@@ -6134,6 +8547,215 @@ async function openWindow(page, url, options) {
   await page.close();
 }
 
+{
+  // **Le bilan croisé emprunte la même porte** (Fabrice, 25/08/2026) : il se
+  // calcule lui aussi sur plusieurs comptes, donc on demande lesquels avant
+  // d'ouvrir quoi que ce soit.
+  const page = await browser.newPage();
+  await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/accounts-list.html?mode=STATS&axis=crossed-balance",
+  );
+  await page.click(".list__row >> nth=0");
+  await page.click(".list__row >> nth=1", { modifiers: ["Meta"] });
+  await page.click("#select");
+  await page.waitForTimeout(200);
+  check(
+    "bilan croisé : le choix des comptes l'ouvre sur les deux comptes",
+    (await page.evaluate(() => JSON.stringify(window.__openedCrossed?.accountIds))) === "[1,2]",
+    await page.evaluate(() => JSON.stringify(window.__openedCrossed)),
+  );
+  check(
+    "bilan croisé : et n'ouvre aucune statistique",
+    await page.evaluate(
+      () => window.__openedStats === undefined && window.__openedDashboard === undefined,
+    ),
+  );
+  await page.close();
+}
+
+// --- F39, le bilan croisé (Fabrice, 25/08/2026) --------------------------
+//
+// Le gabarit des six statistiques, aux deux différences demandées : les
+// colonnes sont les affectations, la période est un mois.
+{
+  const page = await browser.newPage();
+  const errors = await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/crossed-balance.html?accounts=1,2&year=2026&month=9",
+  );
+  check(
+    "bilan croisé : la fenêtre s'ouvre sans une plainte",
+    errors.length === 0,
+    errors.join(" | "),
+  );
+
+  // **Le bandeau bleu porte 09/2026**, sur une seule ligne, en deux zones
+  // cliquables séparées par une barre.
+  check(
+    "bilan croisé : le bandeau porte le mois et l'année",
+    (await page.textContent("#month")) === "09" && (await page.textContent("#year")) === "2026",
+  );
+  check(
+    "bilan croisé : les deux tiennent sur une ligne",
+    await page.evaluate(() => {
+      const zone = document.querySelector(".panel__period");
+      const tops = new Set(
+        Array.from(zone.children).map((part) => Math.round(part.getBoundingClientRect().top)),
+      );
+      return tops.size === 1 && zone.scrollWidth <= zone.clientWidth + 1;
+    }),
+  );
+
+  const titles = await page.evaluate(() =>
+    Array.from(document.querySelectorAll(".matrix__title")).map((cell) => cell.textContent),
+  );
+  check(
+    "bilan croisé : les colonnes sont les affectations, pas les mois",
+    JSON.stringify(titles) ===
+      JSON.stringify(["Categorie", "Famille", "Animaux", "Sans affectation", "Total"]),
+    JSON.stringify(titles),
+  );
+
+  const labels = await page.evaluate(() =>
+    Array.from(document.querySelectorAll(".matrix__label")).map((cell) => cell.textContent),
+  );
+  check(
+    "bilan croisé : les lignes sont les catégories, « Sans catégorie » en dernier",
+    JSON.stringify(labels) ===
+      JSON.stringify(["Alimentation", "Salaire", "Sans catégorie", "Somme"]),
+    JSON.stringify(labels),
+  );
+  // **Pas de Cumul** : les affectations n'ont pas d'ordre, et le tableau ne
+  // porte que sur un mois (Fabrice, 25/08/2026).
+  check(
+    "bilan croisé : il n'y a pas de ligne Cumul",
+    !labels.includes("Cumul") && (await page.locator(".matrix__row--cumulative").count()) === 0,
+  );
+  // **Et la Somme colle au bas du cadre**, à la place qu'occupait le Cumul :
+  // sans cela elle garde le décalage d'une ligne prévu pour l'empilement des
+  // six statistiques et flotte en avant-dernière position (Fabrice,
+  // 25/08/2026).
+  check(
+    "bilan croisé : la ligne Somme colle au bas du tableau",
+    await page.evaluate(() => {
+      const sum = document.querySelector(".matrix__row--sum");
+      const style = getComputedStyle(sum);
+      return style.position === "sticky" && style.bottom === "0px";
+    }),
+  );
+
+  check(
+    "bilan croisé : une case négative est peinte",
+    (await page.locator(".matrix__cell--negative").count()) >= 1,
+  );
+  // Le vert et le blanc portent tous deux zéro et ne disent pas la même chose.
+  check(
+    "bilan croisé : une case qui s'annule est verte",
+    (await page.locator(".matrix__cell--cancelling").count()) === 1,
+  );
+
+  // **La largeur plancher** : c'est l'ascenseur horizontal demandé le
+  // 25/08/2026 — trois affectations tiennent, quinze déborderont plutôt que
+  // d'écraser les colonnes.
+  check(
+    "bilan croisé : les lignes portent une largeur plancher",
+    await page.evaluate(() => {
+      const row = document.querySelector(".matrix__row");
+      return row.style.minWidth !== "" && row.style.gridTemplateColumns.includes("repeat(3");
+    }),
+  );
+
+  // Cliquer une case ordinaire : le détail nomme les deux classements.
+  await page.click(".matrix__row >> nth=1 >> .matrix__cell >> nth=0");
+  await page.waitForTimeout(200);
+  check(
+    "bilan croisé : une case nomme sa catégorie et son affectation",
+    JSON.stringify(await page.evaluate(() => window.__crossedDetailAsked?.cell)) ===
+      JSON.stringify({ category: 1, assignment: 2 }),
+    JSON.stringify(await page.evaluate(() => window.__crossedDetailAsked?.cell)),
+  );
+  check(
+    "bilan croisé : le détail s'affiche en bas",
+    (await page.locator(".list--detail .list__row").count()) === 1,
+  );
+
+  // « Toutes » se dit par l'absence : la colonne Total ne nomme que la
+  // catégorie, la ligne Somme que l'affectation.
+  await page.click(".matrix__row >> nth=1 >> .matrix__cell--total");
+  await page.waitForTimeout(200);
+  check(
+    "bilan croisé : la colonne Total ne nomme que la catégorie",
+    JSON.stringify(await page.evaluate(() => window.__crossedDetailAsked?.cell)) ===
+      JSON.stringify({ category: 1, assignment: null }),
+    JSON.stringify(await page.evaluate(() => window.__crossedDetailAsked?.cell)),
+  );
+  await page.click(".matrix__row--sum >> .matrix__cell >> nth=0");
+  await page.waitForTimeout(200);
+  check(
+    "bilan croisé : la ligne Somme ne nomme que l'affectation",
+    JSON.stringify(await page.evaluate(() => window.__crossedDetailAsked?.cell)) ===
+      JSON.stringify({ category: null, assignment: 2 }),
+    JSON.stringify(await page.evaluate(() => window.__crossedDetailAsked?.cell)),
+  );
+
+  // **On navigue de mois en mois**, et décembre bascule sur janvier.
+  await page.click("#next-period");
+  await page.waitForTimeout(200);
+  check(
+    "bilan croisé : l'horloge avance d'un mois",
+    (await page.textContent("#month")) === "10" && (await page.textContent("#year")) === "2026",
+  );
+  check(
+    "bilan croisé : et le tableau est redemandé sur ce mois-là",
+    (await page.evaluate(() => window.__crossedAsked?.month)) === 10,
+  );
+  for (let step = 0; step < 3; step += 1) {
+    await page.click("#next-period");
+    await page.waitForTimeout(120);
+  }
+  check(
+    "bilan croisé : décembre bascule sur janvier de l'année suivante",
+    (await page.textContent("#month")) === "01" && (await page.textContent("#year")) === "2027",
+  );
+  await page.click("#previous-period");
+  await page.waitForTimeout(150);
+  check(
+    "bilan croisé : et janvier revient à décembre de l'année précédente",
+    (await page.textContent("#month")) === "12" && (await page.textContent("#year")) === "2026",
+  );
+
+  // Le mois se clique : un nombre entre 1 et 12.
+  await page.click("#month");
+  await page.waitForTimeout(150);
+  check(
+    "bilan croisé : cliquer le mois pose la question",
+    (await page.textContent(".dialog__question"))?.includes("entre 1 et 12"),
+  );
+  await page.fill(".dialog__field", "3");
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(250);
+  check(
+    "bilan croisé : le mois saisi est celui qu'on regarde",
+    (await page.textContent("#month")) === "03" &&
+      (await page.evaluate(() => window.__crossedAsked?.month)) === 3,
+  );
+
+  // L'export porte sur les douze mois de l'année affichée.
+  await page.click(".window-menu__entry");
+  await page.waitForTimeout(120);
+  const exports = await page.evaluate(() =>
+    Array.from(document.querySelectorAll(".window-menu__choice")).map((c) => c.textContent),
+  );
+  check(
+    "bilan croisé : l'export porte sur tous les mois de l'année affichée",
+    exports.length === 2 && exports[0].includes("tous les mois de l'année affichée"),
+    JSON.stringify(exports),
+  );
+
+  await page.close();
+}
+
 // --- Les six statistiques, une seule page --------------------------------
 {
   // « Tu dois obligatoirement prendre exemple sur ce travail pour générer les
@@ -6148,6 +8770,7 @@ async function openWindow(page, url, options) {
     ["payment-mode", "ModeOperation"],
     ["payee", "Tiers"],
     ["project", "Projets"],
+    ["verification", "Vérification"],
   ]) {
     const page = await browser.newPage();
     const errors = await openWindow(
@@ -6170,6 +8793,17 @@ async function openWindow(page, url, options) {
     check(
       `axe ${axis} : et le titre de la première colonne vient du noyau`,
       (await page.locator(".matrix__title >> nth=0").textContent()) === column,
+    );
+    // **Seule la statistique par vérification teinte le nom de ses lignes** :
+    // la clef d'une ligne y est celle d'une vérification, et c'est elle qui
+    // choisit la couleur. Ailleurs, la même clef est celle d'une catégorie ou
+    // d'un tiers — la teindre serait colorier au hasard.
+    check(
+      `axe ${axis} : le nom des lignes n'est teint que pour la vérification`,
+      (await page.evaluate(
+        () => document.querySelectorAll(".matrix__label[data-verification]").length,
+      )) > 0 ===
+        (axis === "verification"),
     );
 
     // Le détail d'une case porte l'axe lui aussi : sans cela, cliquer une
@@ -6505,6 +9139,1166 @@ async function openWindow(page, url, options) {
   await page.close();
 }
 
+// --- F02 : la vérification d'une sélection, par le clic droit -------------
+{
+  // Fabrice, 03/10/2026 : « en première option de ce menu, une option
+  // Vérification, qui fait apparaître un sous-menu avec toutes les options de
+  // vérification. Le but est de pouvoir modifier le statut de plusieurs lignes
+  // en leur affectant un statut de vérification identique. » Seulement dans la
+  // liste des opérations : le bloc suivant tient le menu des autres tableaux
+  // à ses dix exports, mot pour mot.
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/operations-list.html?account=1");
+  const entries = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll(".context-menu > *")].map((piece) =>
+        piece.matches("hr") ? "—" : piece.matches(".context-menu__nest") ? "nest" : "entry",
+      ),
+    );
+
+  // Sans ligne choisie : l'entrée est là, en tête, et grisée.
+  await page.click(".list__rows", { button: "right" });
+  await page.waitForTimeout(100);
+  const shape = await entries();
+  // Fabrice, 03/10/2026 : « en premier, avant Vérification, une option Statut
+  // opération […] Les options d'exportation seront déplacées dans un
+  // sous-menu, on y accédera via l'option Exporter vers. » Trois entrées qui
+  // s'ouvrent, et plus rien à plat.
+  const openers = page.locator(".context-menu > .context-menu__nest > .context-menu__entry--opener");
+  const submenu = (rank) =>
+    page.locator(`.context-menu > .context-menu__nest >> nth=${rank}`).locator(".context-menu__submenu");
+  check(
+    "clic droit : trois entrées qui s'ouvrent — Statut opération, Vérification, Exporter vers",
+    // Depuis le 07/10/2026, les deux entrées de copie et leur trait les
+    // précèdent.
+    JSON.stringify(shape) === JSON.stringify(["entry", "entry", "—", "nest", "nest", "nest"]) &&
+      (await openers.allTextContents()).join("|") === "Statut opération|Vérification|Exporter vers",
+    JSON.stringify(shape) + " " + (await openers.allTextContents()).join("|"),
+  );
+  check(
+    "clic droit : sans ligne choisie, statut et vérification sont grisés et n'ouvrent rien",
+    (await openers.nth(0).isDisabled()) &&
+      (await openers.nth(1).isDisabled()) &&
+      (await page.locator(".context-menu__submenu").count()) === 1,
+  );
+  check(
+    "clic droit : l'export, lui, reste offert sans sélection",
+    !(await openers.nth(2).isDisabled()),
+  );
+  await page.keyboard.press("Escape");
+
+  // Deux lignes prises : COURSES et SALAIRE. Le clic droit ne change pas la
+  // sélection.
+  await page.click(".list__row >> nth=0");
+  await page.keyboard.down("Meta");
+  await page.click(".list__row >> nth=1");
+  await page.keyboard.up("Meta");
+  await page.waitForTimeout(100);
+  await page.click(".list__rows", { button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "clic droit : la sélection n'a pas bougé",
+    (await page.locator(".list__row[aria-selected='true']").count()) === 2,
+  );
+  const opener = openers.nth(1);
+  check(
+    "clic droit : des lignes prises, les deux entrées s'allument",
+    !(await openers.nth(0).isDisabled()) && !(await opener.isDisabled()),
+  );
+  check(
+    "clic droit : les sous-menus attendent qu'on y vienne",
+    !(await submenu(0).isVisible()) && !(await submenu(1).isVisible()) && !(await submenu(2).isVisible()),
+  );
+
+  // Le statut d'abord : pointé, engagé, prévu, et rien d'autre.
+  await openers.nth(0).hover();
+  await page.waitForTimeout(100);
+  check(
+    "clic droit : le sous-menu du statut montre pointé, engagé, prévu",
+    (await submenu(0).isVisible()) &&
+      (await submenu(0).locator(".context-menu__entry:not(.context-menu__entry--head)").allTextContents()).join("|") ===
+        "Pointé|Engagé|Prévu",
+    (await submenu(0).locator(".context-menu__entry:not(.context-menu__entry--head)").allTextContents()).join("|"),
+  );
+  const barBeforeStatus = await page.locator("#info-bar").textContent();
+  await submenu(0).locator(".context-menu__entry:not(.context-menu__entry--head)").nth(1).click();
+  await page.waitForTimeout(250);
+  const statusSent = await page.evaluate(
+    () => window.__calls.filter(([command]) => command === "set_operations_status"),
+  );
+  check(
+    "clic droit : choisir un statut l'envoie avec toutes les lignes prises, en une fois",
+    statusSent.length === 1 &&
+      statusSent[0][1].statusId === 2 &&
+      JSON.stringify([...statusSent[0][1].ids].sort()) === JSON.stringify([1, 4]),
+    JSON.stringify(statusSent),
+  );
+  check(
+    "clic droit : après le statut, le menu se referme, la liste est relue, et rien n'est annoncé",
+    (await page.locator(".context-menu").count()) === 0 &&
+      (await page.locator("#info-bar").textContent()) === barBeforeStatus &&
+      (await page.evaluate(() => {
+        const names = window.__calls.map(([c]) => c);
+        return names.lastIndexOf("list_operations") > names.indexOf("set_operations_status");
+      })),
+  );
+  check(
+    "clic droit : la sélection a tenu à la relecture",
+    (await page.locator(".list__row[aria-selected='true']").count()) === 2,
+  );
+
+  await page.click(".list__rows", { button: "right" });
+  await page.waitForTimeout(100);
+  await opener.hover();
+  await page.waitForTimeout(100);
+  const choices = await page.evaluate(() =>
+    [...document.querySelectorAll(".context-menu__nest:nth-of-type(2) .context-menu__submenu .context-menu__entry:not(.context-menu__entry--head)")].map((entry) => ({
+      word: entry.textContent,
+      key: entry.dataset.verification,
+      colour: getComputedStyle(entry).color,
+    })),
+  );
+  check(
+    "clic droit : le sous-menu montre les quatre vérifications, dans leur couleur",
+    (await submenu(1).isVisible()) &&
+      choices.map((choice) => choice.word).join("|") === "À vérifier|Vérifiée|Douteuse|Contestée" &&
+      choices.map((choice) => choice.colour).join("|") ===
+        "rgb(26, 26, 26)|rgb(30, 107, 36)|rgb(179, 92, 0)|rgb(192, 0, 0)",
+    JSON.stringify(choices),
+  );
+
+  const barBefore = await page.locator("#info-bar").textContent();
+  await submenu(1).locator(".context-menu__entry:not(.context-menu__entry--head)").nth(3).click();
+  await page.waitForTimeout(250);
+  const sent = await page.evaluate(
+    () => window.__calls.filter(([command]) => command === "set_operations_verification"),
+  );
+  check(
+    "clic droit : choisir envoie la valeur et toutes les lignes prises, en une fois",
+    sent.length === 1 &&
+      sent[0][1].verificationId === 4 &&
+      JSON.stringify([...sent[0][1].ids].sort()) === JSON.stringify([1, 4]),
+    JSON.stringify(sent),
+  );
+  check(
+    "clic droit : le menu se referme, et la liste est relue",
+    (await page.locator(".context-menu").count()) === 0 &&
+      (await page.evaluate(() => {
+        const names = window.__calls.map(([c]) => c);
+        return names.lastIndexOf("list_operations") > names.indexOf("set_operations_verification");
+      })),
+  );
+  // « Je ne pense pas qu'il soit nécessaire de faire une phrase » : la barre
+  // d'état reste ce qu'elle était, et n'annonce aucune alerte.
+  check(
+    "clic droit : aucune phrase n'annonce le changement",
+    (await page.locator("#info-bar").textContent()) === barBefore &&
+      !(await page.evaluate(() =>
+        document.getElementById("info-bar").classList.contains("info-bar--alert"),
+      )),
+    await page.locator("#info-bar").textContent(),
+  );
+
+  // Les dix exports sont rangés sous « Exporter vers », sous leur nom court,
+  // avec leurs deux traits.
+  await page.click(".list__rows", { button: "right" });
+  await page.waitForTimeout(100);
+  await openers.nth(2).hover();
+  await page.waitForTimeout(100);
+  const formats = await submenu(2).locator(".context-menu__entry:not(.context-menu__entry--head)").allTextContents();
+  check(
+    "clic droit : « Exporter vers » range les dix formats, sous leur nom court",
+    (await submenu(2).isVisible()) &&
+      formats.join("|") ===
+        "Excel (.xlsx)|Word (.docx)|LibreOffice Calc (.ods)|CSV (.csv)|TSV (.tsv)|INI (.ini)|JSON (.json)|TOML (.toml)|XML (.xml)|YAML (.yaml)" &&
+      (await submenu(2).locator(".context-menu__rule").count()) === 2,
+    formats.join("|"),
+  );
+  check(
+    "clic droit : le sous-menu des exports tient dans la fenêtre",
+    await submenu(2).evaluate((box) => {
+      const place = box.getBoundingClientRect();
+      return place.top >= 0 && place.bottom <= window.innerHeight && place.right <= window.innerWidth;
+    }),
+  );
+  await submenu(2).locator(".context-menu__entry:not(.context-menu__entry--head)").nth(3).click();
+  await page.waitForTimeout(250);
+  check(
+    "clic droit : choisir un format exporte la liste dans ce format",
+    await page.evaluate(
+      () => window.__exported !== undefined && window.__exported.path.endsWith(".csv"),
+    ),
+    await page.evaluate(() => JSON.stringify(window.__exported && window.__exported.path)),
+  );
+  await page.close();
+}
+
+// --- F02 : chacun ses colonnes -------------------------------------------
+{
+  // Fabrice, 04/10/2026 : « tous n'utilisent pas les mêmes colonnes, tous ne
+  // souhaitent pas le même ordre. Il faut pouvoir personnaliser le nombre de
+  // colonnes, leur ordre. » On glisse un en-tête, on coche au clic droit sur
+  // les en-têtes, et l'ordre, la présence et les largeurs sont retenus.
+  const URL = "http://localhost:4173/ui/windows/operations-list.html?account=1";
+  const BORN =
+    "fold|date|clearing-date|status|verification|label|category|assignment|payment-mode|payee|project|month|debit|credit|balance|comments|attachments|check";
+  const heads = (page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll(".list__header > .list__title")]
+        .map((cell) => cell.dataset.column)
+        .join("|"),
+    );
+  const saves = (page) =>
+    page.evaluate(() =>
+      window.__calls.filter(([command]) => command === "save_table_layout").map(([, args]) => args),
+    );
+  const centre = async (page, column) => {
+    const box = await page.locator(`.list__title[data-column="${column}"]`).boundingBox();
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2, left: box.x, right: box.x + box.width };
+  };
+  const drag = async (page, column, toX) => {
+    const from = await centre(page, column);
+    await page.mouse.move(from.x, from.y);
+    await page.mouse.down();
+    await page.mouse.move(from.x + (toX > from.x ? 10 : -10), from.y, { steps: 2 });
+    await page.mouse.move(toX, from.y, { steps: 6 });
+  };
+
+  const page = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+  await openWindow(page, URL);
+  check("colonnes : sans rien d'enregistré, le tableau naît comme avant", (await heads(page)) === BORN, await heads(page));
+  check(
+    "colonnes : la fenêtre a demandé la disposition de son tableau, par son nom",
+    await page.evaluate(() =>
+      window.__calls.some(([c, a]) => c === "table_layout" && a.table === "operations-list"),
+    ),
+  );
+
+  // --- Le menu des colonnes, au clic droit sur les en-têtes.
+  await page.click('.list__title[data-column="label"]', { button: "right" });
+  await openChecks(page);
+  await page.waitForTimeout(100);
+  const entries = page.locator('.context-menu--columns [data-menu="show-hide"] .context-menu__entry--check');
+  check(
+    "colonnes : le clic droit sur les en-têtes liste les dix-sept colonnes, toutes cochées",
+    (await entries.count()) === 17 &&
+      (await entries.evaluateAll((all) => all.every((entry) => entry.ariaChecked === "true"))) &&
+      (await entries.nth(0).textContent()) === "Date",
+    String(await entries.count()),
+  );
+  check(
+    "colonnes : le « + » qui déplie n'est pas dans le menu",
+    (await page.locator('.context-menu--columns [data-column="fold"]').count()) === 0,
+  );
+  check(
+    "colonnes : sous un trait, « Rétablir les colonnes par défaut »",
+    (await page.locator(".context-menu--columns > .context-menu__rule").count()) === 1 &&
+      (await page.locator(".context-menu--columns .context-menu__entry:not(.context-menu__entry--head)").last().textContent()) ===
+        "Rétablir les colonnes par défaut",
+  );
+  check(
+    "colonnes : ce n'est pas le menu des lignes — ni statut, ni export",
+    (await page.locator(".context-menu").count()) === 1 &&
+      (await page.locator(".context-menu__nest").evaluateAll((nests) =>
+        nests.map((nest) => nest.dataset.menu).join("|"),
+      )) === "show-hide|colour",
+  );
+  check(
+    "colonnes : le menu et son sous-menu tiennent dans la fenêtre",
+    await page.locator(".context-menu--columns").evaluate((menu) => {
+      const inside = (piece) => {
+        const box = piece.getBoundingClientRect();
+        return box.top >= 0 && box.bottom <= window.innerHeight && box.right <= window.innerWidth;
+      };
+      return inside(menu) && inside(menu.querySelector('[data-menu="show-hide"] .context-menu__submenu'));
+    }),
+  );
+
+  // --- Décocher masque, tout de suite, et le menu reste ouvert.
+  await page.click('.context-menu--columns [data-column="category"]');
+  await page.waitForTimeout(150);
+  check(
+    "colonnes : décocher « Categorie » la retire de l'en-tête et des lignes",
+    !(await heads(page)).includes("category") &&
+      (await page.locator(".list__row >> nth=0 >> .list__cell").count()) === 17,
+    await heads(page),
+  );
+  check(
+    "colonnes : le menu reste ouvert, la coche est tombée",
+    (await page.locator('.context-menu--columns [data-column="category"]').getAttribute("aria-checked")) ===
+      "false",
+  );
+  let sent = await saves(page);
+  check(
+    "colonnes : la disposition est retenue aussitôt — masquée, mais à sa place dans l'ordre",
+    sent.length === 1 &&
+      sent[0].table === "operations-list" &&
+      JSON.stringify(sent[0].layout.hidden) === '["category"]' &&
+      sent[0].layout.order.join("|") === BORN.replace("fold|", "") &&
+      Object.keys(sent[0].layout.widths).length === 0,
+    JSON.stringify(sent),
+  );
+  check(
+    "colonnes : en-tête, filtres et lignes ont les mêmes pistes",
+    await page.evaluate(() => {
+      const tracks = document.querySelector(".list__header").style.gridTemplateColumns;
+      return (
+        tracks.split(" ").length === 17 &&
+        document.querySelector(".list__row").style.gridTemplateColumns === tracks
+      );
+    }),
+  );
+
+  // --- La recocher la remet où elle était.
+  await page.click('.context-menu--columns [data-column="category"]');
+  await page.waitForTimeout(150);
+  check("colonnes : recochée, elle revient à sa place", (await heads(page)) === BORN, await heads(page));
+
+  // --- Il reste toujours une colonne (Fabrice : « n'importe laquelle »).
+  for (const name of BORN.split("|").slice(1)) {
+    if (name !== "month") {
+      await page.click(`.context-menu--columns [data-column="${name}"]`);
+    }
+  }
+  await page.waitForTimeout(150);
+  check(
+    "colonnes : on peut tout masquer sauf une — ici « Mois », avec le « + »",
+    (await heads(page)) === "fold|month",
+    await heads(page),
+  );
+  check(
+    "colonnes : la dernière est grisée, et cliquer dessus ne fait rien",
+    await page.locator('.context-menu--columns [data-column="month"]').isDisabled(),
+  );
+  await page.click('.context-menu--columns [data-column="month"]', { force: true });
+  await page.waitForTimeout(100);
+  check("colonnes : elle est toujours là", (await heads(page)) === "fold|month");
+  await page.click('.context-menu--columns [data-column="date"]');
+  await page.waitForTimeout(100);
+  check(
+    "colonnes : une autre réaffichée, elle redevient décochable",
+    !(await page.locator('.context-menu--columns [data-column="month"]').isDisabled()),
+  );
+
+  // --- Rétablir : tout revient, la base oublie, le menu se ferme.
+  await page.locator(".context-menu--columns .context-menu__entry:not(.context-menu__entry--head)").last().click();
+  await page.waitForTimeout(200);
+  check(
+    "colonnes : « Rétablir » rend la disposition de naissance et ferme le menu",
+    (await heads(page)) === BORN && (await page.locator(".context-menu").count()) === 0,
+    await heads(page),
+  );
+  check(
+    "colonnes : et la préférence est ôtée de la base",
+    await page.evaluate(
+      () =>
+        window.__layout === null &&
+        window.__calls.some(([c, a]) => c === "reset_table_layout" && a.table === "operations-list"),
+    ),
+  );
+
+  // --- Le menu se ferme au clic ailleurs et à Échap.
+  await page.click('.list__title[data-column="label"]', { button: "right" });
+  await openChecks(page);
+  await page.keyboard.press("Escape");
+  const closedByEscape = (await page.locator(".context-menu").count()) === 0;
+  await page.click('.list__title[data-column="label"]', { button: "right" });
+  await openChecks(page);
+  await page.mouse.click(1500, 650);
+  check(
+    "colonnes : Échap et le clic ailleurs ferment le menu",
+    closedByEscape && (await page.locator(".context-menu--columns").count()) === 0,
+  );
+  await page.keyboard.press("Escape");
+
+  // --- Glisser un en-tête déplace sa colonne.
+  const before = (await saves(page)).length;
+  await drag(page, "label", (await centre(page, "date")).left + 4);
+  check(
+    "colonnes : pendant le geste, un trait montre où elle tombera — devant « Date »",
+    await page.evaluate(() => {
+      const mark = document.querySelector(".list__drop-mark");
+      const date = document.querySelector('.list__title[data-column="date"]');
+      return (
+        mark !== null &&
+        Math.abs(mark.getBoundingClientRect().left + 1 - date.getBoundingClientRect().left) <= 2 &&
+        mark.getBoundingClientRect().height > 100
+      );
+    }),
+  );
+  await page.mouse.up();
+  await page.waitForTimeout(200);
+  check(
+    "colonnes : lâchée, « Libelle » est passée devant « Date » — le « + » reste en tête",
+    (await heads(page)).startsWith("fold|label|date|clearing-date|"),
+    await heads(page),
+  );
+  check(
+    "colonnes : les cellules ont suivi leur titre",
+    (await page.locator(".list__row >> nth=0 >> .list__cell >> nth=1").textContent()) === "COURSES",
+    await page.locator(".list__row >> nth=0 >> .list__cell >> nth=1").textContent(),
+  );
+  check(
+    "colonnes : le trait est parti, et lâcher n'a pas trié",
+    (await page.locator(".list__drop-mark").count()) === 0 &&
+      (await page.locator(".list__sort-marker").allTextContents()).join("") === "▲" &&
+      (await page.locator('.list__title[data-column="fold"] .list__sort-marker').textContent()) === "▲",
+    (await page.locator(".list__sort-marker").allTextContents()).join(","),
+  );
+  sent = await saves(page);
+  check(
+    "colonnes : le nouvel ordre est retenu, une fois",
+    sent.length === before + 1 &&
+      sent[sent.length - 1].layout.order.slice(0, 3).join("|") === "label|date|clearing-date",
+    JSON.stringify(sent[sent.length - 1]),
+  );
+
+  // Vers la fin : après la dernière colonne.
+  await drag(page, "date", (await centre(page, "check")).right - 3);
+  await page.mouse.up();
+  await page.waitForTimeout(200);
+  check(
+    "colonnes : lâchée au bout, elle devient la dernière",
+    (await heads(page)).endsWith("|attachments|check|date"),
+    await heads(page),
+  );
+  // On ne passe pas devant le « + ».
+  await drag(page, "date", (await centre(page, "fold")).left + 2);
+  await page.mouse.up();
+  await page.waitForTimeout(200);
+  check(
+    "colonnes : rien ne passe devant le « + »",
+    (await heads(page)).startsWith("fold|date|label|"),
+    await heads(page),
+  );
+
+  // --- Un petit mouvement reste un clic, et un clic trie.
+  const label = await centre(page, "label");
+  const countBefore = (await saves(page)).length;
+  await page.mouse.move(label.x, label.y);
+  await page.mouse.down();
+  await page.mouse.move(label.x + 3, label.y);
+  await page.mouse.up();
+  await page.waitForTimeout(150);
+  check(
+    "colonnes : trois pixels ne déplacent rien — c'est un clic, et il trie",
+    (await heads(page)).startsWith("fold|date|label|") &&
+      (await saves(page)).length === countBefore &&
+      (await page.locator('.list__title[data-column="label"] .list__sort-marker').textContent()) === "▲",
+  );
+
+  // --- Le rouge d'un débit suit sa colonne.
+  check(
+    "colonnes : déplacée ou non, la colonne Débit reste rouge",
+    await page.evaluate(() => {
+      const cell = document.querySelector(".list__cell--debit");
+      return cell !== null && getComputedStyle(cell).color !== getComputedStyle(document.querySelector(".list__cell")).color;
+    }),
+  );
+
+  // --- Un filtre ouvert survit au déplacement, pas au masquage de sa colonne.
+  await page.click('.list__title[data-column="label"] .list__filter-toggle');
+  await page.fill(".list__filter-input:not([hidden])", "COURSES");
+  await page.waitForTimeout(150);
+  const filtered = await page.locator(".list__row").count();
+  await drag(page, "month", (await centre(page, "date")).left + 4);
+  await page.mouse.up();
+  await page.waitForTimeout(200);
+  check(
+    "colonnes : déplacer une colonne garde le filtre ouvert, son mot, et ses lignes",
+    (await page.locator(".list__filter-input:not([hidden])").inputValue()) === "COURSES" &&
+      (await page.locator(".list__row").count()) === filtered &&
+      (await page.locator('.list__title[data-column="label"] .list__filter-toggle').getAttribute("aria-pressed")) ===
+        "true",
+  );
+  check(
+    "colonnes : le champ de recherche est resté sous sa colonne",
+    await page.evaluate(() => {
+      const input = document.querySelector(".list__filter-input:not([hidden])");
+      const title = document.querySelector('.list__title[data-column="label"]');
+      return Math.abs(input.getBoundingClientRect().left - title.getBoundingClientRect().left) <= 2;
+    }),
+  );
+  await page.click('.list__title[data-column="date"]', { button: "right" });
+  await openChecks(page);
+  await page.click('.context-menu--columns [data-column="label"]');
+  await page.waitForTimeout(200);
+  check(
+    "colonnes : masquer la colonne filtrée efface son filtre — aucune ligne cachée sans raison visible",
+    (await page.locator(".list__row").count()) > filtered &&
+      (await page.locator(".list__filter-input:not([hidden])").count()) === 0,
+    String(await page.locator(".list__row").count()),
+  );
+  await page.keyboard.press("Escape");
+
+  // --- L'export suit ce qu'on voit.
+  await page.click(".list__rows", { button: "right" });
+  await page.locator(".context-menu__entry--opener").last().hover();
+  await page.locator(".context-menu__submenu").last().locator(".context-menu__entry:not(.context-menu__entry--head)").nth(3).click();
+  await page.waitForTimeout(250);
+  const heading = await page.evaluate(() =>
+    window.__exported.sheet.rows[0].map((cell) => cell.text).join("|"),
+  );
+  check(
+    "colonnes : l'export suit l'ordre choisi et laisse de côté les colonnes masquées",
+    heading.startsWith("|Mois|Date|Date Pointage|") && !heading.includes("Libelle"),
+    heading,
+  );
+
+  // --- Les largeurs : tirer une poignée est retenu, le double-clic rend la
+  // largeur de naissance.
+  const handle = await page.locator('.list__title[data-column="month"] .list__resizer').boundingBox();
+  await page.mouse.move(handle.x + 3, handle.y + 5);
+  await page.mouse.down();
+  await page.mouse.move(handle.x + 63, handle.y + 5, { steps: 4 });
+  await page.mouse.up();
+  await page.waitForTimeout(200);
+  sent = await saves(page);
+  const kept = sent[sent.length - 1].layout;
+  check(
+    "colonnes : une largeur tirée est retenue, en pixels, à la fin du geste",
+    typeof kept.widths.month === "number" && kept.widths.month > 100 && kept.widths.fold === undefined,
+    JSON.stringify(kept.widths),
+  );
+  const afterPull = sent.length;
+  await page.dblclick('.list__title[data-column="month"] .list__resizer');
+  await page.waitForTimeout(200);
+  sent = await saves(page);
+  check(
+    "colonnes : le double-clic sur le fil rend la largeur de naissance, et la mémoire l'oublie",
+    sent.length === afterPull + 1 && sent[sent.length - 1].layout.widths.month === undefined,
+    JSON.stringify(sent[sent.length - 1].layout.widths),
+  );
+  check(
+    "colonnes : dans un tableau aux largeurs tirées, une colonne restée en part garde son minimum",
+    await (async () => {
+      await page.click('.list__title[data-column="date"]', { button: "right" });
+      await openChecks(page);
+      await page.click('.context-menu--columns [data-column="label"]');
+      await page.waitForTimeout(150);
+      await page.keyboard.press("Escape");
+      const label = await page.locator('.list__title[data-column="label"]').boundingBox();
+      const month = await page.locator('.list__title[data-column="month"]').boundingBox();
+      // Ni le libellé réaffiché, ni le mois rendu à sa naissance, ne sont
+      // écrasés par les colonnes figées : chacun tient au moins son minimum.
+      return label !== null && label.width >= 150 && month !== null && month.width >= 64;
+    })(),
+  );
+  await page.close();
+
+  // --- À l'ouverture, la disposition enregistrée est posée.
+  const stored = {
+    order: BORN.split("|").slice(1).reverse(),
+    hidden: ["comments", "attachments"],
+    widths: { label: 333 },
+  };
+  const reopened = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+  await openWindow(reopened, URL, { storedLayout: stored });
+  check(
+    "colonnes : rouverte, la fenêtre retrouve l'ordre et les colonnes masquées",
+    (await heads(reopened)) ===
+      "fold|check|balance|credit|debit|month|project|payee|payment-mode|assignment|category|label|verification|status|clearing-date|date",
+    await heads(reopened),
+  );
+  check(
+    "colonnes : et la largeur tirée",
+    Math.round((await reopened.locator('.list__title[data-column="label"]').boundingBox()).width) === 333,
+  );
+  check(
+    "colonnes : relire sa propre disposition ne la réécrit pas",
+    (await saves(reopened)).length === 0,
+  );
+  // Une autre fenêtre change la disposition : celle-ci suit.
+  await reopened.evaluate(() => {
+    window.__layout = { order: window.__layout.order.slice().reverse(), hidden: [], widths: {} };
+    window.__listeners["table-layout-changed"]({
+      event: "table-layout-changed",
+      id: 1,
+      payload: "operations-list",
+    });
+  });
+  await reopened.waitForTimeout(250);
+  check(
+    "colonnes : une disposition changée ailleurs est reprise aussitôt",
+    (await heads(reopened)) === BORN,
+    await heads(reopened),
+  );
+  // L'événement d'un autre tableau ne la concerne pas.
+  const reads = await reopened.evaluate(() => window.__calls.filter(([c]) => c === "table_layout").length);
+  await reopened.evaluate(() => {
+    window.__listeners["table-layout-changed"]({ event: "table-layout-changed", id: 1, payload: "autre" });
+  });
+  await reopened.waitForTimeout(150);
+  check(
+    "colonnes : le changement d'un autre tableau ne fait rien relire",
+    (await reopened.evaluate(() => window.__calls.filter(([c]) => c === "table_layout").length)) === reads,
+  );
+  // Sa propre écriture revient en écho : elle ne la relit pas.
+  await reopened.click('.list__title[data-column="label"]', { button: "right" });
+  await openChecks(reopened);
+  await reopened.click('.context-menu--columns [data-column="month"]');
+  await reopened.waitForTimeout(150);
+  await reopened.evaluate(() => {
+    window.__listeners["table-layout-changed"]({ event: "table-layout-changed", id: 1, payload: "operations-list" });
+  });
+  await reopened.waitForTimeout(150);
+  check(
+    "colonnes : l'écho de sa propre écriture n'est pas relu",
+    (await reopened.evaluate(() => window.__calls.filter(([c]) => c === "table_layout").length)) === reads,
+  );
+  await reopened.close();
+
+  // --- Une colonne née depuis l'enregistrement prend sa place de naissance.
+  const older = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+  await openWindow(older, URL, {
+    storedLayout: {
+      // Enregistrée avant que « Vérification » et « Statut » n'existent, le
+      // libellé en tête.
+      order: BORN.split("|").slice(1).filter((name) => !["status", "verification"].includes(name)).sort((a, b) => (a === "label" ? -1 : b === "label" ? 1 : 0)),
+      hidden: ["month"],
+      widths: {},
+    },
+  });
+  check(
+    "colonnes : une colonne inconnue de la disposition vient après sa voisine de naissance, le reste est gardé",
+    (await heads(older)).startsWith("fold|label|date|clearing-date|status|verification|category|") &&
+      !(await heads(older)).includes("month"),
+    await heads(older),
+  );
+  check(
+    "colonnes : et rien n'est réinitialisé pour autant",
+    await older.evaluate(() => window.__calls.every(([c]) => c !== "reset_table_layout")),
+  );
+  await older.close();
+
+  // --- Une disposition que le tableau ne reconnaît pas : naissance, et oubli.
+  for (const [what, broken] of [
+    ["une colonne inconnue", { order: ["date", "colonne-du-futur"], hidden: [], widths: {} }],
+    ["une colonne en double", { order: ["date", "date"], hidden: [], widths: {} }],
+    ["tout masqué", { order: BORN.split("|").slice(1), hidden: BORN.split("|").slice(1), widths: {} }],
+    ["une largeur absurde", { order: ["date"], hidden: [], widths: { date: -5 } }],
+    ["une forme inattendue", { order: "date", hidden: [], widths: {} }],
+  ]) {
+    const odd = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+    const errors = await openWindow(odd, URL, { storedLayout: broken });
+    check(
+      `colonnes : ${what} — le tableau naît comme avant, sans une plainte`,
+      (await heads(odd)) === BORN && errors.length === 0 && (await odd.locator(".list__row").count()) > 0,
+      (await heads(odd)) + " " + errors.join(" / "),
+    );
+    check(
+      `colonnes : ${what} — la préférence fautive est ôtée de la base`,
+      await odd.evaluate(
+        () => window.__layout === null && window.__calls.some(([c]) => c === "reset_table_layout"),
+      ),
+    );
+    await odd.close();
+  }
+
+  // --- Les autres tableaux n'ont rien reçu.
+  const other = await browser.newPage();
+  await openWindow(other, "http://localhost:4173/ui/windows/nomenclature-list.html?kind=category");
+  await other.click(".list__header", { button: "right" });
+  await other.waitForTimeout(100);
+  const title = await other.locator(".list__title >> nth=0").boundingBox();
+  await other.mouse.move(title.x + 30, title.y + 8);
+  await other.mouse.down();
+  await other.mouse.move(title.x + 90, title.y + 8, { steps: 4 });
+  const marked = await other.locator(".list__drop-mark").count();
+  await other.mouse.up();
+  check(
+    "colonnes : un tableau sans nom n'a ni menu de colonnes, ni glisser, ni mémoire",
+    (await other.locator(".context-menu--columns").count()) === 0 &&
+      marked === 0 &&
+      (await other.evaluate(() =>
+        window.__calls.every(([c]) => c !== "table_layout" && c !== "save_table_layout"),
+      )),
+  );
+  await other.close();
+}
+
+// --- Les colonnes : Afficher/Masquer, et Colorer --------------------------
+{
+  // Fabrice, 05/10/2026 : « il y aurait un menu Afficher/Masquer qui
+  // contiendrait un sous-menu avec le menu actuel. Et en dessous il y aurait
+  // une option Colorer » — neuf couleurs, posées sur la colonne « comme un
+  // calque transparent ».
+  const URL = "http://localhost:4173/ui/windows/operations-list.html?account=1";
+  const NAMES = "Rouge|Orange|Rose|Vert pastel|Vert|Bleu pastel|Bleu|Jaune pastel|Jaune";
+  const page = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+  await openWindow(page, URL);
+  const saves = () =>
+    page.evaluate(() =>
+      window.__calls.filter(([command]) => command === "save_table_layout").map(([, args]) => args.layout),
+    );
+  const tints = (column) =>
+    page.evaluate((name) => {
+      const head = [...document.querySelectorAll(".list__header > .list__title")];
+      const at = head.findIndex((cell) => cell.dataset.column === name);
+      return [...document.querySelectorAll(".list__row")]
+        .map((row) => row.children[at].dataset.tint ?? "")
+        .join("|");
+    }, column);
+  const colourMenu = async (column) => {
+    await page.click(`.list__title[data-column="${column}"]`, { button: "right" });
+    await page.click('.context-menu--columns [data-menu="colour"] > .context-menu__entry--opener');
+    await page.waitForTimeout(80);
+  };
+  const pick = async (column, colour) => {
+    await colourMenu(column);
+    await page.click(`.context-menu--columns [data-menu="colour"] [data-colour="${colour}"]`);
+    await page.waitForTimeout(200);
+  };
+
+  await page.click('.list__title[data-column="balance"]', { button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "colonnes : le menu a deux entrées qui s'ouvrent, un trait, puis « Rétablir »",
+    await page.evaluate(() => {
+      const pieces = [...document.querySelector(".context-menu--columns").children].map((piece) =>
+        piece.matches("hr") ? "—" : piece.matches(".context-menu__nest") ? piece.firstElementChild.textContent : piece.textContent,
+      );
+      return pieces.join("|") === "Afficher/Masquer|Colorer la colonne : Solde|—|Rétablir les colonnes par défaut";
+    }),
+    await page.locator(".context-menu--columns").textContent(),
+  );
+  check(
+    "colonnes : les sous-menus attendent qu'on y vienne",
+    (await page.locator(".context-menu--columns .context-menu__submenu >> visible=true").count()) === 0,
+  );
+  await page.locator('.context-menu--columns [data-menu="colour"] > .context-menu__entry--opener').hover();
+  await page.waitForTimeout(100);
+  const offered = await page.evaluate(() =>
+    [...document.querySelector('[data-menu="colour"] .context-menu__submenu').children].map((piece) => ({
+      text: piece.matches("hr") ? "—" : piece.textContent,
+      checked: piece.ariaChecked,
+      swatch: piece.querySelector(".context-menu__swatch")
+        ? getComputedStyle(piece.querySelector(".context-menu__swatch")).backgroundImage
+        : "",
+    })),
+  );
+  check(
+    "colorer : « Aucune couleur », un trait, puis les neuf couleurs dans l'ordre dicté",
+    offered.map((one) => one.text).join("|") === `Aucune couleur|—|${NAMES}`,
+    offered.map((one) => one.text).join("|"),
+  );
+  check(
+    "colorer : chaque couleur a sa pastille, toutes différentes — « Aucune couleur » n'en a pas",
+    offered[0].swatch === "" &&
+      offered.slice(2).every((one) => one.swatch.includes("rgba(")) &&
+      new Set(offered.slice(2).map((one) => one.swatch)).size === 9,
+    JSON.stringify(offered.map((one) => one.swatch)),
+  );
+  check(
+    "colorer : sans teinte, c'est « Aucune couleur » qui est cochée",
+    offered[0].checked === "true" && offered.slice(2).every((one) => one.checked === "false"),
+  );
+  check(
+    "colorer : le sous-menu tient dans la fenêtre",
+    await page.locator('[data-menu="colour"] .context-menu__submenu').evaluate((nested) => {
+      const box = nested.getBoundingClientRect();
+      return box.top >= 0 && box.bottom <= window.innerHeight && box.right <= window.innerWidth;
+    }),
+  );
+
+  // Choisir teinte la colonne cliquée, et elle seule.
+  await page.click('[data-menu="colour"] [data-colour="pastel-yellow"]');
+  await page.waitForTimeout(200);
+  check(
+    "colorer : choisir ferme le menu et teinte toutes les cellules de la colonne cliquée",
+    (await page.locator(".context-menu").count()) === 0 &&
+      (await tints("balance")).split("|").every((tint) => tint === "pastel-yellow") &&
+      (await page.locator(".list__row").count()) > 1,
+    await tints("balance"),
+  );
+  check(
+    "colorer : les autres colonnes n'ont rien reçu, l'en-tête non plus",
+    (await page.locator(".list__cell[data-tint]").count()) === (await page.locator(".list__row").count()) &&
+      (await page.locator(".list__title[data-tint]").count()) === 0,
+  );
+  check(
+    "colorer : c'est un calque — une image de fond transparente, le fond de la ligne dessous",
+    await page.evaluate(() => {
+      const cell = document.querySelector('.list__cell[data-tint="pastel-yellow"]');
+      const style = getComputedStyle(cell);
+      const alpha = Number(/rgba\(\d+, \d+, \d+, ([\d.]+)\)/.exec(style.backgroundImage)?.[1] ?? "1");
+      return alpha > 0 && alpha <= 0.5 && style.backgroundColor === "rgba(0, 0, 0, 0)";
+    }),
+  );
+  let sent = await saves();
+  check(
+    "colorer : la teinte est retenue avec la disposition, sous son nom",
+    sent.length === 1 && JSON.stringify(sent[0].colors) === '{"balance":"pastel-yellow"}',
+    JSON.stringify(sent),
+  );
+
+  // La ligne choisie reste visible sous le calque.
+  await page.click(".list__row >> nth=0");
+  await page.waitForTimeout(150);
+  check(
+    "colorer : la ligne choisie garde son fond sous la colonne teintée",
+    await page.evaluate(() => {
+      const row = document.querySelector('.list__row[aria-selected="true"]');
+      const other = document.querySelector('.list__row[aria-selected="false"]');
+      return (
+        getComputedStyle(row).backgroundColor !== getComputedStyle(other).backgroundColor &&
+        row.querySelector("[data-tint]") !== null
+      );
+    }),
+  );
+
+  // Rouvert sur la même colonne, le menu dit où l'on en est.
+  await colourMenu("balance");
+  check(
+    "colorer : rouvert, le menu coche la couleur en cours",
+    (await page.locator('[data-menu="colour"] [aria-checked="true"]').getAttribute("data-colour")) ===
+      "pastel-yellow",
+  );
+  await page.keyboard.press("Escape");
+
+  // Une seconde colonne, une autre couleur.
+  await pick("date", "red");
+  sent = await saves();
+  check(
+    "colorer : deux colonnes, deux couleurs",
+    sent[sent.length - 1].colors.balance === "pastel-yellow" &&
+      sent[sent.length - 1].colors.date === "red" &&
+      Object.keys(sent[sent.length - 1].colors).length === 2 &&
+      (await tints("date")).split("|").every((tint) => tint === "red"),
+    JSON.stringify(sent[sent.length - 1].colors),
+  );
+  check(
+    "colorer : le rouge d'un débit se lit toujours sur une colonne teintée",
+    await (async () => {
+      await pick("debit", "pastel-green");
+      return page.evaluate(() => {
+        const cell = document.querySelector(".list__cell--debit[data-tint]");
+        return cell !== null && getComputedStyle(cell).color !== getComputedStyle(document.body).color;
+      });
+    })(),
+  );
+
+  // La couleur suit sa colonne : déplacée, puis masquée et réaffichée.
+  const from = await page.locator('.list__title[data-column="balance"]').boundingBox();
+  const to = await page.locator('.list__title[data-column="label"]').boundingBox();
+  await page.mouse.move(from.x + 12, from.y + 10);
+  await page.mouse.down();
+  await page.mouse.move(from.x - 10, from.y + 10, { steps: 2 });
+  await page.mouse.move(to.x + 3, from.y + 10, { steps: 6 });
+  await page.mouse.up();
+  await page.waitForTimeout(200);
+  check(
+    "colorer : déplacée, la colonne emporte sa couleur",
+    (await tints("balance")).split("|").every((tint) => tint === "pastel-yellow") &&
+      (await tints("label")).split("|").every((tint) => tint === ""),
+    `${await tints("balance")} / ${await tints("label")}`,
+  );
+  await page.click('.list__title[data-column="label"]', { button: "right" });
+  await openChecks(page);
+  await page.click('.context-menu--columns [data-column="balance"]');
+  await page.waitForTimeout(100);
+  await page.click('.context-menu--columns [data-column="balance"]');
+  await page.waitForTimeout(150);
+  await page.keyboard.press("Escape");
+  check(
+    "colorer : masquée puis réaffichée, elle la retrouve",
+    (await tints("balance")).split("|").every((tint) => tint === "pastel-yellow"),
+  );
+
+  // « Aucune couleur » l'enlève.
+  await pick("date", "");
+  sent = await saves();
+  check(
+    "colorer : « Aucune couleur » retire la teinte, et la mémoire l'oublie",
+    (await tints("date")).split("|").every((tint) => tint === "") &&
+      sent[sent.length - 1].colors.date === undefined &&
+      sent[sent.length - 1].colors.balance === "pastel-yellow",
+    JSON.stringify(sent[sent.length - 1].colors),
+  );
+  const count = sent.length;
+  await pick("date", "");
+  check("colorer : rechoisir ce qu'on a déjà n'écrit rien", (await saves()).length === count);
+
+  // Le « + » ne se colore pas.
+  await page.click('.list__title[data-column="fold"]', { button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "colorer : sur l'en-tête du « + », l'entrée est grisée et ne nomme aucune colonne",
+    (await page.locator('[data-menu="colour"] > .context-menu__entry--opener').isDisabled()) &&
+      (await page.locator('[data-menu="colour"] > .context-menu__entry--opener').textContent()) ===
+        "Colorer la colonne :" &&
+      (await page.locator('[data-menu="colour"] .context-menu__submenu').count()) === 0 &&
+      !(await page.locator('[data-menu="show-hide"] > .context-menu__entry--opener').isDisabled()),
+  );
+  await page.keyboard.press("Escape");
+
+  // L'export ne porte pas les couleurs.
+  await page.click(".list__rows", { button: "right" });
+  await page.locator(".context-menu__entry--opener").last().hover();
+  await page.locator(".context-menu__submenu").last().locator(".context-menu__entry:not(.context-menu__entry--head)").nth(0).click();
+  await page.waitForTimeout(250);
+  check(
+    "colorer : le fichier exporté ne reprend pas les couleurs",
+    await page.evaluate(() =>
+      window.__exported.sheet.rows.slice(1).every((row) => row.every((cell) => !cell.fill)),
+    ),
+  );
+
+  // « Rétablir » enlève aussi les couleurs.
+  await page.click('.list__title[data-column="label"]', { button: "right" });
+  await page.locator(".context-menu--columns .context-menu__entry:not(.context-menu__entry--head)").last().click();
+  await page.waitForTimeout(200);
+  check(
+    "colorer : « Rétablir les colonnes par défaut » enlève aussi les couleurs",
+    (await page.locator(".list__cell[data-tint]").count()) === 0,
+  );
+  await page.close();
+
+  // Rouverte, la fenêtre retrouve ses couleurs.
+  const order = "date|clearing-date|status|verification|label|category|assignment|payment-mode|payee|project|month|debit|credit|balance|comments|attachments|check".split("|");
+  const reopened = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+  await openWindow(reopened, URL, {
+    storedLayout: { order, hidden: [], widths: {}, colors: { label: "blue", credit: "pink" } },
+  });
+  check(
+    "colorer : rouverte, la fenêtre retrouve ses colonnes teintées",
+    await reopened.evaluate(() => {
+      const row = document.querySelector(".list__row");
+      return [...row.children].map((cell) => cell.dataset.tint ?? "").filter(Boolean).join("|") === "blue|pink";
+    }),
+  );
+  await reopened.close();
+
+  // Une couleur que le tableau ne connaît pas : naissance, et oubli.
+  const odd = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+  const errors = await openWindow(odd, URL, {
+    storedLayout: { order, hidden: [], widths: {}, colors: { label: "#ff0000" } },
+  });
+  check(
+    "colorer : une couleur inconnue — le tableau naît sans teinte, et la préférence fautive est ôtée",
+    errors.length === 0 &&
+      (await odd.locator(".list__cell[data-tint]").count()) === 0 &&
+      (await odd.evaluate(() => window.__layout === null)),
+  );
+  await odd.close();
+
+  // Le détail d'une statistique a le même menu, et ses propres couleurs.
+  const stat = await browser.newPage({ viewport: { width: 1700, height: 900 } });
+  await openWindow(stat, "http://localhost:4173/ui/windows/statistics.html?axis=payee&accounts=1,2&year=2026");
+  await stat.click(".matrix__row >> nth=1 >> .matrix__cell >> nth=0");
+  await stat.waitForTimeout(250);
+  await stat.click('#header .list__title[data-column="amount"]', { button: "right" });
+  await stat.waitForTimeout(100);
+  check(
+    "colorer : dans le détail d'une statistique, le menu et son sous-menu tiennent dans la fenêtre",
+    await (async () => {
+      await stat.click('[data-menu="colour"] > .context-menu__entry--opener');
+      await stat.waitForTimeout(80);
+      return stat.evaluate(() => {
+        const inside = (piece) => {
+          const box = piece.getBoundingClientRect();
+          return box.top >= 0 && box.bottom <= window.innerHeight && box.right <= window.innerWidth;
+        };
+        return (
+          inside(document.querySelector(".context-menu--columns")) &&
+          inside(document.querySelector('[data-menu="colour"] .context-menu__submenu'))
+        );
+      });
+    })(),
+  );
+  await stat.click('[data-menu="colour"] [data-colour="green"]');
+  await stat.waitForTimeout(200);
+  check(
+    "colorer : la teinte y est retenue sous le nom de cette statistique",
+    await stat.evaluate(() => {
+      const sent = window.__calls.filter(([c]) => c === "save_table_layout");
+      return (
+        sent.length === 1 &&
+        sent[0][1].table === "statistics-payee" &&
+        sent[0][1].layout.colors.amount === "green" &&
+        document.querySelectorAll('.list--detail .list__cell[data-tint="green"]').length > 0
+      );
+    }),
+  );
+  await stat.close();
+}
+
+// --- Préférences : les colonnes des tableaux ------------------------------
+{
+  // Fabrice, 04/10/2026 : « proposer dans Paramètres → Préférences simplement
+  // une réinitialisation des colonnes », une ligne par tableau — « il est
+  // possible que je te demande de faire cela dans d'autres tableaux » — et
+  // « un bouton Tout réinitialiser ». Les boutons agissent tout de suite.
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/preferences.html");
+  check(
+    "préférences : la feuille « Colonnes des tableaux » est sous « Affichage »",
+    (await page.locator(".tree > *").evaluateAll((all) =>
+      all.map((piece) => piece.dataset.leaf ?? piece.textContent).join("|"),
+    )) === "Affichage|language|currency|zoom|columns|Importation|verification|qif|Outils|electricity|Réinitialisation|comfort" &&
+      (await page.locator('.tree__leaf[data-leaf="columns"]').textContent()) === "Colonnes des tableaux",
+  );
+  await page.click('.tree__leaf[data-leaf="columns"]');
+  await page.waitForTimeout(100);
+  // Fabrice, 04/10/2026, après avoir vu neuf lignes et neuf boutons : « il
+  // aurait mieux valu mettre un menu déroulant indiquant le nom de la fenêtre
+  // et un bouton réinitialiser qui pointe sur le menu déroulant ».
+  check(
+    "préférences : un menu déroulant nomme les fenêtres, un seul bouton « Réinitialiser » à côté",
+    (await page.locator("#pane-columns").isVisible()) &&
+      (await page.locator("#columns-window option").allTextContents()).join("|") ===
+        "Liste des opérations|Stat par catégories|Bilan croisé" &&
+      (await page.locator("#pane-columns select").count()) === 1 &&
+      (await page.locator("#pane-columns button").allTextContents()).join("|") ===
+        "Réinitialiser|Tout réinitialiser",
+    (await page.locator("#pane-columns button").allTextContents()).join("|"),
+  );
+  check(
+    "préférences : aucun libellé devant le menu — le nom de la fenêtre suffit",
+    (await page.locator("#pane-columns label").count()) === 0,
+  );
+  check(
+    "préférences : le bouton est à côté du menu, sur la même ligne",
+    await page.evaluate(() => {
+      const field = document.getElementById("columns-window").getBoundingClientRect();
+      const button = document.getElementById("columns-reset").getBoundingClientRect();
+      return button.left >= field.right && Math.abs(button.top + button.height / 2 - (field.top + field.height / 2)) <= 3;
+    }),
+  );
+  // Choisir dans le menu ne fait rien par soi-même.
+  await page.selectOption("#columns-window", "statistics-category");
+  await page.waitForTimeout(100);
+  check(
+    "préférences : choisir une fenêtre dans le menu ne réinitialise rien",
+    await page.evaluate(() => window.__calls.every(([c]) => !c.startsWith("reset_"))),
+  );
+  await page.click("#columns-reset");
+  await page.waitForTimeout(150);
+  check(
+    "préférences : « Réinitialiser » agit tout de suite, sur la fenêtre que le menu nomme, et le dit",
+    (await page.evaluate(() => {
+      const resets = window.__calls.filter(([c]) => c.startsWith("reset_"));
+      return (
+        resets.length === 1 &&
+        resets[0][0] === "reset_window_table_layouts" &&
+        resets[0][1].window === "statistics-category"
+      );
+    })) && (await page.textContent("#info-bar")) === "Les colonnes ont retrouvé leur disposition d'origine.",
+    await page.textContent("#info-bar"),
+  );
+  // La fenêtre se relit en revenant à l'écran : le choix du menu tient.
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await page.waitForTimeout(250);
+  check(
+    "préférences : relue en revenant à l'écran, elle garde la fenêtre choisie",
+    (await page.inputValue("#columns-window")) === "statistics-category",
+    await page.inputValue("#columns-window"),
+  );
+  await page.click("#columns-reset-all");
+  await page.waitForTimeout(150);
+  check(
+    "préférences : « Tout réinitialiser » rend leur naissance à tous les tableaux",
+    await page.evaluate(() => window.__calls.some(([c]) => c === "reset_all_table_layouts")),
+  );
+  check(
+    "préférences : rien n'est passé par la disquette",
+    await page.evaluate(() => window.__calls.every(([c]) => !c.startsWith("save_preferences"))),
+  );
+  // La fenêtre n'est pas « modifiée » : la quitter ne demande rien.
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  check(
+    "préférences : réinitialiser ne modifie pas la fenêtre — elle se ferme sans question",
+    await page.evaluate(() => window.__calls.some(([c]) => c === "close_preferences")),
+  );
+  await page.close();
+
+  // Sans base, la feuille est grise : la préférence est dans la base.
+  const closed = await browser.newPage();
+  await openWindow(closed, "http://localhost:4173/ui/windows/preferences.html", { databaseOpen: false });
+  check(
+    "préférences : sans base ouverte, « Colonnes des tableaux » est grise",
+    (await closed.locator('.tree__leaf[data-leaf="columns"]').isDisabled()) &&
+      (await closed.evaluate(() => window.__calls.every(([c]) => c !== "windows_with_table_layouts"))),
+  );
+  await closed.close();
+}
+
+// --- Statistiques : la vérification d'une sélection, dans le détail -------
+{
+  // Fabrice, 03/10/2026 : la même entrée « Vérification » que dans la liste du
+  // compte, dans le menu du clic droit du détail — là où la colonne figure,
+  // c'est-à-dire dans les sept statistiques. On est ici dans celle des tiers.
+  const page = await browser.newPage();
+  await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/statistics.html?axis=payee&accounts=1,2&year=2026",
+  );
+  await page.click(".matrix__row >> nth=1 >> .matrix__cell >> nth=0");
+  await page.waitForTimeout(250);
+
+  await page.click("#rows", { button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "détail, clic droit : « Vérification » en tête, grisée tant qu'aucune ligne n'est prise",
+    (await page.locator(".context-menu > :not(.context-menu__entry--head):not(.context-menu__rule--head)").first().evaluate((piece) =>
+      piece.matches(".context-menu__nest"),
+    )) &&
+      (await page.locator(".context-menu__entry:not(.context-menu__entry--head) >> nth=0").textContent()) === "Vérification" &&
+      (await page.locator(".context-menu__entry:not(.context-menu__entry--head) >> nth=0").isDisabled()) &&
+      (await page.locator(".context-menu > .context-menu__entry:not(.context-menu__entry--head)").count()) === 10,
+  );
+  await page.keyboard.press("Escape");
+
+  // Les deux lignes du détail : une opération et une ventilation.
+  await page.click(".list--detail .list__row >> nth=0");
+  await page.keyboard.down("Meta");
+  await page.click(".list--detail .list__row >> nth=1");
+  await page.keyboard.up("Meta");
+  await page.waitForTimeout(100);
+  const before = await page.evaluate(
+    () => window.__calls.filter(([command]) => command === "axis_statistics").length,
+  );
+  await page.click("#rows", { button: "right" });
+  await page.waitForTimeout(100);
+  await page.locator(".context-menu__entry--opener").hover();
+  await page.waitForTimeout(100);
+  check(
+    "détail, clic droit : le sous-menu offre les quatre vérifications",
+    (await page.locator(".context-menu__submenu .context-menu__entry:not(.context-menu__entry--head)").allTextContents()).join("|") ===
+      "À vérifier|Vérifiée|Douteuse|Contestée",
+  );
+  await page.click(".context-menu__submenu .context-menu__entry:not(.context-menu__entry--head) >> nth=2");
+  await page.waitForTimeout(300);
+  const sent = await page.evaluate(
+    () => window.__calls.filter(([command]) => command === "set_operations_verification"),
+  );
+  check(
+    "détail, clic droit : choisir envoie la valeur et toutes les lignes prises",
+    sent.length === 1 &&
+      sent[0][1].verificationId === 3 &&
+      JSON.stringify([...sent[0][1].ids].sort()) === JSON.stringify([1, 2]),
+    JSON.stringify(sent),
+  );
+  check(
+    "détail, clic droit : et tout est recalculé, matrice comprise",
+    (await page.locator(".context-menu").count()) === 0 &&
+      (await page.evaluate(
+        () => window.__calls.filter(([command]) => command === "axis_statistics").length,
+      )) > before,
+  );
+
+  // La matrice, elle, garde son menu : des exports, et rien d'autre.
+  await page.click("#matrix-zone", { button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "matrice, clic droit : son menu n'a pas reçu l'entrée « Vérification »",
+    (await page.locator(".context-menu__nest").count()) === 0 &&
+      (await page.locator(".context-menu__entry:not(.context-menu__entry--head)").count()) > 0,
+  );
+  await page.close();
+}
+
 // --- L'export par clic droit ---------------------------------------------
 {
   // Fabrice, 26/07/2026 : « sur Windev on peut au niveau des tableaux faire un
@@ -6519,7 +10313,7 @@ async function openWindow(page, url, options) {
   check(
     "export : le clic droit ouvre les dix sorties, dans la langue de la fenêtre",
     (await page.evaluate(() =>
-      [...document.querySelectorAll(".context-menu__entry")].map((entry) => entry.textContent),
+      [...document.querySelectorAll(".context-menu__entry:not(.context-menu__entry--head)")].map((entry) => entry.textContent),
     )).join(" | ") ===
       "Exporter vers Excel (.xlsx) | Exporter vers Word (.docx)" +
         " | Exporter vers LibreOffice Calc (.ods) | Exporter vers CSV (.csv)" +
@@ -6528,7 +10322,7 @@ async function openWindow(page, url, options) {
         " | Exporter vers XML (.xml) | Exporter vers YAML (.yaml)",
   );
 
-  await page.click(".context-menu__entry >> nth=0");
+  await page.click(".context-menu__entry:not(.context-menu__entry--head) >> nth=0");
   await page.waitForTimeout(200);
   check(
     "export : le menu se referme dès que l'on a choisi",
@@ -6577,7 +10371,7 @@ async function openWindow(page, url, options) {
   await page.fill(".list__filter-input", "Bricolage");
   await page.waitForTimeout(150);
   await page.click(".list__rows", { button: "right" });
-  await page.click('.context-menu__entry >> nth=3');
+  await page.click('.context-menu__entry:not(.context-menu__entry--head) >> nth=3');
   await page.waitForTimeout(200);
 
   const sheet = await page.evaluate(() => window.__exported.sheet);
@@ -6600,7 +10394,7 @@ async function openWindow(page, url, options) {
   const page = await browser.newPage();
   await openWindow(page, "http://localhost:4173/ui/windows/nomenclature-list.html?kind=category");
   await page.click(".list__rows", { button: "right" });
-  await page.click(".context-menu__entry >> nth=2");
+  await page.click(".context-menu__entry:not(.context-menu__entry--head) >> nth=2");
   await page.waitForTimeout(200);
   check(
     "export : le sélecteur du système propose un .ods",
@@ -6623,10 +10417,10 @@ async function openWindow(page, url, options) {
   await page.waitForTimeout(100);
   check(
     "export : deux traits séparent les trois familles de sorties",
-    (await page.locator(".context-menu__rule").count()) === 2,
+    (await page.locator(".context-menu__rule:not(.context-menu__rule--head)").count()) === 2,
   );
 
-  await page.click(".context-menu__entry >> nth=8");
+  await page.click(".context-menu__entry:not(.context-menu__entry--head) >> nth=8");
   await page.waitForTimeout(200);
   check(
     "export : le XML demande bien un .xml",
@@ -6638,7 +10432,7 @@ async function openWindow(page, url, options) {
   );
 
   await page.click(".list__rows", { button: "right" });
-  await page.click(".context-menu__entry >> nth=6");
+  await page.click(".context-menu__entry:not(.context-menu__entry--head) >> nth=6");
   await page.waitForTimeout(200);
   check(
     "export : le JSON demande bien un .json",
@@ -6663,7 +10457,7 @@ async function openWindow(page, url, options) {
     exportCancelled: true,
   });
   await page.click(".list__rows", { button: "right" });
-  await page.click(".context-menu__entry >> nth=0");
+  await page.click(".context-menu__entry:not(.context-menu__entry--head) >> nth=0");
   await page.waitForTimeout(200);
   check(
     "export : renoncer n'écrit aucun fichier",
@@ -6681,7 +10475,7 @@ async function openWindow(page, url, options) {
     { exportFails: "Export impossible : disque plein" },
   );
   await page.click(".list__rows", { button: "right" });
-  await page.click(".context-menu__entry >> nth=0");
+  await page.click(".context-menu__entry:not(.context-menu__entry--head) >> nth=0");
   await page.waitForTimeout(200);
   check(
     "export : l'échec est dit à l'utilisateur",
@@ -6698,7 +10492,7 @@ async function openWindow(page, url, options) {
   const page = await browser.newPage();
   await openWindow(page, "http://localhost:4173/ui/windows/accounts-list.html");
   await page.click(".list__rows", { button: "right" });
-  await page.click(".context-menu__entry >> nth=0");
+  await page.click(".context-menu__entry:not(.context-menu__entry--head) >> nth=0");
   await page.waitForTimeout(200);
 
   const sheet = await page.evaluate(() => window.__exported.sheet);
@@ -6730,9 +10524,9 @@ async function openWindow(page, url, options) {
   await page.waitForTimeout(100);
   check(
     "export : la matrice a son propre clic droit",
-    (await page.locator(".context-menu__entry").count()) === 10,
+    (await page.locator(".context-menu__entry:not(.context-menu__entry--head)").count()) === 10,
   );
-  await page.click(".context-menu__entry >> nth=0");
+  await page.click(".context-menu__entry:not(.context-menu__entry--head) >> nth=0");
   await page.waitForTimeout(250);
 
   const sheet = await page.evaluate(() => window.__exported.sheet);
@@ -6786,7 +10580,9 @@ async function openWindow(page, url, options) {
   await page.click(".matrix__cell >> nth=1");
   await page.waitForTimeout(200);
   await page.click(".list--detail .list__rows", { button: "right" });
-  await page.click(".context-menu__entry >> nth=0");
+  // Le premier **export** : depuis le 03/10/2026 le menu du détail s'ouvre
+  // sur l'entrée « Vérification », et les exports viennent après son trait.
+  await page.click(".context-menu > .context-menu__entry:not(.context-menu__entry--head) >> nth=0");
   await page.waitForTimeout(250);
   check(
     "export : le détail des statistiques s'exporte à part, sous son propre nom",
@@ -6794,6 +10590,859 @@ async function openWindow(page, url, options) {
     await page.evaluate(() => window.__exported.sheet.name),
   );
   await page.close();
+}
+
+// --- Statistiques et bilan croisé : chacun ses colonnes, dans le détail ---
+{
+  // Fabrice, 04/10/2026 : « le même principe dans tous les tableaux des
+  // fenêtres statistiques — mais attention, pas n'importe lesquels : ceux qui
+  // listent les transactions lorsque l'on clique sur une cellule, ceux du bas
+  // de la fenêtre. » Une disposition **par statistique**, et le bilan croisé
+  // avec la sienne — et, lui, la colonne « Vérification » en plus.
+  const BORN =
+    "date|clearing-date|label|verification|category|assignment|payment-mode|payee|project|amount|comments";
+  const heads = (page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll("#header > .list__title")]
+        .map((cell) => cell.dataset.column)
+        .join("|"),
+    );
+  const asked = (page) =>
+    page.evaluate(() => [
+      ...new Set(window.__calls.filter(([c]) => c === "table_layout").map(([, a]) => a.table)),
+    ].join("|"));
+  const saves = (page) =>
+    page.evaluate(() =>
+      window.__calls.filter(([command]) => command === "save_table_layout").map(([, args]) => args),
+    );
+  const open = async (url, options) => {
+    const page = await browser.newPage({ viewport: { width: 1700, height: 900 } });
+    await openWindow(page, `http://localhost:4173/ui/windows/${url}`, options);
+    await page.click(".matrix__row >> nth=1 >> .matrix__cell >> nth=0");
+    await page.waitForTimeout(250);
+    return page;
+  };
+
+  for (const [what, url, table] of [
+    ["stat par tiers", "statistics.html?axis=payee&accounts=1,2&year=2026", "statistics-payee"],
+    ["stat par catégories", "statistics.html?axis=category&accounts=1,2&year=2026", "statistics-category"],
+    ["stat par vérifications", "statistics.html?axis=verification&accounts=1,2&year=2026", "statistics-verification"],
+    ["bilan croisé", "crossed-balance.html?accounts=1,2&year=2026&month=9", "crossed-balance"],
+  ]) {
+    const page = await open(url);
+    check(`${what} : le détail naît avec ses onze colonnes, dans l'ordre`, (await heads(page)) === BORN, await heads(page));
+    check(
+      `${what} : il demande sa disposition sous son propre nom — « ${table} »`,
+      (await asked(page)) === table,
+      await asked(page),
+    );
+
+    // Le menu des colonnes, sur les en-têtes du détail.
+    await page.click('#header .list__title[data-column="label"]', { button: "right" });
+    await openChecks(page);
+    await page.waitForTimeout(100);
+    check(
+      `${what} : le clic droit sur les en-têtes du détail liste ses onze colonnes — aucune n'est fixe`,
+      (await page.locator('.context-menu--columns [data-menu="show-hide"] .context-menu__entry--check').count()) === 11 &&
+        (await page.locator(".context-menu--columns .context-menu__entry:not(.context-menu__entry--head)").last().textContent()) ===
+          "Rétablir les colonnes par défaut",
+    );
+    await page.click('.context-menu--columns [data-column="clearing-date"]');
+    await page.waitForTimeout(150);
+    await page.keyboard.press("Escape");
+    let sent = await saves(page);
+    check(
+      `${what} : une colonne décochée s'en va, et c'est retenu sous « ${table} »`,
+      !(await heads(page)).includes("clearing-date") &&
+        sent.length === 1 &&
+        sent[0].table === table &&
+        JSON.stringify(sent[0].layout.hidden) === '["clearing-date"]',
+      JSON.stringify(sent),
+    );
+
+    // Glisser le montant tout devant : aucune colonne n'est fixe ici.
+    const from = await page.locator('#header .list__title[data-column="amount"]').boundingBox();
+    const to = await page.locator('#header .list__title[data-column="date"]').boundingBox();
+    await page.mouse.move(from.x + 12, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(from.x - 10, from.y + from.height / 2, { steps: 2 });
+    await page.mouse.move(to.x + 3, from.y + from.height / 2, { steps: 6 });
+    await page.mouse.up();
+    await page.waitForTimeout(200);
+    sent = await saves(page);
+    check(
+      `${what} : glisser « Montant » le met en tête, et l'ordre est retenu`,
+      (await heads(page)).startsWith("amount|date|label|verification|") &&
+        sent[sent.length - 1].table === table &&
+        sent[sent.length - 1].layout.order[0] === "amount",
+      await heads(page),
+    );
+    check(
+      `${what} : le rouge d'un débit a suivi sa colonne`,
+      await page.evaluate(() => {
+        const cell = document.querySelector(".list--detail .list__row--debit .list__cell--amount");
+        return (
+          cell !== null &&
+          cell === cell.parentElement.firstElementChild &&
+          getComputedStyle(cell).color !== getComputedStyle(document.body).color
+        );
+      }),
+    );
+
+    // La matrice du haut n'a rien reçu.
+    await page.click("#matrix-zone", { button: "right" });
+    await page.waitForTimeout(100);
+    check(
+      `${what} : la matrice du haut n'a pas de menu de colonnes`,
+      (await page.locator(".context-menu--columns").count()) === 0 &&
+        (await page.locator(".context-menu").count()) === 1,
+    );
+    await page.keyboard.press("Escape");
+
+    // L'export du détail suit ce qu'on voit.
+    await page.click(".list--detail .list__rows", { button: "right" });
+    await page.click(".context-menu > .context-menu__entry:not(.context-menu__entry--head) >> nth=0");
+    await page.waitForTimeout(250);
+    const heading = await page.evaluate(() =>
+      window.__exported.sheet.rows[0].map((cell) => cell.text).join("|"),
+    );
+    check(
+      `${what} : l'export du détail suit l'ordre choisi, sans la colonne masquée`,
+      heading.split("|").length === 10 && heading.split("|")[3] === "Vérification",
+      heading,
+    );
+    await page.close();
+  }
+
+  // Rouverte, une statistique retrouve sa disposition.
+  const stored = { order: BORN.split("|").reverse(), hidden: ["comments"], widths: { label: 300 } };
+  const again = await open("statistics.html?axis=payee&accounts=1,2&year=2026", { storedLayout: stored });
+  check(
+    "stat par tiers : rouverte, le détail retrouve son ordre, ses colonnes masquées et ses largeurs",
+    (await heads(again)) ===
+      "amount|project|payee|payment-mode|assignment|category|verification|label|clearing-date|date" &&
+      Math.round((await again.locator('#header .list__title[data-column="label"]').boundingBox()).width) === 300,
+    await heads(again),
+  );
+  // Le changement d'une autre statistique ne la concerne pas ; le sien, si.
+  const reads = () =>
+    again.evaluate(() => window.__calls.filter(([c]) => c === "table_layout").length);
+  const before = await reads();
+  await again.evaluate(() => {
+    window.__listeners["table-layout-changed"]({ event: "x", id: 1, payload: "statistics-category" });
+    window.__listeners["table-layout-changed"]({ event: "x", id: 1, payload: "crossed-balance" });
+  });
+  await again.waitForTimeout(150);
+  const afterOthers = await reads();
+  await again.evaluate(() => {
+    window.__layout = null;
+    window.__listeners["table-layout-changed"]({ event: "x", id: 1, payload: "statistics-payee" });
+  });
+  await again.waitForTimeout(200);
+  check(
+    "stat par tiers : le réglage d'une autre statistique ne la fait pas bouger ; la réinitialisation de la sienne, si",
+    afterOthers === before && (await heads(again)) === BORN,
+    `${before} ${afterOthers} ${await heads(again)}`,
+  );
+  await again.close();
+
+  // --- Le bilan croisé a reçu la colonne « Vérification ».
+  const crossed = await open("crossed-balance.html?accounts=1,2&year=2026&month=9");
+  check(
+    "bilan croisé : « Vérification » est entre « Libelle » et « Categorie », le mot dans sa couleur",
+    (await crossed.locator("#header .list__title >> nth=3").textContent()).startsWith("Vérification") &&
+      (await crossed.evaluate(() => {
+        const cell = document.querySelector(".list--detail .list__row .list__cell--verification");
+        return cell !== null && cell.textContent === "Vérifiée" && cell.dataset.verification === "2" &&
+          getComputedStyle(cell).color === "rgb(30, 107, 36)";
+      })),
+  );
+  await crossed.click(".list--detail .list__row >> nth=0");
+  await crossed.waitForTimeout(150);
+  const combo = crossed.locator(".list--detail .list__row >> nth=0 >> .list__combo--verification");
+  check(
+    "bilan croisé : sur la ligne choisie, la vérification se change par sa liste",
+    (await combo.count()) === 1 &&
+      (await combo.locator("option").allTextContents()).join("|") === "À vérifier|Vérifiée|Douteuse|Contestée",
+  );
+  const recomputed = () =>
+    crossed.evaluate(() => window.__calls.filter(([c]) => c === "crossed_balance").length);
+  let count = await recomputed();
+  await combo.selectOption("3");
+  await crossed.waitForTimeout(250);
+  check(
+    "bilan croisé : choisir écrit tout de suite, et le bilan est refait",
+    (await crossed.evaluate(() =>
+      window.__calls.some(
+        ([c, a]) => c === "set_operation_verification" && a.id === 1 && a.verificationId === 3,
+      ),
+    )) && (await recomputed()) > count,
+  );
+  // Et par le clic droit, pour toute la sélection.
+  await crossed.click(".list--detail .list__rows", { button: "right" });
+  await crossed.waitForTimeout(100);
+  check(
+    "bilan croisé : le clic droit des lignes s'ouvre sur « Vérification », puis les dix exports",
+    (await crossed.locator(".context-menu__entry:not(.context-menu__entry--head) >> nth=0").textContent()) === "Vérification" &&
+      !(await crossed.locator(".context-menu__entry:not(.context-menu__entry--head) >> nth=0").isDisabled()) &&
+      (await crossed.locator(".context-menu > .context-menu__entry:not(.context-menu__entry--head)").count()) === 10,
+  );
+  await crossed.locator(".context-menu__entry--opener").hover();
+  await crossed.click(".context-menu__submenu .context-menu__entry:not(.context-menu__entry--head) >> nth=3");
+  await crossed.waitForTimeout(250);
+  check(
+    "bilan croisé : choisir « Contestée » l'envoie avec la sélection",
+    await crossed.evaluate(() => {
+      const sent = window.__calls.filter(([c]) => c === "set_operations_verification");
+      return sent.length === 1 && sent[0][1].verificationId === 4 && sent[0][1].ids.join() === "1";
+    }),
+  );
+  await crossed.close();
+}
+
+// --- F40, « Analyse Évolution du solde » -----------------------------------
+{
+  // Fabrice, 05/10/2026 : le graphique de l'évolution du solde, et en bas le
+  // tableau des opérations. « Lorsque l'utilisateur clique sur le graphique et
+  // maintient la souris appuyée, il trace le début et la fin d'une zone
+  // temporelle […] et à ce moment-là le détail des opérations apparaît dans le
+  // tableau du bas pour les comptes qui avaient été sélectionnés. »
+  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/balance-analysis.html?accounts=1,2");
+  const year = new Date().getFullYear();
+  const state = () => page.locator("#summary").getAttribute("data-state");
+  const veil = () =>
+    page.evaluate(() => {
+      const mark = document.querySelector(".chart__zone");
+      return mark === null
+        ? null
+        : { shown: mark.getAttribute("visibility"), from: mark.dataset.from, to: mark.dataset.to, width: Number(mark.getAttribute("width")) };
+    });
+  /// Le pixel d'un jour sur le graphique — la même arithmétique que la page.
+  const xOf = (iso) =>
+    page.evaluate(
+      ([day, first, last]) => {
+        const box = document.querySelector("svg.chart").getBoundingClientRect();
+        const n = (text) => Date.parse(text + "T00:00:00Z") / 86400000;
+        const x = 78 + ((n(day) - n(first)) / (n(last) - n(first))) * (1000 - 78 - 18);
+        return { x: box.left + (x / 1000) * box.width, y: box.top + box.height / 2, top: box.top, bottom: box.bottom, right: box.right };
+      },
+      [iso, `${year}-01-01`, `${year}-12-31`],
+    );
+
+  check("analyse : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" / "));
+  check(
+    "analyse : le graphique de l'évolution du solde est là — trois courbes, sa légende, son titre",
+    (await page.locator("svg.chart path[data-account]").count()) === 3 &&
+      (await page.locator(".chart__legend-entry").count()) === 3 &&
+      (await page.textContent("#heading")) === "Analyse de l'évolution du solde",
+  );
+  check(
+    "analyse : sous le graphique, le splitter puis le tableau — douze colonnes, « Compte » en tête",
+    (await page.locator("#splitter").count()) === 1 &&
+      (await page.locator("#header > .list__title").evaluateAll((cells) => cells.map((cell) => cell.dataset.column).join("|"))) ===
+        "account|date|clearing-date|label|verification|category|assignment|payment-mode|payee|project|amount|comments" &&
+      (await page.locator("#header > .list__title >> nth=0").textContent()).startsWith("Compte"),
+  );
+  check(
+    "analyse : rien de tracé — le résumé et le tableau disent comment tracer une zone",
+    (await state()) === "none" &&
+      (await page.locator("#summary-hint").isVisible()) &&
+      (await page.textContent("#summary-hint")).startsWith("Tracez une zone") &&
+      (await page.textContent("#rows")).startsWith("Tracez une zone") &&
+      (await veil()).shown === "hidden",
+  );
+  check(
+    "analyse : tant qu'aucune zone n'est tracée, rien n'est demandé",
+    await page.evaluate(() => window.__zonesAsked === undefined),
+  );
+
+  // --- Le geste : appuyer, glisser, relâcher.
+  const start = await xOf(`${year}-03-05`);
+  const end = await xOf(`${year}-03-20`);
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  await page.waitForTimeout(50);
+  let mark = await veil();
+  check(
+    "analyse : à l'appui, la zone se pose sur le jour visé — une barre, large d'un jour",
+    mark.shown === "visible" && mark.from === `${year}-03-05` && mark.to === `${year}-03-05` && mark.width > 0 && mark.width < 6,
+    JSON.stringify(mark),
+  );
+  check(
+    "analyse : et le résumé donne déjà la date, sans chiffres",
+    (await state()) === "dragging" &&
+      (await page.textContent("#zone-dates")) === `05/03/${year}` &&
+      !(await page.locator("#opening").isVisible()),
+    await page.textContent("#zone-dates"),
+  );
+  await page.mouse.move(end.x, end.y, { steps: 8 });
+  await page.waitForTimeout(50);
+  mark = await veil();
+  check(
+    "analyse : en glissant, le voile s'étend jusqu'au pointeur et les deux dates suivent la main",
+    mark.from === `${year}-03-05` && mark.to === `${year}-03-20` && mark.width > 20 &&
+      (await page.textContent("#zone-dates")) === `05/03/${year} – 20/03/${year}`,
+    JSON.stringify(mark),
+  );
+  check(
+    "analyse : pendant le geste, rien n'est lu et l'infobulle se tait",
+    (await page.evaluate(() => window.__zonesAsked === undefined)) &&
+      (await page.locator(".chart__bubble").isHidden()),
+  );
+  await page.mouse.up();
+  await page.waitForTimeout(300);
+  check(
+    "analyse : au relâchement, la zone est demandée au noyau — les comptes choisis, les deux dates",
+    await page.evaluate(
+      ([from, to]) =>
+        window.__zonesAsked === 1 &&
+        window.__zoneAsked.from === from &&
+        window.__zoneAsked.to === to &&
+        window.__zoneAsked.accountIds.join() === "1,2",
+      [`${year}-03-05`, `${year}-03-20`],
+    ),
+    await page.evaluate(() => JSON.stringify(window.__zoneAsked)),
+  );
+  check(
+    "analyse : le résumé donne le solde au début, à la fin, la variation, les débits et les crédits",
+    (await state()) === "shown" &&
+      (await page.locator("#summary .analysis__figure").allTextContents()).map((text) => text.replace(/\s+/g, " ").trim()).join(" | ") ===
+        `Zone : 05/03/${year} – 20/03/${year} | Solde au début : 600,00 € | Solde à la fin : 570,00 € | Variation : -30,00 € | Débit : -100,00 € | Crédit : 70,00 €`,
+    (await page.locator("#summary .analysis__figure").allTextContents()).map((text) => text.replace(/\s+/g, " ").trim()).join(" | "),
+  );
+  check(
+    "analyse : une variation négative se lit en rouge",
+    await page.evaluate(
+      () => getComputedStyle(document.getElementById("variation")).color !== getComputedStyle(document.getElementById("closing")).color,
+    ),
+  );
+  check(
+    "analyse : le tableau se remplit — les opérations de la zone, chacune avec son compte",
+    (await page.locator(".list--detail .list__row").count()) === 2 &&
+      (await page.locator(".list--detail .list__row >> nth=0 >> .list__cell >> nth=0").textContent()) === "CCP" &&
+      (await page.locator(".list--detail .list__row >> nth=1 >> .list__cell >> nth=0").textContent()) === "Livret A" &&
+      (await page.locator(".list--detail .list__row >> nth=0 >> .list__cell >> nth=3").textContent()) === "COURSES",
+  );
+  check("analyse : la zone reste tracée sur le graphique", (await veil()).shown === "visible" && (await veil()).to === `${year}-03-20`);
+
+  // --- À l'envers, et au-delà du bord.
+  await page.mouse.move(end.x, end.y);
+  await page.mouse.down();
+  await page.mouse.move(start.x, start.y, { steps: 6 });
+  await page.mouse.up();
+  await page.waitForTimeout(250);
+  check(
+    "analyse : tracée de droite à gauche, la zone est la même",
+    await page.evaluate(
+      ([from, to]) => window.__zoneAsked.from === from && window.__zoneAsked.to === to,
+      [`${year}-03-05`, `${year}-03-20`],
+    ),
+  );
+  const late = await xOf(`${year}-12-10`);
+  await page.mouse.move(late.x, late.y);
+  await page.mouse.down();
+  await page.mouse.move(late.right + 120, late.y, { steps: 6 });
+  await page.mouse.up();
+  await page.waitForTimeout(250);
+  check(
+    "analyse : glisser hors du graphique arrête la zone au dernier jour de la période",
+    await page.evaluate(
+      ([from, to]) => window.__zoneAsked.from === from && window.__zoneAsked.to === to,
+      [`${year}-12-10`, `${year}-12-31`],
+    ),
+    await page.evaluate(() => JSON.stringify(window.__zoneAsked)),
+  );
+
+  // --- Un clic sans glisser : un seul jour.
+  const single = await xOf(`${year}-07-14`);
+  await page.mouse.click(single.x, single.y);
+  await page.waitForTimeout(250);
+  check(
+    "analyse : un clic sans glisser prend un seul jour",
+    (await page.evaluate(
+      ([day]) => window.__zoneAsked.from === day && window.__zoneAsked.to === day,
+      [`${year}-07-14`],
+    )) && (await page.textContent("#zone-dates")) === `14/07/${year}`,
+  );
+  check(
+    "analyse : une zone sans opération le dit dans le tableau",
+    (await page.textContent("#rows")) === "Aucune opération dans cette zone." && (await state()) === "shown",
+  );
+  check(
+    "analyse : une variation nulle n'est pas rouge",
+    await page.evaluate(
+      () => getComputedStyle(document.getElementById("variation")).color === getComputedStyle(document.getElementById("closing")).color,
+    ),
+  );
+
+  // --- Hors de la surface du tracé, on ne trace rien.
+  const asked = await page.evaluate(() => window.__zonesAsked);
+  await page.mouse.click(single.x, single.bottom - 6);
+  await page.waitForTimeout(150);
+  check(
+    "analyse : cliquer sous l'axe du temps ne trace rien",
+    (await page.evaluate(() => window.__zonesAsked)) === asked,
+  );
+
+  // --- L'infobulle du graphique vit toujours, hors du geste.
+  const march = await xOf(`${year}-03-15`);
+  const plot = await page.locator("svg.chart").boundingBox();
+  await page.mouse.move(march.x, plot.y + plot.height * 0.2);
+  for (let y = plot.y + 20; y < plot.y + plot.height - 50 && (await page.locator(".chart__bubble").isHidden()); y += 6) {
+    await page.mouse.move(march.x, y);
+  }
+  check("analyse : l'infobulle des courbes répond toujours au survol", await page.locator(".chart__bubble").isVisible());
+
+  // --- Le tableau : les gestes du détail des statistiques.
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  await page.mouse.move(end.x, end.y, { steps: 4 });
+  await page.mouse.up();
+  await page.waitForTimeout(250);
+  await page.click(".list--detail .list__row >> nth=0");
+  await page.waitForTimeout(150);
+  const before = await page.evaluate(() => ({
+    curves: window.__calls.filter(([c]) => c === "balance_curves").length,
+    zones: window.__zonesAsked,
+  }));
+  await page.locator(".list--detail .list__row >> nth=0 >> .list__combo--verification").selectOption("3");
+  await page.waitForTimeout(300);
+  check(
+    "analyse : sur la ligne choisie, la vérification se change — et la courbe comme la zone sont relues",
+    await page.evaluate(
+      (was) =>
+        window.__calls.some(([c, a]) => c === "set_operation_verification" && a.verificationId === 3) &&
+        window.__calls.filter(([c]) => c === "balance_curves").length > was.curves &&
+        window.__zonesAsked > was.zones,
+      before,
+    ),
+  );
+  check("analyse : la zone tracée a tenu à la relecture", (await veil()).shown === "visible" && (await veil()).from === `${year}-03-05`);
+  await page.dblclick(".list--detail .list__row >> nth=1");
+  await page.waitForTimeout(150);
+  check(
+    "analyse : double-cliquer une ligne ouvre la fiche de l'opération",
+    await page.evaluate(() => window.__openedFormFor === 2),
+    String(await page.evaluate(() => window.__openedFormFor)),
+  );
+  await page.click(".list--detail .list__rows", { button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "analyse : le clic droit du tableau s'ouvre sur « Vérification », puis les dix exports",
+    (await page.locator(".context-menu__entry:not(.context-menu__entry--head) >> nth=0").textContent()) === "Vérification" &&
+      (await page.locator(".context-menu > .context-menu__entry:not(.context-menu__entry--head)").count()) === 10,
+  );
+  await page.click(".context-menu > .context-menu__entry:not(.context-menu__entry--head) >> nth=0");
+  await page.waitForTimeout(250);
+  check(
+    "analyse : l'export du tableau porte le nom de la fenêtre et ses douze colonnes",
+    await page.evaluate(
+      () => window.__exported.sheet.name === "Analyse du solde" && window.__exported.sheet.rows[0].length === 12,
+    ),
+  );
+  await page.click('#header .list__title[data-column="amount"]', { button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "analyse : les colonnes du tableau se règlent, sous une disposition à elle",
+    (await page.locator('.context-menu--columns [data-menu="show-hide"]').count()) === 1 &&
+      (await page.evaluate(() =>
+        window.__calls.some(([c, a]) => c === "table_layout" && a.table === "balance-analysis"),
+      )),
+  );
+  await page.keyboard.press("Escape");
+
+  // --- Le splitter.
+  const bar = await page.locator("#splitter").boundingBox();
+  const tall = (await page.locator("#chart-zone").boundingBox()).height;
+  await page.mouse.move(bar.x + 200, bar.y + 3);
+  await page.mouse.down();
+  await page.mouse.move(bar.x + 200, bar.y - 120, { steps: 4 });
+  await page.mouse.up();
+  await page.waitForTimeout(150);
+  check(
+    "analyse : le splitter donne de la place au tableau",
+    (await page.locator("#chart-zone").boundingBox()).height < tall - 80,
+  );
+
+  // --- Changer d'année efface la zone.
+  await page.click("#next-year");
+  await page.waitForTimeout(300);
+  check(
+    "analyse : changer d'année efface la zone, le résumé et le tableau",
+    (await state()) === "none" &&
+      (await veil()).shown === "hidden" &&
+      (await page.locator(".list--detail .list__row").count()) === 0,
+  );
+  await page.close();
+
+  // Sans compte : rien à tracer, et rien ne casse.
+  const nobody = await browser.newPage();
+  const complaints = await openWindow(nobody, "http://localhost:4173/ui/windows/balance-analysis.html?accounts=");
+  check(
+    "analyse : sans compte, la fenêtre le dit et ne demande aucune zone",
+    complaints.length === 0 &&
+      (await nobody.locator("#info-bar").textContent()).includes("Aucun compte") &&
+      (await nobody.evaluate(() => window.__zonesAsked === undefined)),
+    complaints.join(" / "),
+  );
+  await nobody.close();
+
+  // F25 n'a rien reçu : ni zone, ni tableau.
+  const chart = await browser.newPage();
+  await openWindow(chart, "http://localhost:4173/ui/windows/balance-curves.html?accounts=1,2");
+  const box = await chart.locator("svg.chart").boundingBox();
+  await chart.mouse.move(box.x + 300, box.y + 200);
+  await chart.mouse.down();
+  await chart.mouse.move(box.x + 500, box.y + 200, { steps: 4 });
+  await chart.mouse.up();
+  await chart.waitForTimeout(150);
+  check(
+    "analyse : « Graphique Évolution du solde » n'a pas bougé — ni zone, ni tableau, ni lecture",
+    (await chart.locator(".chart__zone").count()) === 0 &&
+      (await chart.locator(".list__rows").count()) === 0 &&
+      (await chart.evaluate(() => window.__zonesAsked === undefined)),
+  );
+  await chart.close();
+}
+
+// --- Copier : une cellule, des lignes ---------------------------------------
+{
+  // Fabrice, 07/10/2026, après la remarque d'un utilisateur : « on ne peut
+  // pas faire de Copier de ligne/cellule dans un tableau ». Tranché : pas de
+  // titres de colonnes, les montants en nombre pur, tous les tableaux d'un
+  // coup — et « Copier la cellule » dans les matrices.
+
+  // D'abord la fonction elle-même, hors de tout navigateur : c'est elle qui
+  // décide de ce qu'un tableur recevra.
+  const { transform } = await import("esbuild");
+  const built = await transform(fs.readFileSync("ui/windows/clipboard.ts", "utf8"), { loader: "ts", format: "esm" });
+  const { pureNumber, oneCell } = await import(
+    "data:text/javascript;base64," + Buffer.from(built.code).toString("base64")
+  );
+  for (const [shown, wanted] of [
+    ["1 549,81 €", "1549,81"],
+    ["-100,00 €", "-100,00"],
+    ["0,00 €", "0,00"],
+    ["€1,549.81", "1549.81"],
+    ["-$12.00", "-12.00"],
+    ["1.549,81 €", "1549,81"],
+    ["1’549.81 CHF", "1549.81"],
+    ["1 549,81 €", "1549,81"],
+    ["2 216,71", "2216,71"],
+    ["−30,00 €", "-30,00"],
+    // Ce qui n'est pas un montant revient tel quel.
+    ["9 506 038", "9 506 038"],
+    ["05/01/2026", "05/01/2026"],
+    ["", ""],
+    ["COURSES", "COURSES"],
+    ["2026", "2026"],
+    ["12", "12"],
+  ]) {
+    check(`copier : « ${shown} » se copie « ${wanted} »`, pureNumber(shown) === wanted, pureNumber(shown));
+  }
+  check(
+    "copier : une cellule copiée ne porte ni tabulation ni saut de ligne",
+    oneCell(" payé\ten deux\r\nfois ") === "payé en deux fois",
+  );
+
+  const URL = "http://localhost:4173/ui/windows/operations-list.html?account=1";
+  const page = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+  await openWindow(page, URL);
+  const clipboard = () => page.evaluate(() => window.__clipboard);
+  const last = async () => (await clipboard()).slice(-1)[0];
+  const cellOf = (row, column) =>
+    page.evaluate(
+      ([line, name]) => {
+        const at = [...document.querySelectorAll(".list__header > .list__title")].findIndex(
+          (title) => title.dataset.column === name,
+        );
+        const cell = document.querySelectorAll(".list__row")[line].children[at];
+        const box = cell.getBoundingClientRect();
+        return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+      },
+      [row, column],
+    );
+  const rightClick = async (row, column) => {
+    const at = await cellOf(row, column);
+    await page.mouse.click(at.x, at.y, { button: "right" });
+    await page.waitForTimeout(100);
+  };
+  const head = (name) => page.locator(`.context-menu [data-head="${name}"]`);
+
+  // --- Le menu.
+  await rightClick(0, "label");
+  check(
+    "copier : le clic droit s'ouvre sur « Copier la cellule », « Copier les lignes sélectionnées », puis un trait",
+    await page.evaluate(() => {
+      const pieces = [...document.querySelector(".context-menu").children].slice(0, 3);
+      return (
+        pieces[0].textContent === "Copier la cellule" &&
+        pieces[1].textContent === "Copier les lignes sélectionnées" &&
+        pieces[2].matches("hr")
+      );
+    }),
+  );
+  check(
+    "copier : sans ligne choisie, la cellule se copie mais pas les lignes",
+    !(await head("copy-cell").isDisabled()) && (await head("copy-rows").isDisabled()),
+  );
+  const bar = await page.locator("#info-bar").textContent();
+  await head("copy-cell").click();
+  await page.waitForTimeout(150);
+  check(
+    "copier : « Copier la cellule » met dans le presse-papiers la cellule sous le pointeur",
+    (await clipboard()).length === 1 && (await last()) === "COURSES",
+    JSON.stringify(await clipboard()),
+  );
+  check(
+    "copier : le menu se referme, sans rien annoncer et sans toucher à la sélection",
+    (await page.locator(".context-menu").count()) === 0 &&
+      (await page.locator("#info-bar").textContent()) === bar &&
+      (await page.locator(".list__row[aria-selected='true']").count()) === 0,
+  );
+
+  // --- Un montant, en nombre pur ; le reste, tel qu'on le lit.
+  for (const [row, column, wanted] of [
+    [0, "debit", "-100,00"],
+    [0, "balance", "2322,34"],
+    [1, "credit", "2216,71"],
+    [0, "date", "05/01/2026"],
+    [1, "verification", "Douteuse"],
+    [0, "category", "Alimentation"],
+  ]) {
+    await rightClick(row, column);
+    await head("copy-cell").click();
+    await page.waitForTimeout(120);
+    check(`copier : la cellule « ${column} » se copie « ${wanted} »`, (await last()) === wanted, await last());
+  }
+
+  // --- Une cellule vide, et hors de toute ligne.
+  await rightClick(1, "comments");
+  check(
+    "copier : sur une cellule vide — une coche absente —, « Copier la cellule » est grisée",
+    await head("copy-cell").isDisabled(),
+  );
+  await page.keyboard.press("Escape");
+  const rows = await page.locator(".list__rows").boundingBox();
+  await page.mouse.click(rows.x + 300, rows.y + rows.height - 30, { button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "copier : sous la dernière ligne, il n'y a pas de cellule à copier",
+    (await head("copy-cell").isDisabled()) && (await head("copy-rows").isDisabled()),
+  );
+  await page.keyboard.press("Escape");
+
+  // --- Les lignes choisies.
+  await page.click(".list__row >> nth=1");
+  await page.keyboard.down("Meta");
+  await page.click(".list__row >> nth=0");
+  await page.keyboard.up("Meta");
+  await page.waitForTimeout(100);
+  await rightClick(0, "label");
+  check("copier : des lignes prises, « Copier les lignes sélectionnées » s'allume", !(await head("copy-rows").isDisabled()));
+  await head("copy-rows").click();
+  await page.waitForTimeout(150);
+  const copied = (await last()).split("\n").map((line) => line.split("\t"));
+  check(
+    "copier : une ligne par opération, dans l'ordre de l'écran — pas celui des clics —, sans titres",
+    copied.length === 2 && copied[0][5] === "COURSES" && copied[1][5] === "SALAIRE",
+    JSON.stringify(copied),
+  );
+  check(
+    "copier : une cellule par colonne affichée — dix-huit —, les colonnes sans texte vides",
+    copied.every((line) => line.length === 18) && copied[0][0] === "" && copied[0][1] === "05/01/2026",
+    String(copied[0].length),
+  );
+  check(
+    "copier : dans les lignes aussi, les montants sont des nombres purs",
+    copied[0][12] === "-100,00" && copied[0][13] === "" && copied[1][13] === "2216,71" && copied[0][14] === "2322,34",
+    JSON.stringify([copied[0].slice(12, 15), copied[1].slice(12, 15)]),
+  );
+  check(
+    "copier : la sélection n'a pas bougé",
+    (await page.locator(".list__row[aria-selected='true']").count()) === 2,
+  );
+
+  // --- ⌘C et Ctrl+C.
+  for (const [name, key] of [["⌘C", "Meta+c"], ["Ctrl+C", "Control+c"], ["⌘C, majuscules verrouillées", "Meta+C"]]) {
+    const before = (await clipboard()).length;
+    await page.keyboard.press(key);
+    await page.waitForTimeout(150);
+    const now = await clipboard();
+    check(
+      `copier : ${name} copie les lignes choisies`,
+      now.length === before + 1 && now[now.length - 1].split("\n").length === 2,
+      String(now.length - before),
+    );
+  }
+  // Avec Maj ou Alt, ce n'est plus la touche de copie.
+  for (const key of ["Meta+Shift+c", "Control+Alt+c"]) {
+    const before = (await clipboard()).length;
+    await page.keyboard.press(key);
+    await page.waitForTimeout(100);
+    check(`copier : ${key} n'est pas une copie`, (await clipboard()).length === before);
+  }
+  // Dans un champ, la touche reste ce qu'elle a toujours été.
+  await page.click('.list__title[data-column="label"] .list__filter-toggle');
+  await page.fill(".list__filter-input:not([hidden])", "COUR");
+  let before = (await clipboard()).length;
+  await page.keyboard.press("Meta+c");
+  await page.waitForTimeout(150);
+  check(
+    "copier : dans une loupe de recherche, ⌘C n'est pas pris par le tableau",
+    (await clipboard()).length === before,
+  );
+  await page.click('.list__title[data-column="label"] .list__filter-toggle');
+  // Sans sélection, rien.
+  await page.click("#from");
+  await page.locator(".list__rows").click({ position: { x: 300, y: 300 } });
+  await page.evaluate(() => document.activeElement.blur());
+  await page.close();
+
+  const empty = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+  await openWindow(empty, URL);
+  await empty.keyboard.press("Meta+c");
+  await empty.waitForTimeout(150);
+  check(
+    "copier : sans ligne choisie, ⌘C ne copie rien",
+    (await empty.evaluate(() => window.__clipboard.length)) === 0,
+  );
+
+  // --- Les lignes suivent les colonnes qu'on a choisies.
+  await empty.click('.list__title[data-column="label"]', { button: "right" });
+  await openChecks(empty);
+  for (const name of ["clearing-date", "status", "verification", "category", "assignment", "payment-mode", "payee", "project", "month", "comments", "attachments", "check"]) {
+    await empty.click(`.context-menu--columns [data-column="${name}"]`);
+  }
+  await empty.keyboard.press("Escape");
+  const from = await empty.locator('.list__title[data-column="balance"]').boundingBox();
+  const to = await empty.locator('.list__title[data-column="date"]').boundingBox();
+  await empty.mouse.move(from.x + 12, from.y + 10);
+  await empty.mouse.down();
+  await empty.mouse.move(from.x - 10, from.y + 10, { steps: 2 });
+  await empty.mouse.move(to.x + 3, from.y + 10, { steps: 6 });
+  await empty.mouse.up();
+  await empty.waitForTimeout(200);
+  await empty.click(".list__row >> nth=0");
+  await empty.keyboard.press("Control+c");
+  await empty.waitForTimeout(150);
+  check(
+    "copier : les lignes suivent les colonnes affichées, dans l'ordre choisi",
+    (await empty.evaluate(() => window.__clipboard.slice(-1)[0])) === "\t2322,34\t05/01/2026\tCOURSES\t-100,00\t",
+    JSON.stringify(await empty.evaluate(() => window.__clipboard.slice(-1)[0])),
+  );
+  await empty.close();
+
+  // --- Le presse-papiers refuse : l'autre chemin, puis l'aveu.
+  const old = await browser.newPage();
+  await openWindow(old, URL, { clipboardRefuses: "modern" });
+  await old.click(".list__row >> nth=0 >> .list__cell >> nth=5", { button: "right" });
+  await old.click('.context-menu [data-head="copy-cell"]');
+  await old.waitForTimeout(200);
+  check(
+    "copier : si l'interface moderne refuse, l'ancienne commande de copie prend le relais",
+    await old.evaluate(
+      () => window.__copiedTheOldWay === 1 && window.__clipboard.join() === "COURSES" &&
+        document.querySelector(".clipboard-scratch") === null,
+    ),
+  );
+  check(
+    "copier : et rien n'est dit — la copie a eu lieu",
+    !(await old.evaluate(() => document.getElementById("info-bar").classList.contains("info-bar--alert"))),
+  );
+  await old.close();
+  const refused = await browser.newPage();
+  await openWindow(refused, URL, { clipboardRefuses: "both" });
+  await refused.click(".list__row >> nth=0 >> .list__cell >> nth=5", { button: "right" });
+  await refused.click('.context-menu [data-head="copy-cell"]');
+  await refused.waitForTimeout(200);
+  check(
+    "copier : si rien n'a pu être écrit, la fenêtre le dit, en alerte",
+    (await refused.textContent("#info-bar")) === "La copie dans le presse-papiers a échoué." &&
+      (await refused.evaluate(() => document.getElementById("info-bar").classList.contains("info-bar--alert"))),
+    await refused.textContent("#info-bar"),
+  );
+  await refused.close();
+
+  // --- Tous les tableaux : une liste de nomenclature.
+  const list = await browser.newPage();
+  await openWindow(list, "http://localhost:4173/ui/windows/nomenclature-list.html?kind=category");
+  await list.click(".list__row >> nth=0 >> .list__cell >> nth=0", { button: "right" });
+  await list.waitForTimeout(100);
+  const label = await list.locator(".list__row >> nth=0 >> .list__cell >> nth=0").textContent();
+  check(
+    "copier : une liste de nomenclature a les deux mêmes entrées, puis ses dix exports",
+    (await list.locator(".context-menu > .context-menu__entry--head").allTextContents()).join("|") ===
+      "Copier la cellule|Copier les lignes sélectionnées" &&
+      (await list.locator(".context-menu > .context-menu__entry:not(.context-menu__entry--head)").count()) === 10,
+  );
+  await list.click('.context-menu [data-head="copy-cell"]');
+  await list.waitForTimeout(150);
+  check(
+    "copier : et la cellule s'y copie",
+    (await list.evaluate(() => window.__clipboard.join("|"))) === label,
+    await list.evaluate(() => window.__clipboard.join("|")),
+  );
+  await list.click(".list__row >> nth=0");
+  await list.keyboard.down("Shift");
+  await list.click(".list__row >> nth=2");
+  await list.keyboard.up("Shift");
+  await list.keyboard.press("Control+c");
+  await list.waitForTimeout(150);
+  check(
+    "copier : Ctrl+C y copie les lignes choisies, une par ligne",
+    (await list.evaluate(() => window.__clipboard.slice(-1)[0].split("\n").length)) === 3,
+  );
+  await list.close();
+
+  // --- Les matrices : « Copier la cellule », et elle seule.
+  for (const [what, url] of [
+    ["statistiques", "statistics.html?axis=category&accounts=1,2&year=2026"],
+    ["bilan croisé", "crossed-balance.html?accounts=1,2&year=2026&month=9"],
+  ]) {
+    const matrix = await browser.newPage({ viewport: { width: 1700, height: 900 } });
+    await openWindow(matrix, `http://localhost:4173/ui/windows/${url}`);
+    const cell = matrix.locator(".matrix__row >> nth=1 >> .matrix__cell >> nth=0");
+    const shown = (await cell.textContent()).trim();
+    await cell.click({ button: "right" });
+    await matrix.waitForTimeout(100);
+    check(
+      `copier, ${what} : la matrice offre « Copier la cellule », un trait, puis ses exports — pas de copie de lignes`,
+      (await matrix.locator(".context-menu > .context-menu__entry--head").allTextContents()).join("|") ===
+        "Copier la cellule" &&
+        (await matrix.locator(".context-menu > :nth-child(2)").evaluate((piece) => piece.matches("hr"))) &&
+        (await matrix.locator(".context-menu > .context-menu__entry:not(.context-menu__entry--head)").count()) > 0,
+    );
+    await matrix.click('.context-menu [data-head="copy-cell"]');
+    await matrix.waitForTimeout(150);
+    const got = await matrix.evaluate(() => window.__clipboard.slice(-1)[0]);
+    check(
+      `copier, ${what} : la case se copie en nombre pur — « ${shown} » donne « ${got} »`,
+      /^-?\d+[,.]\d{2}$/.test(got) && !got.includes("€") && got.replace(/\D/g, "") === shown.replace(/\D/g, ""),
+      `${shown} → ${got}`,
+    );
+    const name = matrix.locator(".matrix__row >> nth=1 >> .matrix__label");
+    await name.click({ button: "right" });
+    await matrix.click('.context-menu [data-head="copy-cell"]');
+    await matrix.waitForTimeout(150);
+    check(
+      `copier, ${what} : le libellé d'une ligne se copie tel quel`,
+      (await matrix.evaluate(() => window.__clipboard.slice(-1)[0])) === (await name.textContent()).trim(),
+    );
+    // Le détail du bas, lui, est un tableau comme les autres.
+    await cell.click();
+    await matrix.waitForTimeout(250);
+    await matrix.click(".list--detail .list__row >> nth=0");
+    await matrix.keyboard.press("Meta+c");
+    await matrix.waitForTimeout(150);
+    check(
+      `copier, ${what} : dans le détail du bas, ⌘C copie la ligne choisie — onze cellules`,
+      (await matrix.evaluate(() => window.__clipboard.slice(-1)[0].split("\t").length)) === 11,
+      await matrix.evaluate(() => JSON.stringify(window.__clipboard.slice(-1)[0])),
+    );
+    await matrix.close();
+  }
 }
 
 // --- F05, la classification rapide : le brouillon et ses trois gestes ----
@@ -6845,8 +11494,8 @@ async function openWindow(page, url, options) {
   // **Les six cases sont éteintes, et leurs menus avec.** C'est ce que montre
   // la capture, et c'est ce qui dit qu'on n'a encore rien demandé.
   check(
-    "classification : les six caractéristiques sont là",
-    (await page.locator(".characteristic").count()) === 6,
+    "classification : les sept caractéristiques sont là",
+    (await page.locator(".characteristic").count()) === 7,
     String(await page.locator(".characteristic").count()),
   );
   check(
@@ -6913,7 +11562,8 @@ async function openWindow(page, url, options) {
       asked.change.payment_mode === null &&
       asked.change.payee === null &&
       asked.change.project === null &&
-      asked.change.status === null,
+      asked.change.status === null &&
+      asked.change.verification === null,
     JSON.stringify(asked?.change ?? null),
   );
   check(
@@ -7027,8 +11677,8 @@ async function openWindow(page, url, options) {
   await page.click(".list__row >> nth=0");
   await page.waitForTimeout(150);
   check(
-    "classification : la ligne choisie porte ses six menus",
-    (await page.locator(".list__row[aria-selected='true'] .list__combo").count()) === 6,
+    "classification : la ligne choisie porte ses sept menus",
+    (await page.locator(".list__row[aria-selected='true'] .list__combo").count()) === 7,
     String(await page.locator(".list__row[aria-selected='true'] .list__combo").count()),
   );
   // **Le mode de paiement, et pas une autre.** C'est la seule caractéristique
@@ -7051,6 +11701,141 @@ async function openWindow(page, url, options) {
     await page.evaluate(
       () => !window.__calls.some(([command]) => command === "quick_classification_save"),
     ),
+  );
+
+  // --- La vérification, septième caractéristique (Fabrice, 03/10/2026) ----
+  //
+  // En dernière colonne du tableau, et sous le statut dans le bandeau. Sur le
+  // même principe que les six autres : elle va dans le brouillon, et rien
+  // n'est écrit avant l'enregistrement.
+  const quickTitles = await page.locator(".list__title-text").allTextContents();
+  check(
+    "classification : la vérification est la dernière colonne",
+    quickTitles.length === 10 && quickTitles[9] === "Vérification",
+    JSON.stringify(quickTitles),
+  );
+  const shown = await page.evaluate(() => {
+    const row = document.querySelectorAll(".list__row")[1];
+    const cell = row.querySelectorAll(".list__cell")[9];
+    return {
+      word: cell.textContent.trim(),
+      key: cell.dataset.verification,
+      colour: getComputedStyle(cell).color,
+    };
+  });
+  check(
+    "classification : une ligne montre sa vérification, dans sa couleur",
+    shown.word === "Vérifiée" && shown.key === "2" && shown.colour === "rgb(30, 107, 36)",
+    JSON.stringify(shown),
+  );
+  const lastCombo = page.locator(".list__row[aria-selected='true'] .list__combo >> nth=6");
+  check(
+    "classification : son menu offre les quatre vérifications, sans « Non précisé »",
+    (await lastCombo.locator("option").allTextContents()).join("|") ===
+      "À vérifier|Vérifiée|Douteuse|Contestée",
+  );
+  await lastCombo.selectOption("4");
+  await page.waitForTimeout(250);
+  const verificationSent = await page.evaluate(() => window.__quickSet ?? null);
+  check(
+    "classification : la cellule envoie la vérification au brouillon, pas à la base",
+    verificationSent !== null &&
+      verificationSent.characteristic === "verification" &&
+      verificationSent.value === 4 &&
+      (await page.evaluate(
+        () =>
+          !window.__calls.some(([command]) =>
+            ["quick_classification_save", "set_operation_verification"].includes(command),
+          ),
+      )),
+    JSON.stringify(verificationSent),
+  );
+
+  // Le bandeau : la septième case, sous le statut, dans la colonne de droite.
+  const placed = await page.evaluate(() => {
+    const box = (key) =>
+      document.getElementById("check-" + key).closest(".characteristic").getBoundingClientRect();
+    return {
+      underStatus:
+        Math.abs(box("verification").left - box("status").left) < 2 &&
+        box("verification").top > box("status").top,
+      // Et les six autres n'ont pas bougé : trois à gauche, trois à droite.
+      leftColumn:
+        Math.abs(box("category").left - box("assignment").left) < 2 &&
+        Math.abs(box("category").left - box("payment-mode").left) < 2,
+      rightColumn:
+        Math.abs(box("payee").left - box("project").left) < 2 &&
+        Math.abs(box("payee").left - box("status").left) < 2 &&
+        box("payee").left > box("category").left &&
+        Math.abs(box("payee").top - box("category").top) < 2,
+    };
+  });
+  check(
+    "classification : la vérification est sous le statut, et les six autres n'ont pas bougé",
+    placed.underStatus && placed.leftColumn && placed.rightColumn,
+    JSON.stringify(placed),
+  );
+  await page.uncheck("#check-category");
+  await page.check("#check-verification");
+  await page.selectOption("#check-verification ~ .characteristic__menu", "3");
+  check(
+    "classification : le menu du bandeau porte la couleur de son choix",
+    (await page.evaluate(
+      () =>
+        getComputedStyle(document.querySelector("#check-verification ~ .characteristic__menu"))
+          .color,
+    )) === "rgb(179, 92, 0)",
+  );
+  await page.click(".list__row >> nth=0");
+  await page.waitForTimeout(100);
+  await page.click("#apply");
+  await page.waitForTimeout(250);
+  const verificationApplied = await page.evaluate(() => window.__quickApplied ?? null);
+  check(
+    "classification : appliquer envoie la vérification cochée, et elle seule",
+    verificationApplied !== null &&
+      verificationApplied.change.verification === 3 &&
+      verificationApplied.change.category === null &&
+      verificationApplied.change.status === null,
+    JSON.stringify(verificationApplied?.change ?? null),
+  );
+  check(
+    "classification : et toujours rien sur le disque",
+    await page.evaluate(
+      () => !window.__calls.some(([command]) => command === "quick_classification_save"),
+    ),
+  );
+
+  // **L'ascenseur horizontal** (Fabrice, 03/10/2026) : dix colonnes ne tiennent
+  // pas dans une fenêtre rétrécie. Large, rien ne dépasse ; étroite, les lignes
+  // gardent leur largeur plancher et débordent, et l'en-tête les suit.
+  const sideways = () =>
+    page.evaluate(() => {
+      const rows = document.getElementById("rows");
+      return { content: rows.scrollWidth, frame: rows.clientWidth };
+    });
+  await page.setViewportSize({ width: 1700, height: 900 });
+  await page.waitForTimeout(150);
+  const wide = await sideways();
+  await page.setViewportSize({ width: 900, height: 900 });
+  await page.waitForTimeout(150);
+  const narrow = await sideways();
+  check(
+    "classification : large, le tableau tient ; étroite, il déborde et l'ascenseur vient",
+    wide.content <= wide.frame + 1 && narrow.content > narrow.frame + 50,
+    JSON.stringify({ wide, narrow }),
+  );
+  await page.evaluate(() => {
+    const rows = document.getElementById("rows");
+    rows.scrollLeft = 120;
+    rows.dispatchEvent(new Event("scroll"));
+  });
+  await page.waitForTimeout(100);
+  check(
+    "classification : et l'en-tête suit les lignes quand on fait défiler",
+    (await page.evaluate(() => document.getElementById("header").style.transform)) ===
+      "translateX(-120px)",
+    await page.evaluate(() => document.getElementById("header").style.transform),
   );
   await page.close();
 }
@@ -7422,6 +12207,98 @@ async function openWindow(page, url, options) {
   await page.close();
 }
 
+// --- F17 : un relevé QIF, par le même chemin que l'OFX (15/10/2026) -------
+//
+// « C'est un relevé bancaire aussi, donc on utilise la même fenêtre, les mêmes
+// boutons, la même interface » (Fabrice). Une seule question de plus, quand
+// le fichier ne dit pas l'ordre des dates.
+{
+  const url = "http://localhost:4173/ui/windows/statement-import.html?account=1";
+  const page = await browser.newPage();
+  await openWindow(page, url, { pickedIsQif: true });
+  await page.click("#open");
+  await page.waitForTimeout(300);
+  let loads = await page.evaluate(() => window.__qifLoads ?? []);
+  check(
+    "QIF : un seul compte, aucune question — chargé comme un OFX, sans passer par le découpage CSV",
+    loads.length === 1 && loads[0].path === "/tmp/releve.qif" && loads[0].account === 0 && loads[0].order === null &&
+      !(await page.locator(".dialog").isVisible()) &&
+      (await page.evaluate(() => !window.__calls.some(([command]) => command === "statement_load" || command === "open_csv_statement"))),
+    JSON.stringify(loads),
+  );
+  check("QIF : le même tableau", (await page.locator(".list__row").count()) === 3);
+  check(
+    "QIF : pas de colonne FITID, et ni « Fichier » ni « Écart » quand le fichier ne donne pas de solde",
+    (await page.evaluate(() => document.querySelector(".window--no-fitid") !== null)) &&
+      (await page.locator("#file-balance").textContent()) === "" &&
+      (await page.locator("#difference").textContent()) === "",
+  );
+  check(
+    "QIF : le solde initial écarté est annoncé",
+    ((await page.locator("#info-bar").textContent()) ?? "").includes("Solde initial de 2 140,50 €"),
+    await page.locator("#info-bar").textContent(),
+  );
+  check(
+    "QIF : le dossier jaune annonce les trois formats",
+    (await page.getAttribute("#open", "title")) === "Ouvrir un fichier de relevé (OFX, QIF, CSV)",
+  );
+  await page.close();
+
+  // L'ordre des dates : demandé, et la réponse repart avec la lecture.
+  const ambiguous = await browser.newPage();
+  await openWindow(ambiguous, url, { pickedIsQif: true, qifAmbiguous: true });
+  await ambiguous.click("#open");
+  await ambiguous.waitForTimeout(300);
+  check(
+    "QIF : rien ne prouve l'ordre des dates — la question, avec les deux lectures",
+    (await ambiguous.locator(".dialog").isVisible()) &&
+      ((await ambiguous.locator(".dialog__question").textContent()) ?? "").includes("« 05/03/2023 »") &&
+      (await ambiguous.locator(".dialog__field option").allTextContents()).join("|") ===
+        "Jour 5, mois 3 (jour/mois)|Jour 3, mois 5 (mois/jour)",
+  );
+  await ambiguous.selectOption(".dialog__field", "Jour 3, mois 5 (mois/jour)");
+  await ambiguous.click(".dialog__button >> nth=0");
+  await ambiguous.waitForTimeout(300);
+  loads = await ambiguous.evaluate(() => window.__qifLoads);
+  check(
+    "QIF : la réponse repart avec la lecture, et le relevé s'affiche",
+    loads.length === 2 && loads[1].order === "month-day" && (await ambiguous.locator(".list__row").count()) === 3,
+    JSON.stringify(loads),
+  );
+  await ambiguous.close();
+
+  const refused = await browser.newPage();
+  await openWindow(refused, url, { pickedIsQif: true, qifAmbiguous: true });
+  await refused.click("#open");
+  await refused.waitForTimeout(300);
+  await refused.click(".dialog__button >> nth=1");
+  await refused.waitForTimeout(250);
+  check(
+    "QIF : renoncer à la question ne charge rien",
+    (await refused.evaluate(() => window.__qifLoads.length)) === 1 && (await refused.locator(".list__row").count()) === 0,
+  );
+  await refused.close();
+
+  // Plusieurs comptes : la même question qu'en OFX, et c'est le rang qui part.
+  const many = await browser.newPage();
+  await openWindow(many, url, { pickedIsQif: true, qifAccounts: ["Courant", "Livret"] });
+  await many.click("#open");
+  await many.waitForTimeout(300);
+  check(
+    "QIF : plusieurs comptes, la même question qu'en OFX",
+    (await many.locator(".dialog__question").textContent()) === "Ce fichier contient plusieurs comptes. Lequel voulez-vous importer ?" &&
+      (await many.locator(".dialog__field option").count()) === 2,
+  );
+  await many.selectOption(".dialog__field", "Livret");
+  await many.click(".dialog__button >> nth=0");
+  await many.waitForTimeout(300);
+  check(
+    "QIF : le compte choisi part par son rang",
+    (await many.evaluate(() => window.__qifLoads[0].account)) === 1,
+  );
+  await many.close();
+}
+
 // --- F17 : le menu Filtre et le fichier à plusieurs comptes --------------
 {
   const page = await browser.newPage();
@@ -7607,6 +12484,11 @@ async function openWindow(page, url, options) {
     again,
     "http://localhost:4173/ui/windows/statement-form.html?account=1&rank=2",
   );
+  // Un classement est choisi, et un statut : c'est ce que l'utilisateur laisse
+  // derrière lui en retournant à la liste.
+  await again.selectOption("#category", "1");
+  await again.selectOption("#assignment", "2");
+  await again.selectOption("#status", "3");
   await again.evaluate(() =>
     window.__listeners["window-parameters:statement-form"]({
       payload: "account=1&rank=3",
@@ -7617,6 +12499,42 @@ async function openWindow(page, url, options) {
     "rapprochement : redemandée, elle montre l'autre ligne",
     (await again.textContent("#info-bar")).includes("aucun identifiant"),
     await again.textContent("#info-bar"),
+  );
+  // Bug remonté par Fabrice le 30/08/2026 : le classement ne venant d'aucune
+  // ligne, il restait celui d'avant — et une catégorie héritée ne se voit nulle
+  // part, elle ressort dans une statistique fausse.
+  check(
+    "rapprochement : redemandée, le classement repart à « Non précisé »",
+    await again.evaluate(() =>
+      ["payment-mode", "category", "assignment", "payee", "project"].every(
+        (id) => document.getElementById(id).value === "0",
+      ),
+    ),
+    await again.evaluate(() =>
+      ["payment-mode", "category", "assignment", "payee", "project"]
+        .map((id) => `${id}=${document.getElementById(id).value}`)
+        .join(" "),
+    ),
+  );
+  check(
+    "rapprochement : redemandée, le statut repart à pointée",
+    (await again.inputValue("#status")) === "1",
+    await again.inputValue("#status"),
+  );
+
+  // **Et sur la même ligne aussi** : on ne l'a pas validée, donc elle n'a rien
+  // produit. C'est la règle du virement et celle de « Dupliquer ».
+  await again.selectOption("#payee", "4");
+  await again.evaluate(() =>
+    window.__listeners["window-parameters:statement-form"]({
+      payload: "account=1&rank=3",
+    }),
+  );
+  await again.waitForTimeout(250);
+  check(
+    "rapprochement : rouverte sur la même ligne, elle repart à zéro elle aussi",
+    (await again.inputValue("#payee")) === "0",
+    await again.inputValue("#payee"),
   );
   await again.close();
 }
@@ -8474,6 +13392,53 @@ async function openWindow(page, url, options) {
   await page.close();
 }
 
+// **Un modèle écrit ce qu'écrirait la main** (Fabrice, 25/08/2026). Poser une
+// valeur dans un champ ne déclenche aucun événement : la règle qui lie la date
+// de pointage au statut ne jouait pas, et un modèle « prévu » créait une
+// opération non pointée portant une date de pointage.
+{
+  const page = await browser.newPage();
+  await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/operation-form.html?mode=A&account=1",
+  );
+  // Une fiche neuve est datée du jour, des deux côtés.
+  const fresh = await page.inputValue("#clearing-date");
+  check("modèle : la fiche neuve porte une date de pointage", fresh !== "");
+
+  const applied = await page.evaluate(() => {
+    const handler =
+      window.__listeners && window.__listeners["template-chosen:operation-form"];
+    if (!handler) {
+      return false;
+    }
+    handler({
+      event: "template-chosen:operation-form",
+      id: 1,
+      payload: {
+        label: "Loyer",
+        amount: -700_00,
+        signed_text: "-700,00",
+        status_id: 3,
+        category_id: 1,
+        assignment_id: 2,
+        payment_mode_id: 3,
+        payee_id: 0,
+        project_id: 0,
+      },
+    });
+    return true;
+  });
+  check("modèle : le modèle est appliqué", applied === true);
+  await page.waitForTimeout(120);
+  check(
+    "modèle : un modèle prévu vide la date de pointage, comme à la main",
+    (await page.inputValue("#clearing-date")) === "",
+  );
+  check("modèle : et le statut est bien celui du modèle", (await page.inputValue("#status")) === "3");
+  await page.close();
+}
+
 // --- Phase 11 — la saisie du budget (F26) -------------------------------
 {
   const page = await browser.newPage();
@@ -8513,7 +13478,7 @@ async function openWindow(page, url, options) {
   await page.close();
 }
 
-// --- Phase 11 — le contrôle du budget (F27) -----------------------------
+// --- Phase 11 — le contrôle du budget (F39) -----------------------------
 {
   const page = await browser.newPage();
   await openWindow(page, "http://localhost:4173/ui/windows/budget.html?mode=control&year=2026");
@@ -8874,6 +13839,53 @@ async function openWindow(page, url, options) {
     "périodiques : le calendrier part sur les deux règles choisies",
     JSON.stringify(await page.evaluate(() => window.__opened?.args?.ids)) === "[1,2]",
     JSON.stringify(await page.evaluate(() => window.__opened)),
+  );
+  await page.close();
+}
+
+// **La règle tirée d'une opération** (Fabrice, 25/08/2026) : la fiche s'ouvre
+// neuve puis reçoit ce que l'opération sait donner, « comme si les champs
+// avaient été remplis à la main ». Le rythme, lui, reste celui d'une fiche
+// neuve : une opération ne dit pas à quelle fréquence elle se répète.
+{
+  const page = await browser.newPage();
+  await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/recurring-form.html?mode=A&id=0&from=1",
+  );
+  check(
+    "règle depuis une opération : le libellé est celui de l'opération",
+    (await page.inputValue("#label")) === "VIREMENT DE COMPLEMENTAIRE SANTE",
+  );
+  check(
+    "règle depuis une opération : le montant aussi",
+    (await page.inputValue("#amount")) === "9,00",
+  );
+  check(
+    "règle depuis une opération : un crédit devient le sens positif",
+    (await page.inputValue("#direction")) === "1",
+  );
+  check(
+    "règle depuis une opération : les nomenclatures suivent",
+    (await page.inputValue("#category")) === "1" &&
+      (await page.inputValue("#assignment")) === "2" &&
+      (await page.inputValue("#payment-mode")) === "3",
+  );
+  // Ce que l'opération ne sait pas dire reste celui d'une fiche neuve.
+  check(
+    "règle depuis une opération : le rythme reste celui d'une fiche neuve",
+    (await page.inputValue("#frequency")) === "1" &&
+      (await page.inputValue("#unit")) === "month" &&
+      (await page.isChecked("#ending-no-limit")),
+  );
+  check(
+    "règle depuis une opération : la fiche est bien en création",
+    (await page.inputValue("#id")) === "",
+  );
+  // Rien n'est écrit : c'est une fiche pré-remplie, pas une règle créée.
+  check(
+    "règle depuis une opération : rien n'est enregistré à l'ouverture",
+    (await page.evaluate(() => window.__calls.every(([c]) => c !== "create_recurring_rule"))),
   );
   await page.close();
 }
@@ -9309,6 +14321,2206 @@ async function openWindow(page, url, options) {
     ),
   );
   await page.close();
+}
+
+// --- Accueil : les cases, l'ordre et l'ascenseur des comptes --------------
+{
+  // Fabrice, 07/10/2026 : « avant chaque nom de compte je veux une boîte à
+  // cocher. Le but sera de faire comptabiliser ou non les soldes dans les 3
+  // zones carrées du dessus. Les carrés pourront aussi être déplacés par drag
+  // and drop. Évidemment cela sera mémorisable dans les préférences. »
+  const page = await browser.newPage();
+  await page.setViewportSize({ width: 900, height: 700 });
+  const errors = await openWindow(page, "http://localhost:4173/", { manyAccounts: true });
+  check("accueil, comptes : aucune erreur de script", errors.length === 0, errors.join(" | "));
+
+  const ids = () =>
+    page.evaluate(() => [...document.querySelectorAll(".tile")].map((t) => t.dataset.account).join(","));
+  const saves = () =>
+    page.evaluate(() => window.__calls.filter(([c]) => c === "save_welcome_accounts").map(([, a]) => a));
+  const opened = () =>
+    page.evaluate(() => window.__calls.filter(([c]) => c === "open_operations_list").length);
+
+  check(
+    "accueil : chaque tuile porte sa case, avant le nom, cochée à la naissance",
+    await page.evaluate(() =>
+      [...document.querySelectorAll(".tile")].every((tile) => {
+        const head = tile.firstElementChild;
+        const check = head.firstElementChild;
+        return (
+          check.matches('input[type="checkbox"].tile__check') &&
+          check.checked &&
+          check.nextElementSibling.classList.contains("tile__name")
+        );
+      }),
+    ),
+  );
+  check(
+    "accueil : la case dit à quoi elle sert",
+    (await page.locator(".tile__check").first().getAttribute("title")) === "Compter ce compte dans les totaux",
+  );
+
+  // Huit comptes dans 900 points : une seule rangée, et elle défile.
+  const row = await page.evaluate(() => {
+    const holder = document.getElementById("tiles");
+    const tops = new Set([...holder.children].map((t) => Math.round(t.getBoundingClientRect().top)));
+    return {
+      lines: tops.size,
+      scrolls: holder.scrollWidth > holder.clientWidth,
+      overflow: getComputedStyle(holder).overflowX,
+      page: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      narrowest: Math.min(...[...holder.children].map((t) => t.getBoundingClientRect().width)),
+    };
+  });
+  check(
+    "accueil : les tuiles tiennent sur une seule rangée, qui défile dans sa carte et non la fenêtre",
+    row.lines === 1 && row.scrolls && row.overflow === "auto" && row.page && row.narrowest >= 215,
+    JSON.stringify(row),
+  );
+
+  // Décocher : le compte sort des totaux, reste montré, et la ligne le dit.
+  await page.locator('.tile[data-account="2"] .tile__check').click();
+  await page.waitForTimeout(200);
+  check(
+    "accueil : décocher un compte l'enregistre, sans ouvrir ses opérations",
+    JSON.stringify(await saves()) === JSON.stringify([{ order: [1, 2, 3, 4, 5, 6, 7, 8], excluded: [2] }]) &&
+      (await opened()) === 0,
+    JSON.stringify(await saves()),
+  );
+  check(
+    "accueil : le compte décoché sort du solde en banque",
+    (await page.textContent("#total-bank")) === "4849,81 €",
+    await page.textContent("#total-bank"),
+  );
+  check(
+    "accueil : la ligne dit combien de comptes sont comptés",
+    (await page.textContent("#total-bank-detail")) === "Comptes comptés dans les totaux : 7 sur 8",
+    await page.textContent("#total-bank-detail"),
+  );
+  check(
+    "accueil : le compte décoché reste montré, en retrait, sa case décochée",
+    await page.evaluate(() => {
+      const tile = document.querySelector('.tile[data-account="2"]');
+      return tile.classList.contains("tile--excluded") && !tile.querySelector(".tile__check").checked;
+    }),
+  );
+  await page.locator('.tile[data-account="2"] .tile__name').click();
+  await page.waitForTimeout(150);
+  check("accueil : un compte décoché s'ouvre toujours d'un clic", (await opened()) === 1);
+
+  // Au clavier : la tuile s'ouvre à Entrée ; la case se coche à Espace sans
+  // ouvrir, et garde le focus une fois l'accueil relu.
+  await page.locator('.tile[data-account="1"]').focus();
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(150);
+  check("accueil : Entrée sur une tuile ouvre son compte", (await opened()) === 2);
+  await page.locator('.tile[data-account="2"] .tile__check').focus();
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(200);
+  check(
+    "accueil : Espace sur la case la recoche, n'ouvre rien et lui laisse le focus",
+    (await opened()) === 2 &&
+      (await page.evaluate(() => {
+        const check = document.querySelector('.tile[data-account="2"] .tile__check');
+        return check.checked && document.activeElement === check;
+      })) &&
+      (await page.textContent("#total-bank-detail")) === "8 comptes ouverts",
+    await page.textContent("#total-bank-detail"),
+  );
+
+  // Déplacer : la première tuile se pose après la troisième.
+  const centre = async (id) => {
+    const box = await page.locator(`.tile[data-account="${id}"]`).boundingBox();
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2, right: box.x + box.width };
+  };
+  const from = await centre(1);
+  const third = await centre(3);
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  await page.mouse.move(from.x + 3, from.y);
+  check(
+    "accueil : sous le seuil, rien ne bouge — c'est encore un clic",
+    (await page.locator(".tile-drop-mark").count()) === 0,
+  );
+  await page.mouse.move(third.right - 20, third.y, { steps: 6 });
+  check(
+    "accueil : une tuile en main montre le trait de sa future place",
+    (await page.locator(".tile-drop-mark").count()) === 1 &&
+      (await page.locator('.tile[data-account="1"]').evaluate((t) => t.classList.contains("tile--moving"))),
+  );
+  // L'accueil se relit sous la main (il reprend le focus) : la tuile reste.
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await page.waitForTimeout(150);
+  check(
+    "accueil : relu pendant le geste, il ne redessine pas les tuiles sous la main",
+    await page.locator('.tile[data-account="1"]').evaluate((t) => t.classList.contains("tile--moving")),
+  );
+  const before = await opened();
+  await page.mouse.up();
+  await page.waitForTimeout(250);
+  check(
+    "accueil : la tuile déposée prend sa place, et l'ordre est enregistré",
+    (await ids()) === "2,3,1,4,5,6,7,8" &&
+      JSON.stringify((await saves()).at(-1)) === JSON.stringify({ order: [2, 3, 1, 4, 5, 6, 7, 8], excluded: [] }),
+    await ids(),
+  );
+  check(
+    "accueil : déposer une tuile n'ouvre pas son compte, et le trait s'en va",
+    (await opened()) === before && (await page.locator(".tile-drop-mark").count()) === 0,
+  );
+
+  // Reposée à sa place : rien à écrire.
+  const count = (await saves()).length;
+  const second = await centre(3);
+  await page.mouse.move(second.x, second.y);
+  await page.mouse.down();
+  await page.mouse.move(second.x + 30, second.y, { steps: 4 });
+  await page.mouse.up();
+  await page.waitForTimeout(200);
+  check(
+    "accueil : une tuile reposée à sa place n'écrit rien",
+    (await saves()).length === count && (await ids()) === "2,3,1,4,5,6,7,8",
+    await ids(),
+  );
+
+  // Au bord, la rangée défile ; et la position tient après la relecture.
+  const last = await centre(1);
+  const frame = await page.locator("#tiles").boundingBox();
+  await page.mouse.move(last.x, last.y);
+  await page.mouse.down();
+  for (let step = 0; step < 60; step += 1) {
+    await page.mouse.move(frame.x + frame.width - 5 - (step % 2), last.y);
+  }
+  await page.mouse.up();
+  await page.waitForTimeout(250);
+  check(
+    "accueil : au bord de la rangée elle défile, et la tuile va jusqu'au bout",
+    (await ids()) === "2,3,4,5,6,7,8,1",
+    await ids(),
+  );
+  check(
+    "accueil : redessinée, la rangée reste là où l'on avait défilé",
+    (await page.evaluate(() => document.getElementById("tiles").scrollLeft)) > 0,
+  );
+
+  // Les préférences rendent l'ordre et les cases : l'accueil le montre aussitôt.
+  await page.evaluate(() => {
+    window.__welcomeStored = { order: [], excluded: [] };
+    window.__listeners["welcome-accounts-changed"]({ payload: null });
+  });
+  await page.waitForTimeout(200);
+  check(
+    "accueil : la réinitialisation des préférences lui rend son ordre de naissance",
+    (await ids()) === "1,2,3,4,5,6,7,8",
+    await ids(),
+  );
+  await page.close();
+
+  // Ce que la base retient se retrouve à l'ouverture.
+  const kept = await browser.newPage();
+  await openWindow(kept, "http://localhost:4173/", { storedWelcome: { order: [2, 1], excluded: [1] } });
+  check(
+    "accueil : l'ordre et les cases retenus se retrouvent à l'ouverture",
+    (await kept.evaluate(() => [...document.querySelectorAll(".tile")].map((t) => t.dataset.account).join(","))) === "2,1" &&
+      (await kept.locator('.tile[data-account="1"] .tile__check').isChecked()) === false &&
+      (await kept.textContent("#total-bank")) === "23422,81 €" &&
+      (await kept.textContent("#total-bank-detail")) === "Comptes comptés dans les totaux : 1 sur 2",
+    await kept.textContent("#total-bank-detail"),
+  );
+  // Peu de comptes : ils remplissent la carte, sans ascenseur.
+  const few = await kept.evaluate(() => {
+    const holder = document.getElementById("tiles");
+    const boxes = [...holder.children].map((t) => t.getBoundingClientRect());
+    return {
+      scrolls: holder.scrollWidth > holder.clientWidth,
+      filled: Math.round(boxes.at(-1).right) >= Math.round(holder.getBoundingClientRect().right) - 2,
+    };
+  });
+  check(
+    "accueil : deux comptes remplissent la carte, sans ascenseur",
+    !few.scrolls && few.filled,
+    JSON.stringify(few),
+  );
+  await kept.close();
+}
+
+// --- Préférences : « Réinitialiser les réglages de confort » --------------
+{
+  // Fabrice, 07/10/2026 : « il faut avoir un bouton pour remettre à zéro les
+  // réglages de confort mais pas le reste ».
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/preferences.html");
+  check(
+    "préférences : « Réglages de confort » a sa feuille, sous sa propre branche",
+    await page.evaluate(() => {
+      const leaf = document.querySelector('.tree__leaf[data-leaf="comfort"]');
+      return (
+        leaf.textContent === "Réglages de confort" &&
+        leaf.previousElementSibling.classList.contains("tree__branch") &&
+        leaf.previousElementSibling.textContent === "Réinitialisation"
+      );
+    }),
+  );
+  // Une langue choisie et la taille bougée, pas encore enregistrées.
+  await page.click('.tree__leaf[data-leaf="zoom"]');
+  await page.locator("#zoom").evaluate((field) => {
+    field.value = "1.3";
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await page.click('.tree__leaf[data-leaf="comfort"]');
+  check(
+    "préférences : la feuille montre son bouton et dit ce qu'il touche",
+    (await page.textContent("#comfort-reset")) === "Réinitialiser les réglages de confort" &&
+      (await page.locator("#comfort-hint").isVisible()),
+  );
+
+  await page.click("#comfort-reset");
+  await page.waitForTimeout(100);
+  check(
+    "préférences : le bouton demande avant d'agir",
+    (await page.locator(".dialog__question").textContent()) === "Réinitialiser les réglages de confort ?" &&
+      (await page.evaluate(() => window.__calls.every(([c]) => c !== "reset_comfort_settings"))),
+  );
+  await page.click(".dialog__button:not(.dialog__button--primary)");
+  await page.waitForTimeout(100);
+  check(
+    "préférences : « Non » ne réinitialise rien",
+    await page.evaluate(() => window.__calls.every(([c]) => c !== "reset_comfort_settings")),
+  );
+
+  await page.click("#comfort-reset");
+  await page.waitForTimeout(100);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(200);
+  check(
+    "préférences : « Oui » réinitialise, d'une seule commande, et le dit",
+    (await page.evaluate(
+      () => window.__calls.filter(([c]) => c === "reset_comfort_settings").length === 1,
+    )) && (await page.textContent("#info-bar")) === "Les réglages de confort ont été réinitialisés.",
+    await page.textContent("#info-bar"),
+  );
+  check(
+    "préférences : ni la langue, ni la devise, ni la vérification ne sont écrites",
+    await page.evaluate(() =>
+      window.__calls.every(([c]) => !c.startsWith("save_preferences") && c !== "set_language"),
+    ),
+  );
+  check(
+    "préférences : la taille revient à 100 %, et la fenêtre n'est plus « modifiée »",
+    (await page.inputValue("#zoom")) === "1",
+  );
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  check(
+    "préférences : après la réinitialisation, elle se ferme sans question",
+    await page.evaluate(() => window.__calls.some(([c]) => c === "close_preferences")),
+  );
+  await page.close();
+
+  // Sans base, la taille reste réglable : la feuille ne s'éteint pas.
+  const closed = await browser.newPage();
+  await openWindow(closed, "http://localhost:4173/ui/windows/preferences.html", { databaseOpen: false });
+  check(
+    "préférences : sans base ouverte, « Réglages de confort » reste ouverte",
+    !(await closed.locator('.tree__leaf[data-leaf="comfort"]').isDisabled()),
+  );
+  await closed.close();
+}
+
+// --- F41 : la simulation de crédit (08/10/2026) ---------------------------
+{
+  // « Le simulateur de la Banque Postale est assez simple : il y a trois
+  // curseurs horizontaux (ou on peut mettre la valeur dans trois champs
+  // texte) […] lorsque l'on bouge un curseur l'autre bouge automatiquement. »
+  const page = await browser.newPage();
+  await page.setViewportSize({ width: 1320, height: 940 });
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/loan-simulation.html");
+  await page.waitForTimeout(200);
+  check("crédit : aucune erreur de script", errors.length === 0, errors.join(" | "));
+  check(
+    "crédit : la barre d'information rappelle que l'analyse vaut ce que vaut l'historique",
+    (await page.textContent("#info-bar")) ===
+      "Plus votre historique est long, meilleure sera cette analyse : l'idéal est d'avoir au moins un an d'opérations.",
+    await page.textContent("#info-bar"),
+  );
+  const asked = () => page.evaluate(() => window.__loanAsked ?? []);
+  const last = async () => (await asked()).at(-1);
+
+  check(
+    "crédit : la fenêtre s'ouvre sur un crédit à la consommation et ses valeurs de départ",
+    (await page.inputValue("#kind")) === "consumer" &&
+      (await page.inputValue("#amount")) === "10000,00" &&
+      (await page.inputValue("#months")) === "48" &&
+      (await page.inputValue("#rate")) === "6,00",
+    await page.inputValue("#amount"),
+  );
+  check(
+    "crédit : les trois curseurs sont posés sur leur valeur",
+    (await page.inputValue("#amount-range")) === "10000" &&
+      (await page.inputValue("#months-range")) === "48",
+    await page.inputValue("#amount-range"),
+  );
+  check(
+    "crédit : la mensualité vient du calcul, et les tuiles aussi",
+    (await page.inputValue("#payment")) === "208,33" &&
+      (await page.locator(".loan__tile").count()) === 8 &&
+      (await page.locator(".loan__tile-value").first().textContent()) === "208,33 €",
+    await page.inputValue("#payment"),
+  );
+  check(
+    "crédit : le tableau d'amortissement a une ligne par mois",
+    (await page.evaluate(() => window.__loanAsked.at(-1).moved)) === "other" &&
+      (await page.locator("#rows .list__row").count()) > 0,
+  );
+
+  // Le curseur du montant : son champ suit, et le calcul part en disant qui a bougé.
+  await page.locator("#amount-range").evaluate((range) => {
+    range.value = "12000";
+    range.dispatchEvent(new Event("input", { bubbles: true }));
+    range.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await page.waitForTimeout(200);
+  check(
+    "crédit : bouger le montant recalcule la mensualité, la durée reste",
+    (await last()).moved === "amount" &&
+      (await last()).amount === "12000" &&
+      (await page.inputValue("#payment")) === "250,00" &&
+      (await page.inputValue("#months")) === "48",
+    JSON.stringify(await last()),
+  );
+
+  // Taper la mensualité : la durée suit.
+  await page.fill("#payment", "500");
+  await page.press("#payment", "Enter");
+  await page.waitForTimeout(200);
+  check(
+    "crédit : taper la mensualité recalcule la durée",
+    (await last()).moved === "payment" &&
+      (await page.inputValue("#months")) === "24" &&
+      (await page.inputValue("#months-range")) === "24",
+    await page.inputValue("#months"),
+  );
+
+  // Au-delà du curseur : le champ est honoré, le curseur reste en butée.
+  await page.fill("#amount", "90000");
+  await page.press("#amount", "Enter");
+  await page.waitForTimeout(200);
+  check(
+    "crédit : un montant tapé au-delà du curseur est calculé, le curseur reste en butée",
+    (await page.inputValue("#amount")) === "90000,00" &&
+      (await page.inputValue("#amount-range")) === "75000",
+    await page.inputValue("#amount-range"),
+  );
+
+  // **Les champs ne prennent que des chiffres** (11/10/2026) : une lettre, un
+  // signe moins ne s'écrivent pas ; le taux a trois décimales, la durée aucune.
+  await page.fill("#amount", "");
+  await page.locator("#amount").pressSequentially("1a2-000");
+  check("crédit : une lettre ou un signe moins ne s'écrivent pas dans le montant", (await page.inputValue("#amount")) === "12000");
+  await page.fill("#rate", "");
+  await page.locator("#rate").pressSequentially("3,1254");
+  check("crédit : le taux s'arrête à trois décimales", (await page.inputValue("#rate")) === "3,125");
+  await page.fill("#months", "");
+  await page.locator("#months").pressSequentially("4,8");
+  check("crédit : la durée est un nombre entier de mois", (await page.inputValue("#months")) === "48");
+  await page.press("#months", "Enter");
+  await page.waitForTimeout(200);
+
+  // Un champ vidé est refusé : il est marqué, et les résultats d'avant
+  // s'estompent au lieu de rester affichés comme s'ils étaient justes.
+  const before = await page.inputValue("#payment");
+  await page.fill("#amount", "");
+  await page.press("#amount", "Enter");
+  await page.waitForTimeout(200);
+  check(
+    "crédit : un champ vide est marqué et le dit, sans rien recalculer",
+    (await page.locator("#amount.form__field--invalid").count()) === 1 &&
+      (await page.textContent("#info-bar")) === "Cette valeur n'est pas un nombre : corrigez-la pour relancer le calcul." &&
+      (await page.inputValue("#payment")) === before,
+    await page.textContent("#info-bar"),
+  );
+  check(
+    "crédit : refusé, les résultats d'avant s'estompent",
+    (await page.locator(".loan.loan--stale").count()) === 1 &&
+      Number(await page.locator("#pane-credit").evaluate((node) => getComputedStyle(node).opacity)) < 0.5,
+  );
+  await page.fill("#amount", "12000");
+  await page.press("#amount", "Enter");
+  await page.waitForTimeout(200);
+  check(
+    "crédit : corrigé, le champ perd sa marque et les résultats reviennent",
+    (await page.locator("#amount.form__field--invalid").count()) === 0 && (await page.locator(".loan--stale").count()) === 0,
+  );
+
+  // Le type de crédit ramène ses valeurs de départ, et la case du tableau
+  // mois par mois n'existe que pour l'immobilier.
+  check("crédit : la case « mois par mois » est cachée pour la consommation", await page.locator("#monthly-line").isHidden());
+  await page.selectOption("#kind", "mortgage");
+  await page.waitForTimeout(250);
+  check(
+    "crédit : l'immobilier ramène ses valeurs de départ et montre la case « mois par mois »",
+    (await page.evaluate(() => window.__loanDefaultsAsked)) === "mortgage" &&
+      (await page.inputValue("#amount")) === "200000,00" &&
+      (await page.inputValue("#months")) === "240" &&
+      (await page.locator("#monthly-line").isVisible()),
+    await page.inputValue("#amount"),
+  );
+
+  // Le second onglet.
+  check("crédit : « Puis-je le rembourser ? » est caché au départ", await page.locator("#pane-afford").isHidden());
+  await page.click("#tab-afford");
+  await page.waitForTimeout(100);
+  check(
+    "crédit : l'onglet s'ouvre, et les deux comptes sont cochés",
+    (await page.locator("#pane-afford").isVisible()) &&
+      (await page.locator("#pane-credit").isHidden()) &&
+      (await page.locator("#accounts input:checked").count()) === 2 &&
+      (await page.locator("#tab-afford").getAttribute("aria-selected")) === "true",
+  );
+  check(
+    "crédit : les comptes montrent leur nom, leur banque et leur solde, jamais leur numéro",
+    (await page.locator("#accounts tr").first().textContent()).includes("CCP") &&
+      (await page.locator("#accounts .loan__negative").count()) === 1,
+  );
+  check(
+    "crédit : le verdict prend sa couleur, et ses chiffres leur ton",
+    (await page.getAttribute("#verdict", "data-verdict")) === "green" &&
+      (await page.textContent("#verdict-word")) === "Jouable" &&
+      (await page.locator('#figures dd[data-tone="bad"]').count()) === 1 &&
+      (await page.locator('#figures dd[data-tone="good"]').count()) === 1,
+  );
+  check(
+    "crédit : les trois questions du voyant s'affichent, chacune avec sa pastille",
+    (await page.locator("#checks li").count()) === 3 &&
+      (await page.locator('#checks li[data-tone="good"]').count()) === 3 &&
+      (await page.locator("#warning").isHidden()),
+    await page.getAttribute("#verdict", "data-verdict"),
+  );
+  // L'aiguille glisse jusqu'à son angle.
+  await page.waitForTimeout(600);
+  check(
+    "crédit : l'aiguille de la jauge finit sur l'angle que le noyau donne",
+    await page.evaluate(() => {
+      const needle = document.querySelector("#gauge .gauge-needle");
+      return needle.getAttribute("transform").startsWith("rotate(" + needle.dataset.angle);
+    }),
+    await page.evaluate(() => document.querySelector("#gauge .gauge-needle")?.getAttribute("transform")),
+  );
+
+  // Décocher un compte : le calcul part sans lui. Cliquer la ligne coche aussi.
+  await page.locator('#accounts input[data-account="2"]').click();
+  await page.waitForTimeout(200);
+  check(
+    "crédit : décocher un compte le retire du calcul",
+    JSON.stringify((await last()).accounts) === "[1]" &&
+      (await page.textContent("#checks")).includes("comptes 1."),
+    JSON.stringify((await last()).accounts),
+  );
+  await page.locator("#accounts tr").nth(1).locator("td").nth(1).click();
+  await page.waitForTimeout(200);
+  check(
+    "crédit : toute la ligne d'un compte coche sa case",
+    (await last()).accounts.length === 2,
+  );
+
+  // La période, et les crédits en cours.
+  check("crédit : sans crédit en cours, la phrase le dit", await page.locator("#running-empty").isVisible());
+  await page.selectOption("#history", "2025");
+  await page.waitForTimeout(200);
+  check(
+    "crédit : changer de période relance le calcul, et les crédits en cours se listent",
+    (await last()).history === "2025" &&
+      (await page.locator("#running tr").count()) === 1 &&
+      (await page.locator("#running-empty").isHidden()),
+  );
+  check(
+    "crédit : un historique déjà déficitaire est dit à part, au-dessus des graphiques",
+    (await page.locator("#warning").isVisible()) &&
+      (await page.textContent("#warning")).startsWith("Attention"),
+  );
+
+  // La plage d'années (10/10/2026), en dernier dans le menu de la période.
+  check(
+    "crédit : « Plage d'années… » est la dernière entrée du menu de la période",
+    (await page.locator("#history option").last().getAttribute("value")) === "range" &&
+      !(await page.locator("#range").isVisible()),
+  );
+  await page.selectOption("#history", "range");
+  await page.waitForTimeout(200);
+  check(
+    "crédit : la plage part au calcul avec ses deux bornes, les trois dernières années par défaut",
+    (await page.locator("#range").isVisible()) &&
+      (await last()).history === "range" && (await last()).from === 2024 && (await last()).to === 2026,
+    JSON.stringify(await last()),
+  );
+  await page.selectOption("#history", "2025");
+  await page.waitForTimeout(200);
+
+  // Plus aucun compte : la raison, à la place de l'analyse.
+  for (const id of ["1", "2"]) {
+    await page.locator(`#accounts input[data-account="${id}"]`).click();
+    await page.waitForTimeout(150);
+  }
+  check(
+    "crédit : sans compte coché, la fenêtre dit pourquoi elle ne juge pas",
+    (await page.locator("#unavailable").isVisible()) &&
+      (await page.locator("#analysis").isHidden()) &&
+      (await page.textContent("#unavailable")) === "Cochez au moins un compte pour étudier votre historique.",
+  );
+
+  // Le rapport PDF, mois par mois.
+  await page.check("#monthly");
+  await page.click("#pdf");
+  await page.waitForTimeout(150);
+  check(
+    "crédit : le bouton du rapport envoie la simulation et le choix « mois par mois », et dit où est le fichier",
+    (await page.evaluate(() => window.__loanPrinted?.monthly)) === true &&
+      (await page.evaluate(() => window.__loanPrinted?.request.kind)) === "mortgage" &&
+      (await page.textContent("#info-bar")).startsWith("Le rapport est prêt"),
+  );
+
+  // L'onglet 3 : les trois méthodes (Fabrice, 08/10/2026).
+  await page.locator('#accounts input[data-account="1"]').click();
+  await page.waitForTimeout(200);
+  check(
+    "crédit : la méthode neutre est retenue à l'ouverture, et la ligne du verdict le dit",
+    (await last()).method === "neutral" &&
+      JSON.stringify((await last()).growth) === JSON.stringify(["0", "2", "3"]) &&
+      (await page.textContent("#method-line")) === "Méthode de jugement : Neutre",
+    JSON.stringify(await last()),
+  );
+  await page.click("#method-line");
+  await page.waitForTimeout(100);
+  check(
+    "crédit : un clic sur la méthode ouvre ses réglages",
+    (await page.locator("#pane-rules").isVisible()) &&
+      (await page.locator("#tab-rules").getAttribute("aria-selected")) === "true",
+  );
+  check(
+    "crédit : le tableau montre trois colonnes, leurs verdicts, et la colonne retenue se détache",
+    (await page.locator(".loan__rules-head").count()) === 3 &&
+      (await page.locator('.loan__rules-head[data-method="severe"] .loan__badge').textContent()) === "Risqué" &&
+      (await page.locator('.loan__rules-head[data-method="severe"] .loan__badge').getAttribute("data-verdict")) === "red" &&
+      (await page.locator('#rules tr[data-row="1"] td[data-method="optimistic"]').textContent()) === "v1-optimistic" &&
+      (await page.locator('#rules td.loan__rules-chosen[data-method="neutral"]').count()) === 6 &&
+      (await page.textContent("#explanation")) === "Explication neutral" &&
+      (await page.locator('#rules tr[data-row="growth"] .loan__rules-label').textContent()) === "Hausse de vos dépenses par an",
+  );
+  check(
+    "crédit : chaque méthode a son champ de hausse, à sa valeur de départ",
+    (await page.inputValue("#growth-optimistic")) === "0" &&
+      (await page.inputValue("#growth-neutral")) === "2" &&
+      (await page.inputValue("#growth-severe")) === "3",
+  );
+  await page.check('input[name="method"][value="severe"]');
+  await page.waitForTimeout(200);
+  check(
+    "crédit : choisir la méthode sévère relance le jugement avec elle",
+    (await last()).method === "severe" &&
+      (await page.textContent("#explanation")) === "Explication severe" &&
+      (await page.locator('#rules td.loan__rules-chosen[data-method="severe"]').count()) === 6 &&
+      (await page.textContent("#method-line")) === "Méthode de jugement : Sévère",
+  );
+  await page.fill("#growth-severe", "5");
+  await page.press("#growth-severe", "Enter");
+  await page.waitForTimeout(200);
+  check(
+    "crédit : changer la hausse d'une méthode relance le calcul avec elle",
+    JSON.stringify((await last()).growth) === JSON.stringify(["0", "2", "5"]) &&
+      (await page.inputValue("#growth-severe")) === "5",
+    JSON.stringify((await last()).growth),
+  );
+  await page.fill("#growth-neutral", "");
+  await page.locator("#growth-neutral").pressSequentially("deux-2,5");
+  check("crédit : une hausse ne prend que des chiffres entiers", (await page.inputValue("#growth-neutral")) === "25");
+  await page.fill("#growth-neutral", "2");
+  await page.press("#growth-neutral", "Enter");
+  await page.waitForTimeout(200);
+
+  // Le tableau a son menu du clic droit, comme tous les autres.
+  await page.click("#tab-credit");
+  await page.waitForTimeout(100);
+  await page.locator("#rows .list__row").first().click({ button: "right" });
+  await page.waitForTimeout(100);
+  check(
+    "crédit : le tableau d'amortissement a son menu du clic droit",
+    (await page.locator(".context-menu").count()) > 0,
+  );
+  await page.keyboard.press("Escape");
+
+  await page.click("#close");
+  await page.waitForTimeout(100);
+  check("crédit : la porte masque la fenêtre", await page.evaluate(() => window.__loanClosed === true));
+  await page.close();
+}
+
+// --- F42 : la consommation d'un appareil électrique (09/10/2026) ---------
+{
+  const page = await browser.newPage();
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/appliance-cost.html");
+  await page.waitForTimeout(150);
+  check("appareil : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" / "));
+  check(
+    "appareil : aucune valeur supposée — les champs de l'appareil partent vides",
+    await page.evaluate(() =>
+      ["on-watts", "on-hours", "standby-watts", "standby-hours"].every(
+        (id) => document.getElementById(id).value === "",
+      ),
+    ),
+  );
+  check(
+    "appareil : le contrat reprend le tarif enregistré, en Base",
+    (await page.inputValue("#option")) === "base" &&
+      (await page.inputValue("#base")) === "0,2001" &&
+      (await page.locator("#base-line").isVisible()) &&
+      !(await page.locator("#peak").isVisible()) &&
+      !(await page.locator("#share").isVisible()),
+  );
+  check(
+    "appareil : trois tuiles, par jour, par mois, par an",
+    (await page.locator(".appliance__tile .loan__tile-label").allTextContents()).join("|") ===
+      "Par jour|Par mois|Par an",
+  );
+
+  await page.fill("#on-watts", "2000");
+  await page.fill("#on-hours", "5");
+  await page.fill("#standby-watts", "1");
+  await page.locator("#standby-watts").press("Enter");
+  await page.waitForTimeout(150);
+  const asked = await page.evaluate(() => window.__applianceAsked.at(-1));
+  check(
+    "appareil : les champs partent tels qu'ils sont tapés",
+    asked.usage.on_watts === "2000" && asked.usage.on_hours === "5" && asked.usage.days === "7" &&
+      asked.usage.standby_hours === "" && asked.tariff.base === "0,2001",
+    JSON.stringify(asked),
+  );
+  check(
+    "appareil : le résultat s'affiche, et la veille a sa phrase",
+    (await page.locator(".appliance__tile .loan__tile-value").nth(2).textContent()).endsWith("€") &&
+      (await page.locator("#standby-sentence").isVisible()) &&
+      (await page.locator("#standby-sentence").textContent()).startsWith("La veille seule coûte"),
+  );
+  check(
+    "appareil : vide, la durée de veille montre en grisé le reste de la journée",
+    (await page.getAttribute("#standby-hours", "placeholder")) === "19",
+  );
+  check(
+    "appareil : le détail a ses deux postes et son total, l'anneau est là",
+    (await page.locator("#detail tr").count()) === 3 &&
+      (await page.locator("#detail tr.appliance__total").count()) === 1 &&
+      (await page.locator("#chart svg").count()) === 1,
+  );
+
+  // Heures pleines / heures creuses : les deux prix, les heures creuses, et la
+  // part de la marche.
+  await page.selectOption("#option", "off-peak");
+  await page.waitForTimeout(150);
+  check(
+    "appareil : en heures pleines / heures creuses, les champs changent",
+    !(await page.locator("#base").isVisible()) &&
+      (await page.locator("#peak").isVisible()) &&
+      (await page.locator("#off-peak-hours").isVisible()) &&
+      (await page.locator("#share").isVisible()) &&
+      (await page.locator("#detail tr").count()) === 5,
+  );
+
+  // Un champ faux est marqué, le message dit pourquoi.
+  await page.fill("#standby-hours", "20");
+  await page.locator("#standby-hours").press("Enter");
+  await page.waitForTimeout(150);
+  check(
+    "appareil : marche et veille au-delà de 24 h, le champ est marqué",
+    (await page.locator("#standby-hours.form__field--invalid").count()) === 1 &&
+      (await page.locator("#notice").textContent()).includes("24 heures"),
+  );
+  check(
+    "appareil : refusé, les tuiles et le détail d'avant s'estompent",
+    (await page.locator(".loan.loan--stale").count()) === 1 &&
+      Number(await page.locator(".appliance__result").evaluate((node) => getComputedStyle(node).opacity)) < 0.5,
+  );
+  await page.fill("#standby-hours", "");
+  await page.locator("#standby-hours").press("Enter");
+  await page.waitForTimeout(150);
+  check(
+    "appareil : corrigé, la marque s'en va et le résultat revient",
+    (await page.locator(".form__field--invalid").count()) === 0 &&
+      !(await page.locator("#notice").isVisible()) && (await page.locator(".loan--stale").count()) === 0,
+  );
+
+  // **Les champs ne prennent que des chiffres** (11/10/2026).
+  await page.fill("#on-watts", "");
+  await page.locator("#on-watts").pressSequentially("2k0-0,555");
+  check("appareil : une puissance n'accepte ni lettre ni signe, et deux décimales", (await page.inputValue("#on-watts")) === "200,55");
+  await page.fill("#days", "");
+  await page.locator("#days").pressSequentially("5,5");
+  check("appareil : les jours par semaine sont un nombre entier", (await page.inputValue("#days")) === "55");
+  await page.fill("#days", "7");
+  await page.fill("#on-watts", "2000");
+  await page.locator("#on-watts").press("Enter");
+  await page.waitForTimeout(150);
+
+  // Un prix changé ne vaut que pour ce calcul : le bouton reprend le tarif
+  // enregistré, et rien n'a été enregistré.
+  await page.selectOption("#option", "base");
+  await page.fill("#base", "");
+  await page.locator("#base").pressSequentially("0.251678");
+  check("appareil : le prix du kWh a quatre décimales, le point devient virgule", (await page.inputValue("#base")) === "0,2516");
+  await page.fill("#base", "0,30");
+  await page.locator("#base").press("Enter");
+  await page.waitForTimeout(100);
+  await page.click("#contract-reset");
+  await page.waitForTimeout(150);
+  check(
+    "appareil : « Reprendre le tarif enregistré » remet les prix, sans rien enregistrer",
+    (await page.inputValue("#base")) === "0,2001" &&
+      (await page.evaluate(() => !window.__calls.some(([c]) => c === "save_preferences_electricity"))),
+  );
+  check(
+    "appareil : pas de rapport PDF",
+    (await page.locator("#pdf").count()) === 0,
+  );
+  const spills = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  check("appareil : rien ne déborde en largeur", !spills);
+  await page.click("#close");
+  await page.waitForTimeout(50);
+  check("appareil : la porte masque la fenêtre", await page.evaluate(() => window.__applianceClosed === true));
+  await page.close();
+}
+
+// --- F43 : mon matelas de sécurité (09/10/2026) --------------------------
+{
+  const page = await browser.newPage();
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/safety-cushion.html");
+  await page.waitForTimeout(150);
+  check("matelas : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" / "));
+  check(
+    "matelas : la barre d'information rappelle que l'analyse vaut ce que vaut l'historique",
+    (await page.textContent("#info-bar")) ===
+      "Plus votre historique est long, meilleure sera cette analyse : l'idéal est d'avoir au moins un an d'opérations.",
+    await page.textContent("#info-bar"),
+  );
+  check(
+    "matelas : la question est posée en tête",
+    (await page.locator("#question").textContent()).startsWith("Si vos revenus s'arrêtaient demain"),
+  );
+  check(
+    "matelas : les cases partent d'office — le livret en épargne, le CCP en dépenses, le PEL nulle part",
+    await page.evaluate(() => {
+      const box = (account, role) =>
+        document.querySelector(`input[data-account="${account}"][data-role="${role}"]`).checked;
+      return box(1, "spending") && !box(1, "savings") && box(2, "savings") && !box(2, "spending") &&
+        !box(3, "savings") && !box(3, "spending");
+    }),
+  );
+  check(
+    "matelas : les comptes sont nommés par leur libellé seul",
+    (await page.locator("#accounts tr td:first-child").allTextContents()).join("|") === "CCP|Livret A|PEL",
+  );
+  check(
+    "matelas : 4 mois, en orange, et les deux seuils",
+    (await page.getAttribute("#verdict", "data-verdict")) === "orange" &&
+      (await page.locator("#gauge").textContent()).includes("4,0 mois") &&
+      (await page.locator("#targets li").count()) === 2 &&
+      (await page.locator('#targets li[data-tone="good"]').count()) === 1,
+  );
+
+  // Décocher les loisirs : ils sortent des dépenses, et le restent.
+  await page.locator('input[data-category="902"]').uncheck();
+  await page.waitForTimeout(150);
+  let asked = await page.evaluate(() => window.__cushionAsked.at(-1));
+  check(
+    "matelas : une catégorie décochée part au calcul",
+    asked.excluded.length === 1 && asked.excluded[0] === 902,
+    JSON.stringify(asked),
+  );
+  check(
+    "matelas : décochée, la catégorie est barrée et le matelas passe à 5 mois",
+    (await page.locator(".cushion__category--off").count()) === 1 &&
+      (await page.locator("#gauge").textContent()).includes("5,0 mois"),
+  );
+  await page.selectOption("#history", "2025");
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__cushionAsked.at(-1));
+  check(
+    "matelas : la période change, la catégorie reste décochée",
+    asked.history === "2025" && asked.excluded[0] === 902,
+  );
+
+  // La plage d'années (10/10/2026) : deux listes, les trois dernières
+  // années par défaut.
+  await page.selectOption("#history", "range");
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__cushionAsked.at(-1));
+  check(
+    "matelas : la plage d'années part au calcul avec ses deux bornes",
+    (await page.locator("#range").isVisible()) && asked.history === "range" && asked.from === 2024 && asked.to === 2026,
+    JSON.stringify(asked),
+  );
+  await page.selectOption("#range-from", "2021");
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__cushionAsked.at(-1));
+  check("matelas : changer une borne relance le calcul", asked.from === 2021);
+
+  // Le revenu de secours : tout couvert, l'épargne ne fond pas.
+  await page.fill("#backup", "1500");
+  await page.locator("#backup").press("Enter");
+  await page.waitForTimeout(150);
+  check(
+    "matelas : un revenu de secours qui couvre tout — plus de seuils, la jauge en butée",
+    (await page.locator("#verdict-text").textContent()).includes("ne fondrait pas") &&
+      !(await page.locator("#targets-card").isVisible()),
+  );
+  check("matelas : en sortant, le revenu s'écrit proprement", (await page.inputValue("#backup")) === "1\u202f500,00");
+  // **Le revenu ne prend que des chiffres** (11/10/2026).
+  await page.fill("#backup", "");
+  await page.locator("#backup").pressSequentially("a-1b2");
+  check("matelas : ni lettre ni signe moins dans le revenu de secours", (await page.inputValue("#backup")) === "12");
+  await page.locator("#backup").fill("");
+  await page.locator("#backup").press("Tab");
+  check("matelas : vide, le revenu reste vide — aucun revenu", (await page.inputValue("#backup")) === "");
+  // Un revenu illisible venu d'ailleurs que du clavier reste refusé par le
+  // noyau : marqué, et l'analyse d'avant s'estompe.
+  await page.evaluate(() => {
+    const field = document.getElementById("backup");
+    field.value = "abc";
+    field.dispatchEvent(new Event("change"));
+  });
+  await page.waitForTimeout(150);
+  check(
+    "matelas : un revenu illisible est marqué, et l'analyse d'avant s'estompe",
+    (await page.locator("#backup.form__field--invalid").count()) === 1 &&
+      Number(await page.locator("#analysis").evaluate((node) => getComputedStyle(node).opacity)) < 0.5,
+  );
+  await page.fill("#backup", "");
+  await page.locator("#backup").press("Enter");
+  await page.waitForTimeout(150);
+  check("matelas : corrigé, l'analyse revient", (await page.locator(".loan--stale").count()) === 0);
+
+  // Sans compte de dépenses, la fenêtre le dit.
+  await page.locator('input[data-account="1"][data-role="spending"]').uncheck();
+  await page.waitForTimeout(150);
+  check(
+    "matelas : sans compte de dépenses, la fenêtre le dit",
+    (await page.locator("#unavailable").isVisible()) &&
+      (await page.locator("#unavailable").textContent()).includes("Dépenses") &&
+      !(await page.locator("#analysis").isVisible()),
+  );
+  check("matelas : pas de rapport PDF", (await page.locator("#pdf").count()) === 0);
+  const spills = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  check("matelas : rien ne déborde en largeur", !spills);
+  await page.click("#close");
+  await page.waitForTimeout(50);
+  check("matelas : la porte masque la fenêtre", await page.evaluate(() => window.__cushionClosed === true));
+  await page.close();
+}
+
+// --- F44 : Objectif Épargne (10/10/2026) ---------------------------------
+{
+  const page = await browser.newPage();
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/savings-goal.html");
+  await page.waitForTimeout(150);
+  check("objectif : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" / "));
+  check(
+    "objectif : sans réponse encore, la barre d'information se tait",
+    (await page.textContent("#info-bar")) === "",
+    await page.textContent("#info-bar"),
+  );
+  check(
+    "objectif : le livret part coché, le CCP non ; trois questions, « quand » d'abord",
+    (await page.locator('input[data-account="2"]').isChecked()) &&
+      !(await page.locator('input[data-account="1"]').isChecked()) &&
+      (await page.locator('input[name="question"]').count()) === 3 &&
+      (await page.locator('input[name="question"][value="when"]').isChecked()),
+  );
+  check(
+    "objectif : sans montant, la fenêtre le demande",
+    (await page.locator("#unavailable").textContent()).includes("montant à atteindre") &&
+      (await page.locator("#target.form__field--invalid").count()) === 1,
+  );
+  check(
+    "objectif : « quand » montre le montant, pas la date",
+    (await page.locator("#target").isVisible()) && !(await page.locator("#year").isVisible()),
+  );
+  await page.fill("#target", "10000");
+  await page.locator("#target").press("Enter");
+  await page.waitForTimeout(150);
+  let asked = await page.evaluate(() => window.__goalAsked.at(-1));
+  check(
+    "objectif : avec une réponse, la barre d'information rappelle que l'analyse vaut ce que vaut l'historique",
+    (await page.textContent("#info-bar")) ===
+      "Plus votre historique est long, meilleure sera cette analyse : l'idéal est d'avoir au moins un an d'opérations.",
+    await page.textContent("#info-bar"),
+  );
+  check(
+    "objectif : les champs partent tels qu'ils sont tapés",
+    asked.question === "when" && asked.target === "10000" && asked.accounts.join() === "2" &&
+      asked.period === "last-12" && asked.rate === "" && asked.extra === "",
+    JSON.stringify(asked),
+  );
+  check(
+    "objectif : la réponse s'affiche avec sa fourchette et ses tuiles",
+    (await page.locator("#headline").textContent()).startsWith("Vous aurez") &&
+      (await page.locator("#range-text").isVisible()) &&
+      (await page.locator(".goal__tile").count()) === 4 &&
+      (await page.locator("#chart svg").count()) === 1,
+  );
+
+  // La plage d'années.
+  await page.selectOption("#period", "range");
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__goalAsked.at(-1));
+  check(
+    "objectif : la plage d'années montre ses deux listes, les trois dernières années par défaut",
+    (await page.locator("#range").isVisible()) && asked.period === "range" && asked.from === 2024 && asked.to === 2026,
+    JSON.stringify(asked),
+  );
+
+  // « Combien aurai-je » : la date, pas le montant ; la date proposée est dans un an.
+  await page.locator('input[name="question"][value="amount"]').check();
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__goalAsked.at(-1));
+  check(
+    "objectif : « combien aurai-je » montre la date, dans un an par défaut",
+    !(await page.locator("#target").isVisible()) && (await page.locator("#year").isVisible()) &&
+      asked.question === "amount" && asked.month === 10 && asked.year === "2027",
+    JSON.stringify(asked),
+  );
+
+  // « Combien épargner » : montant et date, sans l'effort de plus — c'est lui
+  // qu'on cherche.
+  await page.fill("#extra", "50");
+  await page.locator('input[name="question"][value="effort"]').check();
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__goalAsked.at(-1));
+  check(
+    "objectif : « combien épargner » cache l'effort de plus et ne l'envoie pas",
+    (await page.locator("#target").isVisible()) && (await page.locator("#year").isVisible()) &&
+      !(await page.locator("#extra").isVisible()) && asked.extra === "",
+  );
+  check(
+    "objectif : un effort à fournir se lit en orange",
+    (await page.getAttribute("#answer", "data-tone")) === "warn",
+  );
+  // **Les champs ne prennent que des chiffres** (11/10/2026).
+  await page.fill("#rate", "");
+  await page.locator("#rate").pressSequentially("a-2,7505");
+  check("objectif : le taux n'accepte ni lettre ni signe, et trois décimales", (await page.inputValue("#rate")) === "2,750");
+  check("objectif : en sortant, le montant visé s'écrit proprement", (await page.inputValue("#target")) === "10\u202f000,00");
+  // Un taux illisible venu d'ailleurs que du clavier reste refusé par le noyau.
+  await page.evaluate(() => {
+    const field = document.getElementById("rate");
+    field.value = "abc";
+    field.dispatchEvent(new Event("change"));
+  });
+  await page.waitForTimeout(150);
+  check(
+    "objectif : un taux illisible est marqué",
+    (await page.locator("#rate.form__field--invalid").count()) === 1,
+  );
+  await page.fill("#rate", "");
+  await page.locator("#rate").press("Enter");
+  await page.waitForTimeout(150);
+  check("objectif : pas de rapport PDF", (await page.locator("#pdf").count()) === 0);
+  const spills = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  check("objectif : rien ne déborde en largeur", !spills);
+  await page.click("#close");
+  await page.waitForTimeout(50);
+  check("objectif : la porte masque la fenêtre", await page.evaluate(() => window.__goalClosed === true));
+  await page.close();
+}
+
+// --- F45 : Et si je réduisais… ? (10/10/2026) ----------------------------
+{
+  const page = await browser.newPage();
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/spending-cut.html");
+  await page.waitForTimeout(150);
+  check("réduction : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" / "));
+  check(
+    "réduction : la barre d'information rappelle que l'analyse vaut ce que vaut l'historique",
+    (await page.textContent("#info-bar")) ===
+      "Plus votre historique est long, meilleure sera cette analyse : l'idéal est d'avoir au moins un an d'opérations.",
+    await page.textContent("#info-bar"),
+  );
+  check(
+    "réduction : tous les comptes partent cochés, les catégories d'abord, l'horizon à 5 ans",
+    (await page.locator('input[data-account="1"]').isChecked()) &&
+      (await page.locator('input[data-account="2"]').isChecked()) &&
+      (await page.inputValue("#axis")) === "category" &&
+      (await page.inputValue("#years")) === "5" &&
+      (await page.locator("#years-text").textContent()) === "5 ans",
+  );
+  check(
+    "réduction : sans réduction, la phrase invite à en taper une",
+    (await page.locator("#headline").textContent()).startsWith("Tapez une réduction") &&
+      (await page.getAttribute("#answer", "data-tone")) === "none",
+  );
+  check(
+    "réduction : un poste par ligne, le plus lourd en tête, avec son champ et son unité",
+    (await page.locator("#rows tr").count()) === 2 &&
+      (await page.locator("#rows tr").first().locator(".cut__name").textContent()) === "Courses" &&
+      (await page.locator("#cut-902").count()) === 1 &&
+      (await page.locator("#unit-902 option").allTextContents()).join("|") === "%|€" &&
+      (await page.locator("#column-item").textContent()) === "Catégories",
+  );
+  check(
+    "réduction : l'aide du tableau vient du contrôleur, monnaie comprise",
+    (await page.locator("#table-hint").textContent()).includes("en €"),
+  );
+
+  // Une réduction en pourcent, une autre en euros.
+  await page.fill("#cut-901", "40");
+  await page.locator("#cut-901").press("Tab");
+  await page.waitForTimeout(150);
+  await page.selectOption("#unit-902", "amount");
+  await page.fill("#cut-902", "150");
+  await page.locator("#cut-902").press("Enter");
+  await page.waitForTimeout(150);
+  let asked = await page.evaluate(() => window.__cutAsked.at(-1));
+  check(
+    "réduction : les réductions partent telles qu'elles sont tapées, avec leur unité",
+    asked.cuts.length === 2 &&
+      asked.cuts.some((cut) => cut.id === 901 && cut.value === "40" && cut.unit === "percent") &&
+      asked.cuts.some((cut) => cut.id === 902 && cut.value === "150" && cut.unit === "amount"),
+    JSON.stringify(asked.cuts),
+  );
+  check(
+    "réduction : les lignes réduites se voient, la phrase et les tuiles suivent",
+    (await page.locator(".cut__row--reduced").count()) === 2 &&
+      (await page.locator("#headline").textContent()).startsWith("En réduisant ces 2 postes") &&
+      (await page.getAttribute("#answer", "data-tone")) === "good",
+  );
+  check(
+    "réduction : mis à jour, le tableau garde les champs tapés",
+    (await page.inputValue("#cut-901")) === "40" && (await page.inputValue("#cut-902")) === "150",
+  );
+
+  // Le curseur d'horizon.
+  await page.locator("#years").fill("8");
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__cutAsked.at(-1));
+  check("réduction : le curseur règle l'horizon", asked.years === 8 && (await page.locator("#years-text").textContent()) === "8 ans");
+
+  // **Les champs ne prennent que des chiffres** (11/10/2026).
+  await page.fill("#cut-901", "");
+  await page.locator("#cut-901").pressSequentially("b-4o0.5");
+  check("réduction : une réduction n'accepte ni lettre ni signe, le point devient virgule", (await page.inputValue("#cut-901")) === "40,5");
+  // Une réduction illisible venue d'ailleurs que du clavier reste refusée par
+  // le noyau : marquée, et le résultat d'avant s'estompe.
+  await page.evaluate(() => {
+    const field = document.getElementById("cut-901");
+    field.value = "beaucoup";
+    field.dispatchEvent(new Event("change"));
+  });
+  await page.waitForTimeout(150);
+  check(
+    "réduction : une réduction illisible est marquée, la barre dit pourquoi",
+    (await page.locator("#cut-901.form__field--invalid").count()) === 1 &&
+      (await page.locator("#info-bar").textContent()).includes("pas lisible"),
+  );
+  check(
+    "réduction : refusé, la réponse et l'anneau d'avant s'estompent, pas les champs",
+    Number(await page.locator("#answer").evaluate((node) => getComputedStyle(node).opacity)) < 0.5 &&
+      Number(await page.locator("#cut-902").evaluate((node) => getComputedStyle(node).opacity)) === 1,
+  );
+  await page.fill("#cut-901", "40");
+  await page.locator("#cut-901").press("Enter");
+  await page.waitForTimeout(150);
+
+  // Le rapport PDF garde tout.
+  await page.click("#pdf");
+  await page.waitForTimeout(150);
+  const printed = await page.evaluate(() => window.__cutPrinted);
+  check(
+    "réduction : le rapport PDF reçoit les réductions et les réglages",
+    printed.cuts.length === 2 && printed.years === 8 &&
+      (await page.locator("#info-bar").textContent()).startsWith("Le rapport est prêt"),
+  );
+
+  // Les fichiers (10/10/2026) : Excel et le projet en JSON.
+  await page.click("#excel");
+  await page.waitForTimeout(150);
+  check(
+    "réduction : l'export Excel demande où, en .xlsx, et reçoit les réductions",
+    await page.evaluate(() =>
+      window.__cutExported.path.endsWith(".xlsx") && window.__saveAsked.defaultPath === "Et si je réduisais.xlsx" &&
+      window.__cutExported.request.cuts.length === 2),
+  );
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check(
+    "réduction : enregistrer le projet demande où, en .json",
+    (await page.evaluate(() => window.__cutSaved.path.endsWith(".json") && window.__saveAsked.filters[0].name === "Projet de réduction")) &&
+      (await page.locator("#info-bar").textContent()).startsWith("Projet enregistré"),
+  );
+  await page.click("#open");
+  await page.waitForTimeout(150);
+  check("réduction : ouvrir un projet demande d'abord confirmation", await page.locator(".dialog").isVisible());
+  await page.click(".dialog__button:not(.dialog__button--primary)");
+  await page.waitForTimeout(150);
+  check(
+    "réduction : « Non » ne change rien",
+    (await page.evaluate(() => window.__cutLoaded === undefined)) && (await page.inputValue("#cut-901")) === "40",
+  );
+  await page.click("#open");
+  await page.waitForTimeout(150);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(250);
+  asked = await page.evaluate(() => window.__cutAsked.at(-1));
+  check(
+    "réduction : le projet ouvert remplace tout — période, horizon, options, comptes, réductions",
+    asked.history === "range" && asked.from === 2023 && asked.to === 2025 && asked.years === 3 &&
+      asked.rate === "1,5" && asked.target === "8000,00" && asked.accounts.join() === "2" &&
+      asked.cuts.length === 1 && asked.cuts[0].id === 902 && asked.cuts[0].unit === "amount" &&
+      (await page.inputValue("#cut-902")) === "100,00" && (await page.inputValue("#unit-902")) === "amount" &&
+      (await page.inputValue("#cut-901")) === "" &&
+      !(await page.locator("#range").isHidden()) &&
+      (await page.locator("#info-bar").textContent()).startsWith("Projet ouvert"),
+    JSON.stringify(asked),
+  );
+
+  // Un autre classement : les réductions tapées ne valent plus.
+  await page.selectOption("#axis", "payee");
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__cutAsked.at(-1));
+  check(
+    "réduction : changer de classement efface les réductions et nomme la colonne",
+    asked.axis === "payee" && asked.cuts.length === 0 &&
+      (await page.locator("#rows tr").count()) === 1 &&
+      (await page.locator("#column-item").textContent()) === "Tiers",
+  );
+
+  // La porte efface tout : la fenêtre se rouvrira vierge.
+  await page.fill("#cut-31", "10");
+  await page.locator("#cut-31").press("Enter");
+  await page.fill("#rate", "2");
+  await page.locator("#rate").press("Enter");
+  await page.waitForTimeout(150);
+  // La porte demande d'abord (10/10/2026) : enregistrer, abandonner, rester.
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  check(
+    "réduction : la porte pose la question à trois issues quand des chiffres seraient perdus",
+    (await page.locator(".dialog").isVisible()) &&
+      (await page.locator(".dialog__button").allTextContents()).join("|") === "Enregistrer et sortir|Abandonner et sortir|Rester",
+  );
+  await page.click(".dialog__button:nth-child(3)");
+  await page.waitForTimeout(150);
+  check(
+    "réduction : « Rester » ne ferme rien et garde les chiffres",
+    (await page.evaluate(() => window.__cutClosed === undefined)) && (await page.inputValue("#cut-31")) === "10",
+  );
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  await page.click(".dialog__button:nth-child(2)");
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__cutAsked.at(-1));
+  check(
+    "réduction : « Abandonner et sortir » efface les réductions, le taux et l'horizon, puis masque la fenêtre",
+    (await page.evaluate(() => window.__cutClosed === 1)) &&
+      asked.cuts.length === 0 && asked.rate === "" && asked.years === 5 &&
+      (await page.inputValue("#cut-31")) === "",
+  );
+  // Un projet enregistré et rien de changé depuis : rien à perdre, la porte
+  // sort sans rien demander.
+  await page.fill("#cut-31", "15");
+  await page.locator("#cut-31").press("Enter");
+  await page.waitForTimeout(150);
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  check(
+    "réduction : après « Enregistrer le projet… », la porte sort sans question",
+    (await page.locator(".dialog").count()) === 0 && (await page.evaluate(() => window.__cutClosed === 2)),
+  );
+  const spills = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  check("réduction : rien ne déborde en largeur", !spills);
+  await page.close();
+}
+
+// --- F46 : Préparer mes vacances (10/10/2026) ----------------------------
+{
+  const page = await browser.newPage();
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/holiday.html");
+  await page.waitForTimeout(200);
+  check("vacances : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" / "));
+  check(
+    "vacances : un séjour, un adulte, aucun enfant, aucun compte coché au départ",
+    (await page.locator('input[name="trip"][value="stay"]').isChecked()) &&
+      (await page.locator("#adults-value").textContent()) === "1" &&
+      (await page.locator("#children-value").textContent()) === "0" &&
+      !(await page.locator('#accounts input[data-account="2"]').isChecked()),
+  );
+  check(
+    "vacances : le budget se bâtit sur le catalogue — les postes du séjour, les lignes facultatives à part",
+    (await page.locator('#lines tr[data-key="transport"]').isVisible()) &&
+      !(await page.locator('#lines tr[data-key="cabins"]').isVisible()) &&
+      (await page.locator('#optional tr[data-key="insurance"]').isVisible()) &&
+      (await page.locator("#optional .holiday__heading").textContent()) === "Lignes facultatives",
+  );
+  check(
+    "vacances : sans enfant, pas de prix enfant ; l'assurance part en pourcent",
+    !(await page.locator("#child-transport").isVisible()) &&
+      (await page.inputValue("#unit-insurance")) === "percent" &&
+      !(await page.locator("#who-insurance").isVisible()),
+  );
+
+  // Deux adultes, un enfant : le prix enfant apparaît sur les lignes par personne.
+  await page.locator("#adults").fill("2");
+  await page.locator("#children").fill("1");
+  await page.waitForTimeout(150);
+  check(
+    "vacances : avec un enfant, le prix enfant apparaît sur une ligne par personne, pas sur une ligne pour tous",
+    (await page.locator("#child-transport").isVisible()) && !(await page.locator("#child-lodging").isVisible()),
+  );
+  await page.fill("#amount-transport", "120");
+  await page.fill("#child-transport", "50");
+  await page.fill("#amount-lodging", "90");
+  await page.fill("#nights", "7");
+  await page.fill("#months", "6");
+  await page.locator("#months").press("Enter");
+  await page.waitForTimeout(200);
+  let asked = await page.evaluate(() => window.__holidayAsked.at(-1).input);
+  const transport = asked.lines.find((line) => line.key === "transport");
+  const lodging = asked.lines.find((line) => line.key === "lodging");
+  check(
+    "vacances : les champs partent tels qu'ils sont tapés, avec leurs choix",
+    asked.adults === 2 && asked.children === 1 && asked.nights === "7" && asked.months === "6" &&
+      transport.amount === "120" && transport.child === "50" && transport.who === "person" &&
+      lodging.amount === "90" && lodging.who === "all" && lodging.span === "night",
+    JSON.stringify(asked),
+  );
+  check(
+    "vacances : le résultat, les jours et le coût des postes s'affichent",
+    (await page.locator("#headline").textContent()).startsWith("Ce séjour coûterait") &&
+      (await page.locator("#days-text").textContent()) === "8 jours" &&
+      (await page.locator("#cost-transport").textContent()).includes("120,00") &&
+      (await page.locator(".goal__tile").count()) === 3,
+  );
+
+  // Le déjà épargné : un compte coché.
+  await page.locator('#accounts input[data-account="2"]').check();
+  await page.waitForTimeout(150);
+  check(
+    "vacances : un compte coché part au calcul",
+    (await page.evaluate(() => window.__holidayAsked.at(-1).accounts.join())) === "2",
+  );
+
+  // **Les champs ne prennent que des chiffres** (11/10/2026).
+  await page.fill("#amount-lodging", "");
+  await page.locator("#amount-lodging").pressSequentially("c-9h0.505");
+  check("vacances : un montant n'accepte ni lettre ni signe, deux décimales", (await page.inputValue("#amount-lodging")) === "90,50");
+  await page.fill("#nights", "");
+  await page.locator("#nights").pressSequentially("7,5n");
+  check("vacances : les nuits sont un nombre entier", (await page.inputValue("#nights")) === "75");
+  await page.fill("#nights", "7");
+  // Un montant illisible venu d'ailleurs que du clavier reste refusé par le
+  // noyau : marqué, et le résultat d'avant s'estompe.
+  await page.evaluate(() => {
+    const field = document.getElementById("amount-lodging");
+    field.value = "cher";
+    field.dispatchEvent(new Event("change"));
+  });
+  await page.waitForTimeout(150);
+  check(
+    "vacances : un montant illisible est marqué, la barre dit pourquoi",
+    (await page.locator("#amount-lodging.form__field--invalid").count()) === 1 &&
+      (await page.locator("#info-bar").textContent()).includes("pas lisible"),
+  );
+  check(
+    "vacances : refusé, la réponse et les coûts d'avant s'estompent",
+    Number(await page.locator("#answer").evaluate((node) => getComputedStyle(node).opacity)) < 0.5,
+  );
+  await page.fill("#amount-lodging", "90");
+  await page.locator("#amount-lodging").press("Enter");
+  await page.waitForTimeout(150);
+
+  // La croisière : ses postes, ses escales.
+  await page.locator('input[name="trip"][value="cruise"]').check();
+  await page.waitForTimeout(150);
+  check(
+    "vacances : une croisière montre ses postes et ses escales, cache ceux du séjour",
+    (await page.locator('#lines tr[data-key="cabins"]').isVisible()) &&
+      (await page.locator("#count-cabins").isVisible()) &&
+      !(await page.locator('#lines tr[data-key="lodging"]').isVisible()) &&
+      !(await page.locator('#optional tr[data-key="stay-tax"]').isVisible()) &&
+      (await page.locator("#stops").isVisible()),
+  );
+  await page.locator('input[name="trip"][value="stay"]').check();
+  await page.waitForTimeout(150);
+
+  // Les fichiers : PDF, Excel, enregistrer.
+  await page.click("#pdf");
+  await page.waitForTimeout(150);
+  check(
+    "vacances : le rapport PDF reçoit le voyage et les comptes",
+    (await page.evaluate(() => window.__holidayPrinted.input.adults === 2 && window.__holidayPrinted.accounts.join() === "2")),
+  );
+  await page.click("#excel");
+  await page.waitForTimeout(150);
+  check(
+    "vacances : l'export Excel demande où, en .xlsx",
+    await page.evaluate(() => window.__holidayExported.path.endsWith(".xlsx") && window.__saveAsked.defaultPath === "Préparer mes vacances.xlsx"),
+  );
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check(
+    "vacances : enregistrer le projet demande où, en .json",
+    (await page.evaluate(() => window.__holidaySaved.path.endsWith(".json"))) &&
+      (await page.locator("#info-bar").textContent()).startsWith("Projet enregistré"),
+  );
+
+  // Ouvrir un projet : la question d'abord, puisque des montants sont tapés.
+  await page.click("#open");
+  await page.waitForTimeout(150);
+  check("vacances : ouvrir un projet demande d'abord confirmation", await page.locator(".dialog").isVisible());
+  await page.click(".dialog__button:not(.dialog__button--primary)");
+  await page.waitForTimeout(150);
+  check(
+    "vacances : « Non » ne change rien",
+    (await page.evaluate(() => window.__holidayLoaded === undefined)) && (await page.inputValue("#amount-transport")) === "120",
+  );
+  await page.click("#open");
+  await page.waitForTimeout(150);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(250);
+  check(
+    "vacances : le projet ouvert remplace tout — croisière, voyageurs, cabines, comptes",
+    (await page.locator('input[name="trip"][value="cruise"]').isChecked()) &&
+      (await page.locator("#adults-value").textContent()) === "2" &&
+      (await page.inputValue("#count-cabins")) === "1" &&
+      (await page.inputValue("#amount-cabins")) === "2400,00" &&
+      (await page.inputValue("#amount-transport")) === "" &&
+      (await page.locator('#accounts input[data-account="2"]').isChecked()) &&
+      (await page.locator("#info-bar").textContent()).startsWith("Projet ouvert"),
+  );
+
+  // Le projet vient d'être ouvert : rien à perdre, la porte ne demanderait
+  // rien. Un chiffre de plus, et elle demande (10/10/2026).
+  await page.fill("#nights", "9");
+  await page.locator("#nights").press("Enter");
+  await page.waitForTimeout(150);
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  check("vacances : la porte demande quand des chiffres seraient perdus", await page.locator(".dialog").isVisible());
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(150);
+  check(
+    "vacances : Échap répond « rester »",
+    (await page.evaluate(() => window.__holidayClosed === undefined)) && (await page.inputValue("#nights")) === "9",
+  );
+  // « Enregistrer et sortir » : le sélecteur, le projet écrit, puis la porte.
+  await page.evaluate(() => { window.__holidaySaved = undefined; });
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(250);
+  asked = await page.evaluate(() => window.__holidayAsked.at(-1));
+  check(
+    "vacances : « Enregistrer et sortir » écrit le projet, efface tout — voyage, montants, comptes — puis masque la fenêtre",
+    (await page.evaluate(() => window.__holidayClosed === 1 && window.__holidaySaved.input.nights === "9")) &&
+      asked.input.trip === "stay" && asked.input.adults === 1 && asked.input.nights === "" &&
+      asked.input.lines.every((line) => line.amount === "") && asked.accounts.length === 0,
+    JSON.stringify(asked),
+  );
+  const spills = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  check("vacances : rien ne déborde en largeur", !spills);
+  await page.close();
+}
+
+// --- F47 : Carnet de ma voiture (10/10/2026) -------------------------------
+{
+  const page = await browser.newPage({ viewport: { width: 1380, height: 960 } });
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/car-logbook.html");
+  await page.waitForTimeout(200);
+  check("carnet : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" / "));
+  check(
+    "carnet : vierge, elle invite à remplir la fiche et n'a pas d'historique",
+    (await page.locator("#headline").textContent()).startsWith("Remplissez la fiche") &&
+      (await page.locator("#history-empty").isVisible()) &&
+      (await page.locator("#car-title").textContent()) === "Ma voiture",
+  );
+  check("carnet : une voiture à essence n'a pas de tarif de recharge", await page.locator("#tariff-card").isHidden());
+  check(
+    "carnet : une ligne nouvelle porte la date du jour, en rubrique Énergie",
+    (await page.inputValue("#date")).length === 10 && (await page.inputValue("#rubric")) === "energy" &&
+      (await page.locator("#entry-title").textContent()) === "Nouvelle ligne",
+  );
+
+  // La fiche part à chaque champ changé.
+  await page.fill("#plate", "AB-123-CD");
+  await page.locator("#plate").press("Tab");
+  await page.fill("#make", "Peugeot");
+  await page.locator("#make").press("Tab");
+  await page.waitForTimeout(150);
+  let sent = await page.evaluate(() => window.__carSet.at(-1));
+  check(
+    "carnet : la fiche part au contrôleur, et le titre suit",
+    sent.plate === "AB-123-CD" && sent.make === "Peugeot" && sent.tariff.option === "base" &&
+      (await page.locator("#car-title").textContent()) === "Peugeot · AB-123-CD",
+    JSON.stringify(sent),
+  );
+  // **Les champs ne prennent que des chiffres** (11/10/2026).
+  await page.fill("#acquired-km", "");
+  await page.locator("#acquired-km").pressSequentially("1o-0,5");
+  check("carnet : un compteur n'accepte que des kilomètres entiers", (await page.inputValue("#acquired-km")) === "105");
+  // Un compteur illisible venu d'ailleurs que du clavier reste refusé par le
+  // noyau.
+  await page.evaluate(() => {
+    const field = document.getElementById("acquired-km");
+    field.value = "beaucoup";
+    field.dispatchEvent(new Event("change"));
+  });
+  await page.waitForTimeout(150);
+  check(
+    "carnet : un compteur illisible est marqué, la barre dit pourquoi",
+    (await page.locator("#acquired-km.form__field--invalid").count()) === 1 &&
+      (await page.locator("#info-bar").textContent()).includes("kilomètres entiers"),
+  );
+  await page.fill("#acquired-km", "10000");
+  await page.locator("#acquired-km").press("Tab");
+  await page.waitForTimeout(150);
+
+  // Une électrique : le tarif, la recharge, l'heure.
+  await page.selectOption("#engine", "electric");
+  await page.waitForTimeout(150);
+  check(
+    "carnet : une électrique montre son tarif, et pas de choix d'énergie",
+    (await page.locator("#tariff-card").isVisible()) && (await page.locator("#energy-line").isHidden()) &&
+      (await page.locator("#quantity-unit").textContent()) === "kWh" && (await page.locator("#charge-line").isVisible()) &&
+      (await page.locator("#battery-line").isVisible()),
+  );
+  await page.selectOption("#charge", "home");
+  await page.waitForTimeout(80);
+  check(
+    "carnet : à la maison, le montant se calcule — le champ disparaît, l'heure n'a pas lieu d'être en Base",
+    (await page.locator("#amount-line").isHidden()) && (await page.locator("#home-hint").isVisible()) &&
+      (await page.locator("#slot-line").isHidden()),
+  );
+  await page.selectOption("#option", "off-peak");
+  await page.waitForTimeout(150);
+  check(
+    "carnet : en heures pleines / heures creuses, l'heure de la recharge se choisit",
+    (await page.locator("#slot-line").isVisible()) && (await page.evaluate(() => window.__carSet.at(-1).tariff.option)) === "off-peak",
+  );
+  await page.click("#tariff-reset");
+  await page.waitForTimeout(100);
+  check("carnet : « Reprendre le tarif des préférences » le demande au contrôleur", await page.evaluate(() => window.__carReset === true));
+  await page.selectOption("#engine", "petrol");
+  await page.waitForTimeout(150);
+  check("carnet : revenu à l'essence, plus de recharge ni de tarif", (await page.locator("#charge-line").isHidden()) && (await page.locator("#tariff-card").isHidden()));
+
+  // Un plein : sans quantité, refusé ; avec, ajouté.
+  await page.fill("#date", "2026-07-01");
+  await page.fill("#km", "71000");
+  await page.fill("#amount", "70");
+  await page.click("#add");
+  await page.waitForTimeout(150);
+  check(
+    "carnet : un plein sans quantité est marqué",
+    (await page.locator("#quantity.form__field--invalid").count()) === 1 && (await page.locator("#rows tr").count()) === 0,
+  );
+  await page.fill("#quantity", "40");
+  await page.locator("#quantity").press("Enter");
+  await page.waitForTimeout(150);
+  let put = await page.evaluate(() => window.__carPut.at(-1));
+  check(
+    "carnet : Entrée ajoute la ligne, avec ses champs",
+    put.id === null && put.entry.rubric === "energy" && put.entry.energy === "petrol" && put.entry.quantity === "40" &&
+      put.entry.km === "71000" && put.entry.date === "2026-07-01" && (await page.locator("#rows tr").count()) === 1,
+    JSON.stringify(put),
+  );
+  check(
+    "carnet : le formulaire repart à vide, la rubrique gardée",
+    (await page.inputValue("#quantity")) === "" && (await page.inputValue("#km")) === "" &&
+      (await page.inputValue("#rubric")) === "energy" && (await page.locator("#energy-card").isVisible()),
+  );
+
+  // Une pièce d'usure : la liste, puis « Autre pièce… ».
+  await page.selectOption("#rubric", "wear");
+  await page.waitForTimeout(80);
+  check(
+    "carnet : une pièce d'usure montre la liste des pièces, sans la quantité",
+    (await page.locator("#part").isVisible()) && (await page.locator("#quantity").isHidden()) &&
+      (await page.locator("#part-name-line").isHidden()),
+  );
+  await page.selectOption("#part", "other");
+  await page.waitForTimeout(80);
+  check("carnet : « Autre pièce… » demande son nom", await page.locator("#part-name-line").isVisible());
+  await page.fill("#amount", "120");
+  await page.click("#add");
+  await page.waitForTimeout(150);
+  check("carnet : une autre pièce sans nom est marquée", (await page.locator("#part-name.form__field--invalid").count()) === 1);
+  await page.fill("#part-name", "Rotule");
+  await page.click("#add");
+  await page.waitForTimeout(150);
+  check("carnet : la pièce nommée s'ajoute", (await page.locator("#rows tr").count()) === 2);
+
+  // Le filtre de l'historique.
+  await page.selectOption("#filter", "energy");
+  await page.waitForTimeout(80);
+  check("carnet : le filtre ne montre que la rubrique choisie", (await page.locator("#rows tr").count()) === 1);
+  await page.selectOption("#filter", "");
+
+  // Modifier une ligne : un clic, la ligne revient dans le formulaire.
+  await page.click('#rows tr[data-id="1"]');
+  await page.waitForTimeout(100);
+  check(
+    "carnet : un clic sur une ligne la reprend dans le formulaire",
+    (await page.locator("#entry-title").textContent()) === "Modifier la ligne" &&
+      (await page.inputValue("#quantity")) === "40" && (await page.inputValue("#rubric")) === "energy" &&
+      (await page.locator("#delete").isVisible()) && (await page.locator("#cancel").isVisible()) &&
+      (await page.locator('#rows tr[data-id="1"].car__row--editing').count()) === 1,
+  );
+  await page.fill("#amount", "");
+  await page.locator("#amount").pressSequentially("7e-2");
+  check("carnet : le montant d'une ligne n'accepte ni lettre ni signe", (await page.inputValue("#amount")) === "72");
+  await page.fill("#quantity", "");
+  await page.locator("#quantity").pressSequentially("40,255");
+  check("carnet : la quantité d'un plein a deux décimales", (await page.inputValue("#quantity")) === "40,25");
+  await page.fill("#quantity", "40");
+  await page.click("#add");
+  await page.waitForTimeout(150);
+  put = await page.evaluate(() => window.__carPut.at(-1));
+  check(
+    "carnet : la ligne modifiée garde sa clef, et le formulaire repart à neuf",
+    put.id === 1 && put.entry.amount === "72,00" && (await page.locator("#rows tr").count()) === 2 &&
+      (await page.locator("#entry-title").textContent()) === "Nouvelle ligne",
+  );
+
+  // Supprimer : la question d'abord.
+  await page.click('#rows tr[data-id="2"]');
+  await page.waitForTimeout(100);
+  await page.click("#delete");
+  await page.waitForTimeout(100);
+  check("carnet : supprimer une ligne demande confirmation", await page.locator(".dialog").isVisible());
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(150);
+  check("carnet : la ligne est supprimée", (await page.locator("#rows tr").count()) === 1);
+
+  // Prendre une opération : le compte, puis la dépense.
+  await page.selectOption("#rubric", "breakdown");
+  await page.click("#take");
+  await page.waitForTimeout(150);
+  check("carnet : « Prendre une opération… » demande d'abord le compte", (await page.locator(".dialog__field").count()) === 1);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(150);
+  check(
+    "carnet : puis la dépense, parmi celles du compte choisi",
+    (await page.evaluate(() => window.__carExpenses)) === 1 && (await page.locator(".dialog__field option").count()) === 2,
+  );
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(150);
+  check(
+    "carnet : la dépense remplit la date, le montant, le garage et la note — la rubrique reste",
+    (await page.inputValue("#date")) === "2026-09-01" && (await page.inputValue("#amount")) === "65,40" &&
+      (await page.inputValue("#garage")) === "Station Total" && (await page.inputValue("#note")) === "TOTAL" &&
+      (await page.inputValue("#rubric")) === "breakdown" && (await page.locator("#info-bar").textContent()).startsWith("Opération reprise"),
+  );
+
+  // Les fichiers.
+  await page.click("#excel");
+  await page.waitForTimeout(150);
+  check(
+    "carnet : l'export Excel demande où, au nom de la voiture",
+    await page.evaluate(() => window.__carExported.path.endsWith(".xlsx") && window.__saveAsked.defaultPath === "Peugeot · AB-123-CD.xlsx"),
+  );
+  await page.click("#pdf");
+  await page.waitForTimeout(150);
+  check("carnet : le dossier PDF se demande", await page.evaluate(() => window.__carPrinted === true));
+  await page.click("#save");
+  await page.waitForTimeout(200);
+  check(
+    "carnet : enregistrer le carnet demande où, en .json, sous le filtre « Carnet de voiture »",
+    (await page.evaluate(() => window.__carSaved.path.endsWith(".json") && window.__saveAsked.filters[0].name === "Carnet de voiture")) &&
+      (await page.locator("#info-bar").textContent()).startsWith("Carnet enregistré"),
+  );
+
+  // Ouvrir un carnet : la question d'abord, puisque la fenêtre en tient un.
+  await page.click("#open");
+  await page.waitForTimeout(150);
+  check("carnet : ouvrir un carnet demande d'abord confirmation", await page.locator(".dialog").isVisible());
+  await page.click(".dialog__button:not(.dialog__button--primary)");
+  await page.waitForTimeout(150);
+  check("carnet : « Non » ne change rien", (await page.evaluate(() => window.__carLoaded === undefined)) && (await page.inputValue("#plate")) === "AB-123-CD");
+  await page.click("#open");
+  await page.waitForTimeout(150);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(250);
+  check(
+    "carnet : le carnet ouvert remplace tout — fiche, motorisation, historique",
+    (await page.inputValue("#plate")) === "EF-456-GH" && (await page.inputValue("#engine")) === "electric" &&
+      (await page.locator("#car-title").textContent()) === "Renault Zoé · EF-456-GH" && (await page.locator("#rows tr").count()) === 1 &&
+      (await page.locator("#info-bar").textContent()).startsWith("Carnet ouvert"),
+  );
+
+  // La porte : rien à perdre, elle ferme sans question.
+  await page.click("#close");
+  await page.waitForTimeout(250);
+  check(
+    "carnet : un carnet tout juste ouvert se ferme sans question, et la fenêtre repart vierge",
+    (await page.locator(".dialog").count()) === 0 && (await page.evaluate(() => window.__carClosed === 1)) &&
+      (await page.inputValue("#plate")) === "" && (await page.locator("#rows tr").count()) === 0,
+  );
+  // Des changements : la question à trois issues.
+  await page.fill("#plate", "IJ-789-KL");
+  await page.locator("#plate").press("Tab");
+  await page.waitForTimeout(150);
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  check(
+    "carnet : avec des changements, la porte pose la question à trois issues",
+    (await page.locator(".dialog").isVisible()) &&
+      (await page.locator(".dialog__button").allTextContents()).join("|") === "Enregistrer et sortir|Abandonner et sortir|Rester",
+  );
+  await page.click(".dialog__button:nth-child(3)");
+  await page.waitForTimeout(150);
+  check("carnet : « Rester » garde le carnet", (await page.evaluate(() => window.__carClosed === 1)) && (await page.inputValue("#plate")) === "IJ-789-KL");
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  await page.click(".dialog__button:nth-child(2)");
+  await page.waitForTimeout(250);
+  check(
+    "carnet : « Abandonner et sortir » oublie le carnet",
+    (await page.evaluate(() => window.__carClosed === 2)) && (await page.inputValue("#plate")) === "",
+  );
+  const spills = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  check("carnet : rien ne déborde en largeur", !spills);
+  await page.close();
+}
+
+// --- F48 : Partager une dépense (11/10/2026) ------------------------------
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/sharing.html");
+  await page.waitForTimeout(200);
+  check("partage : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" / "));
+  check(
+    "partage : la question en tête, une invite, aucune personne, le récapitulatif des règlements caché",
+    (await page.locator("#question").textContent()) === "Qui paie quoi ?" &&
+      (await page.locator("#headline").textContent()) === "Ajoutez les personnes qui partagent la dépense." &&
+      (await page.locator("#people tr").count()) === 0 &&
+      (await page.locator("#balances-card").isHidden()),
+  );
+  check(
+    "partage : une règle pour toute la dépense, parts égales, revenus masqués, arrondi au centime",
+    (await page.locator('input[name="mode"][value="whole"]').isChecked()) &&
+      (await page.inputValue("#rule")) === "equal" &&
+      (await page.locator("#hide-incomes").isChecked()) &&
+      !(await page.locator("#round-euro").isChecked()),
+  );
+
+  // Deux personnes : leur nom vient du noyau.
+  await page.click("#add-person");
+  await page.waitForTimeout(150);
+  await page.click("#add-person");
+  await page.waitForTimeout(150);
+  let asked = await page.evaluate(() => window.__sharingAsked.at(-1));
+  check(
+    "partage : une personne ajoutée porte le nom que le noyau propose, et participe au commun",
+    (await page.inputValue("#name-1")) === "Personne 1" && (await page.inputValue("#name-2")) === "Personne 2" &&
+      asked.people.length === 2 && asked.common.cells.every((cell) => cell.takes),
+    JSON.stringify(asked.common),
+  );
+  await page.fill("#name-1", "Léa");
+  await page.locator("#name-1").press("Enter");
+  await page.fill("#total", "240");
+  await page.locator("#total").press("Enter");
+  await page.waitForTimeout(200);
+  check(
+    "partage : le total part au calcul, et chacun voit sa part dans la grille",
+    (await page.locator("#headline").textContent()) === "240,00 € à partager : chacun paie 120,00 €." &&
+      (await page.locator("#out-0-1").textContent()) === "120,00 €" &&
+      (await page.locator("#due-2").textContent()) === "120,00 €" &&
+      (await page.locator("#common-amount").textContent()) === "240,00 €",
+  );
+  check(
+    "partage : sans règle au revenu, pas de colonne revenu ; pas de colonne pourcentage",
+    (await page.locator("#income-1").count()) === 0 && (await page.locator("#percent-1").count()) === 0,
+  );
+
+  // **Chaque colonne a sa bulle** (11/10/2026) : une définition et un exemple,
+  // au survol du titre et de son « ⓘ ». Une colonne ajoutée sans bulle
+  // ferait échouer cette vérification.
+  const bare = await page.evaluate(() =>
+    [...document.querySelectorAll("#people-head th")]
+      .slice(2)
+      .filter((cell) => !cell.dataset.help || !cell.title || !cell.querySelector(".sharing__help"))
+      .map((cell) => cell.textContent),
+  );
+  check("partage : chaque colonne de la grille a sa bulle et son « ⓘ »", bare.length === 0, JSON.stringify(bare));
+  check(
+    "partage : la bulle d'« Au maximum » définit et donne l'exemple",
+    (await page.locator('#people-head th[data-help="cap"]').getAttribute("title")) ===
+      "La personne ne paiera jamais plus que ce montant. Ce qu'elle ne paie pas retombe sur les autres participants de ses postes." &&
+      (await page.locator('#people-head th[data-help="fixed"]').getAttribute("title")).includes("Exemple : quelqu'un qui se désiste"),
+  );
+  check(
+    "partage : les postes, la règle et les soldes ont aussi leur bulle",
+    (await page.locator('#column-item[data-help="item"]').count()) === 1 &&
+      (await page.locator('#rule-label[data-help="rule"]').count()) === 1 &&
+      (await page.locator('#column-paid[data-help="paid"]').count()) === 1 &&
+      (await page.locator('#column-balance[data-help="balance"]').count()) === 1 &&
+      (await page.locator('#people-head th[data-help="items"]').count()) === 1,
+  );
+
+  // Un poste qui ne concerne pas tout le monde : le vin.
+  await page.click("#add-item");
+  await page.waitForTimeout(150);
+  await page.fill("#label-1", "Vin");
+  await page.locator("#label-1").press("Tab");
+  await page.fill("#amount-1", "60");
+  await page.locator("#amount-1").press("Enter");
+  await page.locator("#takes-1-2").uncheck();
+  await page.waitForTimeout(200);
+  asked = await page.evaluate(() => window.__sharingAsked.at(-1));
+  check(
+    "partage : le vin a sa colonne, et Personne 2 décochée n'y participe pas",
+    (await page.locator("#head-1 span").first().textContent()) === "Vin" &&
+      asked.items[0].label === "Vin" && asked.items[0].amount === "60,00" &&
+      asked.items[0].cells.find((cell) => cell.person === 2).takes === false &&
+      (await page.locator("#out-1-2").textContent()) === "",
+    JSON.stringify(asked.items),
+  );
+
+  // **Un montant est gardé à la frappe**, comme dans les fiches : ni lettre,
+  // ni signe moins ; vide, un champ facultatif reste vide en sortant.
+  await page.locator("#amount-1").fill("");
+  await page.locator("#amount-1").pressSequentially("8a-0");
+  check("partage : une lettre ou un signe moins ne s'écrivent pas dans un montant", (await page.inputValue("#amount-1")) === "80");
+  await page.locator("#amount-1").press("Enter");
+  await page.waitForTimeout(150);
+  check(
+    "partage : en sortant, le montant s'écrit proprement, et la grille suit le nouveau montant",
+    (await page.inputValue("#amount-1")) === "80,00" && (await page.locator("#out-1-1").textContent()) === "80,00 €" &&
+      (await page.locator("#head-amount-1").textContent()) === "80,00 €",
+  );
+  // **Un montant groupé se modifie** : les milliers ne bloquent plus la frappe,
+  // et se regroupent en sortant.
+  await page.fill("#total", "");
+  await page.locator("#total").pressSequentially("1250");
+  await page.locator("#total").press("Enter");
+  check("partage : en sortant, les milliers se groupent", (await page.inputValue("#total")) === "1\u202f250,00");
+  await page.locator("#total").focus();
+  await page.locator("#total").press("End");
+  await page.locator("#total").press("Backspace");
+  await page.locator("#total").press("Backspace");
+  await page.locator("#total").press("Backspace");
+  await page.locator("#total").pressSequentially(",5x");
+  check("partage : un montant de plus de mille se corrige à la frappe", (await page.inputValue("#total")) === "1\u202f250,5");
+  await page.locator("#total").press("Tab");
+  check("partage : et se réécrit proprement en sortant", (await page.inputValue("#total")) === "1\u202f250,50");
+  await page.fill("#total", "240");
+  await page.locator("#total").press("Enter");
+  await page.waitForTimeout(150);
+  await page.locator("#cap-1").click();
+  await page.locator("#cap-1").press("Tab");
+  check("partage : un plafond laissé vide reste vide, il ne devient pas 0,00", (await page.inputValue("#cap-1")) === "");
+  // Un calcul refusé efface les montants d'avant au lieu de les laisser croire justes.
+  await page.fill("#name-2", "");
+  await page.locator("#name-2").press("Enter");
+  await page.waitForTimeout(150);
+  check(
+    "partage : refusé, le calcul n'affiche plus d'anciens montants",
+    (await page.locator("#out-0-1").textContent()) === "" && (await page.locator("#due-1").textContent()) === "" &&
+      (await page.locator("#info-bar").textContent()) === "Chaque personne doit avoir un nom.",
+  );
+  await page.fill("#name-2", "Personne 2");
+  await page.locator("#name-2").press("Enter");
+  await page.waitForTimeout(150);
+
+  // Une règle au revenu : la colonne apparaît. Puis une règle par poste.
+  await page.selectOption("#rule", "income");
+  await page.waitForTimeout(150);
+  check("partage : au prorata des revenus, la colonne revenu apparaît", await page.locator("#income-1").isVisible());
+  await page.locator("#income-1").pressSequentially("2x0,5");
+  check("partage : un revenu se garde comme un montant", (await page.inputValue("#income-1")) === "20,5");
+  await page.locator("#income-1").fill("");
+  await page.locator('input[name="mode"][value="item"]').check();
+  await page.waitForTimeout(150);
+  check(
+    "partage : une règle par poste — la règle globale se cache, chaque poste a la sienne, le revenu disparaît",
+    (await page.locator("#rule-line").isHidden()) && (await page.locator("#rule-1").isVisible()) &&
+      (await page.locator("#rule-0").isVisible()) && (await page.locator("#income-1").count()) === 0,
+  );
+  await page.selectOption("#rule-1", "percent");
+  await page.waitForTimeout(150);
+  check(
+    "partage : la règle d'un poste a sa bulle",
+    ((await page.locator("#rule-1").getAttribute("title")) ?? "").startsWith("Comment ce poste se partage"),
+  );
+  check(
+    "partage : un poste en pourcentages ouvre un champ par case",
+    (await page.locator("#cell-1-1").isVisible()) && (await page.locator("#cell-0-1").count()) === 0,
+  );
+  await page.locator("#cell-1-1").pressSequentially("-6o,25");
+  check("partage : un pourcentage n'accepte que des chiffres et une virgule", (await page.inputValue("#cell-1-1")) === "6,25");
+  await page.locator("#cell-1-1").fill("");
+
+  // Un règlement.
+  await page.click("#add-payment");
+  await page.waitForTimeout(100);
+  await page.fill("#payment-amount-1", "100");
+  await page.locator("#payment-amount-1").press("Enter");
+  await page.waitForTimeout(150);
+  asked = await page.evaluate(() => window.__sharingAsked.at(-1));
+  check(
+    "partage : un règlement part avec la première personne choisie",
+    asked.payments.length === 1 && asked.payments[0].person === 1 && asked.payments[0].amount === "100" &&
+      (await page.locator("#payment-person-1 option").first().textContent()) === "Léa",
+    JSON.stringify(asked.payments),
+  );
+
+  // Les rapports et les relevés.
+  await page.click("#pdf-distribution");
+  await page.click("#pdf-payments");
+  await page.waitForTimeout(150);
+  check(
+    "partage : les deux rapports partent avec leur nature",
+    (await page.evaluate(() => window.__sharingPrinted.map((one) => one.kind).join())) === "distribution,payments",
+  );
+  await page.click("#statements");
+  await page.waitForTimeout(150);
+  check("partage : des relevés existent déjà — une seule question", await page.locator(".dialog").isVisible());
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(150);
+  check(
+    "partage : les relevés s'écrivent pour tout le monde, dans le dossier choisi",
+    (await page.evaluate(() => window.__sharingWritten.folder === "/tmp/Relevés" && window.__sharingWritten.unit === "")) &&
+      (await page.locator("#info-bar").textContent()) === "2 relevés écrits dans « Relevés ».",
+  );
+  check(
+    "partage : le choix des relevés propose tout le monde, puis chacun",
+    (await page.locator("#statements-unit option").allTextContents()).join("|") === "Tout le monde|Léa|Personne 2",
+  );
+
+  // Supprimer une personne qui a des règlements demande d'abord.
+  await page.click("#person-1 .sharing__delete");
+  await page.waitForTimeout(150);
+  check("partage : supprimer quelqu'un qui a payé demande d'abord", await page.locator(".dialog").isVisible());
+  await page.click(".dialog__button:not(.dialog__button--primary)");
+  await page.waitForTimeout(150);
+  check("partage : « Non » garde la personne et son règlement", (await page.locator("#person-1").count()) === 1);
+
+  // Enregistrer, puis la porte sort sans question.
+  await page.fill("#label", "Week-end");
+  await page.locator("#label").press("Enter");
+  await page.click("#save");
+  await page.waitForTimeout(200);
+  check(
+    "partage : le projet s'enregistre sous son libellé",
+    await page.evaluate(() => window.__saveAsked.defaultPath === "Week-end.json" && window.__sharingSaved.input.label === "Week-end"),
+  );
+  await page.click("#excel");
+  await page.waitForTimeout(150);
+  check(
+    "partage : le classeur aussi",
+    await page.evaluate(() => window.__saveAsked.defaultPath === "Week-end.xlsx" && window.__sharingExported.path.endsWith(".xlsx")),
+  );
+
+  // Ouvrir un projet remplace ce qui est tapé — après une question.
+  await page.click("#open");
+  await page.waitForTimeout(150);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(250);
+  check(
+    "partage : un projet rouvert reprend ses personnes, son règlement daté, et le dit",
+    (await page.inputValue("#name-2")) === "Paul" && (await page.inputValue("#payment-date-1")) === "2027-01-15" &&
+      (await page.inputValue("#label")) === "Week-end" &&
+      (await page.locator("#info-bar").textContent()) === "Projet ouvert : Week-end.json",
+  );
+  await page.click("#close");
+  await page.waitForTimeout(200);
+  check(
+    "partage : juste ouvert, la porte sort sans question et efface tout",
+    (await page.evaluate(() => window.__sharingClosed === 1)) && (await page.locator(".dialog").count()) === 0 &&
+      (await page.locator("#people tr").count()) === 0 && (await page.inputValue("#label")) === "",
+  );
+
+  // Quelque chose de tapé : la porte demande, Échap reste.
+  await page.click("#add-person");
+  await page.waitForTimeout(150);
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  check("partage : la porte demande quand quelque chose serait perdu", await page.locator(".dialog").isVisible());
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(150);
+  check(
+    "partage : Échap répond « rester »",
+    (await page.evaluate(() => window.__sharingClosed === 1)) && (await page.locator("#people tr").count()) === 1,
+  );
+  const spills = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  check("partage : rien ne déborde en largeur", !spills);
+  await page.close();
+}
+
+// Les conseils du partage (P-72) : une phrase sous la règle, des valeurs grises
+// dans les cases vides, et trois boutons pour les reprendre.
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/sharing.html");
+  await page.waitForTimeout(200);
+  const advice = () => page.locator("#rule-advice");
+  for (let count = 0; count < 3; count += 1) {
+    await page.click("#add-person");
+    await page.waitForTimeout(120);
+  }
+  await page.fill("#total", "90");
+  await page.locator("#total").press("Enter");
+  await page.waitForTimeout(200);
+  check(
+    "conseils : à parts égales, la division se lit sous la règle",
+    (await advice().isVisible()) && (await advice().textContent()) === "90,00 € ÷ 3 personnes = 30,00 € chacun." &&
+      (await page.locator("#apply-advice").isHidden()) && (await page.locator("#reset-percents").isHidden()),
+  );
+  check(
+    "conseils : le titre dit ce que chacun paie",
+    (await page.locator("#headline").textContent()) === "90,00 € à partager : chacun paie 30,00 €.",
+  );
+
+  // En pourcentages : le reste se conseille en gris, et ne compte pas.
+  await page.selectOption("#rule", "percent");
+  await page.waitForTimeout(150);
+  await page.fill("#percent-1", "40");
+  await page.locator("#percent-1").press("Enter");
+  await page.waitForTimeout(200);
+  let asked = await page.evaluate(() => window.__sharingAsked.at(-1));
+  check(
+    "conseils : il manque 60 %, conseillés en gris dans les cases vides",
+    (await advice().textContent()) === "Il manque 60 % pour arriver à 100 %." &&
+      (await page.getAttribute("#percent-2", "placeholder")) === "30" &&
+      (await page.getAttribute("#percent-3", "placeholder")) === "30" &&
+      (await page.getAttribute("#percent-1", "placeholder")) === "",
+  );
+  check("conseils : une valeur grise ne compte pas tant qu'on ne l'a pas reprise", asked.people[1].percent === "" && (await page.inputValue("#percent-2")) === "");
+  check(
+    "conseils : « Reprendre les valeurs conseillées » se montre, avec sa bulle",
+    (await page.locator("#apply-advice").isVisible()) &&
+      (await page.locator("#apply-advice").textContent()) === "Reprendre les valeurs conseillées" &&
+      ((await page.getAttribute("#apply-advice", "title")) ?? "").startsWith("Remplit les cases vides"),
+  );
+  await page.click("#apply-advice");
+  await page.waitForTimeout(200);
+  check(
+    "conseils : reprises, les valeurs s'écrivent et le compte est bon",
+    (await page.inputValue("#percent-2")) === "30" && (await page.inputValue("#percent-3")) === "30" &&
+      (await advice().textContent()) === "Les pourcentages font bien 100 %." &&
+      !(await advice().evaluate((node) => node.classList.contains("sharing__advice--warn"))) &&
+      (await page.locator("#apply-advice").isHidden()) && (await page.locator("#reset-percents").isVisible()),
+  );
+
+  // Une personne ajoutée après coup ne paierait rien : on le dit, en orange.
+  await page.click("#add-person");
+  await page.waitForTimeout(200);
+  check(
+    "conseils : une personne ajoutée après coup — l'avertissement en orange",
+    (await advice().textContent()) === "Les pourcentages font déjà 100 % : Personne 4 ne paierait rien." &&
+      (await advice().evaluate((node) => node.classList.contains("sharing__advice--warn"))),
+  );
+  await page.click("#reset-percents");
+  await page.waitForTimeout(150);
+  check(
+    "conseils : « Tout répartir à nouveau » demande d'abord",
+    (await page.locator(".dialog").isVisible()) &&
+      (await page.locator(".dialog__question").textContent()) === "Effacer tous les pourcentages et les répartir à parts égales ?",
+  );
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(250);
+  check(
+    "conseils : tout est réparti à nouveau, à parts égales",
+    (await page.inputValue("#percent-1")) === "25" && (await page.inputValue("#percent-4")) === "25" &&
+      (await advice().textContent()) === "Les pourcentages font bien 100 %.",
+  );
+
+  // D'après les revenus : tapés au prorata, gardés en vue en pourcentages.
+  await page.selectOption("#rule", "income");
+  await page.waitForTimeout(150);
+  check("conseils : au prorata, sans revenus, une invite", (await advice().textContent()) === "Tapez le revenu de chacun pour partager au prorata des revenus.");
+  for (const [id, income] of [[1, "1000"], [2, "1000"], [3, "1000"], [4, "2000"]]) {
+    await page.fill(`#income-${id}`, income);
+    await page.locator(`#income-${id}`).press("Enter");
+    await page.waitForTimeout(120);
+  }
+  check("conseils : au prorata, la part du revenu de chacun", (await advice().textContent()) === "Chacun paie 1,8 % de son revenu.");
+  await page.selectOption("#rule", "percent");
+  await page.waitForTimeout(200);
+  check(
+    "conseils : en pourcentages, les revenus tapés restent en vue et proposent leurs pourcentages",
+    (await page.locator("#income-1").isVisible()) && (await page.locator("#from-incomes").isVisible()) &&
+      (await page.locator("#from-incomes").textContent()) === "Pourcentages d'après les revenus",
+  );
+  await page.click("#from-incomes");
+  await page.waitForTimeout(200);
+  check(
+    "conseils : les pourcentages d'après les revenus font 100 %",
+    (await page.inputValue("#percent-1")) === "20" && (await page.inputValue("#percent-4")) === "40" &&
+      (await advice().textContent()) === "Les pourcentages font bien 100 %.",
+  );
+
+  // Refusé, le partage conseille encore.
+  await page.fill("#percent-1", "");
+  await page.locator("#percent-1").press("Enter");
+  await page.fill("#name-2", "");
+  await page.locator("#name-2").press("Enter");
+  await page.waitForTimeout(200);
+  check(
+    "conseils : même refusé, le partage dit ce qui manque",
+    (await page.locator("#info-bar").textContent()) === "Chaque personne doit avoir un nom." &&
+      (await advice().textContent()) === "Il manque 20 % pour arriver à 100 %." &&
+      (await page.getAttribute("#percent-1", "placeholder")) === "20",
+  );
+  await page.fill("#name-2", "Tom");
+  await page.locator("#name-2").press("Enter");
+  await page.waitForTimeout(150);
+
+  // Une règle par poste : la phrase passe sous la règle de chaque poste.
+  await page.locator('input[name="mode"][value="item"]').check();
+  await page.waitForTimeout(200);
+  check(
+    "conseils : par poste, la phrase passe sous la règle du poste",
+    (await advice().isHidden()) && (await page.locator("#advice-0").textContent()) === "90,00 € ÷ 4 personnes = 22,50 € chacun.",
+  );
+  await page.selectOption("#rule-0", "percent");
+  await page.waitForTimeout(200);
+  check(
+    "conseils : un poste en pourcentages conseille chaque case",
+    (await page.locator("#advice-0").textContent()) === "Il manque 100 % pour arriver à 100 %." &&
+      (await page.getAttribute("#cell-0-1", "placeholder")) === "25",
+  );
+  await page.click("#apply-advice");
+  await page.waitForTimeout(200);
+  check(
+    "conseils : reprises par poste, les cases se remplissent",
+    (await page.inputValue("#cell-0-1")) === "25" && (await page.inputValue("#cell-0-4")) === "25" &&
+      (await page.locator("#advice-0").textContent()) === "Les pourcentages font bien 100 %.",
+  );
+  check("conseils : aucune plainte", errors.length === 0, errors.join(" / "));
+  await page.close();
+}
+
+// --- Préférences : le tarif d'électricité (09/10/2026) --------------------
+{
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/preferences.html");
+  check(
+    "préférences : « Tarif d'électricité » sous sa branche « Outils »",
+    await page.evaluate(() => {
+      const leaf = document.querySelector('.tree__leaf[data-leaf="electricity"]');
+      return (
+        leaf.textContent === "Tarif d'électricité" &&
+        leaf.previousElementSibling.textContent === "Outils"
+      );
+    }),
+  );
+  await page.click('.tree__leaf[data-leaf="electricity"]');
+  await page.waitForTimeout(100);
+  check(
+    "préférences : le Tarif Bleu par défaut, en Base",
+    (await page.inputValue("#electricity-option")) === "base" &&
+      (await page.inputValue("#electricity-base")) === "0,2001" &&
+      !(await page.locator("#electricity-peak").isVisible()),
+  );
+  await page.selectOption("#electricity-option", "off-peak");
+  await page.fill("#electricity-peak", "0,25");
+  check(
+    "préférences : en heures pleines / heures creuses, deux prix et les heures",
+    (await page.locator("#electricity-peak").isVisible()) &&
+      (await page.locator("#electricity-off-peak-hours").isVisible()) &&
+      !(await page.locator("#electricity-base").isVisible()),
+  );
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check(
+    "préférences : la disquette enregistre le tarif",
+    await page.evaluate(
+      () => window.__savedTariff?.option === "off-peak" && window.__savedTariff?.peak === "0,25",
+    ),
+  );
+  await page.click("#electricity-blue");
+  await page.waitForTimeout(100);
+  check(
+    "préférences : « Revenir au Tarif Bleu EDF » remplit les champs sans enregistrer",
+    (await page.inputValue("#electricity-option")) === "base" &&
+      (await page.evaluate(() => window.__savedTariff?.peak === "0,25")),
+  );
+  await page.selectOption("#electricity-option", "off-peak");
+  await page.fill("#electricity-off-peak", "abc");
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check(
+    "préférences : un prix illisible n'est pas enregistré, et on le dit",
+    (await page.locator("#info-bar").textContent()).includes("prix du kWh") &&
+      (await page.evaluate(() => window.__savedTariff?.off_peak !== "abc")),
+  );
+  await page.close();
+}
+
+// --- Préférences : les relevés QIF (15/10/2026) -------------------------
+//
+// « Une petite section destinée à l'import de fichiers QIF, pour permettre à
+// l'utilisateur de trancher, avec des choix par défaut » (Fabrice, P-73).
+{
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/preferences.html");
+  check(
+    "préférences : « Relevés QIF » sous la branche « Importation », après « Vérification »",
+    await page.evaluate(() => {
+      const leaf = document.querySelector('.tree__leaf[data-leaf="qif"]');
+      return (
+        leaf.textContent === "Relevés QIF" &&
+        leaf.previousElementSibling.dataset.leaf === "verification"
+      );
+    }),
+  );
+  await page.click('.tree__leaf[data-leaf="qif"]');
+  await page.waitForTimeout(100);
+  check(
+    "préférences QIF : par défaut, « Me demander à chaque fois » et « Tiers + mémo »",
+    (await page.inputValue("#qif-order")) === "ask" && (await page.inputValue("#qif-label")) === "both" &&
+      (await page.locator("#qif-order option").allTextContents()).join("|") ===
+        "Me demander à chaque fois|Toujours jour/mois (05/03 = 5 mars)|Toujours mois/jour (05/03 = 3 mai)" &&
+      (await page.locator("#qif-label option").allTextContents()).join("|") === "Tiers + mémo|Tiers seul|Mémo seul",
+  );
+  check(
+    "préférences QIF : chaque réglage a sa bulle",
+    ((await page.getAttribute("#qif-order", "title")) ?? "").startsWith("Ne sert que si aucune date") &&
+      ((await page.getAttribute("#qif-order-label", "title")) ?? "").startsWith("Ne sert que si aucune date") &&
+      ((await page.getAttribute("#qif-label", "title")) ?? "").startsWith("Quand une opération porte"),
+  );
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check("préférences QIF : rien de changé, rien d'écrit", await page.evaluate(() => (window.__qifSaves ?? 0) === 0));
+  await page.selectOption("#qif-order", "day-month");
+  await page.selectOption("#qif-label", "payee");
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check(
+    "préférences QIF : la disquette enregistre les deux réglages",
+    await page.evaluate(
+      () => window.__qifPreferences?.order === "day-month" && window.__qifPreferences?.label === "payee" && window.__qifSaves === 1,
+    ),
+  );
+  await page.close();
+
+  // **Sans base, la feuille vit** : ce sont des réglages du logiciel.
+  const bare = await browser.newPage();
+  await openWindow(bare, "http://localhost:4173/ui/windows/preferences.html", { databaseOpen: false });
+  check(
+    "préférences QIF : sans base ouverte, la feuille reste vivante",
+    await bare.evaluate(() => {
+      const leaf = document.querySelector('.tree__leaf[data-leaf="qif"]');
+      return !leaf.disabled && !leaf.classList.contains("tree__leaf--off");
+    }),
+  );
+  await bare.click('.tree__leaf[data-leaf="qif"]');
+  await bare.selectOption("#qif-order", "month-day");
+  await bare.click("#save");
+  await bare.waitForTimeout(150);
+  check(
+    "préférences QIF : et elle s'enregistre sans base",
+    await bare.evaluate(() => window.__qifPreferences?.order === "month-day"),
+  );
+  await bare.close();
 }
 
 // --- Le menu Outils du sélecteur de bases (08/08/2026) ------------------

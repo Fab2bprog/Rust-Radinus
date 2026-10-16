@@ -162,6 +162,10 @@ pub struct Operation {
     pub payee_id: i64,
     pub project_id: i64,
     pub is_complement: bool,
+    /// `Verification` — 1 à vérifier, 2 vérifiée, 3 douteuse, 4 contestée
+    /// (base version 11). Ce que l'utilisateur pense de l'écriture, à côté du
+    /// statut, qui dit ce que la banque en a fait.
+    pub verification_id: i64,
 }
 
 /// `Commentaire` (02_BASE_DE_DONNEES.md §3.3).

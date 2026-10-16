@@ -252,13 +252,16 @@ menu-accounts-checkbooks = ניהול פנקסי צ'קים
 
 menu-statistics = סטטיסטיקה
 menu-statistics-balance-chart = גרף התפתחות היתרה
+menu-statistics-balance-analysis = ניתוח התפתחות היתרה
 menu-statistics-by-category = סטטיסטיקה לפי קטגוריות
 menu-statistics-by-assignment = סטטיסטיקה לפי הקצאות
 menu-statistics-by-budget-line = סטטיסטיקה לפי סעיפי תקציב
 menu-statistics-by-payment-mode = סטטיסטיקה לפי אמצעי תשלום
 menu-statistics-by-payee = סטטיסטיקה לפי צדדים נגדיים וסוחרים
 menu-statistics-by-project = סטטיסטיקה לפי פרויקטים
+menu-statistics-by-verification = סטטיסטיקה לפי אימות
 menu-statistics-dashboard = לוח מחוונים של התנועות
+menu-statistics-crossed-balance = מאזן מוצלב
 
 menu-budget = תקציב
 menu-budget-entry = הזנת תקציב
@@ -276,6 +279,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = תבניות תנועות
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = כלים
 menu-settings = הגדרות
 menu-settings-about-author = אודות המחבר
 menu-settings-about-radinus = אודות Radinus
@@ -435,6 +440,15 @@ operations-selection-total = סכום כולל של התנועות שנבחרו:
 
 operations-column-date = תאריך
 operations-column-clearing-date = תאריך התאמה
+operations-column-status = סטטוס תנועה
+operation-status-pointed = מותאמת
+operation-status-committed = משוריינת
+operation-status-planned = מתוכננת
+operations-column-verification = אימות
+operation-verification-to-verify = לבדיקה
+operation-verification-verified = אומתה
+operation-verification-doubtful = מפוקפקת
+operation-verification-disputed = במחלוקת
 operations-column-label = תיאור
 operations-column-category = קטגוריה
 operations-column-assignment = הקצאה
@@ -510,6 +524,9 @@ filter-all = כל התנועות
 filter-pointed = רק תנועות מותאמות
 filter-committed = רק תנועות משוריינות
 filter-planned = רק תנועות מתוכננות
+filter-by-status = סינון לפי סטטוס
+filter-by-verification = סינון לפי אימות
+filter-show-all = הצגת הכול
 
 # --- כרטיס תנועה (F03) -------------------------------------------
 # התוויות הן אלה של צילום המסך "Fiche operation transaction.png",
@@ -543,6 +560,7 @@ operation-field-direction = סוג תנועה:
 operation-field-amount = סכום
 operation-field-status = סטטוס תנועה
 operation-field-clearing-date = תאריך התאמה
+operation-field-verification = אימות
 operation-field-category = קטגוריה
 operation-field-assignment = הקצאה
 operation-field-payment-mode = אמצעי
@@ -565,6 +583,10 @@ operation-nothing-to-show = אין תנועות להצגה.
 operation-label-required = תיאור התנועה הוא שדה חובה.
 operation-date-required = תאריך התנועה הוא שדה חובה.
 operation-clearing-date-invalid = תאריך ההתאמה אינו תאריך תקין.
+operation-clearing-date-required = פעולה מסומנת חייבת לשאת תאריך סימון.
+operation-clearing-date-question =
+    פעולה מסומנת חייבת לשאת תאריך סימון.
+    לשמור עם תאריך הפעולה, { $date }?
 operation-is-a-sub = השורה הזאת היא תת-תנועה: היא נערכת מהכרטיס שלה עצמה.
 operation-delete-form-open = הכרטיס של "{ $label }" פתוח. יש לסגור אותו לפני המחיקה.
 
@@ -604,6 +626,7 @@ sub-operation-is-the-complement = זוהי ההשלמה: מה שנותר לפצ�
 sub-operation-of = פיצול של "{ $label }" ({ $amount })
 
 operations-pointed = { $count ->
+    [0] אין תנועה להתאמה: הבחירה כבר הותאמה.
     [one] תנועה אחת הותאמה.
     [two] שתי תנועות הותאמו.
    *[other] { $count } תנועות הותאמו.
@@ -618,6 +641,7 @@ operations-select-one = יש לבחור תנועה אחת בלבד.
 operation-copy = עותק לשמירה: עדיין לא נוצר דבר.
 operations-show-children = הצגת כל תת-התנועות
 operations-hide-children = הסתרת כל תת-התנועות
+operations-recurring-from = יצירת תנועה מחזורית מתוך תנועה זו
 
 # --- אישור שני למחיקה חמורה ---------------------
 # מחיקת חשבון בנק גוררת את כל ההיסטוריה שלו: על כפתור כן/לא לוחצים
@@ -638,6 +662,7 @@ window-statistics-title = { $kind ->
     [payment-mode] סטטיסטיקה לפי אמצעי תשלום
     [payee] סטטיסטיקה לפי צד נגדי וסוחר
     [project] סטטיסטיקה לפי פרויקט
+    [verification] סטטיסטיקה לפי אימות
    *[category] סטטיסטיקה לפי קטגוריה
 }
 
@@ -647,6 +672,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] אמצעי תנועה
     [payee] צד נגדי
     [project] פרויקטים
+    [verification] אימות
    *[category] שם קטגוריה
 }
 
@@ -656,6 +682,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] ללא אמצעי תשלום
     [payee] ללא צד נגדי
     [project] ללא פרויקט
+    [verification] לבדיקה
    *[category] ללא קטגוריה
 }
 statistics-total = סך הכול
@@ -698,6 +725,19 @@ accounts-stats-multiselect-help = מידע: יש להשתמש בלחיצת עכ�
 statistics-year-question = על איזו שנה ברצונך לעבוד? Radinus נע בין { $first } ל-{ $last }.
 statistics-year-choose = בחירת שנה
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = מאזן מוצלב
+crossed-balance-window-name = מאזן מוצלב
+crossed-balance-column = קטגוריה
+crossed-balance-no-data = אין תנועה בחודש זה בחשבונות שנבחרו.
+crossed-balance-month-question = על איזה חודש ברצונך לעבוד? מספר בין { $first } ל־{ $last }.
+crossed-balance-month-choose = בחירת חודש
+crossed-balance-next = החודש הבא
+crossed-balance-previous = החודש הקודם
+
 # --- ייצוא הטבלאות (לחיצה ימנית) ---------------------------------
 # פונקציה של הטבלה, לא של חלון: היא קיימת בכל הרשימות.
 
@@ -715,8 +755,16 @@ export-to-xml = ייצוא ל-XML (.xml)
 # תפריט הייצוא של חלון הסטטיסטיקה: לשונית לכל שנה, בשם
 # AN_2026. השנים הריקות — לפי המתגים שנקבעו — אינן נכללות.
 export-menu = ייצוא
+export-to = ייצוא אל
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = העתקת התא
+copy-rows = העתקת השורות שנבחרו
+copy-failed = ההעתקה ללוח נכשלה.
 export-all-years-excel = ייצוא כל השנים ל-Excel
 export-all-years-ods = ייצוא כל השנים ל-LibreOffice Calc
+export-all-months-excel = ייצוא כל חודשי השנה המוצגת ל־Excel
+export-all-months-ods = ייצוא כל חודשי השנה המוצגת ל־LibreOffice Calc
 export-no-year = אין שנה שיש בה תנועות: אין מה לייצא.
 export-years-done = { $years } שנים יוצאו לקובץ "{ $file }".
 export-to-json = ייצוא ל-JSON (.json)
@@ -730,6 +778,7 @@ statistics-window-name = { $kind ->
     [payment-mode] סטטיסטיקה לפי אמצעי תשלום
     [payee] סטטיסטיקה לפי צד נגדי וסוחר
     [project] סטטיסטיקה לפי פרויקט
+    [verification] סטטיסטיקה לפי אימות
    *[category] סטטיסטיקה לפי קטגוריה
 }
 statistics-detail-name = פירוט הסטטיסטיקה
@@ -772,6 +821,19 @@ curve-axis-balance = יתרה
 curve-nothing = לא נבחר אף חשבון: אין גרף לשרטט.
 curve-empty = אין תנועות בתקופה זו.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = ניתוח התפתחות היתרה
+analysis-heading = ניתוח התפתחות היתרה
+analysis-hint = גררו על הגרף בלחיצה ממושכת על לחצן העכבר כדי לראות את התנועות של אותה תקופה.
+analysis-zone = אזור:
+analysis-opening = יתרת פתיחה:
+analysis-closing = יתרת סגירה:
+analysis-variation = שינוי:
+analysis-detail-name = ניתוח היתרה
+analysis-detail-none = אין תנועות באזור הזה.
+
 # --- F05 — סיווג מהיר של תנועות ---------------------------------------
 # החלון שבו מסווגים **בכמות גדולה**: בוחרים שורות, מסמנים את
 # המאפיינים שיש לשנות, ומחילים אותם בבת אחת — בזיכרון.
@@ -790,6 +852,7 @@ quick-check-payment-mode = אמצעי
 quick-check-payee = צד נגדי
 quick-check-project = פרויקט
 quick-check-status = סטטוס
+quick-check-verification = אימות
 quick-column-date = תאריך
 quick-column-label = תיאור
 quick-column-amount = סכום
@@ -799,6 +862,7 @@ quick-column-payment-mode = אמצעי תשלום
 quick-column-payee = צד נגדי
 quick-column-project = פרויקטים
 quick-column-status = סטטוס
+quick-column-verification = אימות
 # ב-Mac, Ctrl + לחיצה היא לחיצה ימנית: המקש שמוסיף לבחירה הוא
 # ⌘, והעזרה צריכה לציין את המקש שעובד.
 quick-multiselect-help = מידע: יש להשתמש בלחיצת עכבר + מקש [{ $modifier }] בטבלה כדי לבחור כמה פריטים
@@ -863,7 +927,7 @@ statement-no-match = אף שורה אינה תואמת את הסינון.
 statement-help = מידע: יש להשתמש בלחיצת עכבר + מקש [{ $modifier }] בטבלה כדי לבחור כמה שורות
 statement-choose-account = קובץ זה מכיל כמה חשבונות. איזה מהם לייבא?
 statement-select-line = יש לבחור לפחות שורה אחת מדף החשבון.
-statement-title-open = פתיחת קובץ דף חשבון (.ofx)
+statement-title-open = פתיחת קובץ דף חשבון (OFX, QIF, CSV)
 statement-title-info = מידע על הקובץ הפתוח
 statement-title-integrate = שילוב הבחירה בחשבון
 statement-title-validate = שילוב תנועה זו בחשבון
@@ -874,6 +938,17 @@ statement-loaded = { $count ->
     [one] נקראה שורה אחת. מספר השורות שכבר קיימות בחשבון שלך: { $known }.
     [two] נקראו שתי שורות. מספר השורות שכבר קיימות בחשבון שלך: { $known }.
    *[other] נקראו { $count } שורות. מספר השורות שכבר קיימות בחשבון שלך: { $known }.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] נקראו { $count } שורות. אף אחת מהן אינה דומה לתנועה שכבר קיימת בחשבון שלך.
+    [one] נקראו { $count } שורות. אחת מהן דומה לתנועה שכבר קיימת בחשבון שלך (אותו תאריך, אותו תיאור, אותו סכום).
+    [two] נקראו { $count } שורות. שתיים מהן דומות לתנועות שכבר קיימות בחשבון שלך (אותו תאריך, אותו תיאור, אותו סכום).
+   *[other] נקראו { $count } שורות. { $alike } מהן דומות לתנועות שכבר קיימות בחשבון שלך (אותו תאריך, אותו תיאור, אותו סכום).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] שורה נוספת דומה לתנועה שכבר קיימת (אותו תאריך, אותו תיאור, אותו סכום).
+    [two] שתי שורות נוספות דומות לתנועות שכבר קיימות (אותו תאריך, אותו תיאור, אותו סכום).
+   *[other] { $alike } שורות נוספות דומות לתנועות שכבר קיימות (אותו תאריך, אותו תיאור, אותו סכום).
 }
 statement-integrated = { $count ->
     [0] דבר לא נקלט: שורות אלו כבר נמצאות בחשבון שלך.
@@ -910,7 +985,24 @@ statement-file-info =
     חשבון הקובץ: { $account }
     תקופה: מ-{ $from } עד { $to }
     יתרה שהודיע עליה הבנק: { $balance }
-    { $count } תנועות, מתוכן { $known } כבר קיימות בחשבון שלך.
+statement-qif-question = שום דבר בקובץ זה אינו מציין אם התאריך "{ $date }" כתוב יום/חודש או חודש/יום. משמעותו:
+statement-qif-day-month = יום { $day }, חודש { $month } (יום/חודש)
+statement-qif-month-day = יום { $day }, חודש { $month } (חודש/יום)
+statement-qif-dates-mixed = קובץ זה כותב את התאריכים שלו בשתי דרכים: "{ $first }" נקרא יום/חודש, "{ $second }" חודש/יום. הוא אינו מיובא, כדי שאף תאריך לא ישתבש.
+statement-qif-amounts-mixed = קובץ זה כותב את הסכומים שלו בשתי דרכים: "{ $first }" עם נקודה, "{ $second }" עם פסיק. הוא אינו מיובא, כדי שאף סכום לא ישתבש.
+statement-qif-opening = יתרת פתיחה של { $amount } ב-{ $date }: זו אינה תנועה, היא אינה מיובאת.
+statement-qif-opening-undated = יתרת פתיחה של { $amount }: זו אינה תנועה, היא אינה מיובאת.
+statement-qif-suspect = שורה { $rank }, "{ $label }" ({ $amount }), נראית כמו יתרת פתיחה: יש לבדוק אותה לפני שילובה.
+statement-qif-rejected = { $count ->
+    [one] שורה אחת בלתי קריאה אינה מיובאת: { $lines }.
+    [two] שתי שורות בלתי קריאות אינן מיובאות: { $lines }.
+   *[other] { $count } שורות בלתי קריאות אינן מיובאות: { $lines }.
+}
+statement-qif-reason-date = תאריך
+statement-qif-reason-amount = סכום
+statement-qif-reason-differ = סכומים סותרים
+statement-qif-no-account = חשבון זה כבר אינו נמצא בקובץ: יש לפתוח את הקובץ מחדש.
+statement-balance-unknown = לא צוין בקובץ
 statement-group-identification = זיהוי התנועה
 statement-group-amount = סכום התנועה
 statement-group-classification = סיווג התנועה לצורך חישוב סטטיסטיקה
@@ -1545,6 +1637,9 @@ password-show = הצג את הסיסמה
 password-remove-question = להסיר את ההגנה ממסד נתונים זה?
 password-mismatch = שתי ההקלדות של הסיסמה החדשה שונות
 password-wrong = הסיסמה אינה מתאימה
+database-too-recent = מסד נתונים זה נשמר בגרסה חדשה יותר של Radinus (גרסת מסד { $found }; גרסה זו קוראת עד גרסה { $supported }). עדכנו את Radinus כדי לפתוח אותו.
+database-not-radinus = קובץ זה אינו מסד נתונים של Radinus.
+database-unreadable = לא ניתן היה לקרוא את מסד הנתונים: { $reason }
 password-close-first = סגור מסד נתונים זה לפני שינוי הסיסמה שלו
 password-now-protected = מסד הנתונים מוגן בסיסמה
 password-now-clear = מסד הנתונים אינו מוגן עוד
@@ -1778,6 +1873,11 @@ welcome-total-final = יתרה סופית
 welcome-total-real-detail = מותאם + משוריין
 welcome-total-final-detail = מותאם + משוריין + מתוכנן
 welcome-accounts = החשבונות שלך
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = חשבונות שנספרים בסיכומים: { $count } מתוך { $total }
+welcome-tile-counted = לספור את החשבון הזה בסיכומים
 welcome-tile-bank = בבנק
 welcome-tile-real = בפועל
 welcome-tile-final = סופי
@@ -1831,6 +1931,58 @@ preferences-leaf-zoom = גודל התצוגה
 preferences-field-zoom = הגדלה:
 preferences-zoom-reset = ערך ברירת המחדל
 preferences-zoom-hint = הכול גדל יחד: הטקסט, הסמלים, העמודות. מתחת ל-100%, נכנס יותר אל המסך. שורת התפריטים של המערכת ותיבות הדו-שיח שלה, לעומת זאת, הולכות אחר ההגדרות של המחשב שלך ולא אחר אלה.
+preferences-branch-import = ייבוא
+preferences-leaf-verification = אימות
+preferences-field-verification = תנועות מיובאות:
+preferences-verification-hint = «אומתה»: אתם סומכים על הבנק שלכם, תנועה מיובאת נחשבת תקינה. «לבדיקה»: כל תנועה מיובאת ממתינה לבדיקתכם; לאחר מכן אתם מעבירים אותה בעצמכם ל«אומתה» ברשימת התנועות. הגדרה זו חלה רק על ייבואים עתידיים.
+preferences-leaf-qif = דפי חשבון QIF
+preferences-field-qif-order = סדר היום והחודש:
+preferences-qif-order-ask = לשאול אותי בכל פעם
+preferences-qif-order-day-month = תמיד יום/חודש (05/03 = 5 במרץ)
+preferences-qif-order-month-day = תמיד חודש/יום (05/03 = 3 במאי)
+preferences-qif-order-help = משמש רק כאשר אף תאריך בקובץ אינו מכריע. ברגע שתאריך כמו 24/11 מוכיח את הסדר, הקובץ הוא שמחליט, תהיה הגדרה זו אשר תהיה.
+preferences-field-qif-label = תיאור התנועה:
+preferences-qif-label-both = צד נגדי + הערה
+preferences-qif-label-payee = צד נגדי בלבד
+preferences-qif-label-memo = הערה בלבד
+preferences-qif-label-help = כאשר תנועה נושאת גם צד נגדי וגם הערה. אם היא נושאת רק אחד מהם, בו נעשה שימוש, תהיה הגדרה זו אשר תהיה.
+preferences-qif-hint = הגדרות אלה חלות על כל דפי החשבון בפורמט QIF, יהיה מסד הנתונים הפתוח אשר יהיה. «לשאול אותי בכל פעם» היא האפשרות הבטוחה ביותר: קובץ שתאריכיו דו-משמעיים לעולם אינו נקרא על סמך ניחוש.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = שחזור עמודות ברירת המחדל
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = הצגה/הסתרה
+columns-colour = צביעת העמודה:
+columns-colour-none = ללא צבע
+columns-colour-red = אדום
+columns-colour-orange = כתום
+columns-colour-pink = ורוד
+columns-colour-pastel-green = ירוק פסטל
+columns-colour-green = ירוק
+columns-colour-pastel-blue = כחול פסטל
+columns-colour-blue = כחול
+columns-colour-pastel-yellow = צהוב פסטל
+columns-colour-yellow = צהוב
+preferences-leaf-columns = עמודות הטבלאות
+preferences-table-operations-list = רשימת התנועות
+preferences-columns-reset = איפוס
+preferences-columns-reset-all = איפוס הכול
+preferences-columns-done = העמודות חזרו לסידור המקורי.
+preferences-columns-hint = כל טבלה זוכרת את סדר העמודות שלה, את העמודות שהסתרתם ואת רוחבן. «איפוס» מחזיר לה מיד את הסידור המקורי.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = איפוס
+preferences-leaf-comfort = הגדרות נוחות
+preferences-comfort-reset = איפוס הגדרות הנוחות
+preferences-comfort-hint = מחזיר למצב המקורי את העמודות של כל הטבלאות, את הסדר ואת תיבות הסימון של החשבונות בחלון הפתיחה ואת גודל התצוגה. השפה, המטבע ואימות התנועות המיובאות אינם משתנים.
+preferences-comfort-question = לאפס את הגדרות הנוחות? עמודות הטבלאות, חלון הפתיחה וגודל התצוגה יחזרו למצבם המקורי.
+preferences-comfort-done = הגדרות הנוחות אופסו.
 
 # --- כרזת הפתיחה ---------------------------------------------------------
 #
@@ -1893,3 +2045,969 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = תוכנה זו מסופקת ללא כל אחריות, ככל שהחוק מתיר.
 licence-info = הנוסח הרשמי נפתח בדפדפן שלך, באתר gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = סימולציית הלוואה
+window-loan-title = סימולציית הלוואה
+loan-tab-credit = ההלוואה
+loan-tab-afford = האם אוכל להחזיר אותה?
+loan-field-kind = סוג ההלוואה
+loan-kind-consumer = הלוואה צרכנית
+loan-kind-mortgage = משכנתה
+loan-field-amount = סכום ההלוואה
+loan-field-payment = החזר חודשי
+loan-field-months = תקופה
+loan-field-rate = ריבית קבועה
+loan-field-fees = דמי פתיחת תיק
+loan-field-insurance = ביטוח לחודש
+loan-unit-months = חודשים
+loan-unit-percent = %
+loan-invalid-field = הערך אינו מספר: תקנו אותו כדי לחשב מחדש.
+loan-report-button = דוח PDF
+loan-monthly-table = טבלה חודש אחר חודש
+loan-months-count = { $count ->
+        [one] חודש אחד
+        [two] חודשיים
+       *[other] { $count } חודשים
+    }
+loan-percent = { $value }%
+loan-notice-payment-too-low = החזר זה אינו מכסה את הריבית: ההלוואה לא תיפרע לעולם. התקופה נשארת 600 חודשים.
+loan-notice-too-long = החזר זה ידרוש יותר מ־600 חודשים: התקופה נשארת 600 חודשים.
+loan-figure-payment = החזר חודשי
+loan-figure-payment-insured = החזר כולל ביטוח
+loan-figure-taeg = ריבית אפקטיבית
+loan-figure-interest = עלות הריבית
+loan-figure-insurance = עלות הביטוח
+loan-figure-cost = העלות הכוללת של ההלוואה
+loan-figure-total-due = הסכום הכולל לתשלום
+loan-figure-all-in = סך הכול הוחזר, כולל ביטוח
+loan-part-capital = סכום ההלוואה
+loan-part-interest = ריבית
+loan-part-fees = דמי פתיחת תיק
+loan-part-insurance = ביטוח
+loan-donut-cost-caption = בסך הכול
+loan-chart-cost = כמה עולה ההלוואה
+loan-chart-capital = יתרת הקרן
+loan-schedule-title = לוח סילוקין
+loan-schedule-yearly = לוח סילוקין, שנה אחר שנה
+loan-column-number = מס׳
+loan-column-year = שנה
+loan-column-date = מועד
+loan-column-payment = החזר
+loan-column-payments = החזרים
+loan-column-interest = ריבית
+loan-column-capital = קרן
+loan-column-insurance = ביטוח
+loan-column-remaining = יתרת הקרן
+loan-history-label = התקופה הנבדקת
+loan-period-last-12 = 12 החודשים האחרונים
+loan-accounts-title = החשבונות הנבדקים
+loan-period-title = תקופה
+loan-column-account = חשבון
+loan-column-bank = בנק
+loan-column-balance = יתרה ריאלית
+loan-unavailable-no-account = סמנו לפחות חשבון אחד כדי לבחון את ההיסטוריה שלכם.
+loan-unavailable-no-month = לתקופה זו אין עדיין אף חודש מלא: בחרו תקופה אחרת.
+loan-verdict-title = בקצרה
+loan-verdict-green = אפשרי
+loan-verdict-orange = על הגבול
+loan-verdict-red = מסוכן
+loan-verdict-no-income = אין הכנסות בתקופה זו: אי אפשר לחשב את יחס החוב.
+loan-check-debt-green = יחס חוב של { $ratio }: מתחת לסף של שיטה זו ({ $green }).
+loan-check-debt-orange = יחס חוב של { $ratio }: בין { $green } ל־{ $red }, על הגבול.
+loan-check-debt-red = יחס חוב של { $ratio }: מעל { $red }.
+loan-check-effort = ההחזר של { $payment } לוקח { $share } ממה שאתם חוסכים { $kind ->
+        [good] בחודש טוב
+        [hard] בחודש קשה
+       *[usual] בחודש רגיל
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] חודש טוב
+        [hard] חודש קשה
+       *[usual] חודש רגיל
+    } לא משאיר לכם דבר בצד: ההחזר של { $payment } יילקח מהעתודה שלכם.
+loan-check-reserve-green = היתרה שלכם נשארת חיובית עד סוף ההלוואה.
+loan-check-reserve-red = היתרה שלכם הייתה יורדת מתחת לאפס ב{ $month }, בגלל ההלוואה הזו.
+loan-check-reserve-sooner = היתרה שלכם הייתה יורדת מתחת לאפס ב{ $month }, { $count ->
+        [one] חודש אחד
+        [two] חודשיים
+       *[other] { $count } חודשים
+    } מוקדם יותר מאשר בלי ההלוואה.
+loan-check-reserve-anyway = היתרה שלכם הייתה יורדת מתחת לאפס בסביבות { $month } גם בלי ההלוואה, שכמעט אינה משנה זאת.
+loan-check-reserve-floor-green = היתרה שלכם נשארת מעל עתודת הביטחון ({ $floor }) עד סוף ההלוואה.
+loan-check-reserve-floor-red = היתרה שלכם הייתה יורדת מתחת לעתודת הביטחון ({ $floor }) ב{ $month }, בגלל ההלוואה הזו.
+loan-check-reserve-floor-sooner = היתרה שלכם הייתה יורדת מתחת לעתודת הביטחון ({ $floor }) ב{ $month }, { $count ->
+        [one] חודש אחד
+        [two] חודשיים
+       *[other] { $count } חודשים
+    } מוקדם יותר מאשר בלי ההלוואה.
+loan-check-reserve-floor-anyway = היתרה שלכם הייתה יורדת מתחת לעתודת הביטחון ({ $floor }) בסביבות { $month } גם בלי ההלוואה, שכמעט אינה משנה זאת.
+loan-warning-deficit = שימו לב: בתקופה זו ההוצאות שלכם כבר עולות על ההכנסות ב־{ $amount } בחודש בממוצע, עוד לפני כל הלוואה.
+loan-figure-reference = חיסכון { $kind ->
+        [good] בחודש טוב
+        [hard] בחודש קשה
+       *[usual] בחודש רגיל
+    }
+loan-figure-tipped = חודשים שההלוואה הייתה מכניסה למינוס
+loan-gauge-caption = יחס חוב
+loan-figure-income = הכנסה ממוצעת לחודש
+loan-figure-spending = הוצאה ממוצעת לחודש
+loan-figure-saving = חיסכון ממוצע לחודש
+loan-figure-running = הלוואות קיימות לחודש
+loan-figure-new = החזר חדש, כולל ביטוח
+loan-figure-rest = למחיה בחודש
+loan-figure-debt = יחס חוב
+loan-red-months-value = { $count } מתוך { $total }
+loan-figure-balance-now = יתרה ריאלית היום
+loan-figure-balance-end = יתרה צפויה בסוף ההלוואה
+loan-chart-income = לאן הולכת ההכנסה הממוצעת שלכם
+loan-donut-income-caption = הכנסה ממוצעת
+loan-part-spending = הוצאות שוטפות
+loan-part-running = הלוואות קיימות
+loan-part-new = הלוואה חדשה
+loan-part-rest = נשאר
+loan-part-missing = חסר
+loan-chart-history = ההיסטוריה שלכם עם ההלוואה הזו
+loan-chart-history-hint = מה היה נשאר בכל חודש אחרי ההחזר. באדום בוהק — החודשים שההלוואה הייתה מכניסה למינוס; באדום חיוור — אלה שהיו במינוס גם בלעדיה.
+loan-chart-projection = היתרה הצפויה שלכם
+loan-mark-loan-end = סיום: { $label }
+loan-mark-negative = במינוס
+loan-mark-floor = מתחת לעתודה
+loan-mark-floor-line = עתודת ביטחון
+loan-running-title = הלוואות קיימות שנלקחו בחשבון
+loan-running-column-label = פעולה מחזורית
+loan-running-column-monthly = לחודש
+loan-running-column-end = החזר אחרון
+loan-no-running = לא זוהתה אף הלוואה קיימת בין הפעולות המחזוריות שלכם.
+loan-period-caption = מ־{ $from } עד { $to } ({ $count ->
+        [one] חודש אחד
+        [two] חודשיים
+       *[other] { $count } חודשים
+    })
+loan-transfers = { $count ->
+        [0] לא זוהתה אף העברה בין החשבונות המסומנים שלכם.
+        [one] העברה אחת בין החשבונות המסומנים שלכם זוהתה והוצאה מהחישוב.
+       *[other] { $count } העברות בין החשבונות המסומנים שלכם זוהו והוצאו מהחישוב.
+    }
+loan-method = ממוצעים על פני החודשים המלאים של התקופה, פעולות מותאמות ומחויבות, ללא ההעברות בין החשבונות המסומנים שלכם.
+loan-report-title = סימולציית הלוואה
+loan-report-made-on = סימולציה מ־{ $date }
+loan-disclaimer = סימולציה להמחשה בלבד, ללא תוקף חוזי. רק הצעת הבנק מחייבת.
+loan-tab-rules = הגדרות השיפוט
+loan-method-optimistic = אופטימית
+loan-method-neutral = ניטרלית
+loan-method-severe = מחמירה
+loan-method-line = שיטת השיפוט: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = פסק הדין עונה על שלוש שאלות, וכל שיטה מציבה דרישות משלה. בחרו את זו שמתאימה לכם: פסק הדין בלשונית „האם אוכל להחזיר אותה?” הולך אחריה. השורה האחרונה מניחה שההוצאות שלכם עולות מדי שנה באחוז שצוין; ההחזר אינו משתנה.
+loan-rule-row-debt = יחס חוב מקובל
+loan-rule-row-reference = חיסכון ייחוס
+loan-rule-row-share = החלק מהחיסכון הזה שההחזר רשאי לקחת
+loan-rule-row-floor = סף שהיתרה אסור שתרד מתחתיו
+loan-rule-row-sooner = אם היתרה יורדת מתחתיו גם בלי ההלוואה
+loan-rule-row-growth = עלייה בהוצאות שלכם בשנה
+loan-rule-limits = ירוק עד { $green }, כתום עד { $red }
+loan-rule-reference = { $kind ->
+        [good] חודש טוב
+        [hard] חודש קשה
+       *[usual] חודש רגיל
+    }: { $amount }
+loan-rule-floor-zero = אפס
+loan-rule-floor-cushion = חודש של הוצאות: { $amount }
+loan-rule-sooner = כתום אם ההלוואה מקדימה זאת ב־{ $orange }, אדום ב־{ $red }
+loan-unit-percent-year = % בשנה
+loan-method-optimistic-explain = השיטה האופטימית מניחה חודש טוב, מקבלת יחס חוב עד 40% ואינה שומרת עתודה: היא מראה מה אפשרי אם הכול ילך טוב.
+loan-method-neutral-explain = השיטה הניטרלית מניחה חודש רגיל ופועלת לפי כלל הבנקים, יחס חוב של 33 עד 35%: זה שיפוט הייחוס.
+loan-method-severe-explain = השיטה המחמירה מניחה חודש קשה ושומרת חודש של הוצאות כעתודה לבלתי צפוי: היא מראה מה מחזיק גם אם הדברים ילכו רע.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = צריכת מכשיר חשמלי
+window-appliance-title = צריכת מכשיר חשמלי
+appliance-device-title = המכשיר
+appliance-on-title = פועל
+appliance-standby-title = במצב המתנה
+appliance-field-on-watts = הספק בזמן פעולה
+appliance-field-on-hours = זמן פעולה ביום
+appliance-field-days = ימי שימוש בשבוע
+appliance-field-share = חלק זמן הפעולה בשעות שפל
+appliance-field-standby-watts = הספק במצב המתנה
+appliance-field-standby-hours = זמן המתנה ביום שימוש
+appliance-unit-watts = W
+appliance-unit-hours = h
+appliance-unit-days = מתוך 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/kWh
+appliance-standby-hint = אם השדה נשאר ריק, מצב ההמתנה נמשך בשאר היום. בימים ללא שימוש המכשיר נשאר מחובר: כל הזמן הזה נחשב כהמתנה. כשהמכשיר מנותק, הספק ההמתנה שלו הוא 0 W.
+appliance-contract-title = החוזה שלך
+appliance-field-option = מסלול תעריף
+appliance-option-base = בסיסי (מחיר אחיד)
+appliance-option-off-peak = שעות שיא / שעות שפל
+appliance-field-base = מחיר ל-kWh
+appliance-field-peak = מחיר ל-kWh בשעות שיא
+appliance-field-off-peak = מחיר ל-kWh בשעות שפל
+appliance-field-off-peak-hours = שעות שפל ביום
+appliance-contract-hint = מחירים אלה חלים על חישוב זה בלבד. את התעריף השמור מגדירים בהגדרות › העדפות › כלים.
+appliance-contract-reset = חזרה לתעריף השמור
+appliance-period-day = ליום
+appliance-period-month = לחודש
+appliance-period-year = לשנה
+appliance-energy = { $value } kWh
+appliance-less-than = פחות מ-{ $amount }
+appliance-detail-title = פירוט לשנה אחת
+appliance-column-part = סעיף
+appliance-column-energy = אנרגיה
+appliance-column-cost = עלות
+appliance-column-share = חלק
+appliance-line-on = פועל
+appliance-line-standby = במצב המתנה
+appliance-line-on-peak = פועל, שעות שיא
+appliance-line-on-off-peak = פועל, שעות שפל
+appliance-line-standby-peak = במצב המתנה, שעות שיא
+appliance-line-standby-off-peak = במצב המתנה, שעות שפל
+appliance-line-total = סה״כ
+appliance-chart-title = לאן הולך הכסף
+appliance-chart-caption = לשנה
+appliance-standby-sentence = מצב ההמתנה לבדו עולה { $amount } בשנה: { $share } מעלות המכשיר.
+appliance-note-plate = ההספק הרשום על המכשיר או בהוראות השימוש שלו הוא ערך מרבי: בזמן פעולה רוב המכשירים צורכים פחות. לקבלת נתון אמיתי, מדדו אותו במד צריכה המחובר לשקע והזינו את מה שהוא מציג.
+appliance-note-subscription = התשלום הקבוע אינו נכלל: משלמים אותו בין שהמכשיר מחובר ובין שלא.
+appliance-invalid-watts = נא להזין הספק בין 0 ל-100,000 W.
+appliance-invalid-hours = נא להזין זמן בין 0 ל-24 שעות ביום.
+appliance-invalid-days = נא להזין מספר שלם של ימים, בין 0 ל-7.
+appliance-invalid-share = נא להזין חלק בין 0 ל-100%.
+appliance-invalid-day-overflow = זמן הפעולה וזמן ההמתנה יחד עולים על 24 שעות ביום.
+appliance-invalid-price = נא להזין מחיר ל-kWh בין 0 ל-100.
+appliance-invalid-off-peak-hours = נא להזין מספר שלם של שעות שפל, בין 0 ל-24.
+preferences-branch-tools = כלים
+preferences-leaf-electricity = תעריף חשמל
+preferences-electricity-blue = חזרה ל-Tarif Bleu של EDF
+preferences-electricity-hint = התעריף שבחוזה שלך, שבו משתמש הכלי "צריכת מכשיר חשמלי". ברירת מחדל: Tarif Bleu של EDF (צרפת) נכון ל-1 באוגוסט 2026, מחירים כולל מסים, מונה 3 עד 6 kVA. מחירים אלה משתנים לעיתים קרובות בפברואר ובאוגוסט: העתיקו את המחירים מהחשבון.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = כרית הביטחון שלי
+window-cushion-title = כרית הביטחון שלי
+cushion-question = אם ההכנסות שלך ייפסקו מחר, לכמה חודשים יספיקו החסכונות שלך?
+cushion-accounts-title = החשבונות שלך
+cushion-column-account = חשבון
+cushion-column-balance = יתרה ריאלית
+cushion-column-savings = חיסכון
+cushion-column-spending = הוצאות
+cushion-accounts-hint = "חיסכון": הכסף שעליו אפשר לסמוך בעת משבר. "הוצאות": החשבונות שמהם יוצאות ההוצאות השוטפות.
+cushion-history-label = תקופת הבדיקה
+cushion-backup-label = הכנסת גיבוי לחודש
+cushion-backup-hint = מה שימשיך להיכנס: דמי אבטלה, משכורת של בן או בת הזוג… ריק: אין הכנסה.
+cushion-categories-title = ההוצאות שנלקחו בחשבון
+cushion-categories-hint = בטלו את הסימון של מה שהייתם מקצצים בעת משבר.
+cushion-categories-empty = אין הוצאות בתקופה זו.
+cushion-verdict-title = כרית הביטחון שלך
+cushion-targets-title = ספי הזהירות
+cushion-projection-title = החיסכון שלך בעת משבר
+cushion-projection-hint = מה שהיה נשאר בכל חודש אם ההכנסות שלך היו נפסקות היום.
+cushion-note = הערכה המבוססת על ההיסטוריה שלך: ההוצאות בחודש קשה עשויות להיות שונות מהממוצע.
+cushion-invalid-backup = לא ניתן לקרוא את הסכום הזה: תקנו אותו כדי להפעיל מחדש את החישוב.
+cushion-no-spending-account = סמנו לפחות חשבון "הוצאות" אחד.
+cushion-no-month = בתקופה זו אין עדיין אף חודש מלא.
+cushion-months = { $value } חודשים
+cushion-per-month = { $amount } לחודש
+cushion-figure-holds = ללא הגבלה
+cushion-gauge-caption = של הוצאות מכוסות
+cushion-verdict-short = פחות משלושה חודשים: משבר יכניס אותך במהירות לקשיים.
+cushion-verdict-fair = בין שלושה לשישה חודשים: כרית סבירה, כדאי להגדיל אותה אם אפשר.
+cushion-verdict-solid = שישה חודשים או יותר: כרית הביטחון שלך יציבה.
+cushion-verdict-holds = הכנסת הגיבוי שלך מכסה את ההוצאות: החיסכון שלך לא יישחק.
+cushion-verdict-nothing = אין הוצאות שנלקחו בחשבון בתקופה: אין מה לכסות.
+cushion-tile-savings = חיסכון זמין
+cushion-tile-spending = הוצאות שנלקחו בחשבון
+cushion-tile-backup = הכנסת גיבוי
+cushion-tile-burn = שחיקת החיסכון
+cushion-tile-rhythm = קצב החיסכון
+cushion-burn-none = אין
+cushion-target-title = { $months } חודשי הוצאות: { $amount }
+cushion-target-reached = הושג.
+cushion-target-date = חסרים { $missing }. בקצב החיסכון שלך, הסף יושג בסביבות { $month }.
+cushion-target-never = חסרים { $missing }. החיסכון שלך לא גדל בתקופה: בקצב הזה, הסף לא יושג.
+cushion-mark-empty = החיסכון אוזל: { $month }
+cushion-period = ממוצע של { $count ->
+        [one] { $count } חודש מלא
+        [two] { $count } חודשים מלאים
+       *[other] { $count } חודשים מלאים
+    }, מ־{ $from } עד { $to }. { $transfers ->
+        [0] אין העברות בין החשבונות שלך.
+        [one] העברה אחת בין החשבונות שלך, שהוצאה מהחישוב.
+        [two] שתי העברות בין החשבונות שלך, שהוצאו מהחישוב.
+       *[other] { $transfers } העברות בין החשבונות שלך, שהוצאו מהחישוב.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = יעד חיסכון
+window-goal-title = יעד חיסכון
+goal-accounts-title = החשבונות במעקב
+goal-column-account = חשבון
+goal-column-balance = יתרה ריאלית
+goal-accounts-hint = העברה בין שני חשבונות שבמעקב מתקזזת; העברה לחשבון שאינו במעקב נחשבת כהוצאה.
+goal-period-label = תקופת ייחוס
+goal-period-range = טווח שנים…
+goal-range-from = משנת
+goal-range-to = עד
+goal-question-title = השאלה שלך
+goal-question-when = מתי יהיה לי הסכום הזה?
+goal-question-amount = כמה יהיה לי בתאריך הזה?
+goal-question-effort = כמה לחסוך כדי שיהיה לי הסכום הזה בתאריך הזה?
+goal-field-target = סכום היעד
+goal-field-date = תאריך היעד
+goal-field-rate = ריבית שנתית על החיסכון
+goal-field-extra = ואם אחסוך יותר, לחודש
+goal-options-hint = ריק: ללא ריבית, ללא תוספת.
+goal-answer-title = התשובה
+goal-chart-title = היתרה שלך, אתמול ומחר
+goal-chart-hint = קו רציף: היתרה הריאלית בשנים־עשר החודשים האחרונים; קו מקווקו: התחזית; אזור בהיר: הטווח לפי החודשים.
+goal-disclaimer = תחזית המבוססת על ההיסטוריה שלך, לא הבטחה: אירוע בלתי צפוי יכול לשנות הכול.
+goal-no-account = סמנו לפחות חשבון אחד למעקב.
+goal-no-month = בתקופה זו אין עדיין אף חודש מלא.
+goal-invalid-target = נא להזין סכום יעד.
+goal-invalid-date = נא לבחור תאריך עתידי, בתוך חמישים השנים הבאות.
+goal-invalid-rate = נא להזין ריבית בין 0 ל־100%.
+goal-invalid-extra = לא ניתן לקרוא את הסכום הזה: תקנו אותו כדי להפעיל מחדש את החישוב.
+goal-per-month = { $amount } לחודש
+goal-tile-balance = יתרה היום
+goal-tile-rhythm = קצב ממוצע
+goal-tile-target = יעד
+goal-tile-reached = יושג בסביבות
+goal-tile-date = תאריך היעד
+goal-tile-projected = יתרה צפויה
+goal-tile-saved = ייחסך עד אז
+goal-tile-interest = מתוכם ריבית
+goal-tile-needed = סכום לחיסכון
+goal-when-already = כבר יש לך { $amount }: סך היתרות בחשבונות שבמעקב הוא { $balance }.
+goal-when-reached = יהיה לך { $amount } בסביבות { $month }, בעוד { $months ->
+        [one] חודש אחד
+        [two] חודשיים
+       *[other] { $months } חודשים
+    }.
+goal-when-range = לפי החודשים, בין { $early } לבין { $late }.
+goal-when-range-open = לכל המוקדם בסביבות { $early }; עם חודשים חלשים, היעד לא יושג.
+goal-when-never = בקצב הזה, הסכום { $amount } לא יושג.
+goal-zero = היתרה שלך תרד לאפס בסביבות { $month }.
+goal-amount = ב־{ $month } יהיה לך בערך { $amount }.
+goal-amount-range = לפי החודשים, בין { $low } לבין { $high }.
+goal-effort-more = כדי שיהיה לך { $amount } ב־{ $month }, יש לחסוך בממוצע { $monthly } לחודש, כלומר { $gap } יותר מהיום.
+goal-effort-less = כדי שיהיה לך { $amount } ב־{ $month }, יספיקו { $monthly } לחודש, כלומר { $gap } פחות מהיום: החיסכון שלך מקדים את התוכנית.
+goal-effort-range = לפי החודשים, הפער מהקצב שלך ינוע בין { $low } לבין { $high } לחודש.
+goal-chart-target = יעד: { $amount }
+goal-chart-today = היום
+goal-note-seasons = התחזית עוקבת אחר עונות השנה: כל חודש עתידי מקבל את הממוצע של אותם חודשים בתקופה.
+goal-note-range = הטווח נגזר מהחודשים החלשים והחזקים בתקופה: הרבע הנמוך ביותר והרבע הגבוה ביותר.
+goal-note-loan = ההלוואה "{ $label }" מסתיימת ב־{ $month }: לאחר מכן { $amount } נוספים בכל חודש.
+goal-note-interest = הריבית מחושבת מדי חודש בשיעור של { $rate }% לשנה: קירוב לכלל חישוב הריבית לפי חצאי חודש בחשבונות חיסכון.
+goal-period = הקצב חושב על פני { $count ->
+        [one] { $count } חודש מלא
+        [two] { $count } חודשים מלאים
+       *[other] { $count } חודשים מלאים
+    }, מ־{ $from } עד { $to }. { $transfers ->
+        [0] אין העברות בין החשבונות שבמעקב.
+        [one] העברה אחת בין החשבונות שבמעקב, שקוזזה.
+        [two] שתי העברות בין החשבונות שבמעקב, שקוזזו.
+       *[other] { $transfers } העברות בין החשבונות שבמעקב, שקוזזו.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = ומה אם אצמצם…?
+window-cut-title = ומה אם אצמצם…?
+cut-axis-label = קיבוץ לפי
+cut-axis-category = קטגוריות
+cut-axis-payee = צדדים נגדיים
+cut-axis-budget-line = סעיפי תקציב
+cut-table-title = ההוצאות שלך, פריט אחר פריט
+cut-table-hint = יש להזין צמצום ב־% או ב־{ $sign } לחודש בפריטים שברצונך להקל בהם. צמצום אינו יכול לעלות על ההוצאה עצמה.
+cut-column-monthly = לחודש
+cut-column-cut = צמצום
+cut-column-after = אחרי
+cut-column-yearly = חיסכון בשנה
+cut-total = סך הכול
+cut-horizon-label = טווח זמן
+cut-settings-title = הגדרות
+cut-options-hint = הריבית וסכום היעד אינם חובה.
+cut-report-button = דוח PDF
+cut-chart-title = היתרה שלך, בלי ועם הצמצומים
+cut-chart-hint = קו רציף: היתרה הריאלית בשנים־עשר החודשים האחרונים; קו מקווקו אפור: התחזית ללא צמצום; בכחול: עם הצמצומים; בירוק: הכסף שנחסך.
+cut-donut-title = ההוצאות החודשיות שלך אחרי הצמצום
+cut-donut-caption = לחודש אחרי הצמצום
+cut-donut-others = פריטים אחרים
+cut-donut-saved = נחסך
+cut-legend-with = עם הצמצומים
+cut-legend-without = ללא צמצום
+cut-years = { $years ->
+        [one] שנה אחת
+        [two] שנתיים
+       *[other] { $years } שנים
+    }
+cut-headline-none = יש להזין צמצום בטבלה כדי לראות את השפעתו.
+cut-headline = צמצום { $count ->
+        [one] הפריט הזה
+        [two] שני הפריטים האלה
+       *[other] { $count } הפריטים האלה
+    } יאפשר לחסוך עוד { $monthly } בחודש, כלומר { $yearly } בשנה.
+cut-tile-monthly = חיסכון בחודש
+cut-tile-yearly = חיסכון בשנה
+cut-tile-horizon = חיסכון על פני { $years ->
+        [one] שנה אחת
+        [two] שנתיים
+       *[other] { $years } שנים
+    }
+cut-tile-spending = הוצאות בחודש
+cut-target-already = כבר יש לך { $amount }.
+cut-target-sooner = הסכום { $amount } יושג בסביבות { $with } במקום { $without }: { $months ->
+        [0] לא מוקדם יותר
+        [one] חודש אחד מוקדם יותר
+        [two] חודשיים מוקדם יותר
+       *[other] { $months } חודשים מוקדם יותר
+    }.
+cut-target-only-with = עם הצמצומים האלה, הסכום { $amount } יושג בסביבות { $with }; בלעדיהם, בקצב הנוכחי שלך, לעולם לא.
+cut-target-never = גם עם הצמצומים האלה, הסכום { $amount } לא יושג בקצב הנוכחי שלך.
+cut-note-seasons = כל צמצום עוקב אחר העונות של הפריט שלו: פריט שמשקלו בעיקר בקיץ חוסך בעיקר בקיץ.
+cut-note-capped = צמצום שהוזן עלה על ההוצאה: הוא הוגבל לגובה ההוצאה עצמה.
+cut-invalid-cut = לא ניתן לקרוא את הצמצום הזה: אחוז בין 0 ל־100, או סכום לחודש.
+cut-report-settings = ההגדרות
+cut-report-result = התוצאה
+cut-report-accounts = החשבונות במעקב
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = תכנון החופשה שלי
+window-holiday-title = תכנון החופשה שלי
+holiday-trip-title = הטיול
+holiday-field-trip = סוג הטיול
+holiday-trip-stay = חופשה ביעד
+holiday-trip-cruise = שייט
+holiday-field-adults = מבוגרים
+holiday-field-children = ילדים
+holiday-field-nights = משך השהייה, בלילות
+holiday-field-days = ימים
+holiday-field-months = חודשים עד היציאה
+holiday-field-stops = מספר נמלי עגינה
+holiday-saved-title = כבר נחסך
+holiday-saved-hint = יש לסמן את החשבונות שבהם כסף החופשה כבר מופרש: היתרה הריאלית שלהם נחשבת לכסף שכבר נחסך.
+holiday-budget-title = התקציב
+holiday-budget-hint = לכל סעיף: סכום, על מי הוא חל ולכמה זמן. סעיף ריק אינו נספר.
+holiday-optional-title = שורות רשות
+holiday-result-title = התוצאה
+holiday-donut-title = לאן הולך כסף הטיול
+holiday-donut-caption = לטיול
+holiday-child-label = מחיר לילד
+holiday-count-label = תאים
+holiday-open = פתיחת פרויקט…
+holiday-save = שמירת הפרויקט…
+holiday-pdf = דוח PDF
+holiday-excel = ייצוא ל־Excel
+holiday-file-filter = פרויקט חופשה
+holiday-replace-question = פתיחת הפרויקט הזה תחליף את מה שהוקלד בחלון. להמשיך?
+holiday-file-saved = הפרויקט נשמר: { $file }
+holiday-file-opened = הפרויקט נפתח: { $file }
+holiday-file-not-project = קובץ זה אינו פרויקט חופשה של Radinus.
+holiday-file-too-recent = פרויקט זה מגיע מגרסה חדשה יותר של Radinus: יש לעדכן את Radinus כדי לפתוח אותו.
+holiday-file-failed = לא ניתן היה לקרוא או לכתוב את הקובץ: { $reason }
+holiday-line-transport = תחבורה הלוך ושוב
+holiday-line-lodging = לינה
+holiday-line-meals = ארוחות והוצאות שוטפות
+holiday-line-visits = אטרקציות ופנאי
+holiday-line-port = הגעה לנמל
+holiday-line-cabins = תאים
+holiday-line-service = דמי שירות (טיפים)
+holiday-line-drinks = חבילת משקאות
+holiday-line-excursions = סיורים בנמלי העגינה
+holiday-line-port-taxes = מסי נמל
+holiday-line-wifi = Wi-Fi על הסיפון
+holiday-line-onboard = הוצאות על הסיפון ובנמלי העגינה
+holiday-line-other = הוצאות אחרות ובלתי צפויות
+holiday-line-insurance = ביטוח ביטול
+holiday-line-stay-tax = מס תיירות
+holiday-line-car = רכב ביעד, דלק ואגרות
+holiday-line-parking = חניה בשדה התעופה או בתחנה
+holiday-line-bank = עמלות בנק בחו״ל
+holiday-line-formalities = מסמכים ואישורים (דרכון, ויזה, חיסונים)
+holiday-line-pets = טיפול בחיות המחמד
+holiday-span-trip = לכל השהייה
+holiday-span-night = ללילה
+holiday-span-day = ליום
+holiday-span-stop = לנמל עגינה
+holiday-who-all = לכולם
+holiday-who-person = לאדם
+holiday-who-adults = למבוגר
+holiday-cabins-count = { $count ->
+        [one] תא אחד
+        [two] שני תאים
+       *[other] { $count } תאים
+    }
+holiday-days = { $days ->
+        [one] יום אחד
+        [two] יומיים
+       *[other] { $days } ימים
+    }
+holiday-invalid-count = נא להזין מספר שלם.
+holiday-invalid-amount = לא ניתן לקרוא את הסכום הזה: מספר חיובי, או אחוז בין 0 ל־100.
+holiday-headline-empty = יש להזין את סכומי התקציב כדי לראות כמה יעלה הטיול.
+holiday-headline-stay = חופשה זו תעלה { $total } עבור { $people ->
+        [one] אדם אחד
+        [two] שני אנשים
+       *[other] { $people } אנשים
+    }, { $nights ->
+        [0] ללא לילות
+        [one] לילה אחד
+        [two] שני לילות
+       *[other] { $nights } לילות
+    }.
+holiday-headline-cruise = שייט זה יעלה { $total } עבור { $people ->
+        [one] אדם אחד
+        [two] שני אנשים
+       *[other] { $people } אנשים
+    }, { $nights ->
+        [0] ללא לילות
+        [one] לילה אחד
+        [two] שני לילות
+       *[other] { $nights } לילות
+    }.
+holiday-tile-total = עלות כוללת
+holiday-tile-person = לאדם
+holiday-tile-person-day = לאדם ליום
+holiday-tile-saved = כבר נחסך
+holiday-tile-remaining = נותר לממן
+holiday-tile-monthly = חיסכון נדרש
+holiday-remaining-none = כלום: הכול מכוסה
+holiday-monthly-none = אין צורך להפריש דבר
+holiday-monthly-now = יציאה החודש
+holiday-note-days = הימים הם הלילות ועוד אחד: שבעה לילות הם שמונה ימים.
+holiday-note-child = בסעיף לאדם, ילד משלם את מחיר הילד אם צוין; אם השדה ריק, הוא משלם כמו מבוגר.
+holiday-note-percent = אחוז ביטוח חל על הסעיפים העיקריים של הטיול; אחוז עמלות הבנק – על ההוצאות ביעד.
+holiday-sheet-budget = תקציב
+holiday-sheet-result = תוצאה
+holiday-column-line = סעיף
+holiday-column-amount = סכום
+holiday-column-child = מחיר לילד
+holiday-column-who = עבור מי
+holiday-column-span = לכמה זמן
+holiday-column-cost = עלות
+holiday-disclaimer = הערכה המבוססת על הסכומים שלך: המחירים בפועל עשויים להשתנות.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = פרויקט צמצום
+cut-file-not-project = קובץ זה אינו פרויקט צמצום של Radinus.
+cut-file-too-recent = פרויקט זה מגיע מגרסה חדשה יותר של Radinus: יש לעדכן את Radinus כדי לפתוח אותו.
+cut-sheet-items = פריטים
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = יומן הרכב שלי
+window-car-title = יומן הרכב שלי
+car-unnamed = הרכב שלי
+car-sheet-title = הרכב
+car-field-plate = מספר רישוי
+car-field-make = יצרן
+car-field-model = דגם
+car-field-engine = סוג הנעה
+car-field-first-hand = יד ראשונה
+car-field-registered = עלייה לכביש
+car-field-acquired = תאריך הרכישה
+car-field-acquired-km = קילומטראז' ברכישה
+car-field-service = טיפול כל
+car-field-service-or = או כל
+car-unit-months-short = חודשים
+car-unit-km = km
+car-tariff-title = תעריף הטעינה בבית
+car-tariff-hint = תעריף זה נשמר ביומן הרכב: הוא אינו משנה את התעריף שבהעדפות.
+car-tariff-reset = שימוש בתעריף מההעדפות
+car-engine-petrol = בנזין
+car-engine-diesel = דיזל
+car-engine-lpg = גז (LPG)
+car-engine-e85 = E85 (ביו־אתנול)
+car-engine-hybrid = היברידי
+car-engine-plug-in = היברידי נטען (פלאג־אין)
+car-engine-electric = חשמלי
+car-engine-hydrogen = מימן
+car-energy-petrol = בנזין
+car-energy-diesel = סולר
+car-energy-lpg = גז (LPG)
+car-energy-e85 = E85
+car-energy-electricity = חשמל
+car-energy-hydrogen = מימן
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = אנרגיה
+car-rubric-upkeep = תחזוקה שוטפת
+car-rubric-service = טיפול תקופתי
+car-rubric-wear = חלקים מתבלים
+car-rubric-tyres = צמיגים
+car-rubric-breakdown = תקלות
+car-rubric-insurance = ביטוח
+car-rubric-inspection = טסט
+car-part-brake-pads = רפידות בלמים
+car-part-brake-discs = דיסקים של בלמים
+car-part-timing-belt = רצועת תזמון
+car-part-clutch = מצמד
+car-part-battery-12v = מצבר 12 V
+car-part-shock-absorbers = בולמי זעזועים
+car-part-wipers = מגבים
+car-part-spark-plugs = מצתים
+car-part-glow-plugs = מצתי להט
+car-part-particulate-filter = מסנן חלקיקים
+car-part-catalytic-converter = ממיר קטליטי
+car-part-fuel-cell-filter = מסנן תא הדלק
+car-part-exhaust = מערכת פליטה
+car-part-other = חלק אחר…
+car-axle-all = ארבעת הצמיגים
+car-axle-front = צמיגים קדמיים
+car-axle-rear = צמיגים אחוריים
+car-verdict-pass = עבר
+car-verdict-counter = טסט חוזר
+car-charge-station = בעמדת טעינה
+car-charge-home = בבית
+car-slot-peak = שעות שיא
+car-slot-off-peak = שעות שפל
+car-entry-new = שורה חדשה
+car-entry-edit = עריכת השורה
+car-field-date = תאריך
+car-field-km = מד אוץ
+car-field-rubric = קטגוריה
+car-field-amount = סכום
+car-field-garage = מוסך או תחנה
+car-field-note = הערה
+car-field-energy = אנרגיה
+car-field-quantity = כמות
+car-field-charge = טעינה
+car-field-slot = שעת הטעינה
+car-field-part = חלק
+car-field-part-name = שם החלק
+car-field-axle = צמיגים שהוחלפו
+car-field-verdict = תוצאה
+car-field-months = חודשים מכוסים
+car-field-battery = מצב הסוללה
+car-home-amount-hint = הסכום של טעינה בבית מחושב לפי התעריף של הרכב.
+car-entry-add = הוספה ליומן
+car-entry-update = שמירת השורה
+car-entry-cancel = ביטול
+car-entry-delete = מחיקת השורה
+car-delete-question = למחוק את השורה הזו מהיומן?
+car-from-operation = לקיחת תנועה…
+car-pick-account = מאיזה חשבון באה ההוצאה?
+car-pick-operation = איזו תנועה?
+car-pick-take = לקיחה
+car-pick-none = אין הוצאות בחשבון זה.
+car-pick-taken = התנועה נלקחה: יש להשלים את מד האוץ ואת הקטגוריה, ואז להוסיף את השורה.
+car-history-title = ההיסטוריה
+car-filter-all = כל הקטגוריות
+car-history-empty = אין עדיין שורות.
+car-history-hint = יש ללחוץ על שורה כדי לערוך אותה.
+car-column-date = תאריך
+car-column-km = ק״מ
+car-column-rubric = קטגוריה
+car-column-detail = פירוט
+car-column-amount = סכום
+car-column-garage = מוסך
+car-column-note = הערה
+car-column-share = חלק יחסי
+car-column-per-km = לק״מ
+car-column-energy = אנרגיה
+car-column-quantity = כמות
+car-column-price = מחיר ממוצע
+car-column-consumption = צריכה
+car-column-part = חלק
+car-column-changes = החלפות
+car-column-last = החלפה אחרונה
+car-column-life = אורך חיים
+car-column-next = ההחלפה הבאה
+car-total = סך הכול
+car-summary-title = כמה עולה הרכב
+car-headline-empty = יש למלא את פרטי הרכב ואז להוסיף שורה ראשונה: תדלוק, טיפול, חשבונית מוסך…
+car-headline = מאז { $since }, הרכב שלך עלה לך { $total }.
+car-headline-km = מאז { $since }, הרכב שלך עלה לך { $total } עבור { $km } שנסעת: { $cost } לקילומטר.
+car-tile-total = עלות כוללת
+car-tile-month = לחודש
+car-tile-km = לקילומטר
+car-tile-driven = קילומטרים שנסעת
+car-tile-consumption = צריכה
+car-tile-energy-km = אנרגיה לקילומטר
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [one] חודש אחד
+        [two] חודשיים
+       *[other] { $months } חודשים
+    }
+car-detail-battery = סוללה: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = לפי קטגוריה
+car-energy-title = האנרגיה
+car-parts-title = חלקים מתבלים
+car-tyres-title = צמיגים
+car-battery-title = מצב הסוללה
+car-years-title = כמה עלה הרכב בכל שנה
+car-donut-title = לאן הולך הכסף
+car-donut-caption = בסך הכול
+car-deadlines-title = המועדים הקרובים
+car-deadlines-empty = אין עדיין מועדים: יש לרשום טיפול, טסט, ביטוח, או שתי החלפות של אותו חלק.
+car-deadline-service = טיפול תקופתי
+car-deadline-inspection = טסט
+car-deadline-counter = טסט חוזר
+car-deadline-insurance = סיום הביטוח
+car-when-date = ב־{ $date }
+car-when-km = ב־{ $km }
+car-when-km-reached = ב־{ $km }, בסביבות { $month } בקצב שלך
+car-when-date-km = ב־{ $date } או ב־{ $km }, המוקדם מביניהם
+car-when-inspection-unknown = יש לרשום את הטסט האחרון כדי לדעת את מועד הטסט הבא.
+car-tone-late = עבר המועד
+car-tone-soon = בקרוב
+car-note-since = הכול נספר מיום הרכישה: התאריך ומד האוץ שנרשמו בפרטי הרכב.
+car-note-consumption = הצריכה נמדדת ממילוי מלא למילוי מלא: יש למלא את המיכל עד הסוף ולרשום את מד האוץ בכל פעם.
+car-note-e85 = רכב E85 שותה את מה שנותנים לו: הקילומטרים שאחרי תדלוק נספרים לדלק שתודלק.
+car-note-home = טעינה בבית מתומחרת לפי התעריף של הרכב ביום שבו היא נרשמת, ושומרת על עלות זו.
+car-note-inspection = הטסט פועל לפי הכלל הצרפתי: הראשון בתוך ארבע שנים מהעלייה לכביש, ולאחר מכן כל שנתיים; טסט חוזר, בתוך חודשיים.
+car-disclaimer = המועדים ואורכי החיים הם הערכות שנגזרות מהיומן: רק ספר הטיפולים של היצרן הוא המחייב.
+car-invalid-date = יש להזין תאריך תקין שאינו בעתיד.
+car-invalid-acquired = תאריך הרכישה אינו יכול להקדים את העלייה לכביש.
+car-invalid-km = יש להזין מד אוץ בקילומטרים שלמים.
+car-invalid-amount = לא ניתן לקרוא את הסכום הזה.
+car-invalid-quantity = יש להקליד את הכמות: ליטרים, kWh או קילוגרמים.
+car-invalid-part = יש לבחור את החלק שהוחלף, או להקליד את שמו.
+car-invalid-rubric = יש לבחור קטגוריה.
+car-invalid-months = יש להזין מספר שלם של חודשים.
+car-invalid-battery = יש להזין מצב סוללה בין 0 ל־100 %.
+car-open = פתיחת יומן…
+car-save = שמירת היומן…
+car-report-button = דוח PDF
+car-file-filter = יומן רכב
+car-file-saved = היומן נשמר: { $file }
+car-file-opened = היומן נפתח: { $file }
+car-file-not-logbook = קובץ זה אינו יומן רכב של Radinus.
+car-file-too-recent = יומן זה מגיע מגרסה חדשה יותר של Radinus: יש לעדכן את Radinus כדי לפתוח אותו.
+car-replace-question = פתיחת היומן הזה תחליף את היומן שבחלון. להמשיך?
+car-sheet-history = יומן
+car-sheet-summary = סיכום
+
+analysis-history-hint = ככל שההיסטוריה שלך ארוכה יותר, כך הניתוח הזה יהיה טוב יותר: האידיאל הוא לפחות שנה של תנועות.
+
+# --- F48 — חלוקת הוצאה (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = חלוקת הוצאה
+window-sharing-title = חלוקת הוצאה
+sharing-question = מי משלם מה?
+sharing-setup-title = החלוקה
+sharing-field-label = תיאור
+sharing-label-hint = לדוגמה "מסעדה ב-12/10" או "טיול בבריטני 2027": הוא נותן שם לקבצים ולדוחות.
+sharing-field-total = סכום כולל
+sharing-total-hint = כשהשדה ריק, הסכום הכולל הוא סכום הסעיפים והתוספות האישיות של כל אחד.
+sharing-field-rule = כלל
+sharing-field-rounding = עיגול
+sharing-field-people = אנשים
+sharing-mode-whole = כלל אחד לכל ההוצאה
+sharing-mode-item = כלל אחד לכל סעיף
+sharing-rule-equal = חלקים שווים
+sharing-rule-parts = לפי חלקים
+sharing-rule-percent = לפי אחוזים
+sharing-rule-income = ביחס להכנסות
+sharing-rounding-cent = לסנט
+sharing-rounding-euro = ליחידה שלמה
+sharing-round-euro = עיגול ליחידות שלמות
+sharing-hide-incomes = הסתרת הכנסות בדוחות ובייצוא
+sharing-people-title = האנשים
+sharing-people-hint = שורה אחת לכל אדם, עמודה אחת לכל סעיף: יש לסמן מי משתתף במה. כל השאר הוא רשות. מי שמבטל ומשאיר את המקדמה שלו: סכום מדויק השווה למה ששילם, וללא סימון באף תיבה.
+sharing-add-person = הוספת אדם
+sharing-person-default = אדם { $number }
+sharing-items-title = הסעיפים
+sharing-items-hint = רק מה שלא נוגע לכולם, כמו היין. שאר הסכום הכולל הולך לסעיף המשותף.
+sharing-add-item = הוספת סעיף
+sharing-common = משותף
+sharing-payments-title = התשלומים
+sharing-payments-hint = מי שילם, כמה ומתי. שורה ללא סכום עדיין אינה נספרת.
+sharing-payments-none = עדיין אין תשלומים.
+sharing-add-payment = הוספת תשלום
+sharing-result-title = התוצאה
+sharing-balances-title = מצב התשלומים
+sharing-transfers-title = העברות מוצעות
+sharing-delete = מחיקה
+sharing-delete-person-question = לאדם הזה יש תשלומים: למחוק אותם יחד איתו?
+sharing-disclaimer = Radinus מציע חלוקה: בין חברים, כל אחד חופשי להסתדר אחרת.
+sharing-column-person = אדם
+sharing-column-household = משק בית
+sharing-column-income = הכנסה
+sharing-column-parts = חלקים
+sharing-column-percent = %
+sharing-column-floor = לפחות
+sharing-column-cap = לכל היותר
+sharing-column-fixed = סכום מדויק
+sharing-column-alone = תוספות אישיות
+sharing-column-gift = עודף שניתן
+sharing-column-share = חלק
+sharing-column-typed = % שהוקלד
+sharing-column-constraint = מה שהשפיע
+sharing-column-due = לתשלום
+sharing-column-item = סעיף
+sharing-column-amount = סכום
+sharing-column-rule = כלל
+sharing-column-participants = משתתפים
+sharing-column-unit = משק בית או אדם
+sharing-column-members = חברים
+sharing-column-paid = שולם
+sharing-column-balance = יתרה
+sharing-column-date = תאריך
+sharing-column-who = מי
+sharing-column-label = תיאור
+sharing-help-household = אנשים באותו משק בית מסדירים את החשבון יחד: התשלומים שלהם והסכומים שהם חבים מצטרפים, והם מקבלים דף חשבון אחד. לדוגמה: "משפחת מרטין" להורים ולילדים.
+sharing-help-income = משמש רק בכלל "ביחס להכנסות": ככל שההכנסה גבוהה יותר, החלק גדול יותר. יש להקליד את ההכנסה החודשית.
+sharing-help-parts = אדם עם 2 חלקים משלם פי שניים מאדם עם חלק אחד. לדוגמה: מבוגר 1, ילד 0.5.
+sharing-help-percent = החלק מההוצאה שהאדם משלם. סך האחוזים חייב להיות 100 %.
+sharing-help-floor = האדם ישלם לפחות את הסכום הזה, גם אם החלק שחושב לו קטן יותר. ההפרש מקל על האחרים.
+sharing-help-cap = האדם לא ישלם לעולם יותר מהסכום הזה. מה שאינו משלם נופל על שאר המשתתפים בסעיפים שלו.
+sharing-help-fixed = האדם משלם את הסכום המדויק הזה, יהי מה, והשאר מתחלק בין האחרים. לדוגמה: מי שמבטל ומשאיר את המקדמה שלו.
+sharing-help-alone = מה שהאדם לקח לעצמו בלבד, כמו קינוח או קפה. הוא משלם אותו במלואו, בנוסף לחלקו.
+sharing-help-gift = אם האדם שילם יותר מחלקו: כשהתיבה מסומנת, העודף הוא מתנה לקבוצה; כשאינה מסומנת, הוא מוחזר לו.
+sharing-help-items = יש לסמן את האנשים שמשתתפים בסעיף הזה. הסעיף המשותף הוא מה שנשאר מהסכום הכולל לאחר הסרת שאר הסעיפים.
+sharing-help-due = מה שהאדם חייב בסך הכול: חלקו בסעיפים, התוספות האישיות שלו והעיגול.
+sharing-help-share = מה שחלקו מייצג, באחוזים מהסכום המתחלק.
+sharing-help-typed = האחוז שהוקלד. הוא יכול להיות שונה מהחלק בפועל כשמינימום, מקסימום או סכום מדויק השפיעו.
+sharing-help-constraint = מציין אם חלקו של האדם שונה בגלל מינימום, מקסימום, סכום מדויק או עודף שניתן.
+sharing-help-item = רק מה שלא נוגע לכולם, כמו היין. שאר הסכום הכולל הולך לסעיף המשותף, ומתחלק בין המסומנים בו.
+sharing-help-rule = כיצד הסעיף הזה מתחלק: בחלקים שווים, לפי חלקים, לפי אחוזים או ביחס להכנסות.
+sharing-help-paid = מה שמשק הבית או האדם כבר שילם, לפי התשלומים שהוזנו.
+sharing-help-balance = מה שנותר לשלם, או מה ששולם מעבר לחלק. לדוגמה: "נותר לשלם: 61.54 €".
+sharing-advice-equal = { $count ->
+        [one] { $total } לאדם אחד בלבד.
+        [two] { $total } ÷ שני אנשים = { $amount } לכל אחד.
+       *[other] { $total } ÷ { $count } אנשים = { $amount } לכל אחד.
+    }
+sharing-advice-equal-varied = בחלקים שווים בין המשתתפים, בהתחשב במגבלות ובהחרגות.
+sharing-advice-parts = { $parts } חלקים בסך הכול: חלק אחד שווה { $amount }.
+sharing-advice-parts-varied = כל אחד משלם לפי החלקים שלו, בהתחשב במגבלות ובהחרגות. שדה ריק נחשב לחלק אחד.
+sharing-advice-percent-rest = חסרים { $rest } % כדי להגיע ל־100 %.
+sharing-advice-percent-over = האחוזים עוברים את 100 % ב־{ $over } %.
+sharing-advice-percent-ok = האחוזים מסתכמים בדיוק ב־100 %.
+sharing-advice-percent-nobody = האחוזים כבר מגיעים ל־100 %: { $count ->
+        [one] { $names } לא ישלם כלום.
+        [two] { $names } לא ישלמו כלום.
+       *[other] { $names } לא ישלמו כלום.
+    }
+sharing-advice-income = כל אחד משלם { $rate } % מההכנסה שלו.
+sharing-advice-income-missing = יש להקליד את ההכנסה של כל אחד כדי לחלק ביחס להכנסות.
+sharing-advice-income-varied = כל אחד משלם אותו שיעור מההכנסה שלו, בהתחשב במגבלות ובהחרגות.
+sharing-advice-empty = יש להקליד את הסכום לחלוקה.
+sharing-apply-advice = שימוש בערכים המוצעים
+sharing-help-apply-advice = ממלא את השדות הריקים בערכים האפורים. שדות שכבר מולאו אינם משתנים.
+sharing-from-incomes = אחוזים לפי ההכנסות
+sharing-help-from-incomes = מחליף את האחוזים בחלקה של כל הכנסה מסך ההכנסות. יחד הם מגיעים ל־100 %.
+sharing-reset-percents = חלוקה מחדש של הכול
+sharing-help-reset-percents = מוחק את האחוזים ומחלק אותם שווה בשווה בין כולם. שימושי לאחר הוספת אדם.
+sharing-reset-percents-question = למחוק את כל האחוזים ולחלק אותם שווה בשווה?
+sharing-open = פתיחת פרויקט…
+sharing-save = שמירת הפרויקט…
+sharing-pdf-distribution = חלוקה (PDF)
+sharing-pdf-payments = מצב התשלומים (PDF)
+sharing-pdf-statements = דפי חשבון אישיים (PDF)…
+sharing-statements-everyone = כולם
+sharing-excel = ייצוא ל־Excel
+sharing-file-filter = פרויקט חלוקה
+sharing-replace-question = פתיחת הפרויקט הזה תחליף את מה שהוקלד בחלון. להמשיך?
+sharing-file-saved = הפרויקט נשמר: { $file }
+sharing-file-opened = הפרויקט נפתח: { $file }
+sharing-file-not-project = קובץ זה אינו פרויקט חלוקה של Radinus.
+sharing-file-too-recent = פרויקט זה מגיע מגרסה חדשה יותר של Radinus: יש לעדכן את Radinus כדי לפתוח אותו.
+sharing-file-failed = לא ניתן היה לקרוא או לכתוב את הקובץ: { $reason }
+sharing-statements-replace-question = { $count ->
+        [one] כבר קיים דף חשבון אחד בתיקייה הזאת. להחליף אותו?
+        [two] כבר קיימים שני דפי חשבון בתיקייה הזאת. להחליף אותם?
+       *[other] כבר קיימים { $count } דפי חשבון בתיקייה הזאת. להחליף אותם?
+    }
+sharing-statements-written = { $count ->
+        [one] דף חשבון אחד נכתב בתיקייה "{ $folder }".
+        [two] שני דפי חשבון נכתבו בתיקייה "{ $folder }".
+       *[other] { $count } דפי חשבון נכתבו בתיקייה "{ $folder }".
+    }
+sharing-too-many-people = חלוקה כוללת 40 אנשים לכל היותר.
+sharing-too-many-items = חלוקה כוללת 20 סעיפים לכל היותר.
+sharing-too-many-payments = חלוקה כוללת 400 תשלומים לכל היותר.
+sharing-invalid-amount = לא ניתן לקרוא את הסכום הזה: מספר חיובי.
+sharing-invalid-number = לא ניתן לקרוא את המספר הזה: מספר חיובי.
+sharing-invalid-percent = אחוז הוא בין 0 ל־100.
+sharing-invalid-date = לא ניתן לקרוא את התאריך הזה.
+sharing-name-missing = לכל אדם חייב להיות שם.
+sharing-name-duplicate = כבר קיים "{ $name }": יש להבדיל ביניהם, למשל באות ראשונה.
+sharing-floor-above-cap = המינימום גבוה מהמקסימום.
+sharing-item-label-missing = לסעיף הזה אין שם.
+sharing-items-above-total = הסעיפים והתוספות האישיות של כל אחד עולים על הסכום הכולל ב־{ $amount }.
+sharing-payment-person = יש לבחור מי שילם.
+sharing-percent-total = האחוזים מסתכמים ב־{ $sum } %: הם צריכים להגיע ל־100 %.
+sharing-percent-total-item = "{ $item }": האחוזים מסתכמים ב־{ $sum } %: הם צריכים להגיע ל־100 %.
+sharing-item-nobody = אף אחד אינו משתתף ב־"{ $item }".
+sharing-item-no-weight = אף אחד אינו משפיע על "{ $item }": כל משתתפיו מאופסים.
+sharing-income-missing = חסרה ההכנסה של { $name }.
+sharing-fixed-above = הסכומים המדויקים עולים על הסכום לחלוקה ב־{ $amount }.
+sharing-floors-above = המינימומים עולים על הסכום לחלוקה ב־{ $amount }.
+sharing-cap-alone = ב־"{ $item }" משתתף רק { $name }: לא ניתן לכבד את המקסימום שלו.
+sharing-caps-short = המקסימומים אינם מספיקים לכיסוי הסכום: חסרים { $amount }.
+sharing-impossible = לא ניתן לכבד את כל התנאים האלה: יש להקל על מינימום או על מקסימום.
+sharing-constraint-floor = הושג המינימום
+sharing-constraint-cap = הושג המקסימום
+sharing-constraint-fixed = סכום מדויק
+sharing-constraint-gift = עודף שניתן
+sharing-and = { $first } ו־{ $last }
+sharing-outside = מחוץ לסעיפים
+sharing-alone = תוספות אישיות
+sharing-rounding = עיגול
+sharing-headline-empty = יש להוסיף את האנשים שמתחלקים בהוצאה.
+sharing-headline-no-amount = יש להזין את הסכום הכולל, או את הסעיפים לחלוקה.
+sharing-headline-equal = { $total } לחלוקה: כל אחד משלם { $amount }.
+sharing-headline-range = { $total } לחלוקה: מ־{ $min } עד { $max }, תלוי באדם.
+sharing-participants = { $count ->
+        [0] אין משתתפים
+        [one] משתתף אחד
+        [two] שני משתתפים
+       *[other] { $count } משתתפים
+    }
+sharing-balance-due = נותר לשלם: { $amount }
+sharing-balance-over = שולמו { $amount } מעבר לחלק
+sharing-balance-even = מעודכן
+sharing-summary-collected = שולמו { $collected } מתוך { $total }.
+sharing-summary-owing = { $count ->
+        [0] כולם מעודכנים.
+        [one] רק אחד עדיין חייב { $amount }.
+        [two] שניים עדיין חייבים { $amount } בסך הכול.
+       *[other] { $count } עדיין חייבים { $amount } בסך הכול.
+    }
+sharing-remaining-outside = נותר לשלם על ההוצאה: { $amount }
+sharing-remaining-reimburse = להחזיר ל־{ $name }: { $amount }
+sharing-all-settled = הכול שולם: אף אחד אינו חייב דבר לאף אחד.
+sharing-transfer = על { $from } להעביר { $amount } אל { $to }
+sharing-warning-over-paid = התשלומים עולים על ההוצאה ב־{ $amount }: יש לבדוק את הסכומים.
+sharing-note-income-zero = ההכנסה של { $name } היא 0, ולכן אין תשלום על { $items }.
+sharing-note-excluded = { $name } אינו משתתף ב־"{ $item }": החלק שלו מתחלק בין האחרים.
+sharing-note-gift = העודף שניתן על ידי { $giver } מקטין את חלקם של האחרים: { $name } שילם כעת יותר מחלקו.
+sharing-note-outside = { $name } משלם { $amount } מחוץ לסעיפים שלו: הסכום מנוכה ממה שהאחרים מתחלקים בו.
+sharing-note-keeper = עיגול ליחידות שלמות: { $name } שומר את הסנטים, כדי שהסכום הכולל ייצא מדויק.
+sharing-report-distribution = חלוקה
+sharing-report-sharing = החלוקה
+sharing-report-who-pays = מי משלם מה
+sharing-report-items = פירוט לפי סעיף
+sharing-report-payments = מצב התשלומים
+sharing-report-as-of = מצב ליום { $date }
+sharing-report-balances = חלק, שולם, יתרה
+sharing-report-statement = דף חשבון — { $name }
+sharing-report-your-share = החלק שלך
+sharing-statement-total = סך הכול למשק הבית: { $amount }
+sharing-statement-pay = לתשלום ל־{ $name }: { $amount }
+sharing-statement-receive = לקבל מ־{ $name }: { $amount }
+sharing-sheet-people = אנשים
+sharing-sheet-items = סעיפים
+sharing-sheet-result = תוצאה
+sharing-sheet-payments = תשלומים
+sharing-sheet-balances = החזרים

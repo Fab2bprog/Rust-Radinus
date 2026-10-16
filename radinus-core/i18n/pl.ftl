@@ -264,13 +264,16 @@ menu-accounts-checkbooks = Zarządzanie książeczkami czekowymi
 
 menu-statistics = Statystyki
 menu-statistics-balance-chart = Wykres zmiany salda
+menu-statistics-balance-analysis = Analiza zmiany salda
 menu-statistics-by-category = Stat. wg kategorii
 menu-statistics-by-assignment = Stat. wg przeznaczeń
 menu-statistics-by-budget-line = Stat. wg pozycji budżetowych
 menu-statistics-by-payment-mode = Stat. wg sposobów płatności
 menu-statistics-by-payee = Stat. wg kontrahentów i sprzedawców
 menu-statistics-by-project = Stat. wg projektów
+menu-statistics-by-verification = Stat. wg weryfikacji
 menu-statistics-dashboard = Pulpit operacji
+menu-statistics-crossed-balance = Bilans krzyżowy
 
 menu-budget = Budżet
 menu-budget-entry = Wprowadzanie budżetu
@@ -288,6 +291,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = Szablony operacji
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = Narzędzia
 menu-settings = Ustawienia
 menu-settings-about-author = O autorze
 menu-settings-about-radinus = O programie Radinus
@@ -450,6 +455,15 @@ operations-selection-total = Łączna kwota zaznaczonych operacji: { $amount }
 
 operations-column-date = Data
 operations-column-clearing-date = Data uzgodnienia
+operations-column-status = Status operacji
+operation-status-pointed = Uzgodniona
+operation-status-committed = Zarezerwowana
+operation-status-planned = Planowana
+operations-column-verification = Weryfikacja
+operation-verification-to-verify = Do sprawdzenia
+operation-verification-verified = Sprawdzona
+operation-verification-doubtful = Wątpliwa
+operation-verification-disputed = Zakwestionowana
 operations-column-label = Opis
 operations-column-category = Kategoria
 operations-column-assignment = Przeznaczenie
@@ -525,6 +539,9 @@ filter-all = Wszystkie operacje
 filter-pointed = Tylko operacje uzgodnione
 filter-committed = Tylko operacje zarezerwowane
 filter-planned = Tylko operacje planowane
+filter-by-status = Filtr statusu
+filter-by-verification = Filtr weryfikacji
+filter-show-all = Pokaż wszystko
 
 # --- Karta operacji (F03) --------------------------------------------
 # Nazwy pól pochodzą ze zrzutu „Fiche operation transaction.png”,
@@ -558,6 +575,7 @@ operation-field-direction = Typ operacji:
 operation-field-amount = Kwota
 operation-field-status = Status operacji
 operation-field-clearing-date = Data uzgodnienia
+operation-field-verification = Weryfikacja
 operation-field-category = Kategoria
 operation-field-assignment = Przeznaczenie
 operation-field-payment-mode = Sposób
@@ -580,6 +598,10 @@ operation-nothing-to-show = Brak operacji do wyświetlenia.
 operation-label-required = Opis operacji jest obowiązkowy.
 operation-date-required = Data operacji jest obowiązkowa.
 operation-clearing-date-invalid = Data uzgodnienia nie jest prawidłową datą.
+operation-clearing-date-required = Operacja rozliczona musi obowiązkowo mieć datę rozliczenia.
+operation-clearing-date-question =
+    Operacja rozliczona musi obowiązkowo mieć datę rozliczenia.
+    Czy chcesz zapisać z datą operacji, { $date }?
 operation-is-a-sub = Ten wiersz jest podoperacją: edytuje się ją z jej własnej karty.
 operation-delete-form-open = Karta „{ $label }” jest otwarta. Zamknij ją przed usunięciem.
 
@@ -620,6 +642,7 @@ sub-operation-is-the-complement = To jest Dopełnienie: to, co pozostaje do rozk
 sub-operation-of = Rozksięgowanie „{ $label }” ({ $amount })
 
 operations-pointed = { $count ->
+    [0] Brak operacji do uzgodnienia: zaznaczenie jest już uzgodnione.
     [one] Uzgodniono { $count } operację.
     [few] Uzgodniono { $count } operacje.
     [many] Uzgodniono { $count } operacji.
@@ -635,6 +658,7 @@ operations-select-one = Wybierz tylko jedną operację.
 operation-copy = Kopia do zapisania: nic jeszcze nie zostało utworzone.
 operations-show-children = Pokaż wszystkie podoperacje
 operations-hide-children = Ukryj wszystkie podoperacje
+operations-recurring-from = Utwórz operację cykliczną na podstawie tej operacji
 
 # --- Drugie potwierdzenie poważnego usunięcia -------------------------
 # Usunięcie konta bankowego pociąga za sobą całą jego historię: Tak/Nie
@@ -655,6 +679,7 @@ window-statistics-title = { $kind ->
     [payment-mode] Statystyki według sposobu płatności
     [payee] Statystyki według kontrahenta i sprzedawcy
     [project] Statystyki według projektu
+    [verification] Statystyki według weryfikacji
    *[category] Statystyki według kategorii
 }
 
@@ -664,6 +689,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] SposóbOperacji
     [payee] Kontrahent
     [project] Projekty
+    [verification] Weryfikacja
    *[category] NazwaKategorii
 }
 
@@ -673,6 +699,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] Bez sposobu płatności
     [payee] Bez kontrahenta
     [project] Bez projektu
+    [verification] Do sprawdzenia
    *[category] Bez kategorii
 }
 statistics-total = Razem
@@ -716,6 +743,19 @@ accounts-stats-multiselect-help = Info: użyj kliknięcia myszą + klawisza [{ $
 statistics-year-question = Z którego roku chcesz korzystać? Radinus obejmuje lata od { $first } do { $last }.
 statistics-year-choose = Wybierz rok
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = Bilans krzyżowy
+crossed-balance-window-name = Bilans krzyżowy
+crossed-balance-column = Kategoria
+crossed-balance-no-data = Brak operacji w tym miesiącu dla wybranych kont.
+crossed-balance-month-question = Nad którym miesiącem chcesz pracować? Liczba od { $first } do { $last }.
+crossed-balance-month-choose = Wybierz miesiąc
+crossed-balance-next = Następny miesiąc
+crossed-balance-previous = Poprzedni miesiąc
+
 # --- Eksport tabel (prawy przycisk myszy) -----------------------------
 # Funkcja tabeli, a nie okna: mają ją wszystkie listy.
 
@@ -733,8 +773,16 @@ export-to-xml = Eksportuj do XML (.xml)
 # Menu Eksport w oknie statystyk: jedna zakładka na rok, nazwana
 # AN_2026. Puste lata — przy ustawionych przełącznikach — nie występują.
 export-menu = Eksport
+export-to = Eksportuj do
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = Kopiuj komórkę
+copy-rows = Kopiuj zaznaczone wiersze
+copy-failed = Nie udało się skopiować do schowka.
 export-all-years-excel = Eksportuj wszystkie lata do Excela
 export-all-years-ods = Eksportuj wszystkie lata do LibreOffice Calc
+export-all-months-excel = Eksportuj wszystkie miesiące wyświetlanego roku do Excela
+export-all-months-ods = Eksportuj wszystkie miesiące wyświetlanego roku do LibreOffice Calc
 export-no-year = Żaden rok nie zawiera operacji: nie ma czego eksportować.
 export-years-done = Wyeksportowano lat: { $years } do „{ $file }”.
 export-to-json = Eksportuj do JSON (.json)
@@ -748,6 +796,7 @@ statistics-window-name = { $kind ->
     [payment-mode] Statystyki według sposobu płatności
     [payee] Statystyki według kontrahenta i sprzedawcy
     [project] Statystyki według projektu
+    [verification] Statystyki według weryfikacji
    *[category] Statystyki według kategorii
 }
 statistics-detail-name = Szczegóły statystyk
@@ -790,6 +839,19 @@ curve-axis-balance = saldo
 curve-nothing = Nie wybrano żadnego konta: nie ma czego rysować.
 curve-empty = Brak operacji w tym okresie.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = Analiza zmiany salda
+analysis-heading = Analiza zmiany salda
+analysis-hint = Przeciągnij po wykresie z wciśniętym przyciskiem myszy, aby zobaczyć operacje z tego okresu.
+analysis-zone = Strefa:
+analysis-opening = Saldo początkowe:
+analysis-closing = Saldo końcowe:
+analysis-variation = Zmiana:
+analysis-detail-name = Analiza salda
+analysis-detail-none = Brak operacji w tej strefie.
+
 # --- F05 — Szybka klasyfikacja operacji --------------------------------
 # Okno, w którym klasyfikuje się **masowo**: zaznacza się wiersze, zaznacza
 # cechy do zmiany i stosuje je za jednym razem — w pamięci. Nic nie zostaje
@@ -808,6 +870,7 @@ quick-check-payment-mode = Sposób
 quick-check-payee = Kontrahent
 quick-check-project = Projekt
 quick-check-status = Status
+quick-check-verification = Weryfikacja
 quick-column-date = Data
 quick-column-label = Opis
 quick-column-amount = Kwota
@@ -817,6 +880,7 @@ quick-column-payment-mode = Sposób płatności
 quick-column-payee = Kontrahent
 quick-column-project = Projekty
 quick-column-status = Status
+quick-column-verification = Weryfikacja
 # Na Macu Ctrl + kliknięcie to kliknięcie prawym przyciskiem: klawiszem,
 # który dodaje do zaznaczenia, jest tam ⌘, i pomoc musi podawać ten działający.
 quick-multiselect-help = Info: Użyj kliknięcia myszą + klawisza [{ $modifier }] w tabeli, aby zaznaczyć kilka elementów
@@ -885,7 +949,7 @@ statement-no-match = Żaden wiersz nie odpowiada filtrowi.
 statement-help = Info: Użyj kliknięcia myszą + klawisza [{ $modifier }] w tabeli, aby zaznaczyć kilka wierszy
 statement-choose-account = Ten plik zawiera kilka kont. Które chcesz zaimportować?
 statement-select-line = Zaznacz co najmniej jeden wiersz wyciągu.
-statement-title-open = Otwórz plik wyciągu (.ofx)
+statement-title-open = Otwórz plik wyciągu (OFX, QIF, CSV)
 statement-title-info = Informacje o otwartym pliku
 statement-title-integrate = Włącz zaznaczenie do konta
 statement-title-validate = Włącz tę operację do konta
@@ -897,6 +961,19 @@ statement-loaded = { $count ->
     [few] Wczytano { $count } wiersze; już obecnych na twoim koncie: { $known }.
     [many] Wczytano { $count } wierszy; już obecnych na twoim koncie: { $known }.
    *[other] Wczytano { $count } wiersza; już obecnych na twoim koncie: { $known }.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] Wczytano wierszy: { $count }; żaden nie przypomina operacji już obecnej na twoim koncie.
+    [one] Wczytano wierszy: { $count }; jeden z nich przypomina operację już obecną na twoim koncie (ta sama data, ten sam opis, ta sama kwota).
+    [few] Wczytano wierszy: { $count }; { $alike } z nich przypominają operacje już obecne na twoim koncie (ta sama data, ten sam opis, ta sama kwota).
+    [many] Wczytano wierszy: { $count }; { $alike } z nich przypomina operacje już obecne na twoim koncie (ta sama data, ten sam opis, ta sama kwota).
+   *[other] Wczytano wierszy: { $count }; { $alike } z nich przypomina operacje już obecne na twoim koncie (ta sama data, ten sam opis, ta sama kwota).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] Jeszcze jeden przypomina operację już obecną (ta sama data, ten sam opis, ta sama kwota).
+    [few] Jeszcze { $alike } przypominają operacje już obecne (ta sama data, ten sam opis, ta sama kwota).
+    [many] Jeszcze { $alike } przypomina operacje już obecne (ta sama data, ten sam opis, ta sama kwota).
+   *[other] Jeszcze { $alike } przypomina operacje już obecne (ta sama data, ten sam opis, ta sama kwota).
 }
 statement-integrated = { $count ->
     [0] Nic nie zostało wprowadzone: te wiersze są już na twoim koncie.
@@ -934,7 +1011,25 @@ statement-file-info =
     Konto z pliku: { $account }
     Okres: od { $from } do { $to }
     Saldo podane przez bank: { $balance }
-    Operacji: { $count }, w tym { $known } już obecnych na twoim koncie.
+statement-qif-question = Nic w tym pliku nie wskazuje, czy data „{ $date }” jest zapisana jako dzień/miesiąc czy miesiąc/dzień. Oznacza ona:
+statement-qif-day-month = Dzień { $day }, miesiąc { $month } (dzień/miesiąc)
+statement-qif-month-day = Dzień { $day }, miesiąc { $month } (miesiąc/dzień)
+statement-qif-dates-mixed = Ten plik zapisuje daty na dwa sposoby: „{ $first }” czyta się jako dzień/miesiąc, „{ $second }” jako miesiąc/dzień. Nie jest importowany, aby nie zafałszować żadnej daty.
+statement-qif-amounts-mixed = Ten plik zapisuje kwoty na dwa sposoby: „{ $first }” z kropką, „{ $second }” z przecinkiem. Nie jest importowany, aby nie zafałszować żadnej kwoty.
+statement-qif-opening = Saldo początkowe { $amount } na dzień { $date }: to nie jest operacja, nie jest importowane.
+statement-qif-opening-undated = Saldo początkowe { $amount }: to nie jest operacja, nie jest importowane.
+statement-qif-suspect = Wiersz { $rank }, „{ $label }” ({ $amount }), wygląda na saldo początkowe: sprawdź go przed włączeniem.
+statement-qif-rejected = { $count ->
+    [one] Jeden nieczytelny wiersz nie jest importowany: { $lines }.
+    [few] { $count } nieczytelne wiersze nie są importowane: { $lines }.
+    [many] { $count } nieczytelnych wierszy nie jest importowanych: { $lines }.
+   *[other] { $count } nieczytelnego wiersza nie jest importowane: { $lines }.
+}
+statement-qif-reason-date = data
+statement-qif-reason-amount = kwota
+statement-qif-reason-differ = sprzeczne kwoty
+statement-qif-no-account = Tego konta nie ma już w pliku: otwórz plik ponownie.
+statement-balance-unknown = nie podano w pliku
 statement-group-identification = Identyfikacja operacji
 statement-group-amount = Kwota operacji
 statement-group-classification = Klasyfikacja operacji do obliczania statystyk
@@ -1577,6 +1672,9 @@ password-show = Pokaż hasło
 password-remove-question = Zdjąć ochronę z tej bazy?
 password-mismatch = Dwa wpisy nowego hasła różnią się
 password-wrong = Hasło nie pasuje
+database-too-recent = Ta baza została zapisana przez nowszą wersję programu Radinus (wersja bazy { $found }; ta wersja odczytuje do wersji { $supported }). Zaktualizuj Radinus, aby ją otworzyć.
+database-not-radinus = Ten plik nie jest bazą Radinus.
+database-unreadable = Nie udało się odczytać bazy: { $reason }
 password-close-first = Zamknij tę bazę przed zmianą jej hasła
 password-now-protected = Baza jest chroniona hasłem
 password-now-clear = Baza nie jest już chroniona
@@ -1815,6 +1913,11 @@ welcome-total-final = Saldo końcowe
 welcome-total-real-detail = uzgodnione + zarezerwowane
 welcome-total-final-detail = uzgodnione + zarezerwowane + planowane
 welcome-accounts = Twoje konta
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = Konta liczone w sumach: { $count } z { $total }
+welcome-tile-counted = Licz to konto w sumach
 welcome-tile-bank = W banku
 welcome-tile-real = Rzeczywiste
 welcome-tile-final = Końcowe
@@ -1869,6 +1972,58 @@ preferences-leaf-zoom = Rozmiar wyświetlania
 preferences-field-zoom = Powiększenie:
 preferences-zoom-reset = Wartość domyślna
 preferences-zoom-hint = Wszystko powiększa się razem: tekst, ikony, kolumny. Poniżej 100 % więcej mieści się na ekranie. Pasek menu systemu i jego okna dialogowe idą natomiast za ustawieniami twojego komputera, a nie za tymi.
+preferences-branch-import = Import
+preferences-leaf-verification = Weryfikacja
+preferences-field-verification = Operacje importowane:
+preferences-verification-hint = „Sprawdzona”: ufasz swojemu bankowi, zaimportowana operacja jest uznawana za poprawną. „Do sprawdzenia”: każda zaimportowana operacja czeka na Twoją kontrolę; potem samodzielnie zmieniasz ją na „Sprawdzona” na liście operacji. To ustawienie dotyczy tylko przyszłych importów.
+preferences-leaf-qif = Wyciągi QIF
+preferences-field-qif-order = Kolejność dnia i miesiąca:
+preferences-qif-order-ask = Pytaj mnie za każdym razem
+preferences-qif-order-day-month = Zawsze dzień/miesiąc (05/03 = 5 marca)
+preferences-qif-order-month-day = Zawsze miesiąc/dzień (05/03 = 3 maja)
+preferences-qif-order-help = Używane tylko wtedy, gdy żadna data w pliku nie pozwala tego rozstrzygnąć. Gdy tylko data taka jak 24/11 dowodzi kolejności, decyduje plik, niezależnie od tego ustawienia.
+preferences-field-qif-label = Opis operacji:
+preferences-qif-label-both = Kontrahent + notatka
+preferences-qif-label-payee = Tylko kontrahent
+preferences-qif-label-memo = Tylko notatka
+preferences-qif-label-help = Gdy operacja ma jednocześnie kontrahenta i notatkę. Jeśli ma tylko jedno z nich, używane jest właśnie ono, niezależnie od tego ustawienia.
+preferences-qif-hint = Te ustawienia dotyczą wszystkich wyciągów QIF, niezależnie od otwartej bazy. „Pytaj mnie za każdym razem” jest najbezpieczniejsze: plik z niejednoznacznymi datami nigdy nie jest odczytywany na chybił trafił.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = Przywróć domyślne kolumny
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = Pokaż/Ukryj
+columns-colour = Pokoloruj kolumnę:
+columns-colour-none = Brak koloru
+columns-colour-red = Czerwony
+columns-colour-orange = Pomarańczowy
+columns-colour-pink = Różowy
+columns-colour-pastel-green = Pastelowy zielony
+columns-colour-green = Zielony
+columns-colour-pastel-blue = Pastelowy niebieski
+columns-colour-blue = Niebieski
+columns-colour-pastel-yellow = Pastelowy żółty
+columns-colour-yellow = Żółty
+preferences-leaf-columns = Kolumny tabel
+preferences-table-operations-list = Lista operacji
+preferences-columns-reset = Przywróć
+preferences-columns-reset-all = Przywróć wszystko
+preferences-columns-done = Kolumny wróciły do pierwotnego układu.
+preferences-columns-hint = Każda tabela zapamiętuje kolejność kolumn, te, które ukrywasz, i ich szerokość. „Przywróć” od razu przywraca jej pierwotny układ.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = Przywracanie
+preferences-leaf-comfort = Ustawienia wygody
+preferences-comfort-reset = Przywróć ustawienia wygody
+preferences-comfort-hint = Przywraca kolumny wszystkich tabel, kolejność i pola wyboru kont w oknie startowym oraz rozmiar wyświetlania. Język, waluta i weryfikacja importowanych operacji pozostają bez zmian.
+preferences-comfort-question = Przywrócić ustawienia wygody? Kolumny tabel, okno startowe i rozmiar wyświetlania wrócą do pierwotnego stanu.
+preferences-comfort-done = Ustawienia wygody zostały przywrócone.
 
 # --- Baner strony powitalnej ---------------------------------------------
 #
@@ -1933,3 +2088,1002 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = Ten program jest dostarczany bez żadnej gwarancji, w zakresie dozwolonym przez prawo.
 licence-info = Oficjalny tekst otworzy się w twojej przeglądarce, na gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = Symulacja kredytu
+window-loan-title = Symulacja kredytu
+loan-tab-credit = Kredyt
+loan-tab-afford = Czy dam radę go spłacić?
+loan-field-kind = Rodzaj kredytu
+loan-kind-consumer = Kredyt konsumpcyjny
+loan-kind-mortgage = Kredyt hipoteczny
+loan-field-amount = Kwota kredytu
+loan-field-payment = Rata miesięczna
+loan-field-months = Okres
+loan-field-rate = Stałe oprocentowanie
+loan-field-fees = Prowizja
+loan-field-insurance = Ubezpieczenie miesięcznie
+loan-unit-months = mies.
+loan-unit-percent = %
+loan-invalid-field = Ta wartość nie jest liczbą: popraw ją, aby ponownie obliczyć.
+loan-report-button = Raport PDF
+loan-monthly-table = Tabela miesiąc po miesiącu
+loan-months-count = { $count ->
+        [one] { $count } miesiąc
+        [few] { $count } miesiące
+        [many] { $count } miesięcy
+       *[other] { $count } miesiąca
+    }
+loan-percent = { $value }%
+loan-notice-payment-too-low = Ta rata nie pokrywa odsetek: kredyt nigdy nie zostałby spłacony. Okres pozostaje na 600 miesiącach.
+loan-notice-too-long = Ta rata wymagałaby ponad 600 miesięcy: okres pozostaje na 600 miesiącach.
+loan-figure-payment = Rata miesięczna
+loan-figure-payment-insured = Rata z ubezpieczeniem
+loan-figure-taeg = RRSO
+loan-figure-interest = Koszt odsetek
+loan-figure-insurance = Koszt ubezpieczenia
+loan-figure-cost = Całkowity koszt kredytu
+loan-figure-total-due = Całkowita kwota do zapłaty
+loan-figure-all-in = Razem spłacone, z ubezpieczeniem
+loan-part-capital = Kwota kredytu
+loan-part-interest = Odsetki
+loan-part-fees = Prowizja
+loan-part-insurance = Ubezpieczenie
+loan-donut-cost-caption = łącznie
+loan-chart-cost = Ile kosztuje ten kredyt
+loan-chart-capital = Pozostały kapitał
+loan-schedule-title = Harmonogram spłaty
+loan-schedule-yearly = Harmonogram spłaty, rok po roku
+loan-column-number = Nr
+loan-column-year = Rok
+loan-column-date = Termin
+loan-column-payment = Rata
+loan-column-payments = Raty
+loan-column-interest = Odsetki
+loan-column-capital = Kapitał
+loan-column-insurance = Ubezpieczenie
+loan-column-remaining = Pozostały kapitał
+loan-history-label = Badany okres
+loan-period-last-12 = Ostatnie 12 miesięcy
+loan-accounts-title = Badane konta
+loan-period-title = Okres
+loan-column-account = Konto
+loan-column-bank = Bank
+loan-column-balance = Saldo rzeczywiste
+loan-unavailable-no-account = Zaznacz co najmniej jedno konto, aby zbadać swoją historię.
+loan-unavailable-no-month = Ten okres nie ma jeszcze żadnego pełnego miesiąca: wybierz inny.
+loan-verdict-title = W skrócie
+loan-verdict-green = Wykonalne
+loan-verdict-orange = Na styk
+loan-verdict-red = Ryzykowne
+loan-verdict-no-income = Brak dochodów w tym okresie: wskaźnika zadłużenia nie da się obliczyć.
+loan-check-debt-green = Wskaźnik zadłużenia { $ratio }: poniżej progu { $green } tej metody.
+loan-check-debt-orange = Wskaźnik zadłużenia { $ratio }: między { $green } a { $red }, na granicy.
+loan-check-debt-red = Wskaźnik zadłużenia { $ratio }: powyżej { $red }.
+loan-check-effort = Rata { $payment } pochłania { $share } tego, co odkładasz { $kind ->
+        [good] w dobrym miesiącu
+        [hard] w trudnym miesiącu
+       *[usual] w zwykłym miesiącu
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] Dobry miesiąc
+        [hard] Trudny miesiąc
+       *[usual] Zwykły miesiąc
+    } nie zostawia nic na boku: rata { $payment } byłaby brana z Twojej rezerwy.
+loan-check-reserve-green = Twoje saldo pozostaje dodatnie do końca kredytu.
+loan-check-reserve-red = Z powodu tego kredytu Twoje saldo spadłoby poniżej zera: { $month }.
+loan-check-reserve-sooner = Twoje saldo spadłoby poniżej zera ({ $month }) o { $count ->
+        [one] { $count } miesiąc
+        [few] { $count } miesiące
+        [many] { $count } miesięcy
+       *[other] { $count } miesiąca
+    } wcześniej niż bez tego kredytu.
+loan-check-reserve-anyway = Twoje saldo spadłoby poniżej zera nawet bez tego kredytu (około: { $month }); kredyt niewiele zmienia.
+loan-check-reserve-floor-green = Twoje saldo pozostaje powyżej rezerwy bezpieczeństwa ({ $floor }) do końca kredytu.
+loan-check-reserve-floor-red = Z powodu tego kredytu Twoje saldo spadłoby poniżej rezerwy bezpieczeństwa ({ $floor }): { $month }.
+loan-check-reserve-floor-sooner = Twoje saldo spadłoby poniżej rezerwy bezpieczeństwa ({ $floor }; { $month }) o { $count ->
+        [one] { $count } miesiąc
+        [few] { $count } miesiące
+        [many] { $count } miesięcy
+       *[other] { $count } miesiąca
+    } wcześniej niż bez tego kredytu.
+loan-check-reserve-floor-anyway = Twoje saldo spadłoby poniżej rezerwy bezpieczeństwa ({ $floor }) nawet bez tego kredytu (około: { $month }); kredyt niewiele zmienia.
+loan-warning-deficit = Uwaga: w tym okresie Twoje wydatki już przekraczają dochody średnio o { $amount } miesięcznie, przed jakimkolwiek kredytem.
+loan-figure-reference = Oszczędności { $kind ->
+        [good] w dobrym miesiącu
+        [hard] w trudnym miesiącu
+       *[usual] w zwykłym miesiącu
+    }
+loan-figure-tipped = Miesiące, które kredyt zepchnąłby na minus
+loan-gauge-caption = zadłużenia
+loan-figure-income = Średnie dochody miesięcznie
+loan-figure-spending = Średnie wydatki miesięcznie
+loan-figure-saving = Średnie oszczędności miesięcznie
+loan-figure-running = Bieżące kredyty miesięcznie
+loan-figure-new = Nowa rata, z ubezpieczeniem
+loan-figure-rest = Na życie miesięcznie
+loan-figure-debt = Wskaźnik zadłużenia
+loan-red-months-value = { $count } z { $total }
+loan-figure-balance-now = Saldo rzeczywiste dziś
+loan-figure-balance-end = Przewidywane saldo na koniec kredytu
+loan-chart-income = Na co idzie Twój średni dochód
+loan-donut-income-caption = średni dochód
+loan-part-spending = Bieżące wydatki
+loan-part-running = Bieżące kredyty
+loan-part-new = Nowy kredyt
+loan-part-rest = Reszta
+loan-part-missing = Brakuje
+loan-chart-history = Twoja historia z tym kredytem
+loan-chart-history-hint = Co zostałoby w każdym miesiącu po zapłaceniu raty. Jaskrawoczerwone: miesiące, które kredyt zepchnąłby na minus; bladoczerwone: te, które były na minusie już bez niego.
+loan-chart-projection = Twoje przewidywane saldo
+loan-mark-loan-end = Koniec: { $label }
+loan-mark-negative = Na minusie
+loan-mark-floor = Poniżej rezerwy
+loan-mark-floor-line = Rezerwa bezpieczeństwa
+loan-running-title = Uwzględnione bieżące kredyty
+loan-running-column-label = Operacja cykliczna
+loan-running-column-monthly = Miesięcznie
+loan-running-column-end = Ostatnia rata
+loan-no-running = Wśród Twoich operacji cyklicznych nie rozpoznano żadnego bieżącego kredytu.
+loan-period-caption = { $from } – { $to } ({ $count ->
+        [one] { $count } miesiąc
+        [few] { $count } miesiące
+        [many] { $count } miesięcy
+       *[other] { $count } miesiąca
+    })
+loan-transfers = { $count ->
+        [0] Nie rozpoznano żadnego przelewu między zaznaczonymi kontami.
+        [one] Rozpoznano i pominięto jeden przelew między zaznaczonymi kontami.
+        [few] Rozpoznano i pominięto { $count } przelewy między zaznaczonymi kontami.
+        [many] Rozpoznano i pominięto { $count } przelewów między zaznaczonymi kontami.
+       *[other] Rozpoznano i pominięto { $count } przelewu między zaznaczonymi kontami.
+    }
+loan-method = Średnie z pełnych miesięcy okresu, operacje rozliczone i zaksięgowane, bez przelewów między zaznaczonymi kontami.
+loan-report-title = Symulacja kredytu
+loan-report-made-on = symulacja z { $date }
+loan-disclaimer = Symulacja orientacyjna, bez mocy umownej. Wiążąca jest wyłącznie oferta banku.
+loan-tab-rules = Ustawienia oceny
+loan-method-optimistic = Optymistyczna
+loan-method-neutral = Neutralna
+loan-method-severe = Surowa
+loan-method-line = Metoda oceny: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = Ocena odpowiada na trzy pytania, a każda metoda stawia im własne wymagania. Wybierz tę, która do Ciebie pasuje: ocena w zakładce „Czy dam radę go spłacić?” podąża za nią. Ostatni wiersz zakłada, że Twoje wydatki rosną co roku o podany procent; rata się nie zmienia.
+loan-rule-row-debt = Akceptowane zadłużenie
+loan-rule-row-reference = Oszczędności odniesienia
+loan-rule-row-share = Część tych oszczędności, którą może zabrać rata
+loan-rule-row-floor = Próg, poniżej którego saldo nie może spaść
+loan-rule-row-sooner = Jeśli saldo spada poniżej niego nawet bez kredytu
+loan-rule-row-growth = Wzrost Twoich wydatków rocznie
+loan-rule-limits = zielony do { $green }, pomarańczowy do { $red }
+loan-rule-reference = { $kind ->
+        [good] dobry miesiąc
+        [hard] trudny miesiąc
+       *[usual] zwykły miesiąc
+    }: { $amount }
+loan-rule-floor-zero = zero
+loan-rule-floor-cushion = miesiąc wydatków: { $amount }
+loan-rule-sooner = pomarańczowy, jeśli kredyt przyspiesza to o { $orange }, czerwony o { $red }
+loan-unit-percent-year = % rocznie
+loan-method-optimistic-explain = Metoda optymistyczna zakłada dobry miesiąc, akceptuje zadłużenie do 40% i nie trzyma rezerwy: pokazuje, co jest możliwe, jeśli wszystko pójdzie dobrze.
+loan-method-neutral-explain = Metoda neutralna zakłada zwykły miesiąc i stosuje regułę banków, 33–35% zadłużenia: to ocena odniesienia.
+loan-method-severe-explain = Metoda surowa zakłada trudny miesiąc i trzyma miesiąc wydatków w rezerwie na nieprzewidziane: pokazuje, co wytrzyma nawet wtedy, gdy sprawy pójdą źle.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = Zużycie prądu przez urządzenie elektryczne
+window-appliance-title = Zużycie prądu przez urządzenie elektryczne
+appliance-device-title = Urządzenie
+appliance-on-title = Włączone
+appliance-standby-title = W trybie czuwania
+appliance-field-on-watts = Moc podczas pracy
+appliance-field-on-hours = Czas pracy na dobę
+appliance-field-days = Dni użytkowania w tygodniu
+appliance-field-share = Udział czasu pracy poza szczytem
+appliance-field-standby-watts = Moc w trybie czuwania
+appliance-field-standby-hours = Czas czuwania na dzień użytkowania
+appliance-unit-watts = W
+appliance-unit-hours = h
+appliance-unit-days = z 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/kWh
+appliance-standby-hint = Jeśli pole jest puste, tryb czuwania trwa przez resztę doby. W dni bez użytkowania urządzenie pozostaje podłączone: cały ten czas liczy się jako czuwanie. Po odłączeniu z gniazdka czuwanie wynosi 0 W.
+appliance-contract-title = Twoja umowa
+appliance-field-option = Taryfa
+appliance-option-base = Jednostrefowa (jedna cena)
+appliance-option-off-peak = Godziny szczytu / Poza szczytem
+appliance-field-base = Cena za kWh
+appliance-field-peak = Cena za kWh w godzinach szczytu
+appliance-field-off-peak = Cena za kWh poza szczytem
+appliance-field-off-peak-hours = Godziny poza szczytem na dobę
+appliance-contract-hint = Te ceny dotyczą tylko tego obliczenia. Zapisaną taryfę ustawia się w menu Ustawienia › Preferencje › Narzędzia.
+appliance-contract-reset = Przywróć zapisaną taryfę
+appliance-period-day = Na dobę
+appliance-period-month = Na miesiąc
+appliance-period-year = Na rok
+appliance-energy = { $value } kWh
+appliance-less-than = mniej niż { $amount }
+appliance-detail-title = Szczegóły za rok
+appliance-column-part = Pozycja
+appliance-column-energy = Energia
+appliance-column-cost = Koszt
+appliance-column-share = Udział
+appliance-line-on = Włączone
+appliance-line-standby = Tryb czuwania
+appliance-line-on-peak = Włączone, godziny szczytu
+appliance-line-on-off-peak = Włączone, poza szczytem
+appliance-line-standby-peak = Tryb czuwania, godziny szczytu
+appliance-line-standby-off-peak = Tryb czuwania, poza szczytem
+appliance-line-total = Razem
+appliance-chart-title = Na co idą pieniądze
+appliance-chart-caption = rocznie
+appliance-standby-sentence = Roczny koszt samego trybu czuwania: { $amount }. Udział w koszcie urządzenia: { $share }.
+appliance-note-plate = Moc podana na urządzeniu lub w instrukcji to wartość maksymalna: podczas pracy większość urządzeń zużywa mniej. Aby poznać rzeczywistą wartość, zmierz ją watomierzem do gniazdka i wpisz to, co pokazuje.
+appliance-note-subscription = Opłaty stałe nie są wliczone: płaci się je niezależnie od tego, czy urządzenie jest podłączone.
+appliance-invalid-watts = Podaj moc od 0 do 100 000 W.
+appliance-invalid-hours = Podaj czas od 0 do 24 godzin na dobę.
+appliance-invalid-days = Podaj całkowitą liczbę dni, od 0 do 7.
+appliance-invalid-share = Podaj udział od 0 do 100%.
+appliance-invalid-day-overflow = Czas pracy i czuwania przekracza łącznie 24 godziny na dobę.
+appliance-invalid-price = Podaj cenę za kWh od 0 do 100.
+appliance-invalid-off-peak-hours = Podaj całkowitą liczbę godzin poza szczytem, od 0 do 24.
+preferences-branch-tools = Narzędzia
+preferences-leaf-electricity = Taryfa za prąd
+preferences-electricity-blue = Wróć do taryfy Tarif Bleu EDF
+preferences-electricity-hint = Taryfa z Twojej umowy, używana przez narzędzie „Zużycie prądu przez urządzenie elektryczne”. Domyślnie: Tarif Bleu EDF (Francja) według stanu na 1 sierpnia 2026, ceny brutto, moc przyłączeniowa od 3 do 6 kVA. Te ceny często zmieniają się w lutym i sierpniu: przepisz je ze swojego rachunku.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = Moja poduszka finansowa
+window-cushion-title = Moja poduszka finansowa
+cushion-question = Gdyby twoje dochody skończyły się jutro, na ile miesięcy wystarczyłyby ci oszczędności?
+cushion-accounts-title = Twoje konta
+cushion-column-account = Konto
+cushion-column-balance = Saldo rzeczywiste
+cushion-column-savings = Oszczędności
+cushion-column-spending = Wydatki
+cushion-accounts-hint = „Oszczędności”: pieniądze, na które liczysz w razie kłopotów. „Wydatki”: konta, z których idą codzienne wydatki.
+cushion-history-label = Analizowany okres
+cushion-backup-label = Dochód awaryjny miesięcznie
+cushion-backup-hint = To, co nadal by wpływało: zasiłek dla bezrobotnych, pensja partnera… Puste: brak dochodu.
+cushion-categories-title = Uwzględnione wydatki
+cushion-categories-hint = Odznacz wydatki, które można by obciąć w razie kłopotów.
+cushion-categories-empty = Brak wydatków w tym okresie.
+cushion-verdict-title = Twoja poduszka
+cushion-targets-title = Progi bezpieczeństwa
+cushion-projection-title = Twoje oszczędności w razie kłopotów
+cushion-projection-hint = Co zostałoby co miesiąc, gdyby twoje dochody skończyły się dziś.
+cushion-note = Szacunek na podstawie twojej historii: wydatki w trudnym miesiącu mogą odbiegać od średniej.
+cushion-invalid-backup = Tej kwoty nie da się odczytać: popraw ją, aby ponownie uruchomić obliczenia.
+cushion-no-spending-account = Zaznacz co najmniej jedno konto „Wydatki”.
+cushion-no-month = Ten okres nie zawiera jeszcze żadnego pełnego miesiąca.
+cushion-months = { $value } mies.
+cushion-per-month = { $amount } miesięcznie
+cushion-figure-holds = Bez limitu
+cushion-gauge-caption = pokrytych wydatków
+cushion-verdict-short = Mniej niż trzy miesiące: nagłe kłopoty szybko postawiłyby cię w trudnej sytuacji.
+cushion-verdict-fair = Od trzech do sześciu miesięcy: przyzwoita poduszka, warto ją powiększyć, jeśli możesz.
+cushion-verdict-solid = Sześć miesięcy lub więcej: twoja poduszka jest solidna.
+cushion-verdict-holds = Twój dochód awaryjny pokrywa wydatki: twoje oszczędności by nie topniały.
+cushion-verdict-nothing = Brak uwzględnionych wydatków w tym okresie: nie ma czego pokrywać.
+cushion-tile-savings = Dostępne oszczędności
+cushion-tile-spending = Uwzględnione wydatki
+cushion-tile-backup = Dochód awaryjny
+cushion-tile-burn = Oszczędności topniałyby o
+cushion-tile-rhythm = Tempo oszczędzania
+cushion-burn-none = Nic
+cushion-target-title = { $months ->
+        [one] { $months } miesiąc
+        [few] { $months } miesiące
+        [many] { $months } miesięcy
+       *[other] { $months } mies.
+    } wydatków: { $amount }
+cushion-target-reached = Osiągnięty.
+cushion-target-date = Brakuje { $missing }. Przy twoim tempie oszczędzania przewidywany termin: { $month }.
+cushion-target-never = Brakuje { $missing }. Twoje oszczędności nie wzrosły w tym okresie: w tym tempie ten próg nie zostanie osiągnięty.
+cushion-mark-empty = Wyczerpane: { $month }
+cushion-period = Średnia z { $count ->
+        [one] { $count } pełnego miesiąca
+        [few] { $count } pełnych miesięcy
+        [many] { $count } pełnych miesięcy
+       *[other] { $count } pełnego miesiąca
+    }, okres: { $from } – { $to }. { $transfers ->
+        [0] Brak przelewów między twoimi kontami.
+        [one] Pominięto jeden przelew między twoimi kontami.
+        [few] Pominięto { $transfers } przelewy między twoimi kontami.
+        [many] Pominięto { $transfers } przelewów między twoimi kontami.
+       *[other] Pominięto { $transfers } przelewu między twoimi kontami.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = Cel oszczędnościowy
+window-goal-title = Cel oszczędnościowy
+goal-accounts-title = Śledzone konta
+goal-column-account = Konto
+goal-column-balance = Saldo rzeczywiste
+goal-accounts-hint = Przelew między dwoma śledzonymi kontami się znosi; przelew na konto nieśledzone liczy się jako wypływ pieniędzy.
+goal-period-label = Okres odniesienia
+goal-period-range = Zakres lat…
+goal-range-from = od
+goal-range-to = do
+goal-question-title = Twoje pytanie
+goal-question-when = Kiedy będę mieć tę kwotę?
+goal-question-amount = Ile będę mieć w tym dniu?
+goal-question-effort = Ile oszczędzać, aby mieć tę kwotę w tym dniu?
+goal-field-target = Kwota docelowa
+goal-field-date = Data docelowa
+goal-field-rate = Roczne oprocentowanie oszczędności
+goal-field-extra = A gdyby odkładać więcej, miesięcznie
+goal-options-hint = Puste: bez odsetek, nic więcej.
+goal-answer-title = Odpowiedź
+goal-chart-title = Twoje saldo wczoraj i jutro
+goal-chart-hint = Linia ciągła: rzeczywiste saldo z ostatnich dwunastu miesięcy; linia przerywana: prognoza; jasny obszar: przedział zależny od miesięcy.
+goal-disclaimer = Prognoza oparta na twojej historii, a nie obietnica: jedno nieprzewidziane zdarzenie może wszystko zmienić.
+goal-no-account = Zaznacz co najmniej jedno konto do śledzenia.
+goal-no-month = Ten okres nie zawiera jeszcze żadnego pełnego miesiąca.
+goal-invalid-target = Podaj kwotę do osiągnięcia.
+goal-invalid-date = Wybierz przyszłą datę w ciągu najbliższych pięćdziesięciu lat.
+goal-invalid-rate = Podaj oprocentowanie od 0 do 100%.
+goal-invalid-extra = Tej kwoty nie da się odczytać: popraw ją, aby ponownie uruchomić obliczenia.
+goal-per-month = { $amount } miesięcznie
+goal-tile-balance = Saldo dziś
+goal-tile-rhythm = Średnie tempo
+goal-tile-target = Cel
+goal-tile-reached = Przewidywany termin
+goal-tile-date = Data docelowa
+goal-tile-projected = Prognozowane saldo
+goal-tile-saved = Zaoszczędzone do tego czasu
+goal-tile-interest = W tym odsetki
+goal-tile-needed = Do odłożenia
+goal-when-already = Masz już { $amount }: twoje śledzone konta mają łącznie { $balance }.
+goal-when-reached = Będziesz mieć { $amount } za { $months ->
+        [one] miesiąc
+        [few] { $months } miesiące
+        [many] { $months } miesięcy
+       *[other] { $months } miesiąca
+    }; przewidywany termin: { $month }.
+goal-when-range = Zależnie od miesięcy przewidywany termin: { $early } – { $late }.
+goal-when-range-open = Najwcześniejszy termin: { $early }; przy słabych miesiącach cel nie zostałby osiągnięty.
+goal-when-never = W tym tempie nie osiągniesz { $amount }.
+goal-zero = Twoje saldo spadłoby do zera; przewidywany termin: { $month }.
+goal-amount = Termin: { $month }. Prognozowane saldo: około { $amount }.
+goal-amount-range = Zależnie od miesięcy: od { $low } do { $high }.
+goal-effort-more = Aby mieć { $amount } (termin: { $month }), trzeba by odkładać średnio { $monthly } miesięcznie, czyli o { $gap } więcej niż obecnie.
+goal-effort-less = Aby mieć { $amount } (termin: { $month }), wystarczyłoby { $monthly } miesięcznie, czyli o { $gap } mniej niż obecnie: wyprzedzasz plan.
+goal-effort-range = Zależnie od miesięcy różnica względem twojego tempa wynosiłaby od { $low } do { $high } miesięcznie.
+goal-chart-target = Cel: { $amount }
+goal-chart-today = Dziś
+goal-note-seasons = Prognoza uwzględnia pory roku: każdy przyszły miesiąc przyjmuje średnią z tych samych miesięcy w okresie.
+goal-note-range = Przedział wynika ze słabych i mocnych miesięcy okresu: najniższej i najwyższej ćwiartki.
+goal-note-loan = Ostatni miesiąc kredytu „{ $label }”: { $month }; potem { $amount } więcej miesięcznie.
+goal-note-interest = Odsetki naliczane co miesiąc według stopy { $rate }% rocznie: przybliżenie zasady półmiesięcznej stosowanej na kontach oszczędnościowych.
+goal-period = Tempo obliczone na podstawie { $count ->
+        [one] { $count } pełnego miesiąca
+        [few] { $count } pełnych miesięcy
+        [many] { $count } pełnych miesięcy
+       *[other] { $count } pełnego miesiąca
+    }, okres: { $from } – { $to }. { $transfers ->
+        [0] Brak przelewów między śledzonymi kontami.
+        [one] Pominięto jeden przelew między śledzonymi kontami.
+        [few] Pominięto { $transfers } przelewy między śledzonymi kontami.
+        [many] Pominięto { $transfers } przelewów między śledzonymi kontami.
+       *[other] Pominięto { $transfers } przelewu między śledzonymi kontami.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = A gdyby ograniczyć…?
+window-cut-title = A gdyby ograniczyć…?
+cut-axis-label = Grupuj według
+cut-axis-category = Kategorie
+cut-axis-payee = Kontrahenci
+cut-axis-budget-line = Pozycje budżetowe
+cut-table-title = Twoje wydatki, pozycja po pozycji
+cut-table-hint = Wpisz ograniczenie w % lub w { $sign } miesięcznie przy pozycjach, które chcesz zmniejszyć. Ograniczenie nie może przekroczyć samego wydatku.
+cut-column-monthly = Miesięcznie
+cut-column-cut = Ograniczenie
+cut-column-after = Po ograniczeniu
+cut-column-yearly = Oszczędność rocznie
+cut-total = Razem
+cut-horizon-label = Horyzont
+cut-settings-title = Ustawienia
+cut-options-hint = Oprocentowanie i kwota docelowa są opcjonalne.
+cut-report-button = Raport PDF
+cut-chart-title = Twoje saldo bez ograniczeń i z nimi
+cut-chart-hint = Linia ciągła: rzeczywiste saldo z ostatnich dwunastu miesięcy; szara linia przerywana: prognoza bez ograniczeń; niebieski: z ograniczeniami; zielony: zaoszczędzone pieniądze.
+cut-donut-title = Twoje miesięczne wydatki po ograniczeniach
+cut-donut-caption = miesięcznie po ograniczeniach
+cut-donut-others = Pozostałe pozycje
+cut-donut-saved = Zaoszczędzone
+cut-legend-with = Z ograniczeniami
+cut-legend-without = Bez ograniczeń
+cut-years = { $years ->
+        [one] { $years } rok
+        [few] { $years } lata
+        [many] { $years } lat
+       *[other] { $years } roku
+    }
+cut-headline-none = Wpisz ograniczenie w tabeli, aby zobaczyć jego efekt.
+cut-headline = Ograniczenie { $count ->
+        [one] tej pozycji
+        [few] tych { $count } pozycji
+        [many] tych { $count } pozycji
+       *[other] tych { $count } pozycji
+    } pozwoliłoby odkładać dodatkowo { $monthly } miesięcznie, czyli { $yearly } rocznie.
+cut-tile-monthly = Oszczędność miesięcznie
+cut-tile-yearly = Oszczędność rocznie
+cut-tile-horizon = Oszczędność w ciągu { $years ->
+        [one] { $years } roku
+        [few] { $years } lat
+        [many] { $years } lat
+       *[other] { $years } roku
+    }
+cut-tile-spending = Wydatki miesięcznie
+cut-target-already = Masz już { $amount }.
+cut-target-sooner = Przewidywany termin osiągnięcia kwoty { $amount }: { $with } zamiast { $without }, czyli { $months ->
+        [0] nie wcześniej
+        [one] miesiąc wcześniej
+        [few] { $months } miesiące wcześniej
+        [many] { $months } miesięcy wcześniej
+       *[other] { $months } miesiąca wcześniej
+    }.
+cut-target-only-with = Z tymi ograniczeniami kwota { $amount } zostałaby osiągnięta (termin: { $with }); bez nich, w obecnym tempie – nigdy.
+cut-target-never = Nawet z tymi ograniczeniami kwota { $amount } nie zostałaby osiągnięta w obecnym tempie.
+cut-note-seasons = Każde ograniczenie uwzględnia pory roku swojej pozycji: pozycja, która obciąża budżet głównie latem, przynosi oszczędności głównie latem.
+cut-note-capped = Wpisane ograniczenie przekraczało wydatek: zostało zmniejszone do wysokości samego wydatku.
+cut-invalid-cut = Tego ograniczenia nie da się odczytać: podaj procent od 0 do 100 lub kwotę miesięcznie.
+cut-report-settings = Ustawienia
+cut-report-result = Wynik
+cut-report-accounts = Śledzone konta
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = Zaplanuj wakacje
+window-holiday-title = Zaplanuj wakacje
+holiday-trip-title = Podróż
+holiday-field-trip = Rodzaj podróży
+holiday-trip-stay = Pobyt
+holiday-trip-cruise = Rejs
+holiday-field-adults = Dorośli
+holiday-field-children = Dzieci
+holiday-field-nights = Długość pobytu w nocach
+holiday-field-days = Dni
+holiday-field-months = Miesiące do wyjazdu
+holiday-field-stops = Liczba postojów w portach
+holiday-saved-title = Już zaoszczędzone
+holiday-saved-hint = Zaznacz konta, na których pieniądze na wakacje są już odłożone: ich rzeczywiste saldo liczy się jako już zaoszczędzone.
+holiday-budget-title = Budżet
+holiday-budget-hint = Dla każdej pozycji: kwota, kogo dotyczy i na jak długo. Pusta pozycja nie jest liczona.
+holiday-optional-title = Pozycje opcjonalne
+holiday-result-title = Wynik
+holiday-donut-title = Na co idą pieniądze na podróż
+holiday-donut-caption = na podróż
+holiday-child-label = Cena za dziecko
+holiday-count-label = Kabiny
+holiday-open = Otwórz projekt…
+holiday-save = Zapisz projekt…
+holiday-pdf = Raport PDF
+holiday-excel = Eksportuj do Excela
+holiday-file-filter = Projekt wakacyjny
+holiday-replace-question = Otwarcie tego projektu zastąpi dane wpisane w oknie. Kontynuować?
+holiday-file-saved = Zapisano projekt: { $file }
+holiday-file-opened = Otwarto projekt: { $file }
+holiday-file-not-project = Ten plik nie jest projektem wakacyjnym programu Radinus.
+holiday-file-too-recent = Ten projekt pochodzi z nowszej wersji programu Radinus: zaktualizuj Radinus, aby go otworzyć.
+holiday-file-failed = Nie udało się odczytać ani zapisać pliku: { $reason }
+holiday-line-transport = Transport w obie strony
+holiday-line-lodging = Zakwaterowanie
+holiday-line-meals = Posiłki i bieżące wydatki
+holiday-line-visits = Zwiedzanie i rozrywka
+holiday-line-port = Dojazd do portu
+holiday-line-cabins = Kabiny
+holiday-line-service = Opłata serwisowa (napiwki)
+holiday-line-drinks = Pakiet napojów
+holiday-line-excursions = Wycieczki w portach
+holiday-line-port-taxes = Opłaty portowe
+holiday-line-wifi = Wi-Fi na pokładzie
+holiday-line-onboard = Wydatki na pokładzie i na lądzie
+holiday-line-other = Inne koszty i nieprzewidziane wydatki
+holiday-line-insurance = Ubezpieczenie kosztów rezygnacji
+holiday-line-stay-tax = Opłata miejscowa
+holiday-line-car = Samochód na miejscu, paliwo i opłaty drogowe
+holiday-line-parking = Parking na lotnisku lub dworcu
+holiday-line-bank = Opłaty bankowe za granicą
+holiday-line-formalities = Formalności (paszport, wiza, szczepienia)
+holiday-line-pets = Opieka nad zwierzętami
+holiday-span-trip = za cały pobyt
+holiday-span-night = za noc
+holiday-span-day = za dzień
+holiday-span-stop = za postój w porcie
+holiday-who-all = dla wszystkich
+holiday-who-person = na osobę
+holiday-who-adults = na dorosłego
+holiday-cabins-count = { $count ->
+        [one] { $count } kabina
+        [few] { $count } kabiny
+        [many] { $count } kabin
+       *[other] { $count } kabiny
+    }
+holiday-days = { $days ->
+        [one] { $days } dzień
+        [few] { $days } dni
+        [many] { $days } dni
+       *[other] { $days } dnia
+    }
+holiday-invalid-count = Podaj liczbę całkowitą.
+holiday-invalid-amount = Tej kwoty nie da się odczytać: podaj liczbę dodatnią lub procent od 0 do 100.
+holiday-headline-empty = Wpisz kwoty budżetu, aby zobaczyć, ile będzie kosztować podróż.
+holiday-headline-stay = Ten pobyt kosztowałby { $total } dla { $people ->
+        [one] jednej osoby
+        [few] { $people } osób
+        [many] { $people } osób
+       *[other] { $people } osoby
+    } { $nights ->
+        [0] bez noclegu
+        [one] na jedną noc
+        [few] na { $nights } noce
+        [many] na { $nights } nocy
+       *[other] na { $nights } nocy
+    }.
+holiday-headline-cruise = Ten rejs kosztowałby { $total } dla { $people ->
+        [one] jednej osoby
+        [few] { $people } osób
+        [many] { $people } osób
+       *[other] { $people } osoby
+    } { $nights ->
+        [0] bez noclegu
+        [one] na jedną noc
+        [few] na { $nights } noce
+        [many] na { $nights } nocy
+       *[other] na { $nights } nocy
+    }.
+holiday-tile-total = Koszt całkowity
+holiday-tile-person = Na osobę
+holiday-tile-person-day = Na osobę dziennie
+holiday-tile-saved = Już zaoszczędzone
+holiday-tile-remaining = Pozostało do sfinansowania
+holiday-tile-monthly = Potrzebne oszczędności
+holiday-remaining-none = Nic: wszystko pokryte
+holiday-monthly-none = Nie trzeba nic odkładać
+holiday-monthly-now = Wyjazd w tym miesiącu
+holiday-note-days = Dni to noce plus jeden: siedem nocy daje osiem dni.
+holiday-note-child = W przeliczeniu na osobę dziecko płaci cenę za dziecko, jeśli ją podano; jeśli pole jest puste, płaci jak dorosły.
+holiday-note-percent = Procent ubezpieczenia dotyczy głównych pozycji podróży; procent opłat bankowych – wydatków na miejscu.
+holiday-sheet-budget = Budżet
+holiday-sheet-result = Wynik
+holiday-column-line = Pozycja
+holiday-column-amount = Kwota
+holiday-column-child = Cena za dziecko
+holiday-column-who = Dla kogo
+holiday-column-span = Na jak długo
+holiday-column-cost = Koszt
+holiday-disclaimer = Szacunek oparty na twoich własnych kwotach: rzeczywiste ceny mogą się różnić.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = Projekt ograniczenia wydatków
+cut-file-not-project = Ten plik nie jest projektem ograniczenia wydatków programu Radinus.
+cut-file-too-recent = Ten projekt pochodzi z nowszej wersji programu Radinus: zaktualizuj Radinus, aby go otworzyć.
+cut-sheet-items = Pozycje
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = Dziennik mojego samochodu
+window-car-title = Dziennik mojego samochodu
+car-unnamed = Mój samochód
+car-sheet-title = Samochód
+car-field-plate = Numer rejestracyjny
+car-field-make = Marka
+car-field-model = Model
+car-field-engine = Napęd
+car-field-first-hand = Pierwszy właściciel
+car-field-registered = Data pierwszej rejestracji
+car-field-acquired = Data nabycia
+car-field-acquired-km = Przebieg w chwili nabycia
+car-field-service = Przegląd co
+car-field-service-or = lub co
+car-unit-months-short = mies.
+car-unit-km = km
+car-tariff-title = Taryfa ładowania w domu
+car-tariff-hint = Ta taryfa jest przechowywana w dzienniku samochodu: nie zmienia taryfy ustawionej w preferencjach.
+car-tariff-reset = Przywróć taryfę z preferencji
+car-engine-petrol = Benzyna
+car-engine-diesel = Diesel
+car-engine-lpg = LPG
+car-engine-e85 = E85 (bioetanol)
+car-engine-hybrid = Hybryda
+car-engine-plug-in = Hybryda plug-in
+car-engine-electric = Elektryczny
+car-engine-hydrogen = Wodór
+car-energy-petrol = Benzyna
+car-energy-diesel = Olej napędowy
+car-energy-lpg = LPG
+car-energy-e85 = E85
+car-energy-electricity = Energia elektryczna
+car-energy-hydrogen = Wodór
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = Energia
+car-rubric-upkeep = Bieżąca obsługa
+car-rubric-service = Przegląd
+car-rubric-wear = Części eksploatacyjne
+car-rubric-tyres = Opony
+car-rubric-breakdown = Awarie
+car-rubric-insurance = Ubezpieczenie
+car-rubric-inspection = Badanie techniczne
+car-part-brake-pads = Klocki hamulcowe
+car-part-brake-discs = Tarcze hamulcowe
+car-part-timing-belt = Pasek rozrządu
+car-part-clutch = Sprzęgło
+car-part-battery-12v = Akumulator 12 V
+car-part-shock-absorbers = Amortyzatory
+car-part-wipers = Wycieraczki
+car-part-spark-plugs = Świece zapłonowe
+car-part-glow-plugs = Świece żarowe
+car-part-particulate-filter = Filtr cząstek stałych
+car-part-catalytic-converter = Katalizator
+car-part-fuel-cell-filter = Filtr ogniwa paliwowego
+car-part-exhaust = Układ wydechowy
+car-part-other = Inna część…
+car-axle-all = Wszystkie cztery opony
+car-axle-front = Opony przednie
+car-axle-rear = Opony tylne
+car-verdict-pass = Pozytywny
+car-verdict-counter = Ponowne badanie
+car-charge-station = Na stacji ładowania
+car-charge-home = W domu
+car-slot-peak = Godziny szczytu
+car-slot-off-peak = Poza szczytem
+car-entry-new = Nowy wpis
+car-entry-edit = Edytuj wpis
+car-field-date = Data
+car-field-km = Stan licznika
+car-field-rubric = Kategoria
+car-field-amount = Kwota
+car-field-garage = Warsztat lub stacja
+car-field-note = Notatka
+car-field-energy = Energia
+car-field-quantity = Ilość
+car-field-charge = Ładowanie
+car-field-slot = Pora ładowania
+car-field-part = Część
+car-field-part-name = Nazwa części
+car-field-axle = Wymienione opony
+car-field-verdict = Wynik
+car-field-months = Liczba objętych miesięcy
+car-field-battery = Stan baterii
+car-home-amount-hint = Kwota ładowania w domu jest obliczana według taryfy samochodu.
+car-entry-add = Dodaj do dziennika
+car-entry-update = Zapisz wpis
+car-entry-cancel = Anuluj
+car-entry-delete = Usuń wpis
+car-delete-question = Usunąć ten wpis z dziennika?
+car-from-operation = Pobierz operację…
+car-pick-account = Z którego konta pochodzi wydatek?
+car-pick-operation = Która operacja?
+car-pick-take = Pobierz
+car-pick-none = Brak wydatków na tym koncie.
+car-pick-taken = Operacja pobrana: uzupełnij stan licznika i kategorię, a następnie dodaj wpis.
+car-history-title = Historia
+car-filter-all = Wszystkie kategorie
+car-history-empty = Na razie brak wpisów.
+car-history-hint = Kliknij wpis, aby go edytować.
+car-column-date = Data
+car-column-km = Km
+car-column-rubric = Kategoria
+car-column-detail = Szczegóły
+car-column-amount = Kwota
+car-column-garage = Warsztat
+car-column-note = Notatka
+car-column-share = Udział
+car-column-per-km = Za km
+car-column-energy = Energia
+car-column-quantity = Ilość
+car-column-price = Średnia cena
+car-column-consumption = Zużycie
+car-column-part = Część
+car-column-changes = Wymiany
+car-column-last = Ostatnia wymiana
+car-column-life = Trwałość
+car-column-next = Następna wymiana
+car-total = Razem
+car-summary-title = Ile kosztuje samochód
+car-headline-empty = Wypełnij kartę samochodu, a następnie dodaj pierwszy wpis: tankowanie, przegląd, rachunek z warsztatu…
+car-headline = Od { $since } samochód kosztował cię { $total }.
+car-headline-km = Od { $since } samochód kosztował cię { $total }, przejechany dystans: { $km }, czyli { $cost } za kilometr.
+car-tile-total = Koszt całkowity
+car-tile-month = Miesięcznie
+car-tile-km = Za kilometr
+car-tile-driven = Przejechane kilometry
+car-tile-consumption = Zużycie
+car-tile-energy-km = Energia na kilometr
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [one] { $months } miesiąc
+        [few] { $months } miesiące
+        [many] { $months } miesięcy
+       *[other] { $months } miesiąca
+    }
+car-detail-battery = Bateria: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = Według kategorii
+car-energy-title = Energia
+car-parts-title = Części eksploatacyjne
+car-tyres-title = Opony
+car-battery-title = Stan baterii
+car-years-title = Ile samochód kosztował w poszczególnych latach
+car-donut-title = Na co idą pieniądze
+car-donut-caption = łącznie
+car-deadlines-title = Terminy
+car-deadlines-empty = Na razie brak terminów: zanotuj przegląd, badanie techniczne, ubezpieczenie albo dwie wymiany tej samej części.
+car-deadline-service = Przegląd
+car-deadline-inspection = Badanie techniczne
+car-deadline-counter = Ponowne badanie techniczne
+car-deadline-insurance = Koniec ubezpieczenia
+car-when-date = dnia { $date }
+car-when-km = przy przebiegu { $km }
+car-when-km-reached = przy przebiegu { $km }; w obecnym tempie przewidywany termin: { $month }
+car-when-date-km = dnia { $date } lub przy przebiegu { $km }, zależnie od tego, co nastąpi wcześniej
+car-when-inspection-unknown = Zanotuj ostatnie badanie techniczne, aby poznać termin następnego.
+car-tone-late = Po terminie
+car-tone-soon = Wkrótce
+car-note-since = Wszystko liczy się od nabycia: od daty i stanu licznika zapisanych w karcie samochodu.
+car-note-consumption = Zużycie mierzy się od pełnego baku do pełnego baku: tankuj zawsze do pełna i za każdym razem zapisuj stan licznika.
+car-note-e85 = Samochód na E85 pije to, co dostanie: kilometry przejechane po tankowaniu liczą się dla tego paliwa.
+car-note-home = Ładowanie w domu jest wyceniane według taryfy samochodu z dnia, w którym zostało zapisane, i zachowuje ten koszt.
+car-note-inspection = Badanie techniczne odbywa się według zasady francuskiej: pierwsze w ciągu czterech lat od pierwszej rejestracji, potem co dwa lata; ponowne badanie w ciągu dwóch miesięcy.
+car-disclaimer = Terminy i trwałość części to szacunki oparte na dzienniku: wiążąca jest wyłącznie książka serwisowa producenta.
+car-invalid-date = Podaj prawidłową datę, która nie jest z przyszłości.
+car-invalid-acquired = Data nabycia nie może być wcześniejsza niż data pierwszej rejestracji.
+car-invalid-km = Podaj stan licznika w pełnych kilometrach.
+car-invalid-amount = Tej kwoty nie da się odczytać.
+car-invalid-quantity = Wpisz ilość: litry, kWh lub kilogramy.
+car-invalid-part = Wybierz wymienioną część albo wpisz jej nazwę.
+car-invalid-rubric = Wybierz kategorię.
+car-invalid-months = Podaj liczbę miesięcy jako liczbę całkowitą.
+car-invalid-battery = Podaj stan baterii od 0 do 100 %.
+car-open = Otwórz dziennik…
+car-save = Zapisz dziennik…
+car-report-button = Raport PDF
+car-file-filter = Dziennik samochodu
+car-file-saved = Zapisano dziennik: { $file }
+car-file-opened = Otwarto dziennik: { $file }
+car-file-not-logbook = Ten plik nie jest dziennikiem samochodu programu Radinus.
+car-file-too-recent = Ten dziennik pochodzi z nowszej wersji programu Radinus: zaktualizuj Radinus, aby go otworzyć.
+car-replace-question = Otwarcie tego dziennika zastąpi dziennik w oknie. Kontynuować?
+car-sheet-history = Dziennik
+car-sheet-summary = Podsumowanie
+
+analysis-history-hint = Im dłuższa Twoja historia, tym lepsza będzie ta analiza: najlepiej mieć co najmniej rok operacji.
+
+# --- F48 — Podziel wydatek (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = Podziel wydatek
+window-sharing-title = Podział wydatku
+sharing-question = Kto ile płaci?
+sharing-setup-title = Podział
+sharing-field-label = Nazwa
+sharing-label-hint = Na przykład „Restauracja z 12/10” lub „Wyjazd do Bretanii 2027”: nazwa określa nazwy plików i raportów.
+sharing-field-total = Suma
+sharing-total-hint = Jeśli pole jest puste, suma to łączna wartość pozycji oraz dodatków własnych każdego.
+sharing-field-rule = Reguła
+sharing-field-rounding = Zaokrąglenie
+sharing-field-people = Osoby
+sharing-mode-whole = Jedna reguła dla całego wydatku
+sharing-mode-item = Jedna reguła na pozycję
+sharing-rule-equal = Równe części
+sharing-rule-parts = Według części
+sharing-rule-percent = W procentach
+sharing-rule-income = Proporcjonalnie do dochodów
+sharing-rounding-cent = Do centa
+sharing-rounding-euro = Do pełnej jednostki
+sharing-round-euro = Zaokrąglij do pełnych jednostek
+sharing-hide-incomes = Ukryj dochody w raportach i w eksporcie
+sharing-people-title = Osoby
+sharing-people-hint = Jeden wiersz na osobę, jedna kolumna na pozycję: zaznacz, kto w czym uczestniczy. Cała reszta jest opcjonalna. Ktoś, kto się wycofuje, zostawiając zaliczkę: kwota dokładna równa wpłaconej i żadne pole niezaznaczone.
+sharing-add-person = Dodaj osobę
+sharing-person-default = Osoba { $number }
+sharing-items-title = Pozycje
+sharing-items-hint = Tylko to, co nie dotyczy wszystkich, na przykład wino. Reszta sumy trafia do pozycji wspólnej.
+sharing-add-item = Dodaj pozycję
+sharing-common = Wspólna
+sharing-payments-title = Wpłaty
+sharing-payments-hint = Kto zapłacił, ile i kiedy. Wiersz bez kwoty jeszcze się nie liczy.
+sharing-payments-none = Na razie brak wpłat.
+sharing-add-payment = Dodaj wpłatę
+sharing-result-title = Wynik
+sharing-balances-title = Stan wpłat
+sharing-transfers-title = Proponowane przelewy
+sharing-delete = Usuń
+sharing-delete-person-question = Ta osoba ma wpłaty: usunąć je razem z nią?
+sharing-disclaimer = Radinus proponuje podział: między przyjaciółmi każdy może się rozliczyć inaczej.
+sharing-column-person = Osoba
+sharing-column-household = Gospodarstwo domowe
+sharing-column-income = Dochód
+sharing-column-parts = Części
+sharing-column-percent = %
+sharing-column-floor = Co najmniej
+sharing-column-cap = Co najwyżej
+sharing-column-fixed = Kwota dokładna
+sharing-column-alone = Dodatki własne
+sharing-column-gift = Oddana nadwyżka
+sharing-column-share = Udział
+sharing-column-typed = Wpisany %
+sharing-column-constraint = Co zadziałało
+sharing-column-due = Do zapłaty
+sharing-column-item = Pozycja
+sharing-column-amount = Kwota
+sharing-column-rule = Reguła
+sharing-column-participants = Uczestnicy
+sharing-column-unit = Gospodarstwo lub osoba
+sharing-column-members = Członkowie
+sharing-column-paid = Wpłacono
+sharing-column-balance = Saldo
+sharing-column-date = Data
+sharing-column-who = Kto
+sharing-column-label = Nazwa
+sharing-help-household = Osoby z tego samego gospodarstwa domowego rozliczają się razem: ich wpłaty i to, co są winne, są sumowane, a one dostają jedno rozliczenie. Przykład: „Rodzina Martin” dla rodziców i dzieci.
+sharing-help-income = Używany tylko przez regułę „Proporcjonalnie do dochodów”: im wyższy dochód, tym większy udział. Wpisz dochód miesięczny.
+sharing-help-parts = Osoba z 2 częściami płaci dwa razy więcej niż osoba z 1 częścią. Przykład: dorosły 1, dziecko 0,5.
+sharing-help-percent = Jaką część wydatku płaci osoba. Procenty muszą dawać łącznie 100%.
+sharing-help-floor = Osoba zapłaci co najmniej tę kwotę, nawet jeśli obliczony udział jest mniejszy. Różnica zmniejsza obciążenie pozostałych.
+sharing-help-cap = Osoba nigdy nie zapłaci więcej niż ta kwota. To, czego nie płaci, spada na pozostałych uczestników jej pozycji.
+sharing-help-fixed = Osoba płaci tę kwotę, cokolwiek się stanie, a reszta jest dzielona między pozostałych. Przykład: ktoś, kto się wycofuje i zostawia zaliczkę.
+sharing-help-alone = To, co osoba wzięła tylko dla siebie, na przykład deser lub kawę. Płaci to w całości, oprócz swojego udziału.
+sharing-help-gift = Jeśli osoba wpłaciła więcej niż jej udział: zaznaczone oznacza, że nadwyżka jest darem dla grupy; niezaznaczone, że zostanie jej zwrócona.
+sharing-help-items = Zaznacz osoby, które uczestniczą w tej pozycji. Pozycja wspólna to to, co zostaje z sumy po odjęciu pozostałych pozycji.
+sharing-help-due = Ile osoba jest winna łącznie: jej udział w pozycjach, dodatki własne i zaokrąglenie.
+sharing-help-share = Jaki procent sumy do podziału stanowi jej udział.
+sharing-help-typed = Procent, który wpisano. Może się różnić od rzeczywistego udziału, gdy zadziałało minimum, maksimum lub kwota dokładna.
+sharing-help-constraint = Pokazuje, czy udział osoby został zmieniony przez minimum, maksimum, kwotę dokładną lub oddaną nadwyżkę.
+sharing-help-item = Tylko to, co nie dotyczy wszystkich, na przykład wino. Reszta sumy trafia do pozycji wspólnej, dzielonej między zaznaczonych w niej.
+sharing-help-rule = Jak dzielona jest ta pozycja: na równe części, według części, w procentach lub proporcjonalnie do dochodów.
+sharing-help-paid = Ile gospodarstwo domowe lub osoba już wpłaciła, według wpisanych wpłat.
+sharing-help-balance = Ile jeszcze zostało do zapłaty lub ile wpłacono ponad udział. Przykład: „Pozostało do wpłaty: 61,54 €”.
+sharing-advice-equal = { $count ->
+        [one] { $total } dla jednej osoby.
+        [few] { $total } ÷ { $count } osoby = { $amount } na osobę.
+        [many] { $total } ÷ { $count } osób = { $amount } na osobę.
+       *[other] { $total } ÷ { $count } osoby = { $amount } na osobę.
+    }
+sharing-advice-equal-varied = Po równo między osobami, które uczestniczą, z uwzględnieniem limitów i wykluczeń.
+sharing-advice-parts = Łącznie { $parts } części: jedna część to { $amount }.
+sharing-advice-parts-varied = Każdy płaci według swoich części, z uwzględnieniem limitów i wykluczeń. Puste pole liczy się jako 1 część.
+sharing-advice-percent-rest = Brakuje { $rest }%, aby było 100%.
+sharing-advice-percent-over = Procenty przekraczają 100% o { $over }%.
+sharing-advice-percent-ok = Procenty dają łącznie 100%.
+sharing-advice-percent-nobody = Procenty dają już łącznie 100%: { $count ->
+        [one] { $names } nic nie zapłaci.
+        [few] { $names } nic nie zapłacą.
+        [many] { $names } nic nie zapłacą.
+       *[other] { $names } nic nie zapłacą.
+    }
+sharing-advice-income = Każdy płaci { $rate }% swojego dochodu.
+sharing-advice-income-missing = Wpisz dochód każdej osoby, aby podzielić proporcjonalnie do dochodów.
+sharing-advice-income-varied = Każdy płaci taką samą część swojego dochodu, z uwzględnieniem limitów i wykluczeń.
+sharing-advice-empty = Wpisz kwotę do podziału.
+sharing-apply-advice = Użyj proponowanych wartości
+sharing-help-apply-advice = Wypełnia puste pola wartościami pokazanymi na szaro. Pola już wypełnione się nie zmieniają.
+sharing-from-incomes = Procenty według dochodów
+sharing-help-from-incomes = Zastępuje procenty udziałem dochodu każdej osoby w sumie wszystkich dochodów. Dają łącznie 100%.
+sharing-reset-percents = Rozdziel wszystko od nowa
+sharing-help-reset-percents = Usuwa procenty i rozdziela je po równo między wszystkich. Przydatne po dodaniu osoby.
+sharing-reset-percents-question = Usunąć wszystkie procenty i rozdzielić je po równo?
+sharing-open = Otwórz projekt…
+sharing-save = Zapisz projekt…
+sharing-pdf-distribution = Podział (PDF)
+sharing-pdf-payments = Stan wpłat (PDF)
+sharing-pdf-statements = Rozliczenia indywidualne (PDF)…
+sharing-statements-everyone = Wszyscy
+sharing-excel = Eksportuj do Excela
+sharing-file-filter = Projekt podziału
+sharing-replace-question = Otwarcie tego projektu zastąpi dane wpisane w oknie. Kontynuować?
+sharing-file-saved = Zapisano projekt: { $file }
+sharing-file-opened = Otwarto projekt: { $file }
+sharing-file-not-project = Ten plik nie jest projektem podziału wydatku programu Radinus.
+sharing-file-too-recent = Ten projekt pochodzi z nowszej wersji programu Radinus: zaktualizuj Radinus, aby go otworzyć.
+sharing-file-failed = Nie udało się odczytać ani zapisać pliku: { $reason }
+sharing-statements-replace-question = { $count ->
+        [one] W tym folderze istnieje już jedno rozliczenie. Zastąpić je?
+        [few] W tym folderze istnieją już { $count } rozliczenia. Zastąpić je?
+        [many] W tym folderze istnieje już { $count } rozliczeń. Zastąpić je?
+       *[other] W tym folderze istnieje już { $count } rozliczenia. Zastąpić je?
+    }
+sharing-statements-written = { $count ->
+        [one] Zapisano jedno rozliczenie w „{ $folder }”.
+        [few] Zapisano { $count } rozliczenia w „{ $folder }”.
+        [many] Zapisano { $count } rozliczeń w „{ $folder }”.
+       *[other] Zapisano { $count } rozliczenia w „{ $folder }”.
+    }
+sharing-too-many-people = Podział obejmuje najwyżej 40 osób.
+sharing-too-many-items = Podział obejmuje najwyżej 20 pozycji.
+sharing-too-many-payments = Podział obejmuje najwyżej 400 wpłat.
+sharing-invalid-amount = Nie można odczytać tej kwoty: wpisz liczbę dodatnią.
+sharing-invalid-number = Nie można odczytać tej liczby: wpisz liczbę dodatnią.
+sharing-invalid-percent = Procent mieści się w zakresie od 0 do 100.
+sharing-invalid-date = Nie można odczytać tej daty.
+sharing-name-missing = Każda osoba musi mieć nazwę.
+sharing-name-duplicate = „{ $name }” już istnieje: rozróżnij je, na przykład inicjałem.
+sharing-floor-above-cap = Minimum przekracza maksimum.
+sharing-item-label-missing = Ta pozycja nie ma nazwy.
+sharing-items-above-total = Pozycje oraz dodatki własne każdego przekraczają sumę o { $amount }.
+sharing-payment-person = Wybierz, kto zapłacił.
+sharing-percent-total = Procenty dają łącznie { $sum }%: powinno być 100%.
+sharing-percent-total-item = „{ $item }”: procenty dają łącznie { $sum }%: powinno być 100%.
+sharing-item-nobody = Nikt nie uczestniczy w „{ $item }”.
+sharing-item-no-weight = Nikt nie ma wagi w „{ $item }”: wszyscy uczestnicy mają zero.
+sharing-income-missing = Brakuje dochodu osoby { $name }.
+sharing-fixed-above = Kwoty dokładne przekraczają sumę do podziału o { $amount }.
+sharing-floors-above = Minima przekraczają sumę do podziału o { $amount }.
+sharing-cap-alone = W „{ $item }” uczestniczy tylko { $name }: maksimum nie może zostać zachowane.
+sharing-caps-short = Maksima nie wystarczają do pokrycia sumy: brakuje { $amount }.
+sharing-impossible = Nie da się spełnić wszystkich tych warunków: poluzuj minimum lub maksimum.
+sharing-constraint-floor = Osiągnięte minimum
+sharing-constraint-cap = Osiągnięte maksimum
+sharing-constraint-fixed = Kwota dokładna
+sharing-constraint-gift = Oddana nadwyżka
+sharing-and = { $first } i { $last }
+sharing-outside = Poza pozycjami
+sharing-alone = Dodatki własne
+sharing-rounding = Zaokrąglenie
+sharing-headline-empty = Dodaj osoby, które dzielą wydatek.
+sharing-headline-no-amount = Wpisz sumę lub pozycje do podziału.
+sharing-headline-equal = { $total } do podziału: każdy płaci { $amount }.
+sharing-headline-range = { $total } do podziału: od { $min } do { $max } w zależności od osoby.
+sharing-participants = { $count ->
+        [0] Brak uczestników
+        [one] Jeden uczestnik
+        [few] { $count } uczestników
+        [many] { $count } uczestników
+       *[other] { $count } uczestnika
+    }
+sharing-balance-due = Pozostało do wpłaty: { $amount }
+sharing-balance-over = Wpłacono o { $amount } więcej niż wynosi udział
+sharing-balance-even = Rozliczone
+sharing-summary-collected = Wpłacono { $collected } z { $total }.
+sharing-summary-owing = { $count ->
+        [0] Wszyscy są rozliczeni.
+        [one] Tylko jedna osoba jest jeszcze winna { $amount }.
+        [few] { $count } osoby są jeszcze winne łącznie { $amount }.
+        [many] { $count } osób jest jeszcze winnych łącznie { $amount }.
+       *[other] { $count } osoby są jeszcze winne łącznie { $amount }.
+    }
+sharing-remaining-outside = Pozostało do zapłaty z wydatku: { $amount }
+sharing-remaining-reimburse = Do zwrotu (dla: { $name }): { $amount }
+sharing-all-settled = Wszystko rozliczone: nikt nikomu nic nie jest winien.
+sharing-transfer = { $from } przelewa { $amount } do { $to }
+sharing-warning-over-paid = Wpłaty przekraczają wydatek o { $amount }: sprawdź kwoty.
+sharing-note-income-zero = { $name } nic nie płaci w pozycjach: { $items }, bo dochód wynosi 0.
+sharing-note-excluded = { $name } nie uczestniczy w „{ $item }”: odpowiedni udział jest rozdzielany między pozostałych.
+sharing-note-gift = Nadwyżka od { $giver } zmniejsza udział pozostałych: wpłaty { $name } przekraczają teraz należny udział.
+sharing-note-outside = { $name } płaci { $amount } poza swoimi pozycjami: ta suma jest odejmowana od tego, co dzielą pozostali.
+sharing-note-keeper = Zaokrąglono do pełnych jednostek: { $name } zatrzymuje drobne, aby suma zgadzała się co do grosza.
+sharing-report-distribution = Podział
+sharing-report-sharing = Podział
+sharing-report-who-pays = Kto ile płaci
+sharing-report-items = Szczegóły według pozycji
+sharing-report-payments = Stan wpłat
+sharing-report-as-of = Stan na { $date }
+sharing-report-balances = Udział, wpłacono, saldo
+sharing-report-statement = Rozliczenie — { $name }
+sharing-report-your-share = Twój udział
+sharing-statement-total = Razem dla gospodarstwa domowego: { $amount }
+sharing-statement-pay = Do przekazania (odbiorca: { $name }): { $amount }
+sharing-statement-receive = Do otrzymania (od: { $name }): { $amount }
+sharing-sheet-people = Osoby
+sharing-sheet-items = Pozycje
+sharing-sheet-result = Wynik
+sharing-sheet-payments = Wpłaty
+sharing-sheet-balances = Zwroty

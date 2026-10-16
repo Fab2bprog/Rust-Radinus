@@ -18,7 +18,7 @@
 import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { tell } from "./dialog";
+import { askYesNo, tell } from "./dialog";
 import { asMoneyField, SIGN_CHANGED } from "./money-field";
 import { closeCurrentWindow } from "./window-frame";
 import { loadTexts, onLanguageChanged, t, tError } from "./texts";
@@ -56,6 +56,9 @@ const NOMENCLATURES = [
 
 let combos: Combos | null = null;
 let statuses: Item[] = [];
+
+/// Le statut « pointée », tel que la base le numérote.
+const POINTED = 1;
 let accounts: Item[] = [];
 
 /// Le compte dont la barre du bas montre les soldes, ou `0` quand elle ne
@@ -152,6 +155,25 @@ function reset(): void {
   }
 }
 
+/// **La date de pointage suit le statut** (Fabrice, 21/08/2026), comme dans la
+/// fiche opération : vidée vers prévu ou engagé, remplie de la date du virement
+/// vers pointée. L'utilisateur peut toujours écrire ce qu'il veut ensuite.
+function theClearingDateFollowsTheStatus(): void {
+  const clearing = element<HTMLInputElement>("clearing-date");
+  if (Number(element<HTMLSelectElement>("status").value) === POINTED) {
+    if (clearing.value.trim() === "") {
+      clearing.value = element<HTMLInputElement>("date").value;
+    }
+    return;
+  }
+  clearing.value = "";
+}
+
+element<HTMLSelectElement>("status").addEventListener(
+  "change",
+  theClearingDateFollowsTheStatus,
+);
+
 async function perform(): Promise<void> {
   try {
     const transfer = typedTransfer();
@@ -159,6 +181,20 @@ async function perform(): Promise<void> {
     // négatif, un libellé ou une date manquants. Le noyau les repose derrière.
     const refusal = await invoke<string | null>("transfer_refusal", { transfer });
     if (refusal) {
+      // **Le refus du pointage sans date s'affiche dans un panneau, et il
+      // propose une issue** (Fabrice, 25/08/2026) : la même chose que dans la
+      // fiche opération, parce que c'est le même refus. Non laisse la fenêtre
+      // telle qu'elle est, sans rien écrire.
+      if (refusal === t("operation-clearing-date-required")) {
+        const date = element<HTMLInputElement>("date").value;
+        const question = await invoke<string>("clearing_date_question", { date });
+        if (!(await askYesNo(question, t("ui-yes"), t("ui-no")))) {
+          return;
+        }
+        element<HTMLInputElement>("clearing-date").value = date;
+        await perform();
+        return;
+      }
       say(refusal, true);
       return;
     }

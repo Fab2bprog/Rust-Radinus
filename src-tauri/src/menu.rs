@@ -52,6 +52,42 @@ pub const PREFERENCES_ITEM_ID: &str = "settings-preferences";
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 pub const CALCULATOR_ITEM_ID: &str = "misc-calculator";
 pub const WEBSITE_ITEM_ID: &str = "misc-website";
+/// « Simulation de crédit » (Fabrice, 08/10/2026). D'abord dans Divers, sous
+/// la calculatrice ; **déplacée le lendemain dans un menu à elle, Outils**,
+/// inséré entre Nomenclatures et Paramètres (Fabrice, 09/10/2026). Elle
+/// demande une base qui porte un compte — l'onglet « Puis-je le
+/// rembourser ? » lit l'historique.
+pub const LOAN_ITEM_ID: &str = "tools-loan-simulation";
+
+/// « Consommation d'un appareil électrique » (Fabrice, 09/10/2026), dans
+/// Outils sous la simulation de crédit. Son tarif est une préférence de la
+/// base.
+pub const APPLIANCE_ITEM_ID: &str = "tools-appliance-cost";
+
+/// « Mon matelas de sécurité » (Fabrice, 09/10/2026), dans Outils sous la
+/// consommation d'un appareil électrique.
+pub const CUSHION_ITEM_ID: &str = "tools-safety-cushion";
+
+/// « Objectif Épargne » (Fabrice, 10/10/2026), dans Outils sous le matelas
+/// de sécurité.
+pub const GOAL_ITEM_ID: &str = "tools-savings-goal";
+
+/// « Et si je réduisais… ? » (Fabrice, 10/10/2026), dans Outils sous
+/// l'objectif d'épargne.
+pub const CUT_ITEM_ID: &str = "tools-spending-cut";
+
+/// « Préparer mes vacances » (Fabrice, 10/10/2026), dans Outils sous « Et si
+/// je réduisais… ? ».
+pub const HOLIDAY_ITEM_ID: &str = "tools-holiday";
+
+/// « Carnet de ma voiture » (Fabrice, 10/10/2026), dans Outils sous
+/// « Préparer mes vacances ».
+pub const CAR_ITEM_ID: &str = "tools-car";
+
+/// « Partager une dépense » (Fabrice, 11/10/2026, P-71), dans Outils sous le
+/// carnet. **Toujours allumée** : l'outil ne lit rien dans la base (« oui on
+/// peut utiliser l'outil sans base ouverte »).
+pub const SHARING_ITEM_ID: &str = "tools-sharing";
 
 /// « À propos de l'auteur » (menu Paramètres, 03/08/2026). Les deux autres
 /// entrées de ce menu — l'historique et « À propos de Radinus » — restent
@@ -148,7 +184,16 @@ pub const BANK_DETAILS_ITEM_ID: &str = "accounts-bank-details";
 pub const BUDGET_ENTRY_ITEM_ID: &str = "budget-entry";
 pub const BUDGET_CONTROL_ITEM_ID: &str = "budget-control";
 pub const DASHBOARD_ITEM_ID: &str = "statistics-dashboard";
+
+/// **Bilan croisé** (F39, demande de Fabrice du 25/08/2026) : la dernière
+/// entrée du menu Statistiques, après le tableau de bord.
+pub const CROSSED_BALANCE_ITEM_ID: &str = "statistics-crossed-balance";
 pub const CURVES_ITEM_ID: &str = "statistics-curves";
+
+/// **Analyse Évolution du solde** (F40, Fabrice, 05/10/2026) : « dans le menu
+/// Statistiques général elle sera en dessous de Graphique Évolution Solde ».
+/// Sans raccourci, comme convenu.
+pub const ANALYSIS_ITEM_ID: &str = "statistics-balance-analysis";
 
 fn statistics_item_id(axis: Axis) -> String {
     format!("statistics-by:{}", axis.key())
@@ -182,6 +227,14 @@ const ACCELERATORS: &[(&str, &str)] = &[
     (CHEQUEBOOKS_ITEM_ID, "CmdOrCtrl+F7"),
     (CURVES_ITEM_ID, "CmdOrCtrl+G"),
     (DASHBOARD_ITEM_ID, "CmdOrCtrl+T"),
+    // Le bilan croisé prend la suite des sept statistiques, dont les
+    // raccourcis sont ⌘⇧1 à ⌘⇧7 : il est le huitième de la même famille.
+    //
+    // **Il portait ⌘⇧7 jusqu'au 03/10/2026.** La statistique par vérification
+    // est venue se placer avant lui dans le menu, et Fabrice a préféré
+    // renuméroter — « je n'ai pas encore publié » — pour que les chiffres
+    // suivent l'ordre du menu plutôt que l'ordre d'arrivée.
+    (CROSSED_BALANCE_ITEM_ID, "CmdOrCtrl+Shift+8"),
 ];
 
 /// Le raccourci d'une entrée, ou rien si elle n'en porte pas.
@@ -192,7 +245,7 @@ fn accelerator(id: &str) -> Option<&'static str> {
         .map(|(_, keys)| *keys)
 }
 
-/// Le raccourci de la statistique de rang `rank` — les six sont calculées, pas
+/// Le raccourci de la statistique de rang `rank` — les sept sont calculées, pas
 /// énumérées, comme les entrées qu'elles servent.
 fn statistics_shortcut(rank: usize) -> String {
     format!("CmdOrCtrl+Shift+{}", rank + 1)
@@ -374,7 +427,7 @@ pub fn trigger<R: Runtime>(app: &AppHandle<R>, id: &str) {
 }
 
 /// La clef Fluent de l'entrée de menu d'un axe.
-fn statistics_menu_key(axis: Axis) -> &'static str {
+pub(crate) fn statistics_menu_key(axis: Axis) -> &'static str {
     match axis {
         Axis::Category => "menu-statistics-by-category",
         Axis::Assignment => "menu-statistics-by-assignment",
@@ -382,6 +435,7 @@ fn statistics_menu_key(axis: Axis) -> &'static str {
         Axis::PaymentMode => "menu-statistics-by-payment-mode",
         Axis::Payee => "menu-statistics-by-payee",
         Axis::Project => "menu-statistics-by-project",
+        Axis::Verification => "menu-statistics-by-verification",
     }
 }
 
@@ -723,6 +777,13 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         true,
         accelerator(CURVES_ITEM_ID),
     )?;
+    let balance_analysis = MenuItem::with_id(
+        app,
+        ANALYSIS_ITEM_ID,
+        t("menu-statistics-balance-analysis"),
+        true,
+        accelerator(ANALYSIS_ITEM_ID),
+    )?;
     let dashboard = MenuItem::with_id(
         app,
         DASHBOARD_ITEM_ID,
@@ -744,11 +805,20 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         })
         .collect::<tauri::Result<Vec<_>>>()?;
 
-    let mut statistics_entries: Vec<&dyn tauri::menu::IsMenuItem<R>> = vec![&balance_chart];
+    let mut statistics_entries: Vec<&dyn tauri::menu::IsMenuItem<R>> =
+        vec![&balance_chart, &balance_analysis];
     for item in &by_axis {
         statistics_entries.push(item);
     }
     statistics_entries.push(&dashboard);
+    let crossed_balance = MenuItem::with_id(
+        app,
+        CROSSED_BALANCE_ITEM_ID,
+        t("menu-statistics-crossed-balance"),
+        true,
+        accelerator(CROSSED_BALANCE_ITEM_ID),
+    )?;
+    statistics_entries.push(&crossed_balance);
     let statistics_menu =
         Submenu::with_items(app, t("menu-statistics"), usable, &statistics_entries)?;
 
@@ -819,6 +889,80 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     }
     let nomenclature_menu =
         Submenu::with_items(app, t("menu-nomenclatures"), usable, &nomenclature_entries)?;
+
+    // --- Outils ---
+    //
+    // **Un menu principal à lui, entre Nomenclatures et Paramètres** (Fabrice,
+    // 09/10/2026 : « nous allons créer une nouvelle option principale entre
+    // Nomenclatures et Paramètres : Outils »). Il porte la simulation de
+    // crédit, venue de Divers, la consommation d'un appareil électrique, le
+    // matelas de sécurité (même jour), l'objectif d'épargne, « Et si je
+    // réduisais… ? » et « Préparer mes vacances » (10/10/2026). Comme Comptes ou Statistiques, **il s'éteint en entier**
+    // tant qu'il n'y a pas de base portant un compte : la simulation lit
+    // l'historique, et le tarif d'électricité est une préférence de la base.
+    let tools_menu = Submenu::with_items(
+        app,
+        t("menu-tools"),
+        usable,
+        &[
+            &MenuItem::with_id(
+                app,
+                LOAN_ITEM_ID,
+                t("menu-tools-loan-simulation"),
+                usable,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                APPLIANCE_ITEM_ID,
+                t("menu-tools-appliance-cost"),
+                usable,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                CUSHION_ITEM_ID,
+                t("menu-tools-safety-cushion"),
+                usable,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                GOAL_ITEM_ID,
+                t("menu-tools-savings-goal"),
+                usable,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                CUT_ITEM_ID,
+                t("menu-tools-spending-cut"),
+                usable,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                HOLIDAY_ITEM_ID,
+                t("menu-tools-holiday"),
+                usable,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                CAR_ITEM_ID,
+                t("menu-tools-car"),
+                usable,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                SHARING_ITEM_ID,
+                t("menu-tools-sharing"),
+                true,
+                None::<&str>,
+            )?,
+        ],
+    )?;
 
     // --- Paramètres ---
     //
@@ -938,6 +1082,7 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
             &statistics_menu,
             &budget_menu,
             &nomenclature_menu,
+            &tools_menu,
             &settings_menu,
             &misc_menu,
         ],
@@ -987,7 +1132,12 @@ pub fn on_event<R: Runtime>(app: &AppHandle<R>, event: tauri::menu::MenuEvent) {
             return;
         }
     }
-    for (id, axis) in [(DASHBOARD_ITEM_ID, "dashboard"), (CURVES_ITEM_ID, "curves")] {
+    for (id, axis) in [
+        (DASHBOARD_ITEM_ID, "dashboard"),
+        (CURVES_ITEM_ID, "curves"),
+        (ANALYSIS_ITEM_ID, "analysis"),
+        (CROSSED_BALANCE_ITEM_ID, "crossed-balance"),
+    ] {
         if event.id() == id {
             // Comme les statistiques : on demande d'abord sur quels comptes.
             let list = crate::windows::accounts_list_window(
@@ -1063,6 +1213,62 @@ pub fn on_event<R: Runtime>(app: &AppHandle<R>, event: tauri::menu::MenuEvent) {
     if event.id() == CALCULATOR_ITEM_ID {
         if let Err(error) = crate::system::open_calculator() {
             eprintln!("[radinus] Could not open the system calculator: {error}");
+        }
+        return;
+    }
+    if event.id() == LOAN_ITEM_ID {
+        let window = crate::windows::loan_simulation_window(language);
+        if let Err(error) = crate::windows::open(app, &window, None) {
+            eprintln!("[radinus] Could not open the loan simulation: {error}");
+        }
+        return;
+    }
+    if event.id() == APPLIANCE_ITEM_ID {
+        let window = crate::windows::appliance_cost_window(language);
+        if let Err(error) = crate::windows::open(app, &window, None) {
+            eprintln!("[radinus] Could not open the appliance consumption: {error}");
+        }
+        return;
+    }
+    if event.id() == CUSHION_ITEM_ID {
+        let window = crate::windows::safety_cushion_window(language);
+        if let Err(error) = crate::windows::open(app, &window, None) {
+            eprintln!("[radinus] Could not open the safety cushion: {error}");
+        }
+        return;
+    }
+    if event.id() == GOAL_ITEM_ID {
+        let window = crate::windows::savings_goal_window(language);
+        if let Err(error) = crate::windows::open(app, &window, None) {
+            eprintln!("[radinus] Could not open the savings goal: {error}");
+        }
+        return;
+    }
+    if event.id() == CUT_ITEM_ID {
+        let window = crate::windows::spending_cut_window(language);
+        if let Err(error) = crate::windows::open(app, &window, None) {
+            eprintln!("[radinus] Could not open the spending cut: {error}");
+        }
+        return;
+    }
+    if event.id() == HOLIDAY_ITEM_ID {
+        let window = crate::windows::holiday_window(language);
+        if let Err(error) = crate::windows::open(app, &window, None) {
+            eprintln!("[radinus] Could not open the holiday planner: {error}");
+        }
+        return;
+    }
+    if event.id() == CAR_ITEM_ID {
+        let window = crate::windows::car_logbook_window(language);
+        if let Err(error) = crate::windows::open(app, &window, None) {
+            eprintln!("[radinus] Could not open the car logbook: {error}");
+        }
+        return;
+    }
+    if event.id() == SHARING_ITEM_ID {
+        let window = crate::windows::sharing_window(language);
+        if let Err(error) = crate::windows::open(app, &window, None) {
+            eprintln!("[radinus] Could not open the expense sharing: {error}");
         }
         return;
     }
@@ -1266,6 +1472,65 @@ pub fn on_event<R: Runtime>(app: &AppHandle<R>, event: tauri::menu::MenuEvent) {
                 eprintln!("[radinus] Could not open the {} window: {error}", list.label);
             }
             return;
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// **Les raccourcis suivent l'ordre du menu, et aucun n'est porté deux
+    /// fois** (Fabrice, 03/10/2026). Les sept statistiques prennent ⌘⇧1 à ⌘⇧7
+    /// dans l'ordre où le menu les montre, la vérification en dernier, et le
+    /// bilan croisé vient après elles sur ⌘⇧8. C'est ce qui a failli se croiser
+    /// le jour où la septième est arrivée : son rang lui donnait le raccourci
+    /// que le bilan croisé portait déjà.
+    #[test]
+    fn les_raccourcis_des_statistiques_suivent_le_menu_sans_se_croiser() {
+        let last = AXES.len() - 1;
+        assert_eq!(AXES[last], Axis::Verification);
+        assert_eq!(statistics_shortcut(last), "CmdOrCtrl+Shift+7");
+        assert_eq!(accelerator(CROSSED_BALANCE_ITEM_ID), Some("CmdOrCtrl+Shift+8"));
+
+        let mut all: Vec<String> = ACCELERATORS.iter().map(|(_, keys)| keys.to_string()).collect();
+        all.extend((0..AXES.len()).map(statistics_shortcut));
+        let count = all.len();
+        all.sort();
+        all.dedup();
+        assert_eq!(all.len(), count, "deux entrées du menu portent le même raccourci");
+    }
+
+    /// **L'analyse de l'évolution du solde a son entrée, sans raccourci**
+    /// (Fabrice, 05/10/2026) : elle n'en prend à personne, et elle ne
+    /// s'appelle pas comme le graphique, dont elle est la voisine du dessous.
+    #[test]
+    fn l_analyse_du_solde_a_son_entree_sans_raccourci() {
+        assert_eq!(accelerator(ANALYSIS_ITEM_ID), None);
+        assert_ne!(ANALYSIS_ITEM_ID, CURVES_ITEM_ID);
+        for language in radinus_core::i18n::Language::all() {
+            let chart = radinus_core::i18n::text(language, "menu-statistics-balance-chart");
+            let analysis = radinus_core::i18n::text(language, "menu-statistics-balance-analysis");
+            assert!(!analysis.is_empty() && analysis != "menu-statistics-balance-analysis");
+            assert_ne!(chart, analysis, "{language:?} : deux entrées du menu portent le même nom");
+        }
+    }
+
+    /// La septième statistique a son entrée, et elle ne s'appelle pas comme
+    /// une autre.
+    #[test]
+    fn chaque_statistique_a_son_entree_de_menu() {
+        let mut keys: Vec<&str> = AXES.iter().map(|axis| statistics_menu_key(*axis)).collect();
+        assert!(keys.contains(&"menu-statistics-by-verification"));
+        let count = keys.len();
+        keys.sort();
+        keys.dedup();
+        assert_eq!(keys.len(), count);
+        for language in [Language::French, Language::English] {
+            for key in &keys {
+                let said = radinus_core::i18n::text(language, key);
+                assert!(!said.is_empty() && said != *key, "{key} n'est pas traduite en {language:?}");
+            }
         }
     }
 }

@@ -89,6 +89,20 @@ pub struct SoftwareConfig {
     /// `None` quand rien n'a jamais été choisi : c'est 100 %.
     #[serde(default)]
     pub zoom: Option<f64>,
+
+    /// **L'ordre jour/mois des relevés QIF**, quand aucune date du fichier ne
+    /// le prouve (Fabrice, 15/10/2026, P-73) : `day-month` ou `month-day`.
+    /// `None` — ou une valeur qu'on ne connaît pas — veut dire « me demander
+    /// à chaque fois », le choix le plus sûr. Un réglage du logiciel, pas de
+    /// la base : il dit comment sont faits les fichiers de l'utilisateur, pas
+    /// ce que contiennent ses comptes.
+    #[serde(default)]
+    pub qif_date_order: Option<String>,
+
+    /// **Le libellé d'une opération QIF** qui porte un tiers et un mémo :
+    /// `both`, `payee` ou `memo`. `None`, ou inconnu : « tiers + mémo ».
+    #[serde(default)]
+    pub qif_label: Option<String>,
 }
 
 /// Les bornes de la taille d'affichage, et le pas du curseur.
@@ -143,6 +157,20 @@ impl SoftwareConfig {
     /// fichier que l'utilisateur a le droit d'ouvrir.
     pub fn zoom_factor(&self) -> f64 {
         clamp_zoom(self.zoom.unwrap_or(ZOOM_DEFAULT))
+    }
+
+    /// L'ordre des dates QIF choisi d'avance, ou `None` pour « me demander ».
+    /// Une valeur illisible dans le fichier de configuration vaut « me
+    /// demander » : on ne devine jamais une date sur la foi d'un réglage
+    /// corrompu.
+    pub fn qif_order_choice(&self) -> Option<crate::qif_import::DateOrder> {
+        self.qif_date_order.as_deref().and_then(crate::qif_import::DateOrder::from_key)
+    }
+
+    /// Le libellé des opérations QIF ; « tiers + mémo » par défaut, ou si la
+    /// valeur est illisible — rien n'est perdu.
+    pub fn qif_label_choice(&self) -> crate::qif_import::LabelChoice {
+        self.qif_label.as_deref().and_then(crate::qif_import::LabelChoice::from_key).unwrap_or_default()
     }
 }
 
@@ -819,6 +847,8 @@ mod tests {
             // vérifie qu'un aller-retour ne perd aucun champ**, et un champ
             // rempli par défaut serait le seul qu'il ne vérifierait pas.
             zoom: Some(1.2),
+            qif_date_order: Some("day-month".to_string()),
+            qif_label: Some("memo".to_string()),
         };
         write_config(&root, &config).unwrap();
 
@@ -1115,5 +1145,30 @@ mod tests {
         };
         write_config(&root, &config).unwrap();
         assert_eq!(read_config(&root).unwrap().zoom_factor(), 1.3);
+    }
+
+    /// **Les réglages QIF** (15/10/2026) : gardés d'un lancement à l'autre ;
+    /// absents d'une configuration plus ancienne, ou illisibles, ils valent
+    /// « me demander » et « tiers + mémo » — jamais une date devinée.
+    #[test]
+    fn the_qif_settings_survive_and_default_to_the_safest() {
+        use crate::qif_import::{DateOrder, LabelChoice};
+        let root = scratch_dir("qif_aller_retour");
+        ensure_tree(&root).unwrap();
+        let config = SoftwareConfig {
+            qif_date_order: Some("month-day".into()),
+            qif_label: Some("payee".into()),
+            ..SoftwareConfig::default()
+        };
+        write_config(&root, &config).unwrap();
+        let back = read_config(&root).unwrap();
+        assert_eq!(back.qif_order_choice(), Some(DateOrder::MonthDay));
+        assert_eq!(back.qif_label_choice(), LabelChoice::Payee);
+
+        let older: SoftwareConfig = serde_json::from_str(r#"{"language":"fr","zoom":1.0}"#).unwrap();
+        assert_eq!((older.qif_order_choice(), older.qif_label_choice()), (None, LabelChoice::Both));
+        let edited: SoftwareConfig =
+            serde_json::from_str(r#"{"qif_date_order":"jour-mois","qif_label":"???"}"#).unwrap();
+        assert_eq!((edited.qif_order_choice(), edited.qif_label_choice()), (None, LabelChoice::Both));
     }
 }

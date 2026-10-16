@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Objectif Épargne</title>
+    <script type="module" src="/ui/windows/savings-goal.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F44 — « Objectif Épargne » (Fabrice, 10/10/2026).
+
+         « Si je continue au rythme actuel, dans combien de temps aurai-je tel
+         solde et combien aurai-je épargné ? » Trois questions, au choix :
+         quand aurai-je ce montant, combien aurai-je à cette date, combien
+         épargner pour avoir ce montant à cette date.
+
+         À gauche, ce qu'on règle : les comptes suivis, la période de
+         référence (douze derniers mois, une année, ou une plage d'années), la
+         question et ses champs, le taux de l'épargne et l'effort de plus. À
+         droite, la réponse, ses chiffres, et le solde d'hier et de demain.
+         Rien n'est enregistré, pas de rapport PDF. -->
+    <div class="window window--loan window--goal">
+      <main class="window__content loan goal">
+        <div class="loan__afford goal__body">
+          <div class="loan__side">
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="accounts-title"></h2>
+              <label class="loan__field loan__field--wide">
+                <span class="loan__label" id="period-label"></span>
+                <select class="form__field" id="period"></select>
+              </label>
+              <div class="goal__range" id="range" hidden>
+                <span class="loan__unit" id="range-from-label"></span>
+                <select class="form__field" id="range-from"></select>
+                <span class="loan__unit" id="range-to-label"></span>
+                <select class="form__field" id="range-to"></select>
+              </div>
+              <table class="loan__accounts goal__accounts">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th id="account-column"></th>
+                    <th class="loan__number" id="balance-column"></th>
+                  </tr>
+                </thead>
+                <tbody id="accounts"></tbody>
+              </table>
+              <p class="loan__hint goal__hint" id="accounts-hint"></p>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="question-title"></h2>
+              <div class="goal__questions">
+                <label class="goal__question">
+                  <input type="radio" name="question" value="when" checked />
+                  <span id="question-when"></span>
+                </label>
+                <label class="goal__question">
+                  <input type="radio" name="question" value="amount" />
+                  <span id="question-amount"></span>
+                </label>
+                <label class="goal__question">
+                  <input type="radio" name="question" value="effort" />
+                  <span id="question-effort"></span>
+                </label>
+              </div>
+              <div class="goal__fields">
+                <label class="loan__field" id="target-line">
+                  <span class="loan__label" id="target-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="target" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-sign></span>
+                  </span>
+                </label>
+                <div class="loan__field" id="date-line">
+                  <span class="loan__label" id="date-label"></span>
+                  <span class="loan__input">
+                    <select class="form__field goal__month" id="month"></select>
+                    <input class="form__field goal__year" id="year" inputmode="numeric" autocomplete="off" />
+                  </span>
+                </div>
+                <label class="loan__field">
+                  <span class="loan__label" id="rate-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__small" id="rate" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" id="rate-unit"></span>
+                  </span>
+                </label>
+                <label class="loan__field" id="extra-line">
+                  <span class="loan__label" id="extra-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="extra" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-sign></span>
+                  </span>
+                </label>
+              </div>
+              <p class="loan__hint goal__hint" id="options-hint"></p>
+            </article>
+          </div>
+
+          <div class="loan__main">
+            <p class="loan__unavailable" id="unavailable" hidden></p>
+            <div class="loan__analysis" id="analysis">
+              <article class="loan__card goal__answer" id="answer" data-tone="good">
+                <span class="loan__label" id="answer-title"></span>
+                <p class="goal__headline" id="headline"></p>
+                <p class="goal__range-text" id="range-text" hidden></p>
+                <div class="goal__tiles" id="tiles"></div>
+              </article>
+
+              <article class="loan__card">
+                <h2 class="loan__card-title" id="chart-title"></h2>
+                <p class="loan__hint" id="chart-hint"></p>
+                <div class="loan__chart goal__chart" id="chart"></div>
+              </article>
+
+              <ul class="goal__notes" id="notes"></ul>
+              <p class="loan__hint" id="period-text"></p>
+              <p class="loan__hint" id="disclaimer"></p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

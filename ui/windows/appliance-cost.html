@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Consommation d'un appareil électrique</title>
+    <script type="module" src="/ui/windows/appliance-cost.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F42 — « Consommation d'un appareil électrique » (Fabrice, 09/10/2026).
+
+         « Un résultat honnête : qui tienne compte de la consommation allumée,
+         ou en veille, mais aussi coût heure creuse ou heure pleine. » Aucune
+         liste d'appareils, aucune valeur supposée : « je veux un résultat
+         réel ». Les champs de l'appareil partent vides.
+
+         En haut, deux cartes : l'appareil (allumé, en veille) et le contrat
+         (repris du tarif enregistré dans les préférences, modifiable pour ce
+         calcul seulement). Dessous, le résultat : trois tuiles — par jour, par
+         mois, par an —, l'anneau de ce que coûte chaque poste, et le détail
+         sur un an. Pas de rapport PDF (« pas de rapport PDF pour cela »). -->
+    <div class="window window--loan window--appliance">
+      <main class="window__content loan appliance">
+        <section class="appliance__inputs">
+          <article class="loan__card appliance__card">
+            <h2 class="loan__card-title" id="device-title"></h2>
+
+            <div class="appliance__group">
+              <h3 class="appliance__group-title appliance__group-title--on" id="on-title"></h3>
+              <div class="loan__row">
+                <label class="loan__field">
+                  <span class="loan__label" id="on-watts-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field" id="on-watts" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-unit="watts"></span>
+                  </span>
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="on-hours-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field" id="on-hours" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-unit="hours"></span>
+                  </span>
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="days-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field" id="days" inputmode="numeric" autocomplete="off" />
+                    <span class="loan__unit" id="days-unit"></span>
+                  </span>
+                </label>
+                <!-- La part en heures creuses n'a de sens qu'avec cette
+                     option : en Base, le champ s'efface. -->
+                <label class="loan__field" id="share-line">
+                  <span class="loan__label" id="share-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field" id="share" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" id="share-unit"></span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div class="appliance__group">
+              <h3 class="appliance__group-title appliance__group-title--standby" id="standby-title"></h3>
+              <div class="loan__row">
+                <label class="loan__field">
+                  <span class="loan__label" id="standby-watts-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field" id="standby-watts" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-unit="watts"></span>
+                  </span>
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="standby-hours-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field" id="standby-hours" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-unit="hours"></span>
+                  </span>
+                </label>
+              </div>
+              <p class="appliance__hint" id="standby-hint"></p>
+            </div>
+          </article>
+
+          <article class="loan__card appliance__card">
+            <h2 class="loan__card-title" id="contract-title"></h2>
+            <div class="loan__row">
+              <label class="loan__field loan__field--kind">
+                <span class="loan__label" id="option-label"></span>
+                <select class="form__field" id="option">
+                  <option value="base" id="option-base"></option>
+                  <option value="off-peak" id="option-off-peak"></option>
+                </select>
+              </label>
+            </div>
+            <div class="loan__row appliance__prices">
+              <label class="loan__field" id="base-line">
+                <span class="loan__label" id="base-label"></span>
+                <span class="loan__input">
+                  <input class="form__field" id="base" inputmode="decimal" autocomplete="off" />
+                  <span class="loan__unit" data-unit="price"></span>
+                </span>
+              </label>
+              <label class="loan__field" data-off-peak>
+                <span class="loan__label" id="peak-label"></span>
+                <span class="loan__input">
+                  <input class="form__field" id="peak" inputmode="decimal" autocomplete="off" />
+                  <span class="loan__unit" data-unit="price"></span>
+                </span>
+              </label>
+              <label class="loan__field" data-off-peak>
+                <span class="loan__label" id="off-peak-label"></span>
+                <span class="loan__input">
+                  <input class="form__field" id="off-peak" inputmode="decimal" autocomplete="off" />
+                  <span class="loan__unit" data-unit="price"></span>
+                </span>
+              </label>
+              <label class="loan__field" data-off-peak>
+                <span class="loan__label" id="off-peak-hours-label"></span>
+                <span class="loan__input">
+                  <input class="form__field" id="off-peak-hours" inputmode="numeric" autocomplete="off" />
+                  <span class="loan__unit" data-unit="hours"></span>
+                </span>
+              </label>
+            </div>
+            <p class="appliance__hint" id="contract-hint"></p>
+            <button class="appliance__reset" id="contract-reset" type="button"></button>
+          </article>
+        </section>
+
+        <p class="loan__notice" id="notice" hidden></p>
+
+        <div class="loan__tiles appliance__tiles" id="tiles"></div>
+        <p class="appliance__standby" id="standby-sentence" hidden></p>
+
+        <section class="appliance__result">
+          <article class="loan__card">
+            <h2 class="loan__card-title" id="chart-title"></h2>
+            <div class="loan__chart" id="chart"></div>
+          </article>
+          <article class="loan__card">
+            <h2 class="loan__card-title" id="detail-title"></h2>
+            <table class="appliance__detail">
+              <thead>
+                <tr>
+                  <th id="column-part"></th>
+                  <th class="appliance__number" id="column-energy"></th>
+                  <th class="appliance__number" id="column-cost"></th>
+                  <th class="appliance__number" id="column-share"></th>
+                </tr>
+              </thead>
+              <tbody id="detail"></tbody>
+            </table>
+          </article>
+        </section>
+
+        <footer class="appliance__notes">
+          <p id="note-plate"></p>
+          <p id="note-subscription"></p>
+        </footer>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

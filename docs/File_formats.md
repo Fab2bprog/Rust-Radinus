@@ -83,6 +83,12 @@ Three details worth knowing:
   about which program is running;
 - **a non-JSON entry is ignored, not treated as an error**, so an archive
   carrying attachment files still restores its tables.
+- **`IDVerification` is 3.0.0's own field** (schema 11), written last on each
+  operation so that the twenty fields of 1.9.3 stay where it expects them. An
+  archive that does not carry it — every one written before — restores with
+  its operations *verified*. A field that is there with a value outside 1–4 is
+  an anomaly, and restores as *to verify* (P-45). The round-trip test
+  strips this one field before comparing sizes.
 
 ### The test that guards it
 
@@ -161,6 +167,48 @@ amount are readable. A header line taken for an operation has neither, and
 that is what keeps it out.
 
 Once validated, the lines land in F18 exactly as OFX lines do.
+
+## 3 bis. QIF bank statements — the same window as OFX
+
+`radinus-core/src/qif_import.rs` (15/10/2026, P-73)
+
+A QIF is a bank statement too, so it goes **through the OFX path**: the same
+yellow folder, the same account question, the same table and buttons
+(*« on utilise la même fenêtre, les mêmes boutons, la même interface »*). The
+reader is a module of its own and returns the same `Statement` as the OFX
+reader, which was not touched.
+
+One line per field, a letter in front (`D` date, `T`/`U` amount, `P` payee,
+`M` memo, `N` number, `L` category), `^` closing the operation, `!Type:Bank`
+opening a list, `!Account` naming it. The format has **no rule** for the two
+things that matter most — the order of day and month, and the decimal
+separator — so:
+
+- **both are decided over the whole account, never line by line**: one
+  `24/11` proves day first, one `-57.62` proves the point is decimal;
+- **a file that contradicts itself is refused**, quoting both lines;
+- **what cannot be proven is asked** (the date order, when no date goes past
+  12) **or set aside and said**: an operation without a readable date or
+  amount does not enter, and the information bar gives its number.
+
+Money and Quicken put an **opening balance** first, its category the account
+itself in brackets (`L[CCP banque post]`): it is a starting balance, not an
+operation, and it is set aside and announced. Two clues must agree — the
+bracket, and a known phrase or the account's own name; one clue alone keeps
+the line and flags it.
+
+A QIF carries **no FITID and gives no balance**: nothing is invented — the
+FITID column hides itself, duplicates are caught by resemblance only (as for
+CSV), and the « Fichier » and « Écart » boxes stay empty rather than show a
+0,00 € the bank never stated. Unknown codes are ignored, never fatal; the
+three line endings, a byte-order mark, Windows-1252 and a truncated last
+record are all read. Microsoft Money's two exports, « compatibilité
+stricte » and « relative », give exactly the same statement.
+
+The Preferences (« Relevés QIF ») may give a standing day/month order and
+choose the label (payee + memo, payee only, memo only); they live in
+`settings/radinus_config.json`. A date that proves the order beats the
+setting.
 
 ---
 

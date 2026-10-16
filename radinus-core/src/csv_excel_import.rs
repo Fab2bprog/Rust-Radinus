@@ -808,6 +808,8 @@ pub fn run(
     let credit_at = column_of(links, grid, "Montant_Credit");
 
     let mut report = Report::default();
+    // Lue une fois, avant la boucle : elle vaut pour tout le tableau.
+    let import_verification = crate::preferences::import_verification(conn)?;
     let tx = conn.transaction()?;
 
     // Le pré-balayage de ses `OPT_*` : avant d'écrire quoi que ce soit, on
@@ -917,6 +919,8 @@ pub fn run(
             // connaît pas les projets.
             payee_id: 0,
             project_id: 0,
+            // Un import : vérifiée ou à vérifier, selon la préférence.
+            verification_id: Some(import_verification),
             // Le commentaire est un enregistrement à part, et il n'est écrit
             // que s'il porte quelque chose — comme chez lui.
             comment: if comment.trim().is_empty() {

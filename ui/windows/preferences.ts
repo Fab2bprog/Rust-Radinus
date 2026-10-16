@@ -46,6 +46,7 @@ const currencyField = element<HTMLSelectElement>("currency");
 const customField = element<HTMLInputElement>("custom");
 const languageField = element<HTMLSelectElement>("language");
 const zoomField = element<HTMLInputElement>("zoom");
+const verificationField = element<HTMLSelectElement>("verification");
 
 /// Le zoom que la base porte. Les bornes viennent du noyau : la fenêtre ne
 /// décide pas de ce qui est raisonnable.
@@ -70,12 +71,29 @@ const CHOICES: [string, string][] = [
   ["perso", "preferences-currency-custom"],
 ];
 
-/// Les feuilles de l'arbre.
-const LEAVES: [string, string][] = [
-  ["language", "preferences-leaf-language"],
-  ["currency", "preferences-leaf-currency"],
-  ["zoom", "preferences-leaf-zoom"],
+/// Les feuilles de l'arbre, chacune sous sa branche. Une branche est écrite
+/// quand elle change : quatre aujourd'hui, « Affichage », « Importation »,
+/// « Outils » (09/10/2026) et « Réinitialisation ».
+const LEAVES: [string, string, string][] = [
+  ["language", "preferences-leaf-language", "preferences-branch-display"],
+  ["currency", "preferences-leaf-currency", "preferences-branch-display"],
+  ["zoom", "preferences-leaf-zoom", "preferences-branch-display"],
+  ["columns", "preferences-leaf-columns", "preferences-branch-display"],
+  ["verification", "preferences-leaf-verification", "preferences-branch-import"],
+  ["qif", "preferences-leaf-qif", "preferences-branch-import"],
+  ["electricity", "preferences-leaf-electricity", "preferences-branch-tools"],
+  ["comfort", "preferences-leaf-comfort", "preferences-branch-reset"],
 ];
+
+/// **Les feuilles qui appartiennent à la base** : sans base ouverte, elles
+/// n'ont rien à montrer et rien à écrire. La devise, et la vérification des
+/// opérations importées, les colonnes, et le tarif d'électricité.
+const NEEDS_A_DATABASE = ["currency", "verification", "columns", "electricity"];
+
+/// Les deux seules réponses de la feuille « Vérification », par leur clef dans
+/// `Verification` : 2, vérifiée — le défaut — et 1, à vérifier. « Douteuse »
+/// et « Contestée » sont des jugements ; un import n'en porte pas.
+const IMPORT_VERIFICATIONS = [2, 1];
 
 let chosenLeaf = "currency";
 
@@ -92,15 +110,97 @@ let databaseOpen = true;
 /// sait modifiée en comparant champ à champ, la méthode que Fabrice a imposée
 /// le 25/07/2026 — et non par un drapeau levé à la première frappe, qui
 /// resterait levé après un aller-retour.
-let reserve = { choice: "", custom: "", language: "", zoom: "" };
+let reserve = {
+  choice: "",
+  custom: "",
+  language: "",
+  zoom: "",
+  verification: "",
+  electricity: "",
+  qifOrder: "",
+  qifLabel: "",
+};
 
-function current(): { choice: string; custom: string; language: string; zoom: string } {
+/// Les deux réglages des relevés QIF (P-73).
+const qifOrderField = element<HTMLSelectElement>("qif-order");
+const qifLabelField = element<HTMLSelectElement>("qif-label");
+
+function current(): {
+  choice: string;
+  custom: string;
+  language: string;
+  zoom: string;
+  verification: string;
+  electricity: string;
+  qifOrder: string;
+  qifLabel: string;
+} {
   return {
     choice: currencyField.value,
     custom: customField.value.trim(),
     language: languageField.value,
     zoom: zoomField.value,
+    verification: verificationField.value,
+    // Les cinq champs du tarif, en un seul texte : la fenêtre se sait
+    // modifiée en comparant, comme pour les autres feuilles.
+    electricity: JSON.stringify(electricityFields()),
+    qifOrder: qifOrderField.value,
+    qifLabel: qifLabelField.value,
   };
+}
+
+// --- Le tarif d'électricité (Fabrice, 09/10/2026) ---------------------------------
+
+interface ElectricityTariff {
+  fields: {
+    option: string;
+    base: string;
+    peak: string;
+    off_peak: string;
+    off_peak_hours: string;
+  };
+  price_unit: string;
+}
+
+const electricityOption = element<HTMLSelectElement>("electricity-option");
+const electricityField = (name: string): HTMLInputElement =>
+  element<HTMLInputElement>(`electricity-${name}`);
+
+function electricityFields(): ElectricityTariff["fields"] {
+  return {
+    option: electricityOption.value,
+    base: electricityField("base").value.trim(),
+    peak: electricityField("peak").value.trim(),
+    off_peak: electricityField("off-peak").value.trim(),
+    off_peak_hours: electricityField("off-peak-hours").value.trim(),
+  };
+}
+
+function placeElectricity(tariff: ElectricityTariff): void {
+  electricityOption.value = tariff.fields.option;
+  electricityField("base").value = tariff.fields.base;
+  electricityField("peak").value = tariff.fields.peak;
+  electricityField("off-peak").value = tariff.fields.off_peak;
+  electricityField("off-peak-hours").value = tariff.fields.off_peak_hours;
+  for (const unit of document.querySelectorAll<HTMLElement>("[data-price-unit]")) {
+    unit.textContent = tariff.price_unit;
+  }
+  showElectricityOption();
+}
+
+/// En Base, un seul prix ; en heures pleines / heures creuses, deux prix et
+/// le nombre d'heures creuses.
+function showElectricityOption(): void {
+  const offPeak = electricityOption.value === "off-peak";
+  for (const [name, shown] of [
+    ["base", !offPeak],
+    ["peak", offPeak],
+    ["off-peak", offPeak],
+    ["off-peak-hours", offPeak],
+  ] as const) {
+    element<HTMLElement>(`electricity-${name}-line`).hidden = !shown;
+    element<HTMLElement>(`electricity-${name}-label`).hidden = !shown;
+  }
 }
 
 function modified(): boolean {
@@ -109,6 +209,10 @@ function modified(): boolean {
     now.choice !== reserve.choice ||
     now.language !== reserve.language ||
     now.zoom !== reserve.zoom ||
+    now.verification !== reserve.verification ||
+    now.electricity !== reserve.electricity ||
+    now.qifOrder !== reserve.qifOrder ||
+    now.qifLabel !== reserve.qifLabel ||
     // Le signe personnalisé ne compte que si c'est lui qu'on emploie : l'avoir
     // tapé puis avoir choisi « Euros » ne modifie rien.
     (now.choice === "perso" && now.custom !== reserve.custom)
@@ -191,7 +295,7 @@ function showZoom(): void {
 
 function chooseLeaf(leaf: string): void {
   // Une feuille éteinte ne s'ouvre pas : on reste où l'on est.
-  if (leaf === "currency" && !databaseOpen) {
+  if (NEEDS_A_DATABASE.includes(leaf) && !databaseOpen) {
     return;
   }
   chosenLeaf = leaf;
@@ -208,12 +312,16 @@ function chooseLeaf(leaf: string): void {
 
 function buildTree(): void {
   tree.replaceChildren();
-  const branch = document.createElement("div");
-  branch.className = "tree__branch";
-  branch.textContent = t("preferences-branch-display");
-  tree.append(branch);
+  let written = "";
 
-  for (const [key, label] of LEAVES) {
+  for (const [key, label, under] of LEAVES) {
+    if (under !== written) {
+      const branch = document.createElement("div");
+      branch.className = "tree__branch";
+      branch.textContent = t(under);
+      tree.append(branch);
+      written = under;
+    }
     const leaf = document.createElement("button");
     leaf.type = "button";
     leaf.className = "tree__leaf";
@@ -222,7 +330,7 @@ function buildTree(): void {
     // **Grisée plutôt que cachée** : un arbre qui perd une branche selon d'où
     // l'on vient se cherche ; grise, elle dit que le réglage existe et qu'il
     // demande une base.
-    if (key === "currency" && !databaseOpen) {
+    if (NEEDS_A_DATABASE.includes(key) && !databaseOpen) {
       leaf.disabled = true;
       leaf.classList.add("tree__leaf--off");
     }
@@ -230,14 +338,54 @@ function buildTree(): void {
     tree.append(leaf);
   }
   // Sans base, la devise ne peut pas être la feuille ouverte au départ.
-  if (chosenLeaf === "currency" && !databaseOpen) {
+  if (NEEDS_A_DATABASE.includes(chosenLeaf) && !databaseOpen) {
     chosenLeaf = "language";
   }
   chooseLeaf(chosenLeaf);
 }
 
+/// **Le menu déroulant des fenêtres dont on règle les colonnes**, et un seul
+/// bouton « Réinitialiser » pour celle qu'il nomme (Fabrice, 04/10/2026 : « un
+/// menu déroulant indiquant le nom de la fenêtre et un bouton réinitialiser
+/// qui pointe sur le menu déroulant »).
+///
+/// **Des fenêtres, et non des tableaux** : « on réinitialise les tableaux
+/// contenus dans une fenêtre. Demain il peut y en avoir plusieurs dans une
+/// fenêtre. » Le bouton envoie donc le nom de la fenêtre, et c'est le noyau
+/// qui sait quels tableaux elle porte.
+///
+/// La liste vient du noyau, chaque fenêtre avec son libellé déjà dit dans la
+/// langue en cours : en ajouter une là-bas l'ajoute ici, sans toucher à cette
+/// page.
+///
+/// **Les boutons agissent tout de suite**, sans passer par la disquette et
+/// sans question : le geste est sans gravité, et c'est le filet de celui qui
+/// ne comprend plus son tableau. Ni le menu ni les boutons ne « modifient »
+/// donc la fenêtre — la quitter après ne demande rien.
+async function showTableLayouts(): Promise<void> {
+  const field = element<HTMLSelectElement>("columns-window");
+  // La fenêtre se relit en revenant à l'écran : ce qu'on avait choisi reste
+  // choisi.
+  const chosen = field.value;
+  const windows = databaseOpen
+    ? await invoke<{ name: string; label: string }[]>("windows_with_table_layouts")
+    : [];
+  field.replaceChildren();
+  for (const { name, label } of windows) {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = label;
+    field.append(option);
+  }
+  if (windows.some((one) => one.name === chosen)) {
+    field.value = chosen;
+  }
+}
+
 async function load(): Promise<void> {
   try {
+    await showTableLayouts();
+
     const currency = await invoke<Currency>("preferences_currency");
     systemSign = currency.system;
 
@@ -275,6 +423,27 @@ async function load(): Promise<void> {
     }
     languageField.value = String(now.code);
 
+    // La vérification des opérations importées. Ses deux mots sont ceux de la
+    // colonne, lus à la même source ; sans base, la feuille est grise et l'on
+    // ne lit rien.
+    verificationField.replaceChildren();
+    if (databaseOpen) {
+      const words = await invoke<{ id: number; label: string }[]>("list_operation_verifications");
+      for (const id of IMPORT_VERIFICATIONS) {
+        const option = document.createElement("option");
+        option.value = String(id);
+        option.textContent = words.find((word) => word.id === id)?.label ?? String(id);
+        verificationField.append(option);
+      }
+      verificationField.value = String(await invoke<number>("preferences_import_verification"));
+      placeElectricity(await invoke<ElectricityTariff>("electricity_tariff"));
+    }
+
+    // Les relevés QIF : des réglages du logiciel, lus même sans base.
+    const qif = await invoke<{ order: string; label: string }>("preferences_qif");
+    qifOrderField.value = qif.order;
+    qifLabelField.value = qif.label;
+
     reserve = current();
     showCustomIfNeeded();
     showHint();
@@ -294,6 +463,32 @@ async function save(): Promise<void> {
     return;
   }
   try {
+    // **La vérification des imports part en premier.** Enregistrer la langue
+    // ou la devise fait revenir l'événement de changement de langue, et la
+    // fenêtre se relit alors d'elle-même : ce qu'elle relit doit déjà être
+    // ce qu'on vient de choisir, sinon le champ reviendrait à l'ancienne
+    // valeur sous les yeux de l'utilisateur.
+    // **Le tarif d'électricité aussi**, et lui peut être refusé : un prix
+    // illisible arrête l'enregistrement avant que rien d'autre ne parte.
+    if (databaseOpen && now.electricity !== reserve.electricity) {
+      try {
+        await invoke("save_preferences_electricity", { tariff: electricityFields() });
+      } catch (error) {
+        chooseLeaf("electricity");
+        say(String(error), true);
+        return;
+      }
+    }
+    // Les réglages QIF ne demandent pas de base : ils vivent dans la
+    // configuration du logiciel.
+    if (now.qifOrder !== reserve.qifOrder || now.qifLabel !== reserve.qifLabel) {
+      await invoke("save_preferences_qif", { order: now.qifOrder, label: now.qifLabel });
+    }
+    if (databaseOpen && now.verification !== reserve.verification) {
+      await invoke("save_preferences_import_verification", {
+        verificationId: Number(now.verification),
+      });
+    }
     if (now.language !== reserve.language) {
       await invoke("set_language", { code: Number(now.language) });
     }
@@ -340,6 +535,53 @@ currencyField.addEventListener("change", () => {
   showCustomIfNeeded();
   showHint();
 });
+element<HTMLButtonElement>("columns-reset").addEventListener("click", () => {
+  const window = element<HTMLSelectElement>("columns-window").value;
+  if (window === "") {
+    return;
+  }
+  invoke("reset_window_table_layouts", { window })
+    .then(() => say(t("preferences-columns-done")))
+    .catch((error) => say(tError("ui-save-failed", error), true));
+});
+element<HTMLButtonElement>("columns-reset-all").addEventListener("click", () => {
+  invoke("reset_all_table_layouts")
+    .then(() => say(t("preferences-columns-done")))
+    .catch((error) => say(tError("ui-save-failed", error), true));
+});
+/// **« Réinitialiser les réglages de confort »** (Fabrice, 07/10/2026).
+///
+/// Le seul bouton de réinitialisation qui pose une question : il défait d'un
+/// coup les colonnes de tous les tableaux, l'accueil et la taille — ce que
+/// l'utilisateur a mis des semaines à ajuster — et rien ne le rend.
+///
+/// **Il agit tout de suite**, comme ceux des colonnes, sans passer par la
+/// disquette. Et il ne touche à aucun champ en cours de saisie, sauf la
+/// taille, qu'il vient de remettre lui-même : une langue ou une devise
+/// choisies mais pas encore enregistrées restent choisies.
+async function resetComfort(): Promise<void> {
+  if (!(await askYesNo(t("preferences-comfort-question"), t("ui-yes"), t("ui-no")))) {
+    return;
+  }
+  try {
+    await invoke("reset_comfort_settings");
+    zoomField.value = String(zoomDefault);
+    reserve.zoom = zoomField.value;
+    showZoom();
+    say(t("preferences-comfort-done"));
+  } catch (error) {
+    say(tError("ui-save-failed", error), true);
+  }
+}
+element<HTMLButtonElement>("comfort-reset").addEventListener("click", () => void resetComfort());
+electricityOption.addEventListener("change", showElectricityOption);
+/// **« Revenir au Tarif Bleu EDF »** : remplit les champs, sans enregistrer —
+/// la disquette s'en charge, comme pour tout le reste de la feuille.
+element<HTMLButtonElement>("electricity-blue").addEventListener("click", () => {
+  invoke<ElectricityTariff>("electricity_blue_tariff")
+    .then(placeElectricity)
+    .catch((error) => say(tError("ui-read-failed", error), true));
+});
 element<HTMLButtonElement>("save").addEventListener("click", () => void save());
 element<HTMLButtonElement>("close").addEventListener("click", () => void leave());
 
@@ -367,8 +609,48 @@ async function dress(): Promise<void> {
     ["zoom-label", "preferences-field-zoom"],
     ["zoom-hint", "preferences-zoom-hint"],
     ["zoom-reset", "preferences-zoom-reset"],
+    ["verification-title", "preferences-leaf-verification"],
+    ["verification-label", "preferences-field-verification"],
+    ["verification-hint", "preferences-verification-hint"],
+    ["columns-title", "preferences-leaf-columns"],
+    ["columns-reset", "preferences-columns-reset"],
+    ["columns-reset-all", "preferences-columns-reset-all"],
+    ["columns-hint", "preferences-columns-hint"],
+    ["electricity-title", "preferences-leaf-electricity"],
+    ["electricity-option-label", "appliance-field-option"],
+    ["electricity-option-base", "appliance-option-base"],
+    ["electricity-option-off-peak", "appliance-option-off-peak"],
+    ["electricity-base-label", "appliance-field-base"],
+    ["electricity-peak-label", "appliance-field-peak"],
+    ["electricity-off-peak-label", "appliance-field-off-peak"],
+    ["electricity-off-peak-hours-label", "appliance-field-off-peak-hours"],
+    ["electricity-hours-unit", "appliance-unit-hours"],
+    ["electricity-blue", "preferences-electricity-blue"],
+    ["electricity-hint", "preferences-electricity-hint"],
+    ["qif-title", "preferences-leaf-qif"],
+    ["qif-order-label", "preferences-field-qif-order"],
+    ["qif-order-ask", "preferences-qif-order-ask"],
+    ["qif-order-day-month", "preferences-qif-order-day-month"],
+    ["qif-order-month-day", "preferences-qif-order-month-day"],
+    ["qif-label-label", "preferences-field-qif-label"],
+    ["qif-label-both", "preferences-qif-label-both"],
+    ["qif-label-payee", "preferences-qif-label-payee"],
+    ["qif-label-memo", "preferences-qif-label-memo"],
+    ["qif-hint", "preferences-qif-hint"],
+    ["comfort-title", "preferences-leaf-comfort"],
+    ["comfort-reset", "preferences-comfort-reset"],
+    ["comfort-hint", "preferences-comfort-hint"],
   ] as const) {
     element<HTMLElement>(id).textContent = t(key);
+  }
+  // **Chaque réglage QIF a sa bulle**, sur l'étiquette et sur la liste.
+  for (const [ids, key] of [
+    [["qif-order-label", "qif-order"], "preferences-qif-order-help"],
+    [["qif-label-label", "qif-label"], "preferences-qif-label-help"],
+  ] as const) {
+    for (const id of ids) {
+      element<HTMLElement>(id).title = t(key);
+    }
   }
   element<HTMLElement>("save").title = t("ui-title-save");
   element<HTMLElement>("close").title = t("ui-title-close");

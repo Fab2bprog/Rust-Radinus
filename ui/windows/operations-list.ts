@@ -21,7 +21,7 @@ import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { askYesNo } from "./dialog";
-import { askWhereToSave, exportSheet, FORMATS } from "./export";
+import { askWhereToSave, exportSheet, FORMATS, type MenuAddition } from "./export";
 import { buildPeriodMenu, currentMonth } from "./period";
 import { askForPrinter } from "./printers";
 import { Table } from "./table";
@@ -40,6 +40,9 @@ interface Row {
   /// date qui commence par le jour n'est pas un tri par date.
   date_value: string;
   clearing_date_value: string;
+  is_pointed: boolean;
+  status_id: number;
+  verification_id: number;
   month: string;
   category: string;
   assignment: string;
@@ -118,6 +121,43 @@ let combos: Combos = {
   project: [],
 };
 
+/// The three statuses — pointed, committed, planned — as the fiche shows them.
+/// A closed list: read once, when the window opens.
+let statuses: Item[] = [];
+
+/// **La colonne « Statut opération »** (Fabrice, 01/10/2026 : « rajoute une
+/// colonne "Statut Operation" […] menu déroulant […] pointé, engagé, prévu »).
+///
+/// Le mot sur toutes les lignes, la liste déroulante sur la ligne choisie
+/// seulement — comme les cinq nomenclatures. Choisir écrit tout de suite, et
+/// c'est le noyau qui tient la règle de date : pointé pose la date de
+/// l'opération si la date de pointage est vide, et une date déjà là n'est
+/// jamais touchée.
+///
+/// Elle se trie sur 1, 2, 3 — pointé, engagé, prévu — et non sur le mot.
+/// **Une sous-opération porte le statut de sa mère** : la liste n'est pas
+/// offerte sur une fille, exactement comme pour le mode de paiement.
+function statusColumn() {
+  return {
+    id: "status",
+    title: () => t("operations-column-status"),
+    cell: (row: Row) => statuses.find((item) => item.id === row.status_id)?.label ?? "",
+    key: (row: Row) => row.status_id,
+    width: "0.9fr",
+    minWidth: 90,
+    editor: {
+      options: () => statuses,
+      value: (row: Row) => row.status_id,
+      editable: isATopLevelOperation,
+      change: (row: Row, chosen: number) => {
+        void invoke("set_operation_status", { id: row.id, statusId: chosen })
+          .then(() => reload())
+          .catch((error) => say(tError("ui-save-failed", error), true));
+      },
+    },
+  };
+}
+
 /// A nomenclature column: shown as text, and as a drop-down list on the
 /// selected row. **A nomenclature is never typed** — the user picks one of
 /// the elements that exist (author's ruling, 25/07/2026). Choosing writes
@@ -130,18 +170,76 @@ function nomenclatureColumn(
   options: () => Item[],
   value: (row: Row) => number,
   width: string,
+  minWidth: number,
   editable?: (row: Row) => boolean,
 ) {
   return {
+    // Le nom de la colonne est celui de sa nomenclature : `category`, `payee`…
+    id: kind,
     title: () => t(title),
     cell: text,
     width,
+    minWidth,
     editor: {
       options,
       value,
       editable,
       change: (row: Row, chosen: number) => {
         void invoke("set_operation_nomenclature", { id: row.id, kind, value: chosen })
+          .then(() => reload())
+          .catch((error) => say(tError("ui-save-failed", error), true));
+      },
+    },
+  };
+}
+
+/// The four verifications — to verify, verified, doubtful, disputed — in the
+/// words of the interface. A closed list, like the statuses.
+let verifications: Item[] = [];
+
+/// **La colonne « Vérification »** (Fabrice, 03/10/2026).
+///
+/// Le statut dit ce que la banque a fait de l'écriture ; cette colonne dit ce
+/// que l'utilisateur en pense — « ils vérifient tout et conservent leur ticket
+/// papier ». Quatre valeurs, repérées par leur clef : 1 à vérifier, 2
+/// vérifiée, 3 douteuse, 4 contestée.
+///
+/// Même geste que la colonne Statut : le mot sur toutes les lignes, la liste
+/// déroulante sur la ligne choisie, et choisir écrit tout de suite. Rien
+/// d'autre ne bouge — ni statut, ni date, ni solde.
+///
+/// **Et elle se lit à sa couleur** : noir, vert sombre, orange sombre, rouge.
+/// La couleur est portée par une marque sur la cellule et sur la liste fermée ;
+/// la liste ouverte, elle, est dessinée par le système, qui sur macOS ne
+/// regarde pas les couleurs.
+///
+/// Une sous-opération porte la vérification de sa mère : on juge l'écriture
+/// de la banque, et une ventilation n'en est pas une.
+function verificationColumn() {
+  return {
+    id: "verification",
+    title: () => t("operations-column-verification"),
+    cell: (row: Row) =>
+      verifications.find((item) => item.id === row.verification_id)?.label ?? "",
+    key: (row: Row) => row.verification_id,
+    render: (row: Row, cell: HTMLElement) => {
+      cell.textContent =
+        verifications.find((item) => item.id === row.verification_id)?.label ?? "";
+      cell.classList.add("list__cell--verification");
+      cell.dataset.verification = String(row.verification_id);
+    },
+    width: "0.9fr",
+    minWidth: 96,
+    editor: {
+      options: () => verifications,
+      value: (row: Row) => row.verification_id,
+      editable: isATopLevelOperation,
+      decorate: (row: Row, combo: HTMLSelectElement) => {
+        combo.classList.add("list__combo--verification");
+        combo.dataset.verification = String(row.verification_id);
+      },
+      change: (row: Row, chosen: number) => {
+        void invoke("set_operation_verification", { id: row.id, verificationId: chosen })
           .then(() => reload())
           .catch((error) => say(tError("ui-save-failed", error), true));
       },
@@ -169,6 +267,10 @@ function isATopLevelOperation(row: Row): boolean {
 /// applied by the core, so the foot of the window always adds up exactly what
 /// the table shows (author's request, 25/07/2026).
 let status: number | null = null;
+
+/// Le second filtre du menu : la vérification gardée, par sa clef, ou rien
+/// pour « toutes ». Il s'additionne au statut.
+let verification: number | null = null;
 
 /// Which account this window is about. It arrives in the address and never
 /// changes: another account is another window's business.
@@ -270,8 +372,32 @@ const table = new Table<Row>({
   container: element<HTMLDivElement>("rows"),
   virtualized: true,
   rowHeight: 24,
+  // **Seize colonnes ne tiennent pas dans une fenêtre rétrécie** (Fabrice,
+  // 21/08/2026). Elles se comprimaient jusqu'à devenir illisibles, et les
+  // dernières restaient hors d'atteinte. Chaque colonne annonce désormais la
+  // largeur en dessous de laquelle elle refuse de descendre ; le tableau
+  // déborde alors, et son ascenseur horizontal se pose sous la dernière ligne.
+  horizontalScroll: true,
+  // **Chacun ses colonnes** (Fabrice, 04/10/2026) : « tous n'utilisent pas les
+  // mêmes colonnes, tous ne souhaitent pas le même ordre ». On glisse un
+  // en-tête pour déplacer sa colonne, le clic droit sur les en-têtes les coche
+  // et les décoche, et l'ordre, la présence et les largeurs sont retenus dans
+  // la base — une seule disposition pour tous les comptes : « ce serait la
+  // préférence de la fenêtre ». Tout cela vit dans le tableau commun ; cette
+  // fenêtre lui donne un nom, et un nom à chacune de ses colonnes.
+  layoutName: "operations-list",
   columns: [
-    { title: () => "", cell: () => "", render: foldingCell, width: "34px" },
+    // Le « + » qui déplie les sous-opérations reste en tête et hors du menu :
+    // le masquer rendrait les ventilations inaccessibles.
+    {
+      id: "fold",
+      fixed: true,
+      title: () => "",
+      cell: () => "",
+      render: foldingCell,
+      width: "34px",
+      minWidth: 34,
+    },
     // **Les deux colonnes de date se trient sur l'ISO, pas sur ce qu'on lit**
     // (défaut relevé par Fabrice le 04/08/2026). Le tableau comparait
     // « 15/01/2026 » à « 03/02/2026 » caractère par caractère : il rangeait par
@@ -279,18 +405,46 @@ const table = new Table<Row>({
     // est l'ordre du temps, et la comparaison redevient juste sans que le
     // tableau ait à savoir ce qu'est une date.
     {
+      id: "date",
       title: () => t("operations-column-date"),
       cell: (row) => row.date,
       key: (row) => row.date_value,
       width: "92px",
+      minWidth: 92,
     },
     {
+      id: "clearing-date",
       title: () => t("operations-column-clearing-date"),
       cell: (row) => row.clearing_date,
       key: (row) => row.clearing_date_value,
+      // **Une date de pointage sur une opération non pointée s'affiche en gris
+      // clair** (Fabrice, 21/08/2026). Elle existe — des milliers d'opérations
+      // en portent une, héritées de l'ancien générateur d'échéances — et la
+      // masquer serait mentir : la colonne se trie, se filtre et s'exporte.
+      // Le gris dit la bonne chose : ceci est là, mais ne compte pas. C'est
+      // du reste le langage que la liste des comptes parle déjà pour un compte
+      // clôturé.
+      render: (row, cell) => {
+        cell.textContent = row.clearing_date;
+        if (!row.is_pointed && row.clearing_date !== "") {
+          cell.classList.add("list__cell--faded");
+        }
+      },
       width: "108px",
+      minWidth: 100,
     },
-    { title: () => t("operations-column-label"), cell: (row) => row.label, width: "2fr" },
+    // Entre la date de pointage et le libellé (Fabrice, 01/10/2026).
+    statusColumn(),
+    // Juste après le statut (Fabrice, 03/10/2026).
+    verificationColumn(),
+    {
+      id: "label",
+      title: () => t("operations-column-label"),
+      cell: (row) => row.label,
+      width: "2fr",
+      // La colonne qu'on lit : elle a droit à la place des autres.
+      minWidth: 150,
+    },
     nomenclatureColumn(
       "operations-column-category",
       "category",
@@ -298,6 +452,7 @@ const table = new Table<Row>({
       () => combos.category,
       (row) => row.category_id,
       "1.1fr",
+      100,
     ),
     nomenclatureColumn(
       "operations-column-assignment",
@@ -306,6 +461,7 @@ const table = new Table<Row>({
       () => combos.assignment,
       (row) => row.assignment_id,
       "1fr",
+      90,
     ),
     nomenclatureColumn(
       "operations-column-payment-mode",
@@ -314,6 +470,7 @@ const table = new Table<Row>({
       () => combos.payment_mode,
       (row) => row.payment_mode_id,
       "1fr",
+      95,
       isATopLevelOperation,
     ),
     nomenclatureColumn(
@@ -323,6 +480,7 @@ const table = new Table<Row>({
       () => combos.payee,
       (row) => row.payee_id,
       "1fr",
+      92,
     ),
     nomenclatureColumn(
       "operations-column-project",
@@ -331,51 +489,79 @@ const table = new Table<Row>({
       () => combos.project,
       (row) => row.project_id,
       "0.9fr",
+      85,
     ),
-    { title: () => t("operations-column-month"), cell: (row) => row.month, width: "0.8fr" },
     {
+      id: "month",
+      title: () => t("operations-column-month"),
+      cell: (row) => row.month,
+      width: "0.8fr",
+      minWidth: 64,
+    },
+    {
+      id: "debit",
       title: () => t("operations-column-debit"),
       cell: (row) => row.debit,
+      // **Le rouge d'un débit tient à sa colonne, pas à son rang.** La règle
+      // de style visait « la onzième cellule » ; elle a cessé de s'appliquer
+      // le jour où une colonne est venue se glisser avant celle-ci, et les
+      // débits sont devenus noirs sans que rien ne le dise (01/10/2026). La
+      // cellule se nomme désormais elle-même.
+      render: (row, cell) => {
+        cell.textContent = row.debit;
+        cell.classList.add("list__cell--debit");
+      },
       key: (row) => row.amount,
       // À l'écran une seule des deux colonnes est remplie ; à l'export aussi.
       money: (row) => (row.debit === "" ? null : row.amount),
       numeric: true,
       width: "1fr",
+      minWidth: 85,
     },
     {
+      id: "credit",
       title: () => t("operations-column-credit"),
       cell: (row) => row.credit,
       key: (row) => row.amount,
       money: (row) => (row.credit === "" ? null : row.amount),
       numeric: true,
       width: "1fr",
+      minWidth: 85,
     },
     // Le même défaut, une colonne plus loin : le solde se rangeait sur son
     // texte, donc « 9,00 € » passait après « 1 549,81 € ».
     {
+      id: "balance",
       title: () => t("operations-column-balance"),
       cell: (row) => row.balance,
       key: (row) => row.balance_value,
       numeric: true,
       width: "1fr",
+      minWidth: 88,
     },
     {
+      id: "comments",
       title: () => t("operations-column-comments"),
       cell: () => "",
       render: (row, cell) => tickCell(row.has_comment, cell, row.comment),
       width: "100px",
+      minWidth: 56,
     },
     {
+      id: "attachments",
       title: () => t("operations-column-attachments"),
       cell: () => "",
       render: (row, cell) => tickCell(row.has_attachment, cell),
       width: "100px",
+      minWidth: 56,
     },
     {
+      id: "check",
       title: () => t("operations-column-check"),
       cell: (row) => row.check_number,
       numeric: true,
       width: "1fr",
+      minWidth: 82,
     },
   ],
   identity: (row) => row.id,
@@ -443,6 +629,7 @@ async function reload(): Promise<void> {
       from: fromField.value,
       to: toField.value,
       status,
+      verification,
     });
     everything = data.rows;
     // Le compte que la fenêtre montre, pour son titre. Il vient avec les
@@ -665,16 +852,6 @@ void listen<string>(PARAMETERS_EVENT, (event) => {
   void reload();
 });
 
-/// Puts the tick in front of the chosen entry of a menu, and takes it off the
-/// others. The name of the menu never changes: a menu says what it is, and
-/// the tick says where one stands in it — which is how every menu of the
-/// system behaves (author's remark, 25/07/2026).
-function markChosen(choices: HTMLElement, key: string | null): void {
-  for (const button of choices.querySelectorAll<HTMLElement>(".window-menu__choice")) {
-    button.classList.toggle("window-menu__choice--chosen", button.dataset.key === key);
-  }
-}
-
 /// Builds the Divers menu: showing or hiding every ventilation at once.
 ///
 /// **Two actions, not a mode, and therefore no tick.** A tick says where one
@@ -714,6 +891,40 @@ function miscMenu(entry: HTMLElement): HTMLElement {
     });
     choices.append(button);
   }
+
+  // **Créer une opération périodique à partir de cette opération** (Fabrice,
+  // 25/08/2026), en bas du menu et derrière son trait : les deux entrées
+  // au-dessus ne font que replier ou déplier la liste, celle-ci ouvre une
+  // fiche. Le trait dit qu'on change de nature.
+  //
+  // La fiche F15 s'ouvre en création, préremplie de ce que l'opération sait
+  // donner — « comme si les champs avaient été remplis à la main ». Le rythme,
+  // lui, n'est nulle part dans une opération : la date prochaine, la fréquence
+  // et la condition de fin restent celles d'une fiche neuve, et l'utilisateur
+  // finit la fiche puis l'enregistre. Rien n'est écrit avant.
+  const separator = document.createElement("hr");
+  separator.className = "window-menu__rule";
+  choices.append(separator);
+
+  const periodic = document.createElement("button");
+  periodic.type = "button";
+  periodic.className = "window-menu__choice window-menu__choice--plain";
+  periodic.dataset.key = "operations-recurring-from";
+  periodic.textContent = t("operations-recurring-from");
+  periodic.addEventListener("click", () => {
+    choices.hidden = true;
+    const row = theOnlyChosenRow();
+    if (!row) {
+      return;
+    }
+    // Une ventilation n'a pas d'existence propre : c'est l'opération qu'elle
+    // ventile qui se répète — la règle du bouton « Pointer ».
+    const source = row.parent_id === 0 ? row.id : row.parent_id;
+    void invoke("open_recurring_form_from_operation", { id: source }).catch((error) =>
+      say(tError("ui-load-failed", error), true),
+    );
+  });
+  choices.append(periodic);
 
   entry.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -912,17 +1123,48 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-/// Les quatre choix du menu Filtre, et le statut de chacun. Écrits une fois :
-/// le menu s'en sert pour se construire, et pour savoir où poser son encoche
-/// quand la fenêtre se rebâtit dans une autre langue.
-const FILTERS = [
-  ["filter-all", null],
+/// Les trois statuts du sous-menu « Filtre Statut », et la clef de chacun.
+const STATUS_FILTERS = [
   ["filter-pointed", 1],
   ["filter-committed", 2],
   ["filter-planned", 3],
 ] as const;
 
-/// Builds the Filtre menu under its entry: four choices, one status each.
+/// **Le menu Filtre** (Fabrice, 05/10/2026) :
+///
+/// ```text
+/// Toutes les opérations
+/// ─────────────────────
+/// Filtre Statut        ▸  Afficher tout ─ pointées / engagées / prévues
+/// Filtre Vérification  ▸  Afficher tout ─ à vérifier / vérifiée / douteuse / contestée
+/// ```
+///
+/// Les trois statuts étaient à plat sous « Toutes les opérations » ; ils
+/// descendent d'un niveau — « c'est juste un changement ergonomique » — pour
+/// faire place à un second filtre, celui de la vérification, dont les choix
+/// sont ceux de la table `Verification`.
+///
+/// **Un seul choix par sous-menu, et les deux se combinent** : « on pourra
+/// combiner, choisir opérations pointées et filtre À vérifier, il pourra donc
+/// y avoir deux éléments cochés mais un seul par sous-menu ». Le noyau
+/// applique les deux ensemble, donc le pied de la fenêtre additionne toujours
+/// ce que le tableau montre.
+///
+/// **« Toutes les opérations » décoche tout**, « pour rester cohérent », et ne
+/// porte l'encoche que lorsqu'aucun filtre n'agit. Un second clic sur un choix
+/// coché le décoche : sans cela, lâcher un seul des deux filtres obligerait à
+/// tout lever puis à recocher l'autre. Et l'entrée d'un sous-menu porte
+/// elle-même une encoche dès qu'un choix y est fait — on voit ce qui filtre
+/// sans rien ouvrir.
+///
+/// **« Afficher tout », en tête de chaque sous-menu** (Fabrice, 05/10/2026, le
+/// jour même) : « c'est bête mais j'ai peur que les utilisateurs âgés ne
+/// comprennent pas si on ne le met pas ». Il avait raison, et pas seulement
+/// pour eux : lever un seul des deux filtres demandait de deviner qu'on
+/// reclique le choix coché, et rien dans le menu ne le disait. L'entrée lève
+/// le filtre de son sous-menu et de lui seul, et porte l'encoche quand aucun
+/// choix n'y est fait — il y a donc toujours une encoche, et une seule, dans
+/// chaque sous-menu. Le second clic reste, pour qui le connaît.
 function filterMenu(entry: HTMLElement): HTMLElement {
   const holder = document.createElement("div");
   holder.className = "window-menu__holder";
@@ -931,33 +1173,144 @@ function filterMenu(entry: HTMLElement): HTMLElement {
   choices.dataset.menu = "filter";
   choices.hidden = true;
 
-  for (const [key, chosen] of FILTERS) {
+  /// Pose les encoches là où l'on en est. Elles se lisent sur `status` et
+  /// `verification` eux-mêmes, jamais sur un clic dont on se souviendrait :
+  /// une encoche sur « Toutes » au-dessus d'un tableau filtré serait un
+  /// mensonge.
+  /// `value` absent : l'entrée qui ouvre le sous-menu, cochée dès qu'un filtre
+  /// y agit. Vide : « Afficher tout », cochée quand aucun n'y agit. Sinon, la
+  /// clef d'un choix.
+  const chosenIn = (filter: number | null, value: string | undefined): boolean =>
+    value === undefined ? filter !== null : value === "" ? filter === null : Number(value) === filter;
+  const mark = (): void => {
+    for (const button of choices.querySelectorAll<HTMLElement>(".window-menu__choice")) {
+      const kind = button.dataset.filter;
+      const value = button.dataset.value;
+      const chosen =
+        kind === "all"
+          ? status === null && verification === null
+          : chosenIn(kind === "status" ? status : verification, value);
+      button.classList.toggle("window-menu__choice--chosen", chosen);
+    }
+  };
+  const apply = (): void => {
+    choices.hidden = true;
+    mark();
+    void reload();
+  };
+  const choice = (label: string, key: string): HTMLButtonElement => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "window-menu__choice window-menu__choice--plain";
     button.dataset.key = key;
-    button.textContent = t(key);
-    button.addEventListener("click", () => {
-      choices.hidden = true;
-      status = chosen;
-      markChosen(choices, key);
-      void reload();
+    button.textContent = label;
+    return button;
+  };
+  /// Une entrée qui ouvre un sous-menu : au survol, et au clic pour qui n'a
+  /// pas de survol — comme les années du menu Période.
+  const nest = (key: string, kind: string, entries: HTMLElement[]): HTMLElement => {
+    const opener = choice(t(key), key);
+    opener.classList.add("window-menu__choice--parent");
+    opener.dataset.filter = kind;
+    const nested = document.createElement("div");
+    nested.className = "window-menu__submenu";
+    nested.append(...entries);
+    const box = document.createElement("div");
+    box.className = "window-menu__nest";
+    opener.addEventListener("click", (event) => {
+      event.stopPropagation();
+      box.classList.toggle("window-menu__nest--open");
     });
-    choices.append(button);
-  }
+    box.append(opener, nested);
+    return box;
+  };
+
+  const all = choice(t("filter-all"), "filter-all");
+  all.dataset.filter = "all";
+  all.addEventListener("click", () => {
+    status = null;
+    verification = null;
+    apply();
+  });
+  const rule = document.createElement("hr");
+  rule.className = "window-menu__rule";
+
+  /// « Afficher tout » et son trait, pour la tête d'un sous-menu.
+  const showAll = (kind: "status" | "verification"): HTMLElement[] => {
+    const button = choice(t("filter-show-all"), `filter-${kind}-all`);
+    button.dataset.filter = kind;
+    button.dataset.value = "";
+    button.addEventListener("click", () => {
+      if (kind === "status") {
+        status = null;
+      } else {
+        verification = null;
+      }
+      apply();
+    });
+    const line = document.createElement("hr");
+    line.className = "window-menu__rule";
+    return [button, line];
+  };
+
+  const byStatus = STATUS_FILTERS.map(([key, value]) => {
+    const button = choice(t(key), key);
+    button.dataset.filter = "status";
+    button.dataset.value = String(value);
+    button.addEventListener("click", () => {
+      status = status === value ? null : value;
+      apply();
+    });
+    return button;
+  });
+  // Les mots et les couleurs de la colonne, lus à la même source.
+  //
+  // **Ils sont posés à l'ouverture du menu, et non à sa construction** : la
+  // barre de menus est bâtie avec les mots de la fenêtre, avant que la base
+  // n'ait rendu ses listes. Un sous-menu rempli à ce moment-là serait vide
+  // jusqu'au premier changement de langue.
+  const verificationNest = nest("filter-by-verification", "verification", []);
+  const fillVerifications = (): void => {
+    const nested = verificationNest.querySelector(".window-menu__submenu") as HTMLElement;
+    nested.replaceChildren(
+      ...showAll("verification"),
+      ...verifications.map((item) => {
+        const button = choice(item.label, `filter-verification-${item.id}`);
+        button.dataset.filter = "verification";
+        button.dataset.value = String(item.id);
+        button.dataset.verification = String(item.id);
+        button.addEventListener("click", () => {
+          verification = verification === item.id ? null : item.id;
+          apply();
+        });
+        return button;
+      }),
+    );
+  };
+  fillVerifications();
+
+  choices.append(
+    all,
+    rule,
+    nest("filter-by-status", "status", [...showAll("status"), ...byStatus]),
+    verificationNest,
+  );
 
   entry.addEventListener("click", (event) => {
     event.stopPropagation();
+    if (choices.hidden) {
+      fillVerifications();
+      mark();
+    }
     choices.hidden = !choices.hidden;
   });
   document.addEventListener("click", () => {
     choices.hidden = true;
   });
 
-  // Nothing is filtered out to begin with — et, quand la fenêtre se rhabille,
-  // l'encoche revient là où l'on en est. Une encoche sur « Toutes » au-dessus
-  // d'un tableau qui ne montre que les opérations pointées serait un mensonge.
-  markChosen(choices, FILTERS.find(([, chosen]) => chosen === status)?.[0] ?? "filter-all");
+  // Rien n'est filtré au départ — et, quand la fenêtre se rhabille dans une
+  // autre langue, les encoches reviennent là où l'on en est.
+  mark();
   holder.append(entry, choices);
   return holder;
 }
@@ -986,9 +1339,69 @@ let ready = false;
 ///
 /// Elle finit par relire les opérations : les montants, les totaux du bandeau
 /// et les noms des nomenclatures sont écrits par le noyau, dans sa langue.
+/// **Ce que cette fenêtre ajoute à son menu du clic droit** : une entrée
+/// « Vérification », en tête, qui ouvre les quatre valeurs (Fabrice,
+/// 03/10/2026 : « le but est de pouvoir modifier le statut de plusieurs lignes
+/// en leur affectant un statut de vérification identique »).
+///
+/// Le menu déroulant de la colonne change une ligne ; celui-ci change toute la
+/// sélection. Le clic droit ne touche pas à la sélection : il agit sur les
+/// lignes déjà prises, et sans aucune ligne prise l'entrée est grisée.
+///
+/// Choisir écrit tout de suite, comme tout dans cette liste, puis le tableau
+/// se relit. **Aucune phrase ne le dit** — « je ne pense pas qu'il soit
+/// nécessaire de faire une phrase » : les couleurs qui changent sous les yeux
+/// sont la confirmation. Seul un échec parle.
+///
+/// **Et, avant elle, « Statut opération »** (Fabrice, 03/10/2026) : pointé,
+/// engagé, prévu, sur le même geste — toute la sélection, d'un coup. La date
+/// de pointage suit les règles du bouton Pointer, que le noyau tient : passer
+/// à pointé pose la date de l'opération là où le champ est vide, et une date
+/// déjà là n'est jamais touchée.
+///
+/// Le menu de cette fenêtre a donc trois entrées qui s'ouvrent — le statut, la
+/// vérification, et « Exporter vers », où les dix exports sont rangés. C'est
+/// propre à la liste des opérations : les autres tableaux gardent leur menu.
+function verificationOfTheSelection(): MenuAddition[] {
+  const somethingIsTaken = table.selected().length > 0;
+  return [
+    {
+      label: t("operations-column-status"),
+      enabled: somethingIsTaken,
+      choices: statuses.map((item) => ({
+        label: item.label,
+        run: () => {
+          void invoke("set_operations_status", {
+            ids: table.selected(),
+            statusId: item.id,
+          })
+            .then(() => reload())
+            .catch((error) => say(tError("ui-save-failed", error), true));
+        },
+      })),
+    },
+    {
+      label: t("operations-column-verification"),
+      enabled: somethingIsTaken,
+      choices: verifications.map((item) => ({
+        label: item.label,
+        mark: { name: "verification", value: String(item.id) },
+        run: () => {
+          void invoke("set_operations_verification", {
+            ids: table.selected(),
+            verificationId: item.id,
+          })
+            .then(() => reload())
+            .catch((error) => say(tError("ui-save-failed", error), true));
+        },
+      })),
+    },
+  ];
+}
+
 async function dress(): Promise<void> {
   table.buildHeader(element<HTMLElement>("header"), element<HTMLElement>("filter"));
-  table.exportOnRightClick(say);
+  table.exportOnRightClick(say, verificationOfTheSelection, () => t("export-to"));
 
   for (const [id, key] of [
     ["from-label", "operations-from"],
@@ -1084,6 +1497,8 @@ void (async () => {
   }
   // The five lists the combos are picked from, once for the whole window.
   combos = await invoke<Combos>("list_operation_combos");
+  statuses = await invoke<Item[]>("list_operation_statuses");
+  verifications = await invoke<Item[]>("list_operation_verifications");
   const month = currentMonth();
   fromField.value = month.from;
   toField.value = month.to;
@@ -1092,7 +1507,15 @@ void (async () => {
   // parle : elle peut se relire elle-même.
   ready = true;
   await reload();
-  onLanguageChanged(dress, TITLE);
+  onLanguageChanged(async () => {
+    // **Les deux listes fermées changent de langue avec la fenêtre** : leurs
+    // mots viennent de la traduction, par leur clef. Relues avant de
+    // rhabiller, puis les lignes sont redessinées avec les nouveaux mots.
+    statuses = await invoke<Item[]>("list_operation_statuses");
+    verifications = await invoke<Item[]>("list_operation_verifications");
+    await dress();
+    table.render();
+  }, TITLE);
 })();
 
 /// **Une nomenclature a changé pendant que cette fenêtre vivait.**

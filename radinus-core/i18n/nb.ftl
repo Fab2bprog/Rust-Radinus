@@ -250,13 +250,16 @@ menu-accounts-checkbooks = Håndtering av sjekkhefter
 
 menu-statistics = Statistikk
 menu-statistics-balance-chart = Graf Saldoutvikling
+menu-statistics-balance-analysis = Analyse Saldoutvikling
 menu-statistics-by-category = Stat. per kategori
 menu-statistics-by-assignment = Stat. per tildeling
 menu-statistics-by-budget-line = Stat. per budsjettpost
 menu-statistics-by-payment-mode = Stat. per betalingsmåte
 menu-statistics-by-payee = Stat. per motpart og forhandler
 menu-statistics-by-project = Stat. per prosjekt
+menu-statistics-by-verification = Stat. per kontroll
 menu-statistics-dashboard = Dashbord for transaksjoner
+menu-statistics-crossed-balance = Kryssbalanse
 
 menu-budget = Budsjett
 menu-budget-entry = Budsjettregistrering
@@ -274,6 +277,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = Transaksjonsmaler
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = Verktøy
 menu-settings = Innstillinger
 menu-settings-about-author = Om opphavsmannen
 menu-settings-about-radinus = Om Radinus
@@ -430,6 +435,15 @@ operations-selection-total = Totalt beløp for de valgte transaksjonene: { $amou
 
 operations-column-date = Dato
 operations-column-clearing-date = Avstemmingsdato
+operations-column-status = Transaksjonsstatus
+operation-status-pointed = Avstemt
+operation-status-committed = Reservert
+operation-status-planned = Planlagt
+operations-column-verification = Kontroll
+operation-verification-to-verify = Å kontrollere
+operation-verification-verified = Kontrollert
+operation-verification-doubtful = Tvilsom
+operation-verification-disputed = Bestridt
 operations-column-label = Beskrivelse
 operations-column-category = Kategori
 operations-column-assignment = Tildeling
@@ -505,6 +519,9 @@ filter-all = Alle transaksjoner
 filter-pointed = Bare avstemte transaksjoner
 filter-committed = Bare reserverte transaksjoner
 filter-planned = Bare planlagte transaksjoner
+filter-by-status = Filtrer etter status
+filter-by-verification = Filtrer etter kontroll
+filter-show-all = Vis alle
 
 # --- Transaksjonsskjema (F03) ----------------------------------------
 # Ledetekstene er de fra skjermbildet «Fiche operation transaction.png»,
@@ -538,6 +555,7 @@ operation-field-direction = Transaksjonstype:
 operation-field-amount = Beløp
 operation-field-status = Transaksjonsstatus
 operation-field-clearing-date = Avstemmingsdato
+operation-field-verification = Kontroll
 operation-field-category = Kategori
 operation-field-assignment = Tildeling
 operation-field-payment-mode = Måte
@@ -560,6 +578,10 @@ operation-nothing-to-show = Ingen transaksjoner å vise.
 operation-label-required = Transaksjonens beskrivelse er obligatorisk.
 operation-date-required = Transaksjonens dato er obligatorisk.
 operation-clearing-date-invalid = Avstemmingsdatoen er ikke en gyldig dato.
+operation-clearing-date-required = En avstemt transaksjon må ha en avstemmingsdato.
+operation-clearing-date-question =
+    En avstemt transaksjon må ha en avstemmingsdato.
+    Vil du lagre med transaksjonens egen dato, { $date }?
 operation-is-a-sub = Denne raden er en deltransaksjon: den endres fra sitt eget skjema.
 operation-delete-form-open = Skjemaet for «{ $label }» er åpent. Lukk det før du sletter.
 
@@ -598,6 +620,7 @@ sub-operation-is-the-complement = Dette er Resten: det som gjenstår å fordele.
 sub-operation-of = Fordeling av «{ $label }» ({ $amount })
 
 operations-pointed = { $count ->
+    [0] Ingen transaksjon å avstemme: utvalget er allerede avstemt.
     [one] 1 transaksjon avstemt.
    *[other] { $count } transaksjoner avstemt.
 }
@@ -611,6 +634,7 @@ operations-select-one = Velg bare én transaksjon.
 operation-copy = Kopi som skal lagres: ingenting er opprettet ennå.
 operations-show-children = Vis alle deltransaksjoner
 operations-hide-children = Skjul alle deltransaksjoner
+operations-recurring-from = Opprett en gjentakende transaksjon fra denne transaksjonen
 
 # --- Andre bekreftelse ved en alvorlig sletting -----------------------
 # Å slette en bankkonto drar med seg hele historikken dens: et Ja/Nei blir
@@ -631,6 +655,7 @@ window-statistics-title = { $kind ->
     [payment-mode] Statistikk etter betalingsmåte
     [payee] Statistikk etter motpart og forhandler
     [project] Statistikk etter prosjekt
+    [verification] Statistikk etter kontroll
    *[category] Statistikk etter kategori
 }
 
@@ -640,6 +665,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] TransaksjonsMåte
     [payee] Motpart
     [project] Prosjekter
+    [verification] Kontroll
    *[category] KategoriNavn
 }
 
@@ -649,6 +675,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] Uten betalingsmåte
     [payee] Uten motpart
     [project] Uten prosjekt
+    [verification] Å kontrollere
    *[category] Uten kategori
 }
 statistics-total = Totalt
@@ -690,6 +717,19 @@ accounts-stats-multiselect-help = Info: Bruk museklikk + [{ $modifier }]-tasten 
 statistics-year-question = Hvilket år vil du arbeide med? Radinus går fra { $first } til { $last }.
 statistics-year-choose = Velg år
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = Kryssbalanse
+crossed-balance-window-name = Kryssbalanse
+crossed-balance-column = Kategori
+crossed-balance-no-data = Ingen transaksjon denne måneden for de valgte kontoene.
+crossed-balance-month-question = Hvilken måned vil du arbeide med? Et tall mellom { $first } og { $last }.
+crossed-balance-month-choose = Velg måned
+crossed-balance-next = Neste måned
+crossed-balance-previous = Forrige måned
+
 # --- Eksport av tabellene (høyreklikk) --------------------------------
 # En funksjon i tabellen, ikke i et vindu: alle listene har den.
 
@@ -707,8 +747,16 @@ export-to-xml = Eksporter til XML (.xml)
 # Eksport-menyen i statistikkvinduet: én fane per år, kalt AN_2026. De tomme
 # årene — med bryterne slik de står — er ikke med.
 export-menu = Eksport
+export-to = Eksporter til
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = Kopier cellen
+copy-rows = Kopier valgte rader
+copy-failed = Kunne ikke kopiere til utklippstavlen.
 export-all-years-excel = Eksporter alle år til Excel
 export-all-years-ods = Eksporter alle år til LibreOffice Calc
+export-all-months-excel = Eksporter alle månedene i det viste året til Excel
+export-all-months-ods = Eksporter alle månedene i det viste året til LibreOffice Calc
 export-no-year = Ingen år inneholder transaksjoner: det er ingenting å eksportere.
 export-years-done = { $years } år eksportert til «{ $file }».
 export-to-json = Eksporter til JSON (.json)
@@ -722,6 +770,7 @@ statistics-window-name = { $kind ->
     [payment-mode] Statistikk etter betalingsmåte
     [payee] Statistikk etter motpart og forhandler
     [project] Statistikk etter prosjekt
+    [verification] Statistikk etter kontroll
    *[category] Statistikk etter kategori
 }
 statistics-detail-name = Statistikkdetaljer
@@ -764,6 +813,19 @@ curve-axis-balance = saldo
 curve-nothing = Ingen konto er valgt: det finnes ingen graf å tegne.
 curve-empty = Ingen transaksjoner i denne perioden.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = Analyse av saldoutviklingen
+analysis-heading = Analyse av saldoutviklingen
+analysis-hint = Dra over grafen med museknappen holdt nede for å se transaksjonene i den perioden.
+analysis-zone = Sone:
+analysis-opening = Inngående saldo:
+analysis-closing = Utgående saldo:
+analysis-variation = Endring:
+analysis-detail-name = Saldoanalyse
+analysis-detail-none = Ingen transaksjoner i denne sonen.
+
 # --- F05 — Rask klassifisering av transaksjoner ------------------------
 # Vinduet der man klassifiserer **i bulk**: man merker rader, krysser av
 # for egenskapene som skal endres, og bruker dem på én gang — i minnet.
@@ -783,6 +845,7 @@ quick-check-payment-mode = Måte
 quick-check-payee = Motpart
 quick-check-project = Prosjekt
 quick-check-status = Status
+quick-check-verification = Kontroll
 quick-column-date = Dato
 quick-column-label = Beskrivelse
 quick-column-amount = Beløp
@@ -792,6 +855,7 @@ quick-column-payment-mode = Betalingsmåte
 quick-column-payee = Motpart
 quick-column-project = Prosjekter
 quick-column-status = Status
+quick-column-verification = Kontroll
 # På en Mac er Ctrl + klikk et høyreklikk: tasten som legger til i et
 # utvalg, er ⌘ der, og hjelpeteksten må nevne den som faktisk virker.
 quick-multiselect-help = Info: Bruk museklikk + tasten [{ $modifier }] i tabellen for å velge flere elementer
@@ -852,7 +916,7 @@ statement-no-match = Ingen rad passer til filteret.
 statement-help = Info: Bruk museklikk + tasten [{ $modifier }] i tabellen for å velge flere rader
 statement-choose-account = Denne filen inneholder flere kontoer. Hvilken vil du importere?
 statement-select-line = Velg minst én rad i kontoutskriften.
-statement-title-open = Åpne en kontoutskriftsfil (.ofx)
+statement-title-open = Åpne en kontoutskriftsfil (OFX, QIF, CSV)
 statement-title-info = Informasjon om den åpne filen
 statement-title-integrate = Før utvalget inn i kontoen
 statement-title-validate = Før denne transaksjonen inn i kontoen
@@ -861,6 +925,15 @@ statement-no-fitid = Advarsel: denne filen gir ingen identifikator (FITID) for d
 statement-loaded = { $count ->
     [0] Denne filen inneholder ingen transaksjoner for denne kontoen.
    *[other] { $count } rader lest, hvorav { $known } allerede finnes på kontoen din.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] { $count } rader lest; ingen ligner en transaksjon som allerede finnes på kontoen din.
+    [one] { $count } rader lest, hvorav én ligner en transaksjon som allerede finnes på kontoen din (samme dato, samme beskrivelse, samme beløp).
+   *[other] { $count } rader lest, hvorav { $alike } ligner transaksjoner som allerede finnes på kontoen din (samme dato, samme beskrivelse, samme beløp).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] Én til ligner en transaksjon som allerede finnes (samme dato, samme beskrivelse, samme beløp).
+   *[other] { $alike } til ligner transaksjoner som allerede finnes (samme dato, samme beskrivelse, samme beløp).
 }
 statement-integrated = { $count ->
     [0] Ingenting ble ført inn: disse radene finnes allerede på kontoen din.
@@ -896,7 +969,23 @@ statement-file-info =
     Konto i filen: { $account }
     Periode: fra { $from } til { $to }
     Saldo oppgitt av banken: { $balance }
-    { $count } transaksjoner, hvorav { $known } allerede finnes på kontoen din.
+statement-qif-question = Ingenting i denne filen sier om datoen «{ $date }» er skrevet dag/måned eller måned/dag. Den betyr:
+statement-qif-day-month = Dag { $day }, måned { $month } (dag/måned)
+statement-qif-month-day = Dag { $day }, måned { $month } (måned/dag)
+statement-qif-dates-mixed = Denne filen skriver datoene sine på to måter: «{ $first }» leses dag/måned, «{ $second }» måned/dag. Den blir ikke importert, slik at ingen dato blir feil.
+statement-qif-amounts-mixed = Denne filen skriver beløpene sine på to måter: «{ $first }» med punktum, «{ $second }» med komma. Den blir ikke importert, slik at ikke noe beløp blir feil.
+statement-qif-opening = Inngående saldo på { $amount } per { $date }: dette er ikke en transaksjon, den blir ikke importert.
+statement-qif-opening-undated = Inngående saldo på { $amount }: dette er ikke en transaksjon, den blir ikke importert.
+statement-qif-suspect = Rad { $rank }, «{ $label }» ({ $amount }), ser ut som en inngående saldo: kontroller den før du fører den inn.
+statement-qif-rejected = { $count ->
+    [one] Én uleselig rad blir ikke importert: { $lines }.
+   *[other] { $count } uleselige rader blir ikke importert: { $lines }.
+}
+statement-qif-reason-date = dato
+statement-qif-reason-amount = beløp
+statement-qif-reason-differ = motstridende beløp
+statement-qif-no-account = Denne kontoen finnes ikke lenger i filen: åpne filen på nytt.
+statement-balance-unknown = ikke oppgitt i filen
 statement-group-identification = Identifikasjon av transaksjonen
 statement-group-amount = Beløpet for transaksjonen
 statement-group-classification = Klassifisering av transaksjonen for statistikkberegning
@@ -1521,6 +1610,9 @@ password-show = Vis passordet
 password-remove-question = Fjerne beskyttelsen fra denne databasen?
 password-mismatch = De to innskrivingene av det nye passordet er forskjellige
 password-wrong = Passordet passer ikke
+database-too-recent = Denne databasen er lagret av en nyere versjon av Radinus (databaseversjon { $found }; denne versjonen leser til og med versjon { $supported }). Oppdater Radinus for å åpne den.
+database-not-radinus = Denne filen er ikke en Radinus-database.
+database-unreadable = Databasen kunne ikke leses: { $reason }
 password-close-first = Lukk denne databasen før du endrer passordet
 password-now-protected = Databasen er beskyttet av et passord
 password-now-clear = Databasen er ikke lenger beskyttet
@@ -1752,6 +1844,11 @@ welcome-total-final = Sluttsaldo
 welcome-total-real-detail = avstemt + reservert
 welcome-total-final-detail = avstemt + reservert + planlagt
 welcome-accounts = Kontoene dine
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = Kontoer som telles i summene: { $count } av { $total }
+welcome-tile-counted = Tell denne kontoen i summene
 welcome-tile-bank = I banken
 welcome-tile-real = Faktisk
 welcome-tile-final = Endelig
@@ -1806,6 +1903,58 @@ preferences-leaf-zoom = Visningsstørrelse
 preferences-field-zoom = Forstørrelse:
 preferences-zoom-reset = Standardverdi
 preferences-zoom-hint = Alt vokser sammen: teksten, ikonene, kolonnene. Under 100 % er det plass til mer på skjermen. Systemets menylinje og dialogboksene dens følger derimot innstillingene på datamaskinen din og ikke disse.
+preferences-branch-import = Import
+preferences-leaf-verification = Kontroll
+preferences-field-verification = Importerte transaksjoner:
+preferences-verification-hint = «Kontrollert»: du stoler på banken din, en importert transaksjon regnes som riktig. «Å kontrollere»: hver importert transaksjon venter på kontrollen din; deretter setter du den selv til «Kontrollert» i transaksjonslisten. Innstillingen gjelder bare for kommende importer.
+preferences-leaf-qif = QIF-kontoutskrifter
+preferences-field-qif-order = Rekkefølge for dag og måned:
+preferences-qif-order-ask = Spør meg hver gang
+preferences-qif-order-day-month = Alltid dag/måned (05/03 = 5. mars)
+preferences-qif-order-month-day = Alltid måned/dag (05/03 = 3. mai)
+preferences-qif-order-help = Brukes bare når ingen dato i filen avgjør saken. Så snart en dato som 24/11 viser rekkefølgen, er det filen som avgjør, uansett denne innstillingen.
+preferences-field-qif-label = Transaksjonens beskrivelse:
+preferences-qif-label-both = Motpart + memo
+preferences-qif-label-payee = Bare motpart
+preferences-qif-label-memo = Bare memo
+preferences-qif-label-help = Når en transaksjon har både en motpart og et memo. Har den bare det ene, er det det som brukes, uansett denne innstillingen.
+preferences-qif-hint = Disse innstillingene gjelder for alle QIF-kontoutskrifter, uansett hvilken database som er åpen. «Spør meg hver gang» er det tryggeste: en fil med tvetydige datoer blir aldri lest på måfå.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = Gjenopprett standardkolonner
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = Vis/Skjul
+columns-colour = Fargelegg kolonnen:
+columns-colour-none = Ingen farge
+columns-colour-red = Rød
+columns-colour-orange = Oransje
+columns-colour-pink = Rosa
+columns-colour-pastel-green = Pastellgrønn
+columns-colour-green = Grønn
+columns-colour-pastel-blue = Pastellblå
+columns-colour-blue = Blå
+columns-colour-pastel-yellow = Pastellgul
+columns-colour-yellow = Gul
+preferences-leaf-columns = Tabellkolonner
+preferences-table-operations-list = Transaksjonsliste
+preferences-columns-reset = Tilbakestill
+preferences-columns-reset-all = Tilbakestill alle
+preferences-columns-done = Kolonnene har fått tilbake sitt opprinnelige oppsett.
+preferences-columns-hint = Hver tabell husker rekkefølgen på kolonnene, hvilke du skjuler og bredden deres. «Tilbakestill» gir straks tabellen det opprinnelige oppsettet tilbake.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = Tilbakestilling
+preferences-leaf-comfort = Komfortinnstillinger
+preferences-comfort-reset = Tilbakestill komfortinnstillingene
+preferences-comfort-hint = Tilbakestiller kolonnene i alle tabeller, rekkefølgen og avmerkingsboksene for kontoene i startvinduet og visningsstørrelsen. Språket, valutaen og kontrollen av importerte transaksjoner berøres ikke.
+preferences-comfort-question = Tilbakestille komfortinnstillingene? Tabellkolonnene, startvinduet og visningsstørrelsen går tilbake til sin opprinnelige tilstand.
+preferences-comfort-done = Komfortinnstillingene er tilbakestilt.
 
 # --- Banneret på velkomstsiden -------------------------------------------
 #
@@ -1870,3 +2019,943 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = Dette programmet leveres uten noen garanti, så langt loven tillater.
 licence-info = Den offisielle teksten åpnes i nettleseren din, på gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = Lånesimulering
+window-loan-title = Lånesimulering
+loan-tab-credit = Lånet
+loan-tab-afford = Klarer jeg å betale det tilbake?
+loan-field-kind = Lånetype
+loan-kind-consumer = Forbrukslån
+loan-kind-mortgage = Boliglån
+loan-field-amount = Lånebeløp
+loan-field-payment = Månedlig betaling
+loan-field-months = Løpetid
+loan-field-rate = Fast rente
+loan-field-fees = Etableringsgebyr
+loan-field-insurance = Forsikring per måned
+loan-unit-months = måneder
+loan-unit-percent = %
+loan-invalid-field = Verdien er ikke et tall: rett den for å regne på nytt.
+loan-report-button = PDF-rapport
+loan-monthly-table = Tabell måned for måned
+loan-months-count = { $count ->
+        [one] { $count } måned
+       *[other] { $count } måneder
+    }
+loan-percent = { $value } %
+loan-notice-payment-too-low = Denne betalingen dekker ikke renten: lånet ville aldri blitt nedbetalt. Løpetiden blir stående på 600 måneder.
+loan-notice-too-long = Denne betalingen ville kreve mer enn 600 måneder: løpetiden blir stående på 600 måneder.
+loan-figure-payment = Månedlig betaling
+loan-figure-payment-insured = Betaling inkludert forsikring
+loan-figure-taeg = Effektiv rente
+loan-figure-interest = Rentekostnad
+loan-figure-insurance = Forsikringskostnad
+loan-figure-cost = Lånets totale kostnad
+loan-figure-total-due = Totalt skyldig beløp
+loan-figure-all-in = Totalt tilbakebetalt, inkludert forsikring
+loan-part-capital = Lånebeløp
+loan-part-interest = Renter
+loan-part-fees = Etableringsgebyr
+loan-part-insurance = Forsikring
+loan-donut-cost-caption = totalt
+loan-chart-cost = Hva lånet koster
+loan-chart-capital = Gjenværende gjeld
+loan-schedule-title = Nedbetalingsplan
+loan-schedule-yearly = Nedbetalingsplan, år for år
+loan-column-number = Nr.
+loan-column-year = År
+loan-column-date = Forfall
+loan-column-payment = Betaling
+loan-column-payments = Betalinger
+loan-column-interest = Renter
+loan-column-capital = Avdrag
+loan-column-insurance = Forsikring
+loan-column-remaining = Gjenværende gjeld
+loan-history-label = Undersøkt periode
+loan-period-last-12 = Siste 12 måneder
+loan-accounts-title = Undersøkte kontoer
+loan-period-title = Periode
+loan-column-account = Konto
+loan-column-bank = Bank
+loan-column-balance = Reell saldo
+loan-unavailable-no-account = Merk av minst én konto for å undersøke historikken din.
+loan-unavailable-no-month = Denne perioden har ennå ingen hel måned: velg en annen.
+loan-verdict-title = Kort sagt
+loan-verdict-green = Gjennomførbart
+loan-verdict-orange = Stramt
+loan-verdict-red = Risikabelt
+loan-verdict-no-income = Ingen inntekter i perioden: gjeldsgraden kan ikke beregnes.
+loan-check-debt-green = Gjeldsgrad på { $ratio }: under metodens grense på { $green }.
+loan-check-debt-orange = Gjeldsgrad på { $ratio }: mellom { $green } og { $red }, på grensen.
+loan-check-debt-red = Gjeldsgrad på { $ratio }: over { $red }.
+loan-check-effort = Betalingen på { $payment } tar { $share } av det du setter til side { $kind ->
+        [good] en god måned
+        [hard] en vanskelig måned
+       *[usual] en vanlig måned
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] En god måned
+        [hard] En vanskelig måned
+       *[usual] En vanlig måned
+    } gir deg ingenting til overs: betalingen på { $payment } ville gå av reserven din.
+loan-check-reserve-green = Saldoen din holder seg positiv til lånet er nedbetalt.
+loan-check-reserve-red = Saldoen din ville gått under null i { $month }, på grunn av dette lånet.
+loan-check-reserve-sooner = Saldoen din ville gått under null i { $month }, { $count ->
+        [one] én måned
+       *[other] { $count } måneder
+    } tidligere enn uten lånet.
+loan-check-reserve-anyway = Saldoen din ville gått under null rundt { $month } også uten lånet, som knapt endrer noe.
+loan-check-reserve-floor-green = Saldoen din holder seg over sikkerhetsreserven ({ $floor }) til lånet er nedbetalt.
+loan-check-reserve-floor-red = Saldoen din ville gått under sikkerhetsreserven ({ $floor }) i { $month }, på grunn av dette lånet.
+loan-check-reserve-floor-sooner = Saldoen din ville gått under sikkerhetsreserven ({ $floor }) i { $month }, { $count ->
+        [one] én måned
+       *[other] { $count } måneder
+    } tidligere enn uten lånet.
+loan-check-reserve-floor-anyway = Saldoen din ville gått under sikkerhetsreserven ({ $floor }) rundt { $month } også uten lånet, som knapt endrer noe.
+loan-warning-deficit = Merk: i denne perioden er utgiftene dine allerede i snitt { $amount } høyere enn inntektene per måned, før noe lån.
+loan-figure-reference = Sparing { $kind ->
+        [good] en god måned
+        [hard] en vanskelig måned
+       *[usual] en vanlig måned
+    }
+loan-figure-tipped = Måneder lånet ville satt i minus
+loan-gauge-caption = gjeldsgrad
+loan-figure-income = Gjennomsnittlige inntekter per måned
+loan-figure-spending = Gjennomsnittlige utgifter per måned
+loan-figure-saving = Gjennomsnittlig sparing per måned
+loan-figure-running = Løpende lån per måned
+loan-figure-new = Ny betaling, inkludert forsikring
+loan-figure-rest = Å leve for per måned
+loan-figure-debt = Gjeldsgrad
+loan-red-months-value = { $count } av { $total }
+loan-figure-balance-now = Reell saldo i dag
+loan-figure-balance-end = Beregnet saldo ved lånets slutt
+loan-chart-income = Hvor gjennomsnittsinntekten din går
+loan-donut-income-caption = gjennomsnittsinntekt
+loan-part-spending = Løpende utgifter
+loan-part-running = Løpende lån
+loan-part-new = Nytt lån
+loan-part-rest = Til overs
+loan-part-missing = Mangler
+loan-chart-history = Historikken din med dette lånet
+loan-chart-history-hint = Hva som ville vært igjen hver måned etter betalingen. Knallrødt: månedene lånet ville satt i minus; blekrødt: de som allerede var det uten lånet.
+loan-chart-projection = Din beregnede saldo
+loan-mark-loan-end = Slutt: { $label }
+loan-mark-negative = I minus
+loan-mark-floor = Under reserven
+loan-mark-floor-line = Sikkerhetsreserve
+loan-running-title = Løpende lån som er tatt med
+loan-running-column-label = Gjentakende transaksjon
+loan-running-column-monthly = Per måned
+loan-running-column-end = Siste betaling
+loan-no-running = Ingen løpende lån funnet blant de gjentakende transaksjonene dine.
+loan-period-caption = fra { $from } til { $to } ({ $count ->
+        [one] { $count } måned
+       *[other] { $count } måneder
+    })
+loan-transfers = { $count ->
+        [0] Ingen overføring mellom de avmerkede kontoene dine ble funnet.
+        [one] Én overføring mellom de avmerkede kontoene dine ble funnet og holdt utenfor.
+       *[other] { $count } overføringer mellom de avmerkede kontoene dine ble funnet og holdt utenfor.
+    }
+loan-method = Gjennomsnitt over periodens hele måneder, avstemte og registrerte transaksjoner, uten overføringer mellom de avmerkede kontoene dine.
+loan-report-title = Lånesimulering
+loan-report-made-on = simulering av { $date }
+loan-disclaimer = Veiledende simulering uten avtaleverdi. Kun bankens tilbud er bindende.
+loan-tab-rules = Innstillinger for vurderingen
+loan-method-optimistic = Optimistisk
+loan-method-neutral = Nøytral
+loan-method-severe = Streng
+loan-method-line = Vurderingsmetode: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = Vurderingen svarer på tre spørsmål, og hver metode stiller egne krav. Velg den som passer deg: vurderingen i fanen «Klarer jeg å betale det tilbake?» følger den. Siste linje antar at utgiftene dine øker hvert år med oppgitt prosent; betalingen ligger fast.
+loan-rule-row-debt = Godtatt gjeldsgrad
+loan-rule-row-reference = Referansesparing
+loan-rule-row-share = Andel av sparingen betalingen kan ta
+loan-rule-row-floor = Grense saldoen ikke må under
+loan-rule-row-sooner = Hvis saldoen går under den også uten lånet
+loan-rule-row-growth = Økning i utgiftene dine per år
+loan-rule-limits = grønt opptil { $green }, oransje opptil { $red }
+loan-rule-reference = { $kind ->
+        [good] en god måned
+        [hard] en vanskelig måned
+       *[usual] en vanlig måned
+    }: { $amount }
+loan-rule-floor-zero = null
+loan-rule-floor-cushion = én måneds utgifter: { $amount }
+loan-rule-sooner = oransje hvis lånet fremskynder det med { $orange }, rødt med { $red }
+loan-unit-percent-year = % per år
+loan-method-optimistic-explain = Den optimistiske metoden forutsetter en god måned, godtar gjeldsgrad opptil 40 % og holder ingen reserve: den viser hva som er mulig hvis alt går bra.
+loan-method-neutral-explain = Den nøytrale metoden forutsetter en vanlig måned og følger bankenes regel, 33 til 35 % gjeldsgrad: den er referansevurderingen.
+loan-method-severe-explain = Den strenge metoden forutsetter en vanskelig måned og holder én måneds utgifter i reserve for det uventede: den viser hva som holder selv om det går dårlig.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = Strømforbruk for et elektrisk apparat
+window-appliance-title = Strømforbruk for et elektrisk apparat
+appliance-device-title = Apparatet
+appliance-on-title = Påslått
+appliance-standby-title = I standby
+appliance-field-on-watts = Effekt i drift
+appliance-field-on-hours = Driftstid per dag
+appliance-field-days = Bruksdager per uke
+appliance-field-share = Andel av driftstiden i lavlasttimer
+appliance-field-standby-watts = Effekt i standby
+appliance-field-standby-hours = Standbytid per bruksdag
+appliance-unit-watts = W
+appliance-unit-hours = t
+appliance-unit-days = av 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/kWh
+appliance-standby-hint = Står feltet tomt, varer standby resten av dagen. På dager uten bruk står apparatet tilkoblet: all den tiden regnes som standby. Er det frakoblet, er standby 0 W.
+appliance-contract-title = Din avtale
+appliance-field-option = Prisalternativ
+appliance-option-base = Fastpris (én pris)
+appliance-option-off-peak = Høylasttimer / Lavlasttimer
+appliance-field-base = Pris per kWh
+appliance-field-peak = Pris per kWh i høylasttimer
+appliance-field-off-peak = Pris per kWh i lavlasttimer
+appliance-field-off-peak-hours = Lavlasttimer per dag
+appliance-contract-hint = Disse prisene gjelder bare for denne beregningen. Den lagrede tariffen stilles inn under Innstillinger › Alternativer › Verktøy.
+appliance-contract-reset = Bruk den lagrede tariffen igjen
+appliance-period-day = Per dag
+appliance-period-month = Per måned
+appliance-period-year = Per år
+appliance-energy = { $value } kWh
+appliance-less-than = under { $amount }
+appliance-detail-title = Detaljer for ett år
+appliance-column-part = Post
+appliance-column-energy = Energi
+appliance-column-cost = Kostnad
+appliance-column-share = Andel
+appliance-line-on = Påslått
+appliance-line-standby = I standby
+appliance-line-on-peak = Påslått, høylasttimer
+appliance-line-on-off-peak = Påslått, lavlasttimer
+appliance-line-standby-peak = I standby, høylasttimer
+appliance-line-standby-off-peak = I standby, lavlasttimer
+appliance-line-total = Totalt
+appliance-chart-title = Hvor pengene går
+appliance-chart-caption = per år
+appliance-standby-sentence = Standby alene koster { $amount } per år: { $share } av det apparatet koster.
+appliance-note-plate = Effekten som står på apparatet eller i bruksanvisningen, er et maksimum: i drift bruker de fleste apparater mindre. For et reelt tall kan du måle med en strømmåler for stikkontakt og føre inn det den viser.
+appliance-note-subscription = Fastleddet er ikke tatt med: det betaler du enten apparatet er tilkoblet eller ikke.
+appliance-invalid-watts = Oppgi en effekt fra 0 til 100 000 W.
+appliance-invalid-hours = Oppgi en tid fra 0 til 24 timer per dag.
+appliance-invalid-days = Oppgi et helt antall dager, fra 0 til 7.
+appliance-invalid-share = Oppgi en andel fra 0 til 100 %.
+appliance-invalid-day-overflow = Drift og standby blir til sammen mer enn 24 timer per dag.
+appliance-invalid-price = Oppgi en pris per kWh fra 0 til 100.
+appliance-invalid-off-peak-hours = Oppgi et helt antall lavlasttimer, fra 0 til 24.
+preferences-branch-tools = Verktøy
+preferences-leaf-electricity = Strømtariff
+preferences-electricity-blue = Tilbake til EDFs Tarif Bleu
+preferences-electricity-hint = Tariffen i avtalen din, brukt av verktøyet «Strømforbruk for et elektrisk apparat». Standard: EDFs Tarif Bleu (Frankrike) per 1. august 2026, priser inkl. avgifter, måler på 3 til 6 kVA. Disse prisene endres ofte i februar og august: skriv av dem på regningen din.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = Min økonomiske buffer
+window-cushion-title = Min økonomiske buffer
+cushion-question = Hvis inntektene dine stoppet i morgen, hvor mange måneder ville sparepengene dine holde?
+cushion-accounts-title = Kontoene dine
+cushion-column-account = Konto
+cushion-column-balance = Reell saldo
+cushion-column-savings = Sparing
+cushion-column-spending = Utgifter
+cushion-accounts-hint = «Sparing»: pengene du regner med hvis uhellet er ute. «Utgifter»: kontoene de daglige utgiftene går fra.
+cushion-history-label = Analysert periode
+cushion-backup-label = Reserveinntekt per måned
+cushion-backup-hint = Det som fortsatt ville komme inn: dagpenger, partnerens lønn … Tomt: ingen inntekt.
+cushion-categories-title = Utgiftene som tas med
+cushion-categories-hint = Fjern haken ved det du ville kuttet hvis uhellet er ute.
+cushion-categories-empty = Ingen utgifter i denne perioden.
+cushion-verdict-title = Bufferen din
+cushion-targets-title = Trygghetsgrensene
+cushion-projection-title = Sparepengene dine hvis uhellet er ute
+cushion-projection-hint = Det som ville være igjen hver måned hvis inntektene dine stoppet i dag.
+cushion-note = Et anslag basert på historikken din: utgiftene i en vanskelig måned kan avvike fra gjennomsnittet.
+cushion-invalid-backup = Dette beløpet kan ikke leses: rett det for å kjøre beregningen på nytt.
+cushion-no-spending-account = Kryss av for minst én «Utgifter»-konto.
+cushion-no-month = Denne perioden har ennå ingen hel måned.
+cushion-months = { $value } måneder
+cushion-per-month = { $amount } per måned
+cushion-figure-holds = Ingen grense
+cushion-gauge-caption = med dekkede utgifter
+cushion-verdict-short = Under tre måneder: et uventet tilbakeslag ville raskt gi deg problemer.
+cushion-verdict-fair = Mellom tre og seks måneder: en grei buffer, som du bør bygge videre på hvis du kan.
+cushion-verdict-solid = Seks måneder eller mer: bufferen din er solid.
+cushion-verdict-holds = Reserveinntekten din dekker utgiftene dine: sparepengene dine ville ikke minke.
+cushion-verdict-nothing = Ingen utgifter tatt med i perioden: det er ingenting å dekke.
+cushion-tile-savings = Tilgjengelig sparing
+cushion-tile-spending = Utgifter som tas med
+cushion-tile-backup = Reserveinntekt
+cushion-tile-burn = Sparepengene ville minke med
+cushion-tile-rhythm = Sparetakt
+cushion-burn-none = Ingenting
+cushion-target-title = { $months } måneders utgifter: { $amount }
+cushion-target-reached = Nådd.
+cushion-target-date = Det mangler { $missing }. Med din sparetakt nås den rundt { $month }.
+cushion-target-never = Det mangler { $missing }. Sparepengene dine har ikke vokst i perioden: i denne takten vil denne grensen ikke nås.
+cushion-mark-empty = Tomt: { $month }
+cushion-period = Gjennomsnitt av { $count ->
+        [one] { $count } hel måned
+       *[other] { $count } hele måneder
+    }, fra { $from } til { $to }. { $transfers ->
+        [0] Ingen overføringer mellom kontoene dine.
+        [one] Én overføring mellom kontoene dine, holdt utenfor.
+       *[other] { $transfers } overføringer mellom kontoene dine, holdt utenfor.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = Sparemål
+window-goal-title = Sparemål
+goal-accounts-title = Kontoene som følges
+goal-column-account = Konto
+goal-column-balance = Reell saldo
+goal-accounts-hint = En overføring mellom to kontoer som følges, nuller seg ut; en overføring til en konto som ikke følges, regnes som penger ut.
+goal-period-label = Referanseperiode
+goal-period-range = Årsintervall …
+goal-range-from = fra
+goal-range-to = til
+goal-question-title = Spørsmålet ditt
+goal-question-when = Når har jeg dette beløpet?
+goal-question-amount = Hvor mye har jeg på denne datoen?
+goal-question-effort = Hvor mye må jeg spare for å ha dette beløpet på denne datoen?
+goal-field-target = Målbeløp
+goal-field-date = Måldato
+goal-field-rate = Årlig rente på sparingen
+goal-field-extra = Og hvis jeg sparte mer, per måned
+goal-options-hint = Tomt: ingen rente, ingenting ekstra.
+goal-answer-title = Svaret
+goal-chart-title = Saldoen din, i går og i morgen
+goal-chart-hint = Heltrukken linje: den reelle saldoen de siste tolv månedene; stiplet: framskrivingen; skyggelagt: spennet avhengig av månedene.
+goal-disclaimer = En framskriving basert på historikken din, ikke et løfte: én uforutsett hendelse kan endre alt.
+goal-no-account = Kryss av for minst én konto som skal følges.
+goal-no-month = Denne perioden har ennå ingen hel måned.
+goal-invalid-target = Skriv inn et beløp du vil nå.
+goal-invalid-date = Velg en dato fram i tid, innen de neste femti årene.
+goal-invalid-rate = Skriv inn en rente fra 0 til 100 %.
+goal-invalid-extra = Dette beløpet kan ikke leses: rett det for å kjøre beregningen på nytt.
+goal-per-month = { $amount } per måned
+goal-tile-balance = Saldo i dag
+goal-tile-rhythm = Gjennomsnittlig sparetakt
+goal-tile-target = Mål
+goal-tile-reached = Nådd rundt
+goal-tile-date = Måldato
+goal-tile-projected = Framskrevet saldo
+goal-tile-saved = Spart innen da
+goal-tile-interest = Herav renter
+goal-tile-needed = Må spares
+goal-when-already = Du har allerede { $amount }: kontoene du følger, har til sammen { $balance }.
+goal-when-reached = Du har { $amount } rundt { $month }, om { $months ->
+        [one] én måned
+       *[other] { $months } måneder
+    }.
+goal-when-range = Avhengig av månedene: mellom { $early } og { $late }.
+goal-when-range-open = Tidligst rundt { $early }; med svake måneder ville målet ikke bli nådd.
+goal-when-never = I denne takten når du ikke { $amount }.
+goal-zero = Saldoen din ville falle til null rundt { $month }.
+goal-amount = I { $month } ville du ha omtrent { $amount }.
+goal-amount-range = Avhengig av månedene: mellom { $low } og { $high }.
+goal-effort-more = For å ha { $amount } i { $month } måtte du spare { $monthly } per måned i gjennomsnitt, altså { $gap } mer enn i dag.
+goal-effort-less = For å ha { $amount } i { $month } ville { $monthly } per måned holde, altså { $gap } mindre enn i dag: du ligger foran skjema.
+goal-effort-range = Avhengig av månedene ville avviket fra sparetakten din ligge mellom { $low } og { $high } per måned.
+goal-chart-target = Mål: { $amount }
+goal-chart-today = I dag
+goal-note-seasons = Framskrivingen følger årstidene: hver kommende måned bruker gjennomsnittet av de samme månedene i perioden.
+goal-note-range = Spennet kommer fra de svake og sterke månedene i perioden: den laveste og den høyeste fjerdedelen.
+goal-note-loan = Lånet «{ $label }» avsluttes i { $month }: deretter { $amount } mer per måned.
+goal-note-interest = Renter beregnet hver måned med { $rate } % per år: en tilnærming til halvmånedsregelen for sparekontoer.
+goal-period = Takten er beregnet over { $count ->
+        [one] { $count } hel måned
+       *[other] { $count } hele måneder
+    }, fra { $from } til { $to }. { $transfers ->
+        [0] Ingen overføringer mellom kontoene du følger.
+        [one] Én overføring mellom kontoene du følger, holdt utenfor.
+       *[other] { $transfers } overføringer mellom kontoene du følger, holdt utenfor.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = Hva om jeg kuttet…?
+window-cut-title = Hva om jeg kuttet…?
+cut-axis-label = Grupper etter
+cut-axis-category = Kategorier
+cut-axis-payee = Motparter
+cut-axis-budget-line = Budsjettposter
+cut-table-title = Utgiftene dine, post for post
+cut-table-hint = Skriv inn et kutt i % eller i { $sign } per måned på postene du vil redusere. Et kutt kan ikke være større enn selve utgiften.
+cut-column-monthly = Per måned
+cut-column-cut = Kutt
+cut-column-after = Etter
+cut-column-yearly = Spart per år
+cut-total = Totalt
+cut-horizon-label = Horisont
+cut-settings-title = Innstillinger
+cut-options-hint = Renten og målbeløpet er valgfrie.
+cut-report-button = PDF-rapport
+cut-chart-title = Saldoen din, uten og med kuttene
+cut-chart-hint = Heltrukken linje: den reelle saldoen de siste tolv månedene; grå stiplet: framskrivingen uten kutt; blå: med kutt; grønn: pengene du sparer.
+cut-donut-title = Utgiftene dine per måned etter kutt
+cut-donut-caption = per måned etter kutt
+cut-donut-others = Andre poster
+cut-donut-saved = Spart
+cut-legend-with = Med kuttene
+cut-legend-without = Uten kutt
+cut-years = { $years ->
+        [one] { $years } år
+       *[other] { $years } år
+    }
+cut-headline-none = Skriv inn et kutt i tabellen for å se virkningen.
+cut-headline = Ved å kutte { $count ->
+        [one] denne posten
+       *[other] disse { $count } postene
+    } ville du sette av { $monthly } mer per måned, altså { $yearly } per år.
+cut-tile-monthly = Spart per måned
+cut-tile-yearly = Spart per år
+cut-tile-horizon = Spart over { $years ->
+        [one] { $years } år
+       *[other] { $years } år
+    }
+cut-tile-spending = Utgifter per måned
+cut-target-already = Du har allerede { $amount }.
+cut-target-sooner = Du ville nå { $amount } rundt { $with } i stedet for { $without }: { $months ->
+        [0] ikke tidligere
+        [one] én måned tidligere
+       *[other] { $months } måneder tidligere
+    }.
+cut-target-only-with = Med disse kuttene ville du nå { $amount } rundt { $with }; uten dem, i nåværende takt, aldri.
+cut-target-never = Selv med disse kuttene ville du ikke nå { $amount } i nåværende takt.
+cut-note-seasons = Hvert kutt følger årstidene til posten sin: en post som veier tyngst om sommeren, sparer mest om sommeren.
+cut-note-capped = Et kutt som ble skrevet inn, var større enn utgiften: det er satt ned til selve utgiften.
+cut-invalid-cut = Dette kuttet kan ikke leses: en prosent fra 0 til 100, eller et beløp per måned.
+cut-report-settings = Innstillingene
+cut-report-result = Resultatet
+cut-report-accounts = Kontoene som følges
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = Planlegg ferien min
+window-holiday-title = Planlegg ferien min
+holiday-trip-title = Reisen
+holiday-field-trip = Reisetype
+holiday-trip-stay = Opphold
+holiday-trip-cruise = Cruise
+holiday-field-adults = Voksne
+holiday-field-children = Barn
+holiday-field-nights = Oppholdets lengde, i netter
+holiday-field-days = Dager
+holiday-field-months = Måneder før avreise
+holiday-field-stops = Antall anløpshavner
+holiday-saved-title = Allerede spart
+holiday-saved-hint = Kryss av for kontoene der pengene til ferien allerede er satt av: den reelle saldoen deres regnes som allerede spart.
+holiday-budget-title = Budsjettet
+holiday-budget-hint = For hver post: et beløp, hvem det gjelder for og hvor lenge. En tom post teller ikke.
+holiday-optional-title = Valgfrie poster
+holiday-result-title = Resultatet
+holiday-donut-title = Hvor reisepengene går
+holiday-donut-caption = for reisen
+holiday-child-label = Barnepris
+holiday-count-label = Lugarer
+holiday-open = Åpne et prosjekt…
+holiday-save = Lagre prosjektet…
+holiday-pdf = PDF-rapport
+holiday-excel = Eksporter til Excel
+holiday-file-filter = Ferieprosjekt
+holiday-replace-question = Hvis du åpner dette prosjektet, erstattes det som er skrevet inn i vinduet. Fortsette?
+holiday-file-saved = Prosjekt lagret: { $file }
+holiday-file-opened = Prosjekt åpnet: { $file }
+holiday-file-not-project = Denne filen er ikke et ferieprosjekt fra Radinus.
+holiday-file-too-recent = Dette prosjektet kommer fra en nyere versjon av Radinus: oppdater Radinus for å åpne det.
+holiday-file-failed = Filen kunne ikke leses eller skrives: { $reason }
+holiday-line-transport = Reise tur-retur
+holiday-line-lodging = Overnatting
+holiday-line-meals = Måltider og daglige utgifter
+holiday-line-visits = Severdigheter og fritid
+holiday-line-port = Reise til havnen
+holiday-line-cabins = Lugarer
+holiday-line-service = Servicepakke (driks)
+holiday-line-drinks = Drikkepakke
+holiday-line-excursions = Landutflukter
+holiday-line-port-taxes = Havneavgifter
+holiday-line-wifi = Wifi om bord
+holiday-line-onboard = Utgifter om bord og i land
+holiday-line-other = Andre kostnader og uforutsette utgifter
+holiday-line-insurance = Avbestillingsforsikring
+holiday-line-stay-tax = Turistskatt
+holiday-line-car = Bil på stedet, drivstoff og bompenger
+holiday-line-parking = Parkering ved flyplassen eller stasjonen
+holiday-line-bank = Bankgebyrer i utlandet
+holiday-line-formalities = Formaliteter (pass, visum, vaksiner)
+holiday-line-pets = Dyrepass
+holiday-span-trip = for oppholdet
+holiday-span-night = per natt
+holiday-span-day = per dag
+holiday-span-stop = per anløp
+holiday-who-all = for alle
+holiday-who-person = per person
+holiday-who-adults = per voksen
+holiday-cabins-count = { $count ->
+        [one] { $count } lugar
+       *[other] { $count } lugarer
+    }
+holiday-days = { $days ->
+        [one] { $days } dag
+       *[other] { $days } dager
+    }
+holiday-invalid-count = Skriv inn et heltall.
+holiday-invalid-amount = Dette beløpet kan ikke leses: et positivt tall, eller en prosent fra 0 til 100.
+holiday-headline-empty = Skriv inn budsjettbeløpene for å se hva reisen vil koste.
+holiday-headline-stay = Dette oppholdet ville koste { $total } for { $people ->
+        [one] én person
+       *[other] { $people } personer
+    } og { $nights ->
+        [0] ingen netter
+        [one] én natt
+       *[other] { $nights } netter
+    }.
+holiday-headline-cruise = Dette cruiset ville koste { $total } for { $people ->
+        [one] én person
+       *[other] { $people } personer
+    } og { $nights ->
+        [0] ingen netter
+        [one] én natt
+       *[other] { $nights } netter
+    }.
+holiday-tile-total = Total kostnad
+holiday-tile-person = Per person
+holiday-tile-person-day = Per person per dag
+holiday-tile-saved = Allerede spart
+holiday-tile-remaining = Gjenstår å finansiere
+holiday-tile-monthly = Nødvendig sparing
+holiday-remaining-none = Ingenting: det er dekket
+holiday-monthly-none = Ingenting å sette av
+holiday-monthly-now = Avreise denne måneden
+holiday-note-days = Dagene er nettene pluss én: sju netter blir åtte dager.
+holiday-note-child = Per person betaler et barn barneprisen hvis den er oppgitt; står den tom, betaler barnet som en voksen.
+holiday-note-percent = En prosent for forsikringen gjelder reisens hovedposter; prosenten for bankgebyrene gjelder utgiftene på stedet.
+holiday-sheet-budget = Budsjett
+holiday-sheet-result = Resultat
+holiday-column-line = Post
+holiday-column-amount = Beløp
+holiday-column-child = Barnepris
+holiday-column-who = For hvem
+holiday-column-span = Hvor lenge
+holiday-column-cost = Kostnad
+holiday-disclaimer = Et anslag basert på dine egne beløp: de faktiske prisene kan variere.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = Kuttprosjekt
+cut-file-not-project = Denne filen er ikke et kuttprosjekt fra Radinus.
+cut-file-too-recent = Dette prosjektet kommer fra en nyere versjon av Radinus: oppdater Radinus for å åpne det.
+cut-sheet-items = Poster
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = Loggbok for bilen min
+window-car-title = Loggbok for bilen min
+car-unnamed = Bilen min
+car-sheet-title = Bilen
+car-field-plate = Registreringsnummer
+car-field-make = Merke
+car-field-model = Modell
+car-field-engine = Drivlinje
+car-field-first-hand = Første eier
+car-field-registered = Første gangs registrering
+car-field-acquired = Kjøpsdato
+car-field-acquired-km = Kilometerstand ved kjøp
+car-field-service = Service hver
+car-field-service-or = eller hver
+car-unit-months-short = mnd.
+car-unit-km = km
+car-tariff-title = Pris for lading hjemme
+car-tariff-hint = Denne prisen lagres i bilens loggbok: den endrer ikke prisen i alternativene.
+car-tariff-reset = Bruk prisen fra alternativene
+car-engine-petrol = Bensin
+car-engine-diesel = Diesel
+car-engine-lpg = LPG
+car-engine-e85 = E85 (flexifuel)
+car-engine-hybrid = Hybrid
+car-engine-plug-in = Ladbar hybrid
+car-engine-electric = Elektrisk
+car-engine-hydrogen = Hydrogen
+car-energy-petrol = Bensin
+car-energy-diesel = Diesel
+car-energy-lpg = LPG
+car-energy-e85 = E85
+car-energy-electricity = Strøm
+car-energy-hydrogen = Hydrogen
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = Energi
+car-rubric-upkeep = Løpende vedlikehold
+car-rubric-service = Service
+car-rubric-wear = Slitedeler
+car-rubric-tyres = Dekk
+car-rubric-breakdown = Feil og havari
+car-rubric-insurance = Forsikring
+car-rubric-inspection = EU-kontroll
+car-part-brake-pads = Bremseklosser
+car-part-brake-discs = Bremseskiver
+car-part-timing-belt = Registerreim
+car-part-clutch = Clutch
+car-part-battery-12v = 12 V-batteri
+car-part-shock-absorbers = Støtdempere
+car-part-wipers = Vindusviskere
+car-part-spark-plugs = Tennplugger
+car-part-glow-plugs = Gløderør
+car-part-particulate-filter = Partikkelfilter
+car-part-catalytic-converter = Katalysator
+car-part-fuel-cell-filter = Filter for brenselcellen
+car-part-exhaust = Eksosanlegg
+car-part-other = Annen del…
+car-axle-all = Alle fire dekkene
+car-axle-front = Fordekk
+car-axle-rear = Bakdekk
+car-verdict-pass = Godkjent
+car-verdict-counter = Etterkontroll
+car-charge-station = På en ladestasjon
+car-charge-home = Hjemme
+car-slot-peak = Høylasttimer
+car-slot-off-peak = Lavlasttimer
+car-entry-new = Ny linje
+car-entry-edit = Endre linjen
+car-field-date = Dato
+car-field-km = Kilometerstand
+car-field-rubric = Post
+car-field-amount = Beløp
+car-field-garage = Verksted eller stasjon
+car-field-note = Notat
+car-field-energy = Energi
+car-field-quantity = Mengde
+car-field-charge = Lading
+car-field-slot = Ladetidspunkt
+car-field-part = Del
+car-field-part-name = Navn på delen
+car-field-axle = Dekk som er byttet
+car-field-verdict = Resultat
+car-field-months = Måneder dekket
+car-field-battery = Batteritilstand
+car-home-amount-hint = Beløpet for en lading hjemme regnes ut med bilens pris.
+car-entry-add = Legg til i loggboken
+car-entry-update = Lagre linjen
+car-entry-cancel = Avbryt
+car-entry-delete = Slett linjen
+car-delete-question = Slette denne linjen fra loggboken?
+car-from-operation = Hent en transaksjon…
+car-pick-account = Hvilken konto kommer utgiften fra?
+car-pick-operation = Hvilken transaksjon?
+car-pick-take = Hent
+car-pick-none = Ingen utgifter på denne kontoen.
+car-pick-taken = Transaksjonen er hentet: fyll inn kilometerstand og post, og legg deretter til linjen.
+car-history-title = Historikken
+car-filter-all = Alle poster
+car-history-empty = Ingen linjer ennå.
+car-history-hint = Klikk på en linje for å endre den.
+car-column-date = Dato
+car-column-km = Km
+car-column-rubric = Post
+car-column-detail = Detaljer
+car-column-amount = Beløp
+car-column-garage = Verksted
+car-column-note = Notat
+car-column-share = Andel
+car-column-per-km = Per km
+car-column-energy = Energi
+car-column-quantity = Mengde
+car-column-price = Snittpris
+car-column-consumption = Forbruk
+car-column-part = Del
+car-column-changes = Bytter
+car-column-last = Siste bytte
+car-column-life = Levetid
+car-column-next = Neste bytte
+car-total = Totalt
+car-summary-title = Hva bilen koster
+car-headline-empty = Fyll ut bilkortet, og legg så til en første linje: en tanking, en service, en verkstedregning…
+car-headline = Siden { $since } har bilen din kostet deg { $total }.
+car-headline-km = Siden { $since } har bilen din kostet deg { $total } for { $km } kjørt: { $cost } per kilometer.
+car-tile-total = Total kostnad
+car-tile-month = Per måned
+car-tile-km = Per kilometer
+car-tile-driven = Kilometer kjørt
+car-tile-consumption = Forbruk
+car-tile-energy-km = Energi per kilometer
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [one] { $months } måned
+       *[other] { $months } måneder
+    }
+car-detail-battery = Batteri: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = Per post
+car-energy-title = Energien
+car-parts-title = Slitedeler
+car-tyres-title = Dekk
+car-battery-title = Batteritilstand
+car-years-title = Hva bilen har kostet hvert år
+car-donut-title = Hvor pengene går
+car-donut-caption = totalt
+car-deadlines-title = Fristene
+car-deadlines-empty = Ingen frister ennå: noter en service, en EU-kontroll, en forsikring eller to bytter av samme del.
+car-deadline-service = Service
+car-deadline-inspection = EU-kontroll
+car-deadline-counter = Etterkontroll etter EU-kontrollen
+car-deadline-insurance = Forsikringen utløper
+car-when-date = den { $date }
+car-when-km = ved { $km }
+car-when-km-reached = ved { $km }, rundt { $month } i ditt tempo
+car-when-date-km = den { $date } eller ved { $km }, det som kommer først
+car-when-inspection-unknown = Noter den siste EU-kontrollen for å få vite datoen for den neste.
+car-tone-late = Overskredet
+car-tone-soon = Snart
+car-note-since = Alt regnes fra kjøpet: datoen og kilometerstanden som er notert på bilkortet.
+car-note-consumption = Forbruket måles fra full tank til full tank: fyll tanken helt og noter kilometerstanden hver gang.
+car-note-e85 = En E85-bil drikker det den får: kilometerne etter en tanking regnes for det drivstoffet.
+car-note-home = En lading hjemme prises med bilens pris den dagen den noteres, og beholder den kostnaden.
+car-note-inspection = EU-kontrollen følger den franske regelen: den første innen fire år etter første gangs registrering, deretter hvert annet år; en etterkontroll innen to måneder.
+car-disclaimer = Fristene og levetidene er anslag hentet fra loggboken: bare produsentens servicehefte er gjeldende.
+car-invalid-date = Oppgi en gyldig dato som ikke ligger i fremtiden.
+car-invalid-acquired = Kjøpsdatoen kan ikke være før første gangs registrering.
+car-invalid-km = Oppgi en kilometerstand i hele kilometer.
+car-invalid-amount = Dette beløpet kan ikke leses.
+car-invalid-quantity = Skriv inn mengden: liter, kWh eller kilo.
+car-invalid-part = Velg delen som er byttet, eller skriv inn navnet.
+car-invalid-rubric = Velg en post.
+car-invalid-months = Oppgi et helt antall måneder.
+car-invalid-battery = Oppgi en batteritilstand fra 0 til 100 %.
+car-open = Åpne en loggbok…
+car-save = Lagre loggboken…
+car-report-button = PDF-rapport
+car-file-filter = Billoggbok
+car-file-saved = Loggbok lagret: { $file }
+car-file-opened = Loggbok åpnet: { $file }
+car-file-not-logbook = Denne filen er ikke en billoggbok fra Radinus.
+car-file-too-recent = Denne loggboken kommer fra en nyere versjon av Radinus: oppdater Radinus for å åpne den.
+car-replace-question = Hvis du åpner denne loggboken, erstattes den som er i vinduet. Fortsette?
+car-sheet-history = Loggbok
+car-sheet-summary = Sammendrag
+
+analysis-history-hint = Jo lengre historikk du har, desto bedre blir denne analysen: ideelt sett bør du ha minst ett år med transaksjoner.
+
+# --- F48 — Del en utgift (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = Del en utgift
+window-sharing-title = Del en utgift
+sharing-question = Hvem betaler hva?
+sharing-setup-title = Delingen
+sharing-field-label = Betegnelse
+sharing-label-hint = For eksempel «Restaurant 12/10» eller «Bretagne-tur 2027»: den gir navn til filene og rapportene.
+sharing-field-total = Totalt
+sharing-total-hint = Hvis feltet står tomt, er totalen summen av postene og av hver og ens egne tillegg.
+sharing-field-rule = Regel
+sharing-field-rounding = Avrunding
+sharing-field-people = Personer
+sharing-mode-whole = Én regel for hele utgiften
+sharing-mode-item = Én regel per post
+sharing-rule-equal = Like deler
+sharing-rule-parts = Etter andeler
+sharing-rule-percent = I prosent
+sharing-rule-income = I forhold til inntekt
+sharing-rounding-cent = Til øre
+sharing-rounding-euro = Til hele enheter
+sharing-round-euro = Avrund til hele enheter
+sharing-hide-incomes = Skjul inntektene i rapportene og eksporten
+sharing-people-title = Personene
+sharing-people-hint = Én rad per person, én kolonne per post: kryss av for hvem som deltar i hva. Alt annet er valgfritt. Noen som trekker seg og lar depositumet bli igjen: et eksakt beløp som tilsvarer det vedkommende har betalt, og ingen avkrysset rute.
+sharing-add-person = Legg til en person
+sharing-person-default = Person { $number }
+sharing-items-title = Postene
+sharing-items-hint = Bare det som ikke gjelder alle, som vinen. Resten av totalen går til den felles posten.
+sharing-add-item = Legg til en post
+sharing-common = Felles
+sharing-payments-title = Betalingene
+sharing-payments-hint = Hvem som har betalt, hvor mye og når. En rad uten beløp teller ikke ennå.
+sharing-payments-none = Ingen betalinger ennå.
+sharing-add-payment = Legg til en betaling
+sharing-result-title = Resultatet
+sharing-balances-title = Slik ligger betalingene an
+sharing-transfers-title = Foreslåtte overføringer
+sharing-delete = Slett
+sharing-delete-person-question = Denne personen har betalinger: slette dem sammen med personen?
+sharing-disclaimer = Radinus foreslår en deling: mellom venner står hver og en fritt til å gjøre opp på en annen måte.
+sharing-column-person = Person
+sharing-column-household = Husholdning
+sharing-column-income = Inntekt
+sharing-column-parts = Andeler
+sharing-column-percent = %
+sharing-column-floor = Minst
+sharing-column-cap = Maks
+sharing-column-fixed = Eksakt beløp
+sharing-column-alone = Egne tillegg
+sharing-column-gift = Gitt overskudd
+sharing-column-share = Andel
+sharing-column-typed = Oppgitt %
+sharing-column-constraint = Hva som gjaldt
+sharing-column-due = Å betale
+sharing-column-item = Post
+sharing-column-amount = Beløp
+sharing-column-rule = Regel
+sharing-column-participants = Deltakere
+sharing-column-unit = Husholdning eller person
+sharing-column-members = Medlemmer
+sharing-column-paid = Betalt
+sharing-column-balance = Saldo
+sharing-column-date = Dato
+sharing-column-who = Hvem
+sharing-column-label = Betegnelse
+sharing-help-household = Personer i samme husholdning gjør opp sammen: betalingene og det de skylder legges sammen, og de får én oppstilling. Eksempel: «Familien Martin» for foreldrene og barna.
+sharing-help-income = Brukes bare av regelen «I forhold til inntekt»: jo høyere inntekt, desto større andel. Skriv inn månedsinntekten.
+sharing-help-parts = En person med 2 andeler betaler dobbelt så mye som en person med 1 andel. Eksempel: voksen 1, barn 0,5.
+sharing-help-percent = Den delen av utgiften som personen betaler. Prosentene må bli 100 % til sammen.
+sharing-help-floor = Personen betaler minst dette beløpet, selv om den beregnede andelen er mindre. Differansen reduserer de andres andel.
+sharing-help-cap = Personen betaler aldri mer enn dette beløpet. Det som ikke betales, faller på de andre deltakerne i personens poster.
+sharing-help-fixed = Personen betaler dette beløpet uansett hva som skjer, og resten deles mellom de andre. Eksempel: noen som trekker seg og lar depositumet bli igjen.
+sharing-help-alone = Det personen har tatt kun for seg selv, som en dessert eller en kaffe. Det betales fullt ut, i tillegg til andelen.
+sharing-help-gift = Hvis personen har betalt mer enn sin andel: avkrysset er overskuddet en gave til gruppen, ellers blir det tilbakebetalt.
+sharing-help-items = Kryss av for de som deltar i denne posten. Den felles posten er det som er igjen av totalen når de andre postene er trukket fra.
+sharing-help-due = Det personen skylder til sammen: andelen av postene, egne tillegg og avrundingen.
+sharing-help-share = Hva andelen utgjør, i prosent av summen som deles.
+sharing-help-typed = Prosenten du oppga. Den kan avvike fra den faktiske andelen når et minimum, et maksimum eller et eksakt beløp gjaldt.
+sharing-help-constraint = Viser om personens andel ble endret av et minimum, et maksimum, et eksakt beløp eller et gitt overskudd.
+sharing-help-item = Bare det som ikke gjelder alle, som vinen. Resten av totalen går til den felles posten, som deles mellom de avkryssede.
+sharing-help-rule = Hvordan denne posten deles: like deler, etter andeler, i prosent eller i forhold til inntekt.
+sharing-help-paid = Det husholdningen eller personen allerede har betalt, ifølge de registrerte betalingene.
+sharing-help-balance = Det som gjenstår å betale, eller det som er betalt utover andelen. Eksempel: «Gjenstår å betale: 61,54 €».
+sharing-advice-equal = { $count ->
+        [one] { $total } for én person.
+       *[other] { $total } ÷ { $count } personer = { $amount } hver.
+    }
+sharing-advice-equal-varied = Like deler mellom dem som deltar, med hensyn til grensene og unntakene.
+sharing-advice-parts = { $parts } andeler i alt: én andel er verdt { $amount }.
+sharing-advice-parts-varied = Hver betaler etter sine andeler, med hensyn til grensene og unntakene. En tom rute teller som 1 andel.
+sharing-advice-percent-rest = Det mangler { $rest } % for å nå 100 %.
+sharing-advice-percent-over = Prosentene går { $over } % over 100 %.
+sharing-advice-percent-ok = Prosentene blir nøyaktig 100 %.
+sharing-advice-percent-nobody = Prosentene er allerede 100 %: { $count ->
+        [one] { $names } ville ikke måtte betale noe.
+       *[other] ingen av { $names } ville måtte betale noe.
+    }
+sharing-advice-income = Hver betaler { $rate } % av inntekten sin.
+sharing-advice-income-missing = Skriv inn inntekten til hver enkelt for å dele i forhold til inntekt.
+sharing-advice-income-varied = Hver betaler like stor del av inntekten sin, med hensyn til grensene og unntakene.
+sharing-advice-empty = Skriv inn beløpet som skal deles.
+sharing-apply-advice = Bruk de foreslåtte verdiene
+sharing-help-apply-advice = Fyller de tomme rutene med de grå verdiene. Ruter som allerede er fylt ut, endres ikke.
+sharing-from-incomes = Prosent ut fra inntektene
+sharing-help-from-incomes = Erstatter prosentene med hver inntekts andel av de samlede inntektene. De blir 100 % til sammen.
+sharing-reset-percents = Fordel alt på nytt
+sharing-help-reset-percents = Tømmer prosentene og fordeler dem likt mellom alle. Nyttig etter at du har lagt til en person.
+sharing-reset-percents-question = Tømme alle prosentene og fordele dem likt mellom alle?
+sharing-open = Åpne et prosjekt…
+sharing-save = Lagre prosjektet…
+sharing-pdf-distribution = Fordeling (PDF)
+sharing-pdf-payments = Betalingsstatus (PDF)
+sharing-pdf-statements = Individuelle oppstillinger (PDF)…
+sharing-statements-everyone = Alle
+sharing-excel = Eksporter til Excel
+sharing-file-filter = Delingsprosjekt
+sharing-replace-question = Hvis du åpner dette prosjektet, erstattes det som er skrevet inn i vinduet. Fortsette?
+sharing-file-saved = Prosjekt lagret: { $file }
+sharing-file-opened = Prosjekt åpnet: { $file }
+sharing-file-not-project = Denne filen er ikke et delingsprosjekt fra Radinus.
+sharing-file-too-recent = Dette prosjektet kommer fra en nyere versjon av Radinus: oppdater Radinus for å åpne det.
+sharing-file-failed = Filen kunne ikke leses eller skrives: { $reason }
+sharing-statements-replace-question = { $count ->
+        [one] Én oppstilling finnes allerede i denne mappen. Erstatte den?
+       *[other] { $count } oppstillinger finnes allerede i denne mappen. Erstatte dem?
+    }
+sharing-statements-written = { $count ->
+        [one] Én oppstilling skrevet til «{ $folder }».
+       *[other] { $count } oppstillinger skrevet til «{ $folder }».
+    }
+sharing-too-many-people = En deling kan ha høyst 40 personer.
+sharing-too-many-items = En deling kan ha høyst 20 poster.
+sharing-too-many-payments = En deling kan ha høyst 400 betalinger.
+sharing-invalid-amount = Dette beløpet kan ikke leses: det må være et positivt tall.
+sharing-invalid-number = Dette tallet kan ikke leses: det må være et positivt tall.
+sharing-invalid-percent = En prosentandel går fra 0 til 100.
+sharing-invalid-date = Denne datoen kan ikke leses.
+sharing-name-missing = Hver person må ha et navn.
+sharing-name-duplicate = Det finnes allerede «{ $name }»: skill dem fra hverandre, for eksempel med en forbokstav.
+sharing-floor-above-cap = Minimum ligger over maksimum.
+sharing-item-label-missing = Denne posten har ikke noe navn.
+sharing-items-above-total = Postene og hver og ens egne tillegg overstiger totalen med { $amount }.
+sharing-payment-person = Velg hvem som har betalt.
+sharing-percent-total = Prosentene blir { $sum } %: de må bli 100 %.
+sharing-percent-total-item = «{ $item }»: prosentene blir { $sum } %: de må bli 100 %.
+sharing-item-nobody = Ingen deltar i «{ $item }».
+sharing-item-no-weight = Ingen veier noe i «{ $item }»: alle deltakerne står på null.
+sharing-income-missing = Inntekten til { $name } mangler.
+sharing-fixed-above = De eksakte beløpene overstiger summen som skal deles, med { $amount }.
+sharing-floors-above = Minimumsbeløpene overstiger summen som skal deles, med { $amount }.
+sharing-cap-alone = { $name } er alene om å delta i «{ $item }»: maksimum kan ikke overholdes.
+sharing-caps-short = Maksimumsbeløpene er ikke nok til å dekke summen: det mangler { $amount }.
+sharing-impossible = Disse vilkårene kan ikke alle overholdes: myk opp et minimum eller et maksimum.
+sharing-constraint-floor = Minimum nådd
+sharing-constraint-cap = Maksimum nådd
+sharing-constraint-fixed = Eksakt beløp
+sharing-constraint-gift = Gitt overskudd
+sharing-and = { $first } og { $last }
+sharing-outside = Utenfor postene
+sharing-alone = Egne tillegg
+sharing-rounding = Avrunding
+sharing-headline-empty = Legg til personene som deler utgiften.
+sharing-headline-no-amount = Skriv inn totalen, eller postene som skal deles.
+sharing-headline-equal = { $total } å dele: hver betaler { $amount }.
+sharing-headline-range = { $total } å dele: fra { $min } til { $max } avhengig av personen.
+sharing-participants = { $count ->
+        [0] Ingen deltakere
+        [one] Én deltaker
+       *[other] { $count } deltakere
+    }
+sharing-balance-due = Gjenstår å betale: { $amount }
+sharing-balance-over = Har betalt { $amount } mer enn sin andel
+sharing-balance-even = Oppgjort
+sharing-summary-collected = { $collected } av { $total } er betalt.
+sharing-summary-owing = { $count ->
+        [0] Alle er oppgjort.
+        [one] Bare én skylder fortsatt { $amount }.
+       *[other] { $count } skylder fortsatt { $amount } til sammen.
+    }
+sharing-remaining-outside = Gjenstår å betale på utgiften: { $amount }
+sharing-remaining-reimburse = Skal betales tilbake til { $name }: { $amount }
+sharing-all-settled = Alt er oppgjort: ingen skylder noen noe.
+sharing-transfer = { $from } skylder { $to } { $amount }
+sharing-warning-over-paid = Betalingene overstiger utgiften med { $amount }: kontroller beløpene.
+sharing-note-income-zero = { $name } betaler ingenting på { $items }: inntekten er 0.
+sharing-note-excluded = { $name } deltar ikke i «{ $item }»: andelen fordeles på de andre.
+sharing-note-gift = Overskuddet gitt av { $giver } reduserer de andres andel: { $name } har nå betalt mer enn sin andel.
+sharing-note-outside = { $name } betaler { $amount } utenfor sine poster: beløpet trekkes fra det de andre deler.
+sharing-note-keeper = Avrundet til hele enheter: { $name } beholder øre, slik at totalen går opp.
+sharing-report-distribution = Fordeling
+sharing-report-sharing = Delingen
+sharing-report-who-pays = Hvem betaler hva
+sharing-report-items = Detaljer per post
+sharing-report-payments = Betalingsstatus
+sharing-report-as-of = Status per { $date }
+sharing-report-balances = Andel, betalt, saldo
+sharing-report-statement = Oppstilling — { $name }
+sharing-report-your-share = Din andel
+sharing-statement-total = Totalt for husholdningen: { $amount }
+sharing-statement-pay = Å betale til { $name }: { $amount }
+sharing-statement-receive = Å motta fra { $name }: { $amount }
+sharing-sheet-people = Personer
+sharing-sheet-items = Poster
+sharing-sheet-result = Resultat
+sharing-sheet-payments = Betalinger
+sharing-sheet-balances = Tilbakebetalinger

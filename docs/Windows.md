@@ -1,9 +1,10 @@
 # The windows of Radinus
 
 Radinus 1.9.3 numbers its windows F01 to F38, and Radinus 2.0.0 keeps those
-numbers. The comment at the top of every page names its own — `// F02 — «
-Liste opérations du compte »` — and this file is the map from that number to
-the files that make it.
+numbers. A window that 1.9.3 never had takes the next free number after F38 —
+F39 is the first, the crossed balance of 2.1.0. The comment at the top of
+every page names its own — `// F02 — « Liste opérations du compte »` — and
+this file is the map from that number to the files that make it.
 
 Read `Architecture.md` §6 first if you have not: it explains the window
 lifecycle these pages live under, and it is not the usual one.
@@ -46,9 +47,21 @@ showing the categories.
 | F04 | Fiche sous-opération | `sub-operation-form` | `sub-operation-form.html` |
 | F05 | Classification rapide | `quick-classification` | `quick-classification.html` |
 
-F02 is the window everything else orbits: sixteen columns, the tree of mothers
+F05 classifies in bulk, on a draft held in memory: seven characteristics —
+five nomenclatures, the status and, since 3.0.0, the verification — each as a
+tick box and a list in the banner, and as a column with its drop-down list in
+the table. Nothing reaches the database until the diskette is clicked.
+
+F02 is the window everything else orbits: eighteen columns, the tree of mothers
 and daughters, the running balance, the three totals, the Période and Filtre
-menus, the export by right-click and the printing menu.
+menus, the export by right-click and the printing menu. Its columns are the
+user's own (P-49): a header is dragged to move its column, a right-click on
+the header row ticks columns in and out, and the layout — order, hidden
+columns, widths — is kept in `Preferences`, one for all accounts. The
+mechanism is the shared table's (`layoutName`, and an `id` per column). The
+detail at the bottom of the seven statistics and of the crossed balance asks
+for it too (P-50) — one layout per statistic, the table being named after its
+axis — and never the matrix above.
 
 ### Accounts
 
@@ -127,12 +140,40 @@ integration window **as if they had been OFX**.
 
 | F | Name | Label | Page |
 |---|---|---|---|
-| F20–F24 | Statistiques, six axes | `statistics-<axis>` | `statistics.html?axis=…` |
+| F20–F24 | Statistiques, seven axes | `statistics-<axis>` | `statistics.html?axis=…` |
 | F19 | Tableau de bord | `dashboard` | `dashboard.html` |
 | F25 | Évolution du solde | `balance-curves` | `balance-curves.html` |
+| F39 | Bilan croisé | `crossed-balance` | `crossed-balance.html` |
+| F40 | Analyse Évolution du solde | `balance-analysis` | `balance-analysis.html` |
 
-`<axis>` is `category`, `assignment`, `budget-line`, `payment-mode`, `payee`
-or `project`.
+`<axis>` is `category`, `assignment`, `budget-line`, `payment-mode`, `payee`,
+`project` or `verification`.
+
+**The seventh axis is not a nomenclature** (3.0.0, 03/10/2026). The first six
+cross a list the user manages with time; `verification` crosses the closed
+list of four — to verify, verified, doubtful, disputed. It is the same page
+and the same template, with two differences held in `statistics::Axis`: its
+rows come from the `Verification` table, named in the language of the
+interface, and it has no « Sans … » row — a value outside the list is counted
+under « À vérifier ». It did not take a number of its own: like the six, it is
+`statistics.html` with another axis. The detail under the matrix carries a
+« Vérification » column in all seven.
+
+**F40 is F25's chart with the reason under it** (3.0.0, 05/10/2026, P-54):
+one drags a zone on the chart, and the operations of that zone appear in a
+table below, with a line that sums the zone up — balance before, balance
+after, change, debits, credits. The chart's drawing code is a *copy* of
+F25's, at the author's request: F25 is not touched and the two windows live
+apart. The zone is computed in the core beside the curve
+(`balance_curve::zone`), so the change announced is the sum of the rows shown.
+
+**F39 is the first window Radinus 2 adds of its own** (2.1.0, 25/08/2026):
+1.9.3 stopped at F38, so a new window takes the next free number rather than
+squeezing into a used one. The six statistics cross one nomenclature with
+time; F39 crosses two nomenclatures with each other — categories down the
+side, assignments across the top — and fixes the time to a single month, which
+one steps through with the two clocks. It shares the template of the six, and
+its rules of its own are at the top of `crossed-balance.ts`.
 
 ### Budget
 
@@ -143,6 +184,130 @@ or `project`.
 
 **Two doors, two questions**: one enters a budget, the other checks whether it
 was kept. Two menu entries and two labels rather than two tabs of one window.
+
+### Tools
+
+| F | Name | Label | Page |
+|---|---|---|---|
+| F41 | Simulation de crédit | `loan-simulation` | `loan-simulation.html` |
+| F42 | Consommation d'un appareil électrique | `appliance-cost` | `appliance-cost.html` |
+| F43 | Mon matelas de sécurité | `safety-cushion` | `safety-cushion.html` |
+| F44 | Objectif Épargne | `savings-goal` | `savings-goal.html` |
+| F45 | Et si je réduisais… ? | `spending-cut` | `spending-cut.html` |
+| F46 | Préparer mes vacances | `holiday` | `holiday.html` |
+| F47 | Carnet de ma voiture | `car-logbook` | `car-logbook.html` |
+| F48 | Partager une dépense | `sharing` | `sharing.html` |
+
+**F41 simulates a fixed-rate loan and weighs it against the database's
+history** (3.0.0, 08/10/2026, P-58). Menu Outils, a main menu of its own between
+Nomenclatures and Paramètres (P-61). At the
+top, always visible: the type of loan, three linked sliders — amount,
+monthly payment, term in months — each with its text field, then the rate, the
+fees and the insurance, and the PDF report button. Below, three tabs: « Le
+crédit » (eight figures, the cost ring, the outstanding principal, the
+repayment schedule) and « Puis-je le rembourser ? » (the accounts to study, the
+period, the verdict with its gauge, the income ring, the month-by-month bars,
+the projected balance), and « Réglages du jugement » (the three judging
+methods side by side, P-60). The window computes nothing and writes nothing: the
+core settles the sliders, writes every figure and draws every chart as SVG
+(`loan`, `loan_report`, `loan_charts`) — the same SVG the PDF report embeds.
+Nothing is stored; the window is hidden, not destroyed, so a simulation is
+still there when it is reopened while Radinus runs.
+
+**F42 says what an electrical appliance costs** (3.0.0, 09/10/2026, P-62).
+Menu Outils, under F41. One page, no tab: two cards at the top — the
+appliance (running: power, hours per day, days per week, share in off-peak
+hours; standby: power, hours per day of use) and the contract (option,
+prices, off-peak hours, « Reprendre le tarif enregistré ») — then three tiles
+(per day, per month, per year: cost and kWh), the standby sentence, the ring
+of where the money goes and the one-year detail. The appliance fields start
+empty; the contract starts from the `tarif.electricite` preference and
+changes made here apply to this calculation only. The core reads the fields,
+computes and writes (`appliance`); the ring is `loan_charts::donut`. No PDF.
+The window reloads the saved tariff when the preferences save it
+(`electricity-tariff-changed`) or when the database moves under it.
+
+**F43 tells how many months savings would last if income stopped** (3.0.0,
+09/10/2026, P-63). Menu Outils, under F42. Left: the accounts with two tick
+boxes each (« Épargne », « Dépenses »), the period, the fallback income, and
+the spending categories, each with its monthly average and a tick box. Right:
+the gauge of months covered (0–12, red/orange/green at 3 and 6) with the
+verdict and five figures, the two thresholds and when they would be reached,
+the projected savings until they run out. The core does everything
+(`cushion`); the window keeps only what is ticked. Nothing is stored; the
+window rereads the accounts on focus and when operations or accounts change.
+
+**F44 projects the balance of the followed accounts** (3.0.0, 10/10/2026,
+P-64). Menu Outils, under F43. Left: the followed accounts (savings accounts
+ticked to start with, all of them if there are none), the reference period
+(last 12 months, a year, or a range of years with two lists), the question
+among three, and its fields — target amount, target date (month list and
+year), annual rate, extra effort per month (hidden for the third question,
+whose answer it is). Right: the answer in one sentence with its range, the
+figures, the chart (real balance of the last twelve months, projection,
+range, goal), the notes and the period. The core reads, projects and writes
+(`savings_goal`); the chart reuses the frame of `loan_charts`.
+
+**F45 shows what cutting some spending would change** (3.0.0, 10/10/2026,
+P-66). Menu Outils, under F44. Left: the followed accounts (all ticked to
+start with) and the period, then the settings — group by (categories, payees,
+budget lines), horizon slider 1–10 years, rate, target — and the files
+(open a project, save it, PDF report, Excel export; P-68).
+Right: the answer and its tiles, the table where cuts are typed (a field and
+a % / money unit per line; the table is updated in place while its items do
+not change, so the field being typed keeps its place), the chart without and
+with the cuts, the ring after the cuts, the notes. The door clears every cut,
+the rate, the target and the horizon before hiding the window. The core reads,
+projects, writes and composes the PDF, the workbook and the JSON project
+(`cutback`); the period helper is shared (`period-range.ts`). As in F46, the
+project is opened by the Rust-side picker. The door of F45 and F46 asks first
+when typed figures would be lost (save and leave, discard and leave, stay;
+P-69).
+
+**F46 says what the next trip will cost** (3.0.0, 10/10/2026, P-67). Menu
+Outils, under F45. Left: the trip (stay or cruise, adults and children
+sliders, nights with the days written beside them, months before departure,
+ports of call for a cruise), the accounts whose balance counts as already
+saved, and the files (open a project, save it, PDF report, Excel export).
+Right: the result and its tiles, the budget — built from the catalogue the
+core sends, so the window knows no item by name — with its optional lines
+apart, and the ring. The core reads, computes, writes the PDF, the workbook
+and the JSON project (`holiday`). Opening a project uses the file picker on
+the Rust side: the window is granted no right to read a file.
+
+**F47 keeps the history of a car** (3.0.0, 10/10/2026, P-70). Menu Outils,
+under F46. Left: the car's sheet, the home charging tariff (for a car that
+plugs in), the entry being added or edited — its fields follow the category
+and the energy — with « Prendre une opération… » to fill it from a bank
+transaction, and the files (open, save, PDF, Excel). Right: what the car
+costs and its tiles, the upcoming dates, the history (filter by category;
+click an entry to edit it), the ring by category, energy, wear parts, tyres,
+battery health, and the bars by year. The logbook lives in the application
+state; every gesture goes to the controller, which answers with the whole
+logbook already written (`car`). Opening a logbook uses the Rust-side
+picker. The door asks before forgetting unsaved changes (P-69), then
+forgets the logbook.
+
+**F48 splits a sum between people, with constraints** (3.0.0, 11/10/2026,
+P-71). Menu Outils, under F47 — **the only tool enabled without an open
+database**: it reads and writes nothing there. Left: the split (label,
+total, one rule for everything or one per item, rounding, « Masquer les
+revenus »), the items that do not concern everyone — the rest of the total is
+the « Commun » item, each with its rule under its name in per-item mode —,
+and the files (open, save, the general distribution PDF, the payment status
+PDF, the individual statements written into a chosen folder, Excel). Right:
+the result; one grid for the people — a row each, with what they owe kept in
+view beside their name while the grid scrolls, their optional constraints,
+and a column per item where one ticks who takes part (with a percentage or
+parts field when that item's rule asks for one); the dated payments; and
+where they stand, per household. The window computes nothing and composes
+no sentence — even an added person's default name comes from the core
+(`sharing`). Opening a project and choosing the statements' folder use the
+Rust-side pickers. The door asks before forgetting (P-69). Each calculation
+also returns the core's **advice** (P-72), even when refused: a sentence under
+the rule (`#rule-advice`, or `#advice-<item>` per item), grey placeholders in
+the empty boxes, and the buttons « Reprendre les valeurs conseillées »,
+« Pourcentages d'après les revenus » and « Tout répartir à nouveau ».
 
 ### Everything else
 

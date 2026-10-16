@@ -63,6 +63,19 @@ function say(message: string, alert = false): void {
 let accountId = 0;
 let rank = 0;
 
+/// Les listes du classement, **gardées ici**. Elles sont demandées une fois au
+/// contrôleur, et reposées à chaque ouverture de la fiche : remettre les
+/// défauts ne doit pas coûter un aller-retour, et la fiche doit pouvoir le
+/// faire même si le démarrage a échoué — d'où les listes vides par défaut.
+let combos: Combos = {
+  category: [],
+  assignment: [],
+  payment_mode: [],
+  payee: [],
+  project: [],
+};
+let statuses: Item[] = [];
+
 function fill(menu: HTMLSelectElement, items: Item[], chosen: number): void {
   menu.replaceChildren();
   for (const item of items) {
@@ -72,6 +85,28 @@ function fill(menu: HTMLSelectElement, items: Item[], chosen: number): void {
     menu.append(entry);
   }
   menu.value = String(chosen);
+}
+
+/// **Repose les défauts du classement.** Les cinq listes à « Non précisé » et
+/// le statut à pointée : une ligne de relevé bancaire est, par définition, une
+/// opération que la banque a passée. Rien n'est deviné à partir du type de
+/// transaction du fichier — ce serait une déduction de plus, mais elle
+/// porterait sur un classement que l'on relit dans ses statistiques, et une
+/// déduction fausse y est invisible.
+///
+/// **Appelée à l'ouverture et à chaque réouverture, la ligne fût-elle la même**
+/// (règle de Fabrice, 30/08/2026). C'est le pendant de `load()` : celui-ci
+/// repose ce que le relevé porte, celle-ci ce que le relevé ne porte pas.
+/// Séparée du bloc d'ouverture pour cette raison même — tant qu'elle y était
+/// écrite, il n'y avait rien à rappeler, et une fiche redemandée gardait le
+/// classement de la ligne d'avant.
+function blank(): void {
+  fill(element<HTMLSelectElement>("payment-mode"), combos.payment_mode, 0);
+  fill(element<HTMLSelectElement>("category"), combos.category, 0);
+  fill(element<HTMLSelectElement>("assignment"), combos.assignment, 0);
+  fill(element<HTMLSelectElement>("payee"), combos.payee, 0);
+  fill(element<HTMLSelectElement>("project"), combos.project, 0);
+  fill(element<HTMLSelectElement>("status"), statuses, 1);
 }
 
 async function load(): Promise<void> {
@@ -231,8 +266,23 @@ element<HTMLButtonElement>("close").addEventListener("click", () => void leave()
 /// Redemandée sur une autre ligne : la fiche est bâtie une fois et jamais
 /// détruite, donc les nouveaux paramètres arrivent par un événement. Sans cette
 /// écoute, elle montrerait éternellement la première ligne ouverte.
+///
+/// **Elle repart à zéro, et sur la même ligne aussi.** Bug remonté par Fabrice
+/// le 30/08/2026 : elle ne rejouait que `load()`, qui repose ce que le relevé
+/// porte — date, libellé, sens, montant, date de pointage — et le classement,
+/// qui ne vient d'aucune ligne, restait celui d'avant. Une catégorie héritée ne
+/// se voit nulle part : elle ressort six mois plus tard dans une statistique
+/// fausse. Et un statut hérité écrivait une opération non pointée portant une
+/// date de pointage, que la liste montre désormais en gris italique.
+///
+/// Rouvrir la même ligne repart à zéro comme les autres : on ne l'a pas
+/// validée, donc elle n'a rien produit — c'est la règle du virement et celle de
+/// « Dupliquer ». « À zéro » veut dire *la ligne telle que le relevé la porte
+/// aujourd'hui* : une correction validée avant un doublon refusé appartient au
+/// relevé, plus à la fiche, et `load()` la ramène à bon droit.
 void listen<string>(PARAMETERS_EVENT, (event) => {
   readParameters(event.payload);
+  blank();
   void load();
 });
 
@@ -246,23 +296,12 @@ void (async () => {
     return;
   }
 
-  // Les cinq listes du classement, et les trois statuts. **Tout part à « Non
-  // précisé »**, et le statut à pointée : une ligne de relevé bancaire est,
-  // par définition, une opération que la banque a passée. Rien n'est deviné à
-  // partir du type de transaction du fichier — ce serait une déduction de plus,
-  // mais elle porterait sur un classement que l'on relit dans ses statistiques,
-  // et une déduction fausse y est invisible.
-  const combos = await invoke<Combos>("list_operation_combos");
-  fill(element<HTMLSelectElement>("payment-mode"), combos.payment_mode, 0);
-  fill(element<HTMLSelectElement>("category"), combos.category, 0);
-  fill(element<HTMLSelectElement>("assignment"), combos.assignment, 0);
-  fill(element<HTMLSelectElement>("payee"), combos.payee, 0);
-  fill(element<HTMLSelectElement>("project"), combos.project, 0);
-  fill(
-    element<HTMLSelectElement>("status"),
-    await invoke<Item[]>("list_operation_statuses"),
-    1,
-  );
+  // Les cinq listes du classement, et les trois statuts. Demandés ici,
+  // **reposés par `blank()`** — qui les remettra à l'identique à chaque
+  // réouverture.
+  combos = await invoke<Combos>("list_operation_combos");
+  statuses = await invoke<Item[]>("list_operation_statuses");
+  blank();
 
   readParameters(window.location.search);
   await load();
@@ -279,8 +318,13 @@ void (async () => {
 ///
 /// La liste est reposée sur place, **avec le choix en cours conservé** : on ne
 /// refait pas l'écran d'une fiche que quelqu'un est en train de remplir.
+///
+/// La liste gardée est remplacée elle aussi : sans cela, la prochaine
+/// réouverture de la fiche reposerait des listes d'où le libellé neuf serait
+/// absent, et l'on aurait corrigé le bug pour une séance seulement.
 void listen("nomenclatures-changed", async () => {
   const fresh = await invoke<Combos>("list_operation_combos");
+  combos = fresh;
   for (const [id, list] of [
     ["payment-mode", "payment_mode"],
     ["category", "category"],

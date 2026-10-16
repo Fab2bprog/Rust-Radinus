@@ -255,13 +255,16 @@ menu-accounts-checkbooks = Beheer van de chequeboekjes
 
 menu-statistics = Statistieken
 menu-statistics-balance-chart = Grafiek Verloop van het saldo
+menu-statistics-balance-analysis = Analyse Verloop van het saldo
 menu-statistics-by-category = Stat per categorie
 menu-statistics-by-assignment = Stat per toewijzing
 menu-statistics-by-budget-line = Stat per budgetpost
 menu-statistics-by-payment-mode = Stat per betaalwijze
 menu-statistics-by-payee = Stat per relatie en handelaar
 menu-statistics-by-project = Stat per project
+menu-statistics-by-verification = Stat per controle
 menu-statistics-dashboard = Overzicht van de boekingen
+menu-statistics-crossed-balance = Kruisbalans
 
 menu-budget = Budget
 menu-budget-entry = Budgetinvoer
@@ -279,6 +282,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = Boekingssjablonen
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = Extra
 menu-settings = Instellingen
 menu-settings-about-author = Over de auteur
 menu-settings-about-radinus = Over Radinus
@@ -435,6 +440,15 @@ operations-selection-total = Totaalbedrag van de geselecteerde boekingen: { $amo
 
 operations-column-date = Datum
 operations-column-clearing-date = Afstemdatum
+operations-column-status = Boekingsstatus
+operation-status-pointed = Afgestemd
+operation-status-committed = Gereserveerd
+operation-status-planned = Gepland
+operations-column-verification = Controle
+operation-verification-to-verify = Te controleren
+operation-verification-verified = Gecontroleerd
+operation-verification-doubtful = Twijfelachtig
+operation-verification-disputed = Betwist
 operations-column-label = Omschrijving
 operations-column-category = Categorie
 operations-column-assignment = Toewijzing
@@ -510,6 +524,9 @@ filter-all = Alle boekingen
 filter-pointed = Alleen de afgestemde boekingen
 filter-committed = Alleen de gereserveerde boekingen
 filter-planned = Alleen de geplande boekingen
+filter-by-status = Filter op status
+filter-by-verification = Filter op controle
+filter-show-all = Alles tonen
 
 # --- Boekingsscherm (F03) --------------------------------------------
 # De labels zijn die van de schermafbeelding “Fiche operation transaction.png”,
@@ -543,6 +560,7 @@ operation-field-direction = Boekingstype:
 operation-field-amount = Bedrag
 operation-field-status = Boekingsstatus
 operation-field-clearing-date = Afstemdatum
+operation-field-verification = Controle
 operation-field-category = Categorie
 operation-field-assignment = Toewijzing
 operation-field-payment-mode = Wijze
@@ -565,6 +583,10 @@ operation-nothing-to-show = Geen boeking om weer te geven.
 operation-label-required = De omschrijving van de boeking is verplicht.
 operation-date-required = De datum van de boeking is verplicht.
 operation-clearing-date-invalid = De afstemdatum is geen geldige datum.
+operation-clearing-date-required = Een afgepunte transactie moet verplicht een afpuntdatum hebben.
+operation-clearing-date-question =
+    Een afgepunte transactie moet verplicht een afpuntdatum hebben.
+    Wilt u opslaan met de datum van de transactie, { $date }?
 operation-is-a-sub = Deze rij is een deelboeking: die wijzigt u vanuit haar eigen scherm.
 operation-delete-form-open = Het scherm van “{ $label }” is geopend. Sluit het voordat u verwijdert.
 
@@ -603,6 +625,7 @@ sub-operation-is-the-complement = Dit is het Restant: wat er nog te verdelen val
 sub-operation-of = Verdeling van “{ $label }” ({ $amount })
 
 operations-pointed = { $count ->
+    [0] Geen boeking om af te stemmen: de selectie is al afgestemd.
     [one] 1 boeking afgestemd.
    *[other] { $count } boekingen afgestemd.
 }
@@ -617,6 +640,7 @@ operations-select-one = Selecteer één enkele boeking.
 operation-copy = Kopie nog op te slaan: er is nog niets aangemaakt.
 operations-show-children = Alle deelboekingen tonen
 operations-hide-children = Alle deelboekingen verbergen
+operations-recurring-from = Een periodieke boeking maken op basis van deze boeking
 
 # --- Tweede bevestiging van een ingrijpende verwijdering --------------
 # Een bankrekening verwijderen neemt haar hele historie mee: op een Ja/Nee
@@ -638,6 +662,7 @@ window-statistics-title = { $kind ->
     [payment-mode] Statistieken per betaalwijze
     [payee] Statistieken per relatie en handelaar
     [project] Statistieken per project
+    [verification] Statistieken per controle
    *[category] Statistieken per categorie
 }
 
@@ -647,6 +672,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] BoekingsWijze
     [payee] Relatie
     [project] Projecten
+    [verification] Controle
    *[category] CategorieNaam
 }
 
@@ -656,6 +682,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] Zonder betaalwijze
     [payee] Zonder relatie
     [project] Zonder project
+    [verification] Te controleren
    *[category] Zonder categorie
 }
 statistics-total = Totaal
@@ -697,6 +724,19 @@ accounts-stats-multiselect-help = Info: Gebruik muisklik + toets [{ $modifier }]
 statistics-year-question = Met welk jaar wilt u werken? Radinus loopt van { $first } tot { $last }.
 statistics-year-choose = Kies het jaar
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = Kruisbalans
+crossed-balance-window-name = Kruisbalans
+crossed-balance-column = Categorie
+crossed-balance-no-data = Geen boeking in deze maand voor de gekozen rekeningen.
+crossed-balance-month-question = Aan welke maand wilt u werken? Een getal tussen { $first } en { $last }.
+crossed-balance-month-choose = Maand kiezen
+crossed-balance-next = Volgende maand
+crossed-balance-previous = Vorige maand
+
 # --- Export van de tabellen (rechtermuisklik) -------------------------
 # Een functie van de tabel, niet van een venster: alle lijsten hebben haar.
 
@@ -714,8 +754,16 @@ export-to-xml = Exporteren naar XML (.xml)
 # Het menu Export van het statistiekenvenster: één tabblad per jaar, genaamd
 # AN_2026. De lege jaren — onder de ingestelde schakelaars — staan er niet in.
 export-menu = Export
+export-to = Exporteren naar
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = Cel kopiëren
+copy-rows = Geselecteerde regels kopiëren
+copy-failed = Kopiëren naar het klembord is mislukt.
 export-all-years-excel = Alle jaren naar Excel exporteren
 export-all-years-ods = Alle jaren naar LibreOffice Calc exporteren
+export-all-months-excel = Alle maanden van het getoonde jaar naar Excel exporteren
+export-all-months-ods = Alle maanden van het getoonde jaar naar LibreOffice Calc exporteren
 export-no-year = Geen enkel jaar bevat een boeking: er is niets te exporteren.
 export-years-done = { $years } jaren geëxporteerd naar “{ $file }”.
 export-to-json = Exporteren naar JSON (.json)
@@ -729,6 +777,7 @@ statistics-window-name = { $kind ->
     [payment-mode] Statistieken per betaalwijze
     [payee] Statistieken per relatie en handelaar
     [project] Statistieken per project
+    [verification] Statistieken per controle
    *[category] Statistieken per categorie
 }
 statistics-detail-name = Detail van de statistieken
@@ -771,6 +820,19 @@ curve-axis-balance = saldo
 curve-nothing = Er is geen rekening gekozen: er is geen grafiek te tekenen.
 curve-empty = Geen boekingen in deze periode.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = Analyse van het saldoverloop
+analysis-heading = Analyse van het saldoverloop
+analysis-hint = Sleep met ingedrukte muisknop een zone op de grafiek om de boekingen van die periode te zien.
+analysis-zone = Zone:
+analysis-opening = Beginsaldo:
+analysis-closing = Eindsaldo:
+analysis-variation = Verschil:
+analysis-detail-name = Saldoanalyse
+analysis-detail-none = Geen boeking in deze zone.
+
 # --- F05 — Snelle classificatie van de boekingen -----------------------
 # Het scherm waarin men **in bulk** indeelt: men selecteert rijen, vinkt de
 # te wijzigen kenmerken aan en past ze in één keer toe — in het geheugen.
@@ -790,6 +852,7 @@ quick-check-payment-mode = Wijze
 quick-check-payee = Relatie
 quick-check-project = Project
 quick-check-status = Status
+quick-check-verification = Controle
 quick-column-date = Datum
 quick-column-label = Omschrijving
 quick-column-amount = Bedrag
@@ -799,6 +862,7 @@ quick-column-payment-mode = Betaalwijze
 quick-column-payee = Relatie
 quick-column-project = Projecten
 quick-column-status = Status
+quick-column-verification = Controle
 # Op een Mac is Ctrl + klik een rechtermuisklik: de toets die aan een
 # selectie toevoegt is daar ⌘, en de hulptekst moet die noemen die werkt.
 quick-multiselect-help = Info: Gebruik muisklik + toets [{ $modifier }] op de tabel om meerdere elementen te selecteren
@@ -859,7 +923,7 @@ statement-no-match = Geen enkele rij komt overeen met het filter.
 statement-help = Info: Gebruik muisklik + toets [{ $modifier }] op de tabel om meerdere rijen te selecteren
 statement-choose-account = Dit bestand bevat meerdere rekeningen. Welke wilt u importeren?
 statement-select-line = Selecteer minstens één rij van het bankafschrift.
-statement-title-open = Een bestand met een bankafschrift openen (.ofx)
+statement-title-open = Een bestand met een bankafschrift openen (OFX, QIF, CSV)
 statement-title-info = Informatie over het geopende bestand
 statement-title-integrate = De selectie opnemen in de rekening
 statement-title-validate = Deze boeking opnemen in de rekening
@@ -868,6 +932,15 @@ statement-no-fitid = Let op: dit bestand geeft geen identificatie (FITID) voor d
 statement-loaded = { $count ->
     [0] Dit bestand bevat geen enkele boeking voor deze rekening.
    *[other] { $count } rijen gelezen, waarvan { $known } al aanwezig in uw rekening.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] { $count } rijen gelezen; geen enkele lijkt op een boeking die al aanwezig is in uw rekening.
+    [one] { $count } rijen gelezen, waarvan één lijkt op een boeking die al aanwezig is in uw rekening (dezelfde datum, dezelfde omschrijving, hetzelfde bedrag).
+   *[other] { $count } rijen gelezen, waarvan { $alike } lijken op boekingen die al aanwezig zijn in uw rekening (dezelfde datum, dezelfde omschrijving, hetzelfde bedrag).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] Nog één lijkt op een boeking die al aanwezig is (dezelfde datum, dezelfde omschrijving, hetzelfde bedrag).
+   *[other] Nog { $alike } lijken op boekingen die al aanwezig zijn (dezelfde datum, dezelfde omschrijving, hetzelfde bedrag).
 }
 statement-integrated = { $count ->
     [0] Er is niets opgenomen: deze rijen staan al in uw rekening.
@@ -904,7 +977,23 @@ statement-file-info =
     Rekening van het bestand: { $account }
     Periode: van { $from } tot { $to }
     Door de bank opgegeven saldo: { $balance }
-    { $count } boekingen, waarvan { $known } al aanwezig in uw rekening.
+statement-qif-question = Niets in dit bestand geeft aan of de datum “{ $date }” geschreven is als dag/maand of als maand/dag. Bedoeld is:
+statement-qif-day-month = Dag { $day }, maand { $month } (dag/maand)
+statement-qif-month-day = Dag { $day }, maand { $month } (maand/dag)
+statement-qif-dates-mixed = Dit bestand schrijft zijn datums op twee manieren: “{ $first }” leest als dag/maand, “{ $second }” als maand/dag. Het wordt niet geïmporteerd, zodat geen enkele datum verkeerd wordt.
+statement-qif-amounts-mixed = Dit bestand schrijft zijn bedragen op twee manieren: “{ $first }” met een punt, “{ $second }” met een komma. Het wordt niet geïmporteerd, zodat geen enkel bedrag verkeerd wordt.
+statement-qif-opening = Beginsaldo van { $amount } op { $date }: dit is geen boeking, het wordt niet geïmporteerd.
+statement-qif-opening-undated = Beginsaldo van { $amount }: dit is geen boeking, het wordt niet geïmporteerd.
+statement-qif-suspect = Rij { $rank }, “{ $label }” ({ $amount }), lijkt op een beginsaldo: controleer deze rij voordat u die opneemt.
+statement-qif-rejected = { $count ->
+    [one] Eén onleesbare rij wordt niet geïmporteerd: { $lines }.
+   *[other] { $count } onleesbare rijen worden niet geïmporteerd: { $lines }.
+}
+statement-qif-reason-date = datum
+statement-qif-reason-amount = bedrag
+statement-qif-reason-differ = tegenstrijdige bedragen
+statement-qif-no-account = Deze rekening staat niet meer in het bestand: open het bestand opnieuw.
+statement-balance-unknown = niet vermeld in het bestand
 statement-group-identification = Identificatie van de boeking
 statement-group-amount = Bedrag van de boeking
 statement-group-classification = Indeling van de boeking voor de berekening van de statistieken
@@ -1535,6 +1624,9 @@ password-show = Wachtwoord tonen
 password-remove-question = De beveiliging van deze database opheffen?
 password-mismatch = De twee invoeren van het nieuwe wachtwoord verschillen
 password-wrong = Het wachtwoord past niet
+database-too-recent = Deze database is opgeslagen door een recentere versie van Radinus (databaseversie { $found }; deze versie leest tot en met versie { $supported }). Werk Radinus bij om ze te openen.
+database-not-radinus = Dit bestand is geen Radinus-database.
+database-unreadable = De database kon niet worden gelezen: { $reason }
 password-close-first = Sluit deze database voordat u het wachtwoord wijzigt
 password-now-protected = De database is beveiligd met een wachtwoord
 password-now-clear = De database is niet meer beveiligd
@@ -1770,6 +1862,11 @@ welcome-total-final = Eindsaldo
 welcome-total-real-detail = afgestemd + gereserveerd
 welcome-total-final-detail = afgestemd + gereserveerd + gepland
 welcome-accounts = Uw rekeningen
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = Rekeningen meegeteld in de totalen: { $count } van { $total }
+welcome-tile-counted = Deze rekening meetellen in de totalen
 welcome-tile-bank = Bij de bank
 welcome-tile-real = Werkelijk
 welcome-tile-final = Eind
@@ -1824,6 +1921,58 @@ preferences-leaf-zoom = Grootte van de weergave
 preferences-field-zoom = Vergroting:
 preferences-zoom-reset = Standaardwaarde
 preferences-zoom-hint = Alles wordt samen groter: de tekst, de pictogrammen, de kolommen. Onder 100 % past er meer op het scherm. De menubalk van het systeem en zijn dialoogvensters volgen daarentegen de instellingen van uw computer en niet deze hier.
+preferences-branch-import = Import
+preferences-leaf-verification = Controle
+preferences-field-verification = Geïmporteerde boekingen:
+preferences-verification-hint = ‘Gecontroleerd’: u vertrouwt uw bank, een geïmporteerde boeking wordt als juist beschouwd. ‘Te controleren’: elke geïmporteerde boeking wacht op uw controle; daarna zet u ze zelf op ‘Gecontroleerd’ in de boekingenlijst. Deze instelling geldt alleen voor toekomstige imports.
+preferences-leaf-qif = QIF-bankafschriften
+preferences-field-qif-order = Volgorde van dag en maand:
+preferences-qif-order-ask = Mij elke keer vragen
+preferences-qif-order-day-month = Altijd dag/maand (05/03 = 5 maart)
+preferences-qif-order-month-day = Altijd maand/dag (05/03 = 3 mei)
+preferences-qif-order-help = Wordt alleen gebruikt als geen enkele datum in het bestand de doorslag geeft. Zodra een datum als 24/11 de volgorde bewijst, beslist het bestand, ongeacht deze instelling.
+preferences-field-qif-label = Omschrijving van de boeking:
+preferences-qif-label-both = Relatie + memo
+preferences-qif-label-payee = Alleen relatie
+preferences-qif-label-memo = Alleen memo
+preferences-qif-label-help = Wanneer een boeking zowel een relatie als een memo heeft. Heeft zij er maar één, dan wordt die gebruikt, ongeacht deze instelling.
+preferences-qif-hint = Deze instellingen gelden voor alle QIF-bankafschriften, welke database ook geopend is. ‘Mij elke keer vragen’ is het veiligst: een bestand met dubbelzinnige datums wordt nooit op goed geluk gelezen.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = Standaardkolommen herstellen
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = Tonen/Verbergen
+columns-colour = Kolom kleuren:
+columns-colour-none = Geen kleur
+columns-colour-red = Rood
+columns-colour-orange = Oranje
+columns-colour-pink = Roze
+columns-colour-pastel-green = Pastelgroen
+columns-colour-green = Groen
+columns-colour-pastel-blue = Pastelblauw
+columns-colour-blue = Blauw
+columns-colour-pastel-yellow = Pastelgeel
+columns-colour-yellow = Geel
+preferences-leaf-columns = Tabelkolommen
+preferences-table-operations-list = Lijst boekingen
+preferences-columns-reset = Herstellen
+preferences-columns-reset-all = Alles herstellen
+preferences-columns-done = De kolommen hebben weer hun oorspronkelijke indeling.
+preferences-columns-hint = Elke tabel onthoudt de volgorde van zijn kolommen, de kolommen die u verbergt en hun breedte. ‘Herstellen’ geeft de tabel meteen zijn oorspronkelijke indeling terug.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = Herstellen
+preferences-leaf-comfort = Comfortinstellingen
+preferences-comfort-reset = Comfortinstellingen herstellen
+preferences-comfort-hint = Herstelt de kolommen van alle tabellen, de volgorde en de selectievakjes van de rekeningen in het startvenster, en de grootte van de weergave. De taal, de valuta en de controle van geïmporteerde boekingen blijven ongemoeid.
+preferences-comfort-question = Comfortinstellingen herstellen? De tabelkolommen, het startvenster en de grootte van de weergave keren terug naar hun oorspronkelijke staat.
+preferences-comfort-done = De comfortinstellingen zijn hersteld.
 
 # --- De banner van het startvenster ---------------------------------------
 #
@@ -1889,3 +2038,943 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = Dit programma wordt geleverd zonder enige garantie, voor zover de wet dat toestaat.
 licence-info = De officiële tekst opent in uw browser, op gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = Leningsimulatie
+window-loan-title = Leningsimulatie
+loan-tab-credit = De lening
+loan-tab-afford = Kan ik die terugbetalen?
+loan-field-kind = Soort lening
+loan-kind-consumer = Consumptief krediet
+loan-kind-mortgage = Hypotheek
+loan-field-amount = Geleend bedrag
+loan-field-payment = Maandbedrag
+loan-field-months = Looptijd
+loan-field-rate = Vaste rentevoet
+loan-field-fees = Dossierkosten
+loan-field-insurance = Verzekering per maand
+loan-unit-months = maanden
+loan-unit-percent = %
+loan-invalid-field = Deze waarde is geen getal: verbeter ze om de berekening opnieuw te starten.
+loan-report-button = PDF-rapport
+loan-monthly-table = Tabel maand per maand
+loan-months-count = { $count ->
+        [one] { $count } maand
+       *[other] { $count } maanden
+    }
+loan-percent = { $value }%
+loan-notice-payment-too-low = Dit maandbedrag dekt de rente niet: de lening zou nooit terugbetaald worden. De looptijd blijft op 600 maanden.
+loan-notice-too-long = Dit maandbedrag zou meer dan 600 maanden vergen: de looptijd blijft op 600 maanden.
+loan-figure-payment = Maandbedrag
+loan-figure-payment-insured = Maandbedrag met verzekering
+loan-figure-taeg = JKP
+loan-figure-interest = Rentekosten
+loan-figure-insurance = Verzekeringskosten
+loan-figure-cost = Totale kosten van de lening
+loan-figure-total-due = Totaal verschuldigd bedrag
+loan-figure-all-in = Totaal terugbetaald, verzekering inbegrepen
+loan-part-capital = Geleend bedrag
+loan-part-interest = Rente
+loan-part-fees = Dossierkosten
+loan-part-insurance = Verzekering
+loan-donut-cost-caption = in totaal
+loan-chart-cost = Wat deze lening kost
+loan-chart-capital = Openstaand kapitaal
+loan-schedule-title = Aflossingstabel
+loan-schedule-yearly = Aflossingstabel, jaar per jaar
+loan-column-number = Nr.
+loan-column-year = Jaar
+loan-column-date = Vervaldag
+loan-column-payment = Termijn
+loan-column-payments = Termijnen
+loan-column-interest = Rente
+loan-column-capital = Kapitaal
+loan-column-insurance = Verzekering
+loan-column-remaining = Openstaand kapitaal
+loan-history-label = Onderzochte periode
+loan-period-last-12 = Laatste 12 maanden
+loan-accounts-title = Onderzochte rekeningen
+loan-period-title = Periode
+loan-column-account = Rekening
+loan-column-bank = Bank
+loan-column-balance = Reëel saldo
+loan-unavailable-no-account = Vink minstens één rekening aan om uw geschiedenis te onderzoeken.
+loan-unavailable-no-month = Deze periode heeft nog geen volledige maand: kies een andere.
+loan-verdict-title = Kort gezegd
+loan-verdict-green = Haalbaar
+loan-verdict-orange = Krap
+loan-verdict-red = Riskant
+loan-verdict-no-income = Geen inkomsten in deze periode: de schuldratio is niet te berekenen.
+loan-check-debt-green = Schuldratio van { $ratio }: onder de drempel van { $green } van deze methode.
+loan-check-debt-orange = Schuldratio van { $ratio }: tussen { $green } en { $red }, op de grens.
+loan-check-debt-red = Schuldratio van { $ratio }: boven { $red }.
+loan-check-effort = Het maandbedrag van { $payment } neemt { $share } van wat u opzijzet in { $kind ->
+        [good] een goede maand
+        [hard] een moeilijke maand
+       *[usual] een gewone maand
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] Een goede maand
+        [hard] Een moeilijke maand
+       *[usual] Een gewone maand
+    } laat u niets over: het maandbedrag van { $payment } zou van uw reserve gaan.
+loan-check-reserve-green = Uw saldo blijft positief tot het einde van de lening.
+loan-check-reserve-red = Uw saldo zou in { $month } onder nul zakken, door deze lening.
+loan-check-reserve-sooner = Uw saldo zou in { $month } onder nul zakken, { $count ->
+        [one] één maand
+       *[other] { $count } maanden
+    } vroeger dan zonder deze lening.
+loan-check-reserve-anyway = Uw saldo zou rond { $month } ook zonder deze lening onder nul zakken; de lening verandert daar nauwelijks iets aan.
+loan-check-reserve-floor-green = Uw saldo blijft tot het einde van de lening boven uw veiligheidsreserve ({ $floor }).
+loan-check-reserve-floor-red = Uw saldo zou in { $month } onder uw veiligheidsreserve ({ $floor }) zakken, door deze lening.
+loan-check-reserve-floor-sooner = Uw saldo zou in { $month } onder uw veiligheidsreserve ({ $floor }) zakken, { $count ->
+        [one] één maand
+       *[other] { $count } maanden
+    } vroeger dan zonder deze lening.
+loan-check-reserve-floor-anyway = Uw saldo zou rond { $month } ook zonder deze lening onder uw veiligheidsreserve ({ $floor }) zakken; de lening verandert daar nauwelijks iets aan.
+loan-warning-deficit = Let op: in deze periode zijn uw uitgaven al gemiddeld { $amount } per maand hoger dan uw inkomsten, vóór elke lening.
+loan-figure-reference = Spaarbedrag in { $kind ->
+        [good] een goede maand
+        [hard] een moeilijke maand
+       *[usual] een gewone maand
+    }
+loan-figure-tipped = Maanden die de lening in het rood zou brengen
+loan-gauge-caption = schuldratio
+loan-figure-income = Gemiddelde inkomsten per maand
+loan-figure-spending = Gemiddelde uitgaven per maand
+loan-figure-saving = Gemiddeld spaarbedrag per maand
+loan-figure-running = Lopende leningen per maand
+loan-figure-new = Nieuw maandbedrag, verzekering inbegrepen
+loan-figure-rest = Om van te leven per maand
+loan-figure-debt = Schuldratio
+loan-red-months-value = { $count } op { $total }
+loan-figure-balance-now = Reëel saldo vandaag
+loan-figure-balance-end = Verwacht saldo aan het einde van de lening
+loan-chart-income = Waar uw gemiddelde inkomen naartoe gaat
+loan-donut-income-caption = gemiddeld inkomen
+loan-part-spending = Dagelijkse uitgaven
+loan-part-running = Lopende leningen
+loan-part-new = Nieuwe lening
+loan-part-rest = Rest
+loan-part-missing = Tekort
+loan-chart-history = Uw geschiedenis met deze lening
+loan-chart-history-hint = Wat er elke maand over zou zijn, na betaling van het maandbedrag. Felrood: de maanden die de lening in het rood zou brengen; lichtrood: de maanden die er al zonder haar in stonden.
+loan-chart-projection = Uw verwachte saldo
+loan-mark-loan-end = Einde: { $label }
+loan-mark-negative = In het rood
+loan-mark-floor = Onder de reserve
+loan-mark-floor-line = Veiligheidsreserve
+loan-running-title = Meegerekende lopende leningen
+loan-running-column-label = Periodieke verrichting
+loan-running-column-monthly = Per maand
+loan-running-column-end = Laatste termijn
+loan-no-running = Geen lopende lening herkend onder uw periodieke verrichtingen.
+loan-period-caption = van { $from } tot { $to } ({ $count ->
+        [one] { $count } maand
+       *[other] { $count } maanden
+    })
+loan-transfers = { $count ->
+        [0] Er werd geen overschrijving tussen uw aangevinkte rekeningen herkend.
+        [one] Eén overschrijving tussen uw aangevinkte rekeningen werd herkend en buiten beschouwing gelaten.
+       *[other] { $count } overschrijvingen tussen uw aangevinkte rekeningen werden herkend en buiten beschouwing gelaten.
+    }
+loan-method = Gemiddelden over de volledige maanden van de periode, afgepunte en vastgelegde verrichtingen, zonder de overschrijvingen tussen uw aangevinkte rekeningen.
+loan-report-title = Leningsimulatie
+loan-report-made-on = simulatie van { $date }
+loan-disclaimer = Indicatieve simulatie, zonder contractuele waarde. Alleen het aanbod van de bank is bindend.
+loan-tab-rules = Instellingen van het oordeel
+loan-method-optimistic = Optimistisch
+loan-method-neutral = Neutraal
+loan-method-severe = Streng
+loan-method-line = Beoordelingsmethode: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = Het oordeel beantwoordt drie vragen, en elke methode stelt haar eigen eisen. Kies de methode die bij u past: het oordeel van het tabblad „Kan ik die terugbetalen?” volgt haar. De laatste regel veronderstelt dat uw uitgaven elk jaar met het opgegeven percentage stijgen; het maandbedrag blijft gelijk.
+loan-rule-row-debt = Aanvaarde schuldratio
+loan-rule-row-reference = Referentiespaarbedrag
+loan-rule-row-share = Deel van dat spaarbedrag dat het maandbedrag mag nemen
+loan-rule-row-floor = Drempel waar het saldo niet onder mag
+loan-rule-row-sooner = Als het saldo er ook zonder de lening onder zakt
+loan-rule-row-growth = Stijging van uw uitgaven per jaar
+loan-rule-limits = groen tot { $green }, oranje tot { $red }
+loan-rule-reference = { $kind ->
+        [good] een goede maand
+        [hard] een moeilijke maand
+       *[usual] een gewone maand
+    }: { $amount }
+loan-rule-floor-zero = nul
+loan-rule-floor-cushion = één maand uitgaven: { $amount }
+loan-rule-sooner = oranje als de lening het { $orange } vervroegt, rood bij { $red }
+loan-unit-percent-year = % per jaar
+loan-method-optimistic-explain = De optimistische methode gaat uit van een goede maand, aanvaardt een schuldratio tot 40% en houdt geen reserve: ze toont wat mogelijk is als alles goed gaat.
+loan-method-neutral-explain = De neutrale methode gaat uit van een gewone maand en volgt de regel van de banken, 33 tot 35% schuldratio: het is het referentieoordeel.
+loan-method-severe-explain = De strenge methode gaat uit van een moeilijke maand en houdt één maand uitgaven als reserve voor het onverwachte: ze toont wat standhoudt, ook als het tegenzit.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = Verbruik van een elektrisch apparaat
+window-appliance-title = Verbruik van een elektrisch apparaat
+appliance-device-title = Het apparaat
+appliance-on-title = Aan
+appliance-standby-title = Stand-by
+appliance-field-on-watts = Vermogen in bedrijf
+appliance-field-on-hours = Gebruiksduur per dag
+appliance-field-days = Gebruiksdagen per week
+appliance-field-share = Deel van de gebruiksduur in daluren
+appliance-field-standby-watts = Stand-byvermogen
+appliance-field-standby-hours = Stand-byduur per gebruiksdag
+appliance-unit-watts = W
+appliance-unit-hours = u
+appliance-unit-days = van 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/kWh
+appliance-standby-hint = Leeg gelaten duurt stand-by de rest van de dag. Op dagen zonder gebruik blijft het apparaat aangesloten: al die tijd telt als stand-by. Uit het stopcontact is het stand-byverbruik 0 W.
+appliance-contract-title = Uw contract
+appliance-field-option = Tariefoptie
+appliance-option-base = Enkeltarief (één prijs)
+appliance-option-off-peak = Piekuren / Daluren
+appliance-field-base = Prijs per kWh
+appliance-field-peak = Prijs per kWh in piekuren
+appliance-field-off-peak = Prijs per kWh in daluren
+appliance-field-off-peak-hours = Daluren per dag
+appliance-contract-hint = Deze prijzen gelden alleen voor deze berekening. Het opgeslagen tarief stelt u in via Instellingen › Voorkeuren › Extra.
+appliance-contract-reset = Opgeslagen tarief opnieuw gebruiken
+appliance-period-day = Per dag
+appliance-period-month = Per maand
+appliance-period-year = Per jaar
+appliance-energy = { $value } kWh
+appliance-less-than = minder dan { $amount }
+appliance-detail-title = Details over een jaar
+appliance-column-part = Post
+appliance-column-energy = Energie
+appliance-column-cost = Kosten
+appliance-column-share = Aandeel
+appliance-line-on = Aan
+appliance-line-standby = Stand-by
+appliance-line-on-peak = Aan, piekuren
+appliance-line-on-off-peak = Aan, daluren
+appliance-line-standby-peak = Stand-by, piekuren
+appliance-line-standby-off-peak = Stand-by, daluren
+appliance-line-total = Totaal
+appliance-chart-title = Waar het geld naartoe gaat
+appliance-chart-caption = per jaar
+appliance-standby-sentence = Alleen stand-by kost al { $amount } per jaar: { $share } van wat het apparaat kost.
+appliance-note-plate = Het vermogen op het apparaat of in de handleiding is een maximum: in bedrijf verbruiken de meeste apparaten minder. Voor een echt cijfer meet u het met een energiemeter voor het stopcontact en vult u in wat die aangeeft.
+appliance-note-subscription = Het vastrecht telt niet mee: dat betaalt u of het apparaat nu aangesloten is of niet.
+appliance-invalid-watts = Vul een vermogen in van 0 tot 100.000 W.
+appliance-invalid-hours = Vul een duur in van 0 tot 24 uur per dag.
+appliance-invalid-days = Vul een geheel aantal dagen in, van 0 tot 7.
+appliance-invalid-share = Vul een aandeel in van 0 tot 100%.
+appliance-invalid-day-overflow = Gebruik en stand-by samen komen boven 24 uur per dag uit.
+appliance-invalid-price = Vul een prijs per kWh in van 0 tot 100.
+appliance-invalid-off-peak-hours = Vul een geheel aantal daluren in, van 0 tot 24.
+preferences-branch-tools = Extra
+preferences-leaf-electricity = Elektriciteitstarief
+preferences-electricity-blue = Terug naar het Tarif Bleu van EDF
+preferences-electricity-hint = Het tarief van uw contract, gebruikt door het hulpmiddel "Verbruik van een elektrisch apparaat". Standaard: het Tarif Bleu van EDF (Frankrijk) op 1 augustus 2026, prijzen inclusief belastingen, aansluiting van 3 tot 6 kVA. Deze prijzen veranderen vaak in februari en augustus: neem die van uw factuur over.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = Mijn financiële buffer
+window-cushion-title = Mijn financiële buffer
+cushion-question = Als uw inkomsten morgen zouden stoppen, hoeveel maanden zou u dan met uw spaargeld rondkomen?
+cushion-accounts-title = Uw rekeningen
+cushion-column-account = Rekening
+cushion-column-balance = Reëel saldo
+cushion-column-savings = Spaargeld
+cushion-column-spending = Uitgaven
+cushion-accounts-hint = “Spaargeld”: het geld waarop u rekent als het tegenzit. “Uitgaven”: de rekeningen waarvan de dagelijkse uitgaven worden betaald.
+cushion-history-label = Onderzochte periode
+cushion-backup-label = Vervangend inkomen per maand
+cushion-backup-hint = Wat zou blijven binnenkomen: werkloosheidsuitkering, salaris van uw partner… Leeg: geen inkomen.
+cushion-categories-title = De meegerekende uitgaven
+cushion-categories-hint = Vink uit wat u zou schrappen als het tegenzit.
+cushion-categories-empty = Geen uitgaven in deze periode.
+cushion-verdict-title = Uw buffer
+cushion-targets-title = De veiligheidsdrempels
+cushion-projection-title = Uw spaargeld als het tegenzit
+cushion-projection-hint = Wat er elke maand over zou blijven als uw inkomsten vandaag stopten.
+cushion-note = Een schatting op basis van uw geschiedenis: de uitgaven in een moeilijke maand kunnen afwijken van het gemiddelde.
+cushion-invalid-backup = Dit bedrag is niet leesbaar: corrigeer het om de berekening opnieuw uit te voeren.
+cushion-no-spending-account = Vink ten minste één rekening “Uitgaven” aan.
+cushion-no-month = Deze periode bevat nog geen volledige maand.
+cushion-months = { $value } maanden
+cushion-per-month = { $amount } per maand
+cushion-figure-holds = Geen limiet
+cushion-gauge-caption = aan uitgaven gedekt
+cushion-verdict-short = Minder dan drie maanden: een tegenslag zou u snel in de problemen brengen.
+cushion-verdict-fair = Tussen drie en zes maanden: een redelijke buffer, die u best uitbreidt als het kan.
+cushion-verdict-solid = Zes maanden of meer: uw buffer is stevig.
+cushion-verdict-holds = Uw vervangend inkomen dekt uw uitgaven: uw spaargeld zou niet slinken.
+cushion-verdict-nothing = Geen meegerekende uitgaven in de periode: er valt niets te dekken.
+cushion-tile-savings = Beschikbaar spaargeld
+cushion-tile-spending = Meegerekende uitgaven
+cushion-tile-backup = Vervangend inkomen
+cushion-tile-burn = Het spaargeld zou slinken met
+cushion-tile-rhythm = Spaartempo
+cushion-burn-none = Niets
+cushion-target-title = { $months } maanden uitgaven: { $amount }
+cushion-target-reached = Bereikt.
+cushion-target-date = Er ontbreekt { $missing }. In uw spaartempo bereikt rond { $month }.
+cushion-target-never = Er ontbreekt { $missing }. Uw spaargeld is in de periode niet gegroeid: in dit tempo wordt deze drempel niet bereikt.
+cushion-mark-empty = Leeg: { $month }
+cushion-period = Gemiddelde over { $count ->
+        [one] { $count } volledige maand
+       *[other] { $count } volledige maanden
+    }, van { $from } tot { $to }. { $transfers ->
+        [0] Geen overboekingen tussen uw rekeningen.
+        [one] Eén overboeking tussen uw rekeningen, buiten beschouwing gelaten.
+       *[other] { $transfers } overboekingen tussen uw rekeningen, buiten beschouwing gelaten.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = Spaardoel
+window-goal-title = Spaardoel
+goal-accounts-title = De gevolgde rekeningen
+goal-column-account = Rekening
+goal-column-balance = Reëel saldo
+goal-accounts-hint = Een overboeking tussen twee gevolgde rekeningen valt weg; een overboeking naar een niet-gevolgde rekening telt als een uitgave.
+goal-period-label = Referentieperiode
+goal-period-range = Reeks jaren…
+goal-range-from = van
+goal-range-to = tot
+goal-question-title = Uw vraag
+goal-question-when = Wanneer heb ik dit bedrag?
+goal-question-amount = Hoeveel heb ik op deze datum?
+goal-question-effort = Hoeveel moet ik sparen om dit bedrag op deze datum te hebben?
+goal-field-target = Doelbedrag
+goal-field-date = Streefdatum
+goal-field-rate = Jaarlijkse rente op het spaargeld
+goal-field-extra = En als ik extra spaarde, per maand
+goal-options-hint = Leeg: geen rente, niets extra.
+goal-answer-title = Het antwoord
+goal-chart-title = Uw saldo, gisteren en morgen
+goal-chart-hint = Doorgetrokken lijn: het reële saldo van de afgelopen twaalf maanden; stippellijn: de projectie; lichte zone: de bandbreedte afhankelijk van de maanden.
+goal-disclaimer = Een projectie op basis van uw geschiedenis, geen belofte: één onverwachte gebeurtenis kan alles veranderen.
+goal-no-account = Vink ten minste één te volgen rekening aan.
+goal-no-month = Deze periode bevat nog geen volledige maand.
+goal-invalid-target = Vul een te bereiken bedrag in.
+goal-invalid-date = Kies een datum in de toekomst, binnen de komende vijftig jaar.
+goal-invalid-rate = Vul een rente van 0 tot 100% in.
+goal-invalid-extra = Dit bedrag is niet leesbaar: corrigeer het om de berekening opnieuw uit te voeren.
+goal-per-month = { $amount } per maand
+goal-tile-balance = Saldo vandaag
+goal-tile-rhythm = Gemiddeld spaartempo
+goal-tile-target = Doel
+goal-tile-reached = Bereikt rond
+goal-tile-date = Streefdatum
+goal-tile-projected = Verwacht saldo
+goal-tile-saved = Gespaard tegen dan
+goal-tile-interest = Waarvan rente
+goal-tile-needed = Te sparen
+goal-when-already = U hebt al { $amount }: uw gevolgde rekeningen komen samen op { $balance }.
+goal-when-reached = U hebt { $amount } rond { $month }, over { $months ->
+        [one] één maand
+       *[other] { $months } maanden
+    }.
+goal-when-range = Afhankelijk van de maanden: tussen { $early } en { $late }.
+goal-when-range-open = Op zijn vroegst rond { $early }; met zwakke maanden zou het doel niet worden bereikt.
+goal-when-never = In dit tempo bereikt u { $amount } niet.
+goal-zero = Uw saldo zou rond { $month } tot nul dalen.
+goal-amount = In { $month } zou u ongeveer { $amount } hebben.
+goal-amount-range = Afhankelijk van de maanden: tussen { $low } en { $high }.
+goal-effort-more = Om { $amount } te hebben in { $month }, zou u gemiddeld { $monthly } per maand moeten sparen, dus { $gap } meer dan nu.
+goal-effort-less = Om { $amount } te hebben in { $month }, zou { $monthly } per maand volstaan, dus { $gap } minder dan nu: u loopt voor op schema.
+goal-effort-range = Afhankelijk van de maanden zou het verschil met uw tempo per maand gaan van { $low } tot { $high }.
+goal-chart-target = Doel: { $amount }
+goal-chart-today = Vandaag
+goal-note-seasons = De projectie volgt de seizoenen: elke komende maand neemt het gemiddelde van dezelfde maanden in de periode over.
+goal-note-range = De bandbreedte komt van de zwakke en sterke maanden in de periode: het laagste en het hoogste kwart.
+goal-note-loan = De lening “{ $label }” loopt af in { $month }: daarna { $amount } meer per maand.
+goal-note-interest = Rente elke maand berekend tegen { $rate }% per jaar: een benadering van de halvemaandregel van spaarrekeningen.
+goal-period = Tempo berekend over { $count ->
+        [one] { $count } volledige maand
+       *[other] { $count } volledige maanden
+    }, van { $from } tot { $to }. { $transfers ->
+        [0] Geen overboekingen tussen uw gevolgde rekeningen.
+        [one] Eén overboeking tussen uw gevolgde rekeningen, buiten beschouwing gelaten.
+       *[other] { $transfers } overboekingen tussen uw gevolgde rekeningen, buiten beschouwing gelaten.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = En als ik minder uitgaf…?
+window-cut-title = En als ik minder uitgaf…?
+cut-axis-label = Groeperen op
+cut-axis-category = Categorieën
+cut-axis-payee = Relaties
+cut-axis-budget-line = Budgetposten
+cut-table-title = Uw uitgaven, post per post
+cut-table-hint = Typ een bezuiniging in % of in { $sign } per maand bij de posten die u wilt verlichten. Een bezuiniging kan niet hoger zijn dan de uitgave zelf.
+cut-column-monthly = Per maand
+cut-column-cut = Bezuiniging
+cut-column-after = Daarna
+cut-column-yearly = Besparing per jaar
+cut-total = Totaal
+cut-horizon-label = Horizon
+cut-settings-title = Instellingen
+cut-options-hint = De rente en het doelbedrag zijn optioneel.
+cut-report-button = PDF-rapport
+cut-chart-title = Uw saldo, zonder en met de bezuinigingen
+cut-chart-hint = Doorgetrokken lijn: het reële saldo van de afgelopen twaalf maanden; grijze stippellijn: de projectie zonder bezuiniging; blauw: met; groen: het bespaarde geld.
+cut-donut-title = Uw uitgaven per maand na bezuiniging
+cut-donut-caption = per maand na bezuiniging
+cut-donut-others = Overige posten
+cut-donut-saved = Bespaard
+cut-legend-with = Met de bezuinigingen
+cut-legend-without = Zonder bezuiniging
+cut-years = { $years ->
+        [one] { $years } jaar
+       *[other] { $years } jaar
+    }
+cut-headline-none = Typ een bezuiniging in de tabel om het effect te zien.
+cut-headline = Door te bezuinigen op { $count ->
+        [one] deze post
+       *[other] deze { $count } posten
+    } zou u { $monthly } per maand meer opzijzetten, ofwel { $yearly } per jaar.
+cut-tile-monthly = Besparing per maand
+cut-tile-yearly = Besparing per jaar
+cut-tile-horizon = Besparing over { $years ->
+        [one] { $years } jaar
+       *[other] { $years } jaar
+    }
+cut-tile-spending = Uitgaven per maand
+cut-target-already = U hebt al { $amount }.
+cut-target-sooner = U zou { $amount } bereiken rond { $with } in plaats van { $without }: { $months ->
+        [0] niet eerder
+        [one] één maand eerder
+       *[other] { $months } maanden eerder
+    }.
+cut-target-only-with = Met deze bezuinigingen zou u { $amount } bereiken rond { $with }; zonder, in uw huidige tempo, nooit.
+cut-target-never = Zelfs met deze bezuinigingen zou u { $amount } in uw huidige tempo niet bereiken.
+cut-note-seasons = Elke bezuiniging volgt de seizoenen van haar post: een post die vooral in de zomer zwaar weegt, levert vooral in de zomer op.
+cut-note-capped = Een ingevoerde bezuiniging was hoger dan de uitgave: ze is teruggebracht tot de uitgave zelf.
+cut-invalid-cut = Deze bezuiniging is niet leesbaar: een percentage van 0 tot 100, of een bedrag per maand.
+cut-report-settings = De instellingen
+cut-report-result = Het resultaat
+cut-report-accounts = De gevolgde rekeningen
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = Mijn vakantie plannen
+window-holiday-title = Mijn vakantie plannen
+holiday-trip-title = De reis
+holiday-field-trip = Soort reis
+holiday-trip-stay = Verblijf
+holiday-trip-cruise = Cruise
+holiday-field-adults = Volwassenen
+holiday-field-children = Kinderen
+holiday-field-nights = Duur van het verblijf, in nachten
+holiday-field-days = Dagen
+holiday-field-months = Maanden vóór vertrek
+holiday-field-stops = Aantal aanloophavens
+holiday-saved-title = Al gespaard
+holiday-saved-hint = Vink de rekeningen aan waarop het geld voor de vakantie al opzij is gezet: hun reële saldo telt als al gespaard.
+holiday-budget-title = Het budget
+holiday-budget-hint = Per post: een bedrag, voor wie het geldt en voor hoe lang. Een lege post telt niet mee.
+holiday-optional-title = Optionele posten
+holiday-result-title = Het resultaat
+holiday-donut-title = Waar het reisgeld naartoe gaat
+holiday-donut-caption = voor de reis
+holiday-child-label = Kinderprijs
+holiday-count-label = Hutten
+holiday-open = Een project openen…
+holiday-save = Het project opslaan…
+holiday-pdf = PDF-rapport
+holiday-excel = Exporteren naar Excel
+holiday-file-filter = Vakantieproject
+holiday-replace-question = Als u dit project opent, wordt vervangen wat in het venster is ingevuld. Doorgaan?
+holiday-file-saved = Project opgeslagen: { $file }
+holiday-file-opened = Project geopend: { $file }
+holiday-file-not-project = Dit bestand is geen vakantieproject van Radinus.
+holiday-file-too-recent = Dit project komt uit een nieuwere versie van Radinus: werk Radinus bij om het te openen.
+holiday-file-failed = Het bestand kon niet worden gelezen of geschreven: { $reason }
+holiday-line-transport = Vervoer heen en terug
+holiday-line-lodging = Accommodatie
+holiday-line-meals = Maaltijden en dagelijkse uitgaven
+holiday-line-visits = Bezoeken en vrije tijd
+holiday-line-port = Vervoer naar de haven
+holiday-line-cabins = Hutten
+holiday-line-service = Servicepakket (fooien)
+holiday-line-drinks = Drankenpakket
+holiday-line-excursions = Excursies in de aanloophavens
+holiday-line-port-taxes = Havengelden
+holiday-line-wifi = Wifi aan boord
+holiday-line-onboard = Uitgaven aan boord en aan wal
+holiday-line-other = Overige kosten en onvoorziene uitgaven
+holiday-line-insurance = Annuleringsverzekering
+holiday-line-stay-tax = Toeristenbelasting
+holiday-line-car = Auto ter plaatse, brandstof en tol
+holiday-line-parking = Parkeren bij luchthaven of station
+holiday-line-bank = Bankkosten in het buitenland
+holiday-line-formalities = Formaliteiten (paspoort, visum, vaccinaties)
+holiday-line-pets = Opvang van huisdieren
+holiday-span-trip = voor het verblijf
+holiday-span-night = per nacht
+holiday-span-day = per dag
+holiday-span-stop = per aanloophaven
+holiday-who-all = voor iedereen
+holiday-who-person = per persoon
+holiday-who-adults = per volwassene
+holiday-cabins-count = { $count ->
+        [one] { $count } hut
+       *[other] { $count } hutten
+    }
+holiday-days = { $days ->
+        [one] { $days } dag
+       *[other] { $days } dagen
+    }
+holiday-invalid-count = Vul een geheel getal in.
+holiday-invalid-amount = Dit bedrag is niet leesbaar: een positief getal, of een percentage van 0 tot 100.
+holiday-headline-empty = Typ de bedragen van het budget om te zien wat de reis gaat kosten.
+holiday-headline-stay = Dit verblijf zou { $total } kosten voor { $people ->
+        [one] één persoon
+       *[other] { $people } personen
+    } en { $nights ->
+        [0] geen enkele nacht
+        [one] één nacht
+       *[other] { $nights } nachten
+    }.
+holiday-headline-cruise = Deze cruise zou { $total } kosten voor { $people ->
+        [one] één persoon
+       *[other] { $people } personen
+    } en { $nights ->
+        [0] geen enkele nacht
+        [one] één nacht
+       *[other] { $nights } nachten
+    }.
+holiday-tile-total = Totale kosten
+holiday-tile-person = Per persoon
+holiday-tile-person-day = Per persoon per dag
+holiday-tile-saved = Al gespaard
+holiday-tile-remaining = Nog te financieren
+holiday-tile-monthly = Benodigd spaarbedrag
+holiday-remaining-none = Niets: het is gedekt
+holiday-monthly-none = Niets opzij te zetten
+holiday-monthly-now = Vertrek deze maand
+holiday-note-days = De dagen zijn de nachten plus één: zeven nachten zijn acht dagen.
+holiday-note-child = Per persoon betaalt een kind de kinderprijs als die is opgegeven; blijft die leeg, dan betaalt het kind als een volwassene.
+holiday-note-percent = Een verzekeringspercentage geldt voor de hoofdposten van de reis; dat van de bankkosten voor de uitgaven ter plaatse.
+holiday-sheet-budget = Budget
+holiday-sheet-result = Resultaat
+holiday-column-line = Post
+holiday-column-amount = Bedrag
+holiday-column-child = Kinderprijs
+holiday-column-who = Voor wie
+holiday-column-span = Voor hoe lang
+holiday-column-cost = Kosten
+holiday-disclaimer = Een schatting op basis van uw eigen bedragen: de werkelijke prijzen kunnen afwijken.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = Besparingsproject
+cut-file-not-project = Dit bestand is geen besparingsproject van Radinus.
+cut-file-too-recent = Dit project komt uit een nieuwere versie van Radinus: werk Radinus bij om het te openen.
+cut-sheet-items = Posten
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = Logboek van mijn auto
+window-car-title = Logboek van mijn auto
+car-unnamed = Mijn auto
+car-sheet-title = De auto
+car-field-plate = Kenteken
+car-field-make = Merk
+car-field-model = Model
+car-field-engine = Aandrijving
+car-field-first-hand = Eerste eigenaar
+car-field-registered = Datum eerste toelating
+car-field-acquired = Aankoopdatum
+car-field-acquired-km = Kilometerstand bij aankoop
+car-field-service = Onderhoudsbeurt elke
+car-field-service-or = of elke
+car-unit-months-short = mnd.
+car-unit-km = km
+car-tariff-title = Tarief voor thuisladen
+car-tariff-hint = Dit tarief wordt in het logboek van de auto bewaard: het verandert niets aan het tarief in de voorkeuren.
+car-tariff-reset = Het tarief uit de voorkeuren overnemen
+car-engine-petrol = Benzine
+car-engine-diesel = Diesel
+car-engine-lpg = LPG
+car-engine-e85 = E85 (bio-ethanol)
+car-engine-hybrid = Hybride
+car-engine-plug-in = Plug-in hybride
+car-engine-electric = Elektrisch
+car-engine-hydrogen = Waterstof
+car-energy-petrol = Benzine
+car-energy-diesel = Diesel
+car-energy-lpg = LPG
+car-energy-e85 = E85
+car-energy-electricity = Elektriciteit
+car-energy-hydrogen = Waterstof
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = Energie
+car-rubric-upkeep = Regulier onderhoud
+car-rubric-service = Onderhoudsbeurt
+car-rubric-wear = Slijtdelen
+car-rubric-tyres = Banden
+car-rubric-breakdown = Pech en storingen
+car-rubric-insurance = Verzekering
+car-rubric-inspection = APK
+car-part-brake-pads = Remblokken
+car-part-brake-discs = Remschijven
+car-part-timing-belt = Distributieriem
+car-part-clutch = Koppeling
+car-part-battery-12v = Accu 12 V
+car-part-shock-absorbers = Schokdempers
+car-part-wipers = Ruitenwissers
+car-part-spark-plugs = Bougies
+car-part-glow-plugs = Gloeibougies
+car-part-particulate-filter = Roetfilter
+car-part-catalytic-converter = Katalysator
+car-part-fuel-cell-filter = Filter van de brandstofcel
+car-part-exhaust = Uitlaat
+car-part-other = Ander onderdeel…
+car-axle-all = Alle vier de banden
+car-axle-front = Voorbanden
+car-axle-rear = Achterbanden
+car-verdict-pass = Goedgekeurd
+car-verdict-counter = Herkeuring
+car-charge-station = Bij een laadpaal
+car-charge-home = Thuis
+car-slot-peak = Piekuren
+car-slot-off-peak = Daluren
+car-entry-new = Nieuwe regel
+car-entry-edit = Regel wijzigen
+car-field-date = Datum
+car-field-km = Kilometerstand
+car-field-rubric = Rubriek
+car-field-amount = Bedrag
+car-field-garage = Garage of tankstation
+car-field-note = Notitie
+car-field-energy = Energie
+car-field-quantity = Hoeveelheid
+car-field-charge = Laden
+car-field-slot = Laadtijdstip
+car-field-part = Onderdeel
+car-field-part-name = Naam van het onderdeel
+car-field-axle = Vervangen banden
+car-field-verdict = Resultaat
+car-field-months = Gedekte maanden
+car-field-battery = Batterijconditie
+car-home-amount-hint = Het bedrag van een laadbeurt thuis wordt berekend met het tarief van de auto.
+car-entry-add = Aan het logboek toevoegen
+car-entry-update = Regel opslaan
+car-entry-cancel = Annuleren
+car-entry-delete = Regel verwijderen
+car-delete-question = Deze regel uit het logboek verwijderen?
+car-from-operation = Een boeking overnemen…
+car-pick-account = Van welke rekening komt de uitgave?
+car-pick-operation = Welke boeking?
+car-pick-take = Overnemen
+car-pick-none = Geen uitgaven op deze rekening.
+car-pick-taken = Boeking overgenomen: vul de kilometerstand en de rubriek in en voeg dan de regel toe.
+car-history-title = De geschiedenis
+car-filter-all = Alle rubrieken
+car-history-empty = Nog geen regels.
+car-history-hint = Klik op een regel om hem te wijzigen.
+car-column-date = Datum
+car-column-km = Km
+car-column-rubric = Rubriek
+car-column-detail = Details
+car-column-amount = Bedrag
+car-column-garage = Garage
+car-column-note = Notitie
+car-column-share = Aandeel
+car-column-per-km = Per km
+car-column-energy = Energie
+car-column-quantity = Hoeveelheid
+car-column-price = Gemiddelde prijs
+car-column-consumption = Verbruik
+car-column-part = Onderdeel
+car-column-changes = Vervangingen
+car-column-last = Laatste vervanging
+car-column-life = Levensduur
+car-column-next = Volgende vervanging
+car-total = Totaal
+car-summary-title = Wat de auto kost
+car-headline-empty = Vul de autogegevens in en voeg dan een eerste regel toe: een tankbeurt, een onderhoudsbeurt, een garagerekening…
+car-headline = Sinds { $since } heeft uw auto u { $total } gekost.
+car-headline-km = Sinds { $since } heeft uw auto u { $total } gekost voor { $km } gereden: { $cost } per kilometer.
+car-tile-total = Totale kosten
+car-tile-month = Per maand
+car-tile-km = Per kilometer
+car-tile-driven = Gereden kilometers
+car-tile-consumption = Verbruik
+car-tile-energy-km = Energie per kilometer
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [one] { $months } maand
+       *[other] { $months } maanden
+    }
+car-detail-battery = Batterij: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = Per rubriek
+car-energy-title = De energie
+car-parts-title = Slijtdelen
+car-tyres-title = Banden
+car-battery-title = Batterijconditie
+car-years-title = Wat de auto elk jaar heeft gekost
+car-donut-title = Waar het geld naartoe gaat
+car-donut-caption = in totaal
+car-deadlines-title = De termijnen
+car-deadlines-empty = Nog geen termijnen: noteer een onderhoudsbeurt, een APK, een verzekering, of twee vervangingen van hetzelfde onderdeel.
+car-deadline-service = Onderhoudsbeurt
+car-deadline-inspection = APK
+car-deadline-counter = Herkeuring van de APK
+car-deadline-insurance = Einde van de verzekering
+car-when-date = op { $date }
+car-when-km = bij { $km }
+car-when-km-reached = bij { $km }, rond { $month } in uw tempo
+car-when-date-km = op { $date } of bij { $km }, wat het eerst komt
+car-when-inspection-unknown = Noteer de laatste APK om de datum van de volgende te kennen.
+car-tone-late = Verlopen
+car-tone-soon = Binnenkort
+car-note-since = Alles telt vanaf de aankoop: de datum en de kilometerstand die in de autogegevens zijn genoteerd.
+car-note-consumption = Het verbruik wordt gemeten van volle tank tot volle tank: tank helemaal vol en noteer elke keer de kilometerstand.
+car-note-e85 = Een E85-auto drinkt wat hij krijgt: de kilometers na een tankbeurt tellen voor die brandstof.
+car-note-home = Een laadbeurt thuis wordt berekend tegen het tarief van de auto op de dag dat ze wordt genoteerd, en houdt die kosten.
+car-note-inspection = De APK volgt de Franse regel: de eerste binnen vier jaar na de eerste toelating, daarna om de twee jaar; een herkeuring binnen twee maanden.
+car-disclaimer = De termijnen en levensduren zijn schattingen op basis van het logboek: alleen het onderhoudsboekje van de fabrikant is bindend.
+car-invalid-date = Vul een geldige datum in die niet in de toekomst ligt.
+car-invalid-acquired = De aankoopdatum kan niet vóór de eerste toelating liggen.
+car-invalid-km = Vul een kilometerstand in hele kilometers in.
+car-invalid-amount = Dit bedrag is niet leesbaar.
+car-invalid-quantity = Typ de hoeveelheid: liters, kWh of kilo.
+car-invalid-part = Kies het vervangen onderdeel, of typ de naam ervan.
+car-invalid-rubric = Kies een rubriek.
+car-invalid-months = Vul een geheel aantal maanden in.
+car-invalid-battery = Vul een batterijconditie van 0 tot 100 % in.
+car-open = Een logboek openen…
+car-save = Het logboek opslaan…
+car-report-button = PDF-dossier
+car-file-filter = Autologboek
+car-file-saved = Logboek opgeslagen: { $file }
+car-file-opened = Logboek geopend: { $file }
+car-file-not-logbook = Dit bestand is geen autologboek van Radinus.
+car-file-too-recent = Dit logboek komt uit een nieuwere versie van Radinus: werk Radinus bij om het te openen.
+car-replace-question = Als u dit logboek opent, wordt het logboek in het venster vervangen. Doorgaan?
+car-sheet-history = Logboek
+car-sheet-summary = Overzicht
+
+analysis-history-hint = Hoe langer uw historie, hoe beter deze analyse wordt: ideaal is minstens een jaar aan boekingen.
+
+# --- F48 — Een uitgave verdelen (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = Een uitgave verdelen
+window-sharing-title = Een uitgave verdelen
+sharing-question = Wie betaalt wat?
+sharing-setup-title = De verdeling
+sharing-field-label = Omschrijving
+sharing-label-hint = Bijvoorbeeld “Restaurant van 12/10” of “Reis Bretagne 2027”: ze geeft de bestanden en de rapporten hun naam.
+sharing-field-total = Totaal
+sharing-total-hint = Als dit leeg blijft, is het totaal de som van de onderdelen en van de extra's van ieder.
+sharing-field-rule = Regel
+sharing-field-rounding = Afronding
+sharing-field-people = Personen
+sharing-mode-whole = Eén regel voor de hele uitgave
+sharing-mode-item = Eén regel per onderdeel
+sharing-rule-equal = Gelijke delen
+sharing-rule-parts = Naar delen
+sharing-rule-percent = In percentages
+sharing-rule-income = Naar verhouding van het inkomen
+sharing-rounding-cent = Op de cent
+sharing-rounding-euro = Op hele eenheden
+sharing-round-euro = Afronden op hele eenheden
+sharing-hide-incomes = Inkomens verbergen in de rapporten en de export
+sharing-people-title = De personen
+sharing-people-hint = Eén rij per persoon, één kolom per onderdeel: vink aan wie aan wat deelneemt. Al het overige is optioneel. Iemand die afhaakt en zijn aanbetaling laat staan: een exact bedrag gelijk aan wat is betaald, en geen enkel vakje aangevinkt.
+sharing-add-person = Een persoon toevoegen
+sharing-person-default = Persoon { $number }
+sharing-items-title = De onderdelen
+sharing-items-hint = Alleen wat niet iedereen aangaat, zoals de wijn. De rest van het totaal gaat naar het gemeenschappelijke onderdeel.
+sharing-add-item = Een onderdeel toevoegen
+sharing-common = Gemeenschappelijk
+sharing-payments-title = De betalingen
+sharing-payments-hint = Wie heeft betaald, hoeveel en wanneer. Een rij zonder bedrag telt nog niet mee.
+sharing-payments-none = Nog geen betalingen.
+sharing-add-payment = Een betaling toevoegen
+sharing-result-title = Het resultaat
+sharing-balances-title = Stand van de betalingen
+sharing-transfers-title = Voorgestelde overboekingen
+sharing-delete = Verwijderen
+sharing-delete-person-question = Deze persoon heeft betalingen: ze samen met de persoon verwijderen?
+sharing-disclaimer = Radinus stelt een verdeling voor: onder vrienden staat het ieder vrij het anders te regelen.
+sharing-column-person = Persoon
+sharing-column-household = Huishouden
+sharing-column-income = Inkomen
+sharing-column-parts = Delen
+sharing-column-percent = %
+sharing-column-floor = Minstens
+sharing-column-cap = Hoogstens
+sharing-column-fixed = Exact bedrag
+sharing-column-alone = Eigen extra's
+sharing-column-gift = Geschonken overschot
+sharing-column-share = Aandeel
+sharing-column-typed = Ingevoerd %
+sharing-column-constraint = Toegepast
+sharing-column-due = Te betalen
+sharing-column-item = Onderdeel
+sharing-column-amount = Bedrag
+sharing-column-rule = Regel
+sharing-column-participants = Deelnemers
+sharing-column-unit = Huishouden of persoon
+sharing-column-members = Leden
+sharing-column-paid = Betaald
+sharing-column-balance = Saldo
+sharing-column-date = Datum
+sharing-column-who = Wie
+sharing-column-label = Omschrijving
+sharing-help-household = Personen van hetzelfde huishouden rekenen samen af: hun betalingen en wat ze verschuldigd zijn worden opgeteld, en ze krijgen één afrekening. Voorbeeld: “Familie Martin” voor de ouders en de kinderen.
+sharing-help-income = Alleen gebruikt door de regel “Naar verhouding van het inkomen”: hoe hoger het inkomen, hoe groter het aandeel. Voer het maandinkomen in.
+sharing-help-parts = Een persoon met 2 delen betaalt twee keer zoveel als een persoon met 1 deel. Voorbeeld: volwassene 1, kind 0,5.
+sharing-help-percent = Het deel van de uitgave dat de persoon betaalt. De percentages moeten samen 100% zijn.
+sharing-help-floor = De persoon betaalt minstens dit bedrag, ook als het berekende aandeel kleiner is. Het verschil verlicht de last van de anderen.
+sharing-help-cap = De persoon betaalt nooit meer dan dit bedrag. Wat niet wordt betaald, valt terug op de andere deelnemers aan de onderdelen van de persoon.
+sharing-help-fixed = De persoon betaalt dit bedrag, wat er ook gebeurt, en de rest wordt over de anderen verdeeld. Voorbeeld: iemand die afhaakt en de aanbetaling laat staan.
+sharing-help-alone = Wat de persoon alleen voor zichzelf heeft genomen, zoals een dessert of een koffie. Dat wordt volledig betaald, bovenop het aandeel.
+sharing-help-gift = Als de persoon meer heeft betaald dan het aandeel: aangevinkt is het overschot een geschenk aan de groep; niet aangevinkt wordt het teruggegeven.
+sharing-help-items = Vink de personen aan die aan dit onderdeel deelnemen. Gemeenschappelijk is wat van het totaal overblijft zodra de andere onderdelen eraf zijn.
+sharing-help-due = Wat de persoon in totaal verschuldigd is: het aandeel in de onderdelen, de eigen extra's en de afronding.
+sharing-help-share = Wat het aandeel voorstelt, als percentage van de te verdelen som.
+sharing-help-typed = Het percentage dat is ingevoerd. Het kan afwijken van het werkelijke aandeel wanneer een minimum, een maximum of een exact bedrag is toegepast.
+sharing-help-constraint = Toont of het aandeel van de persoon is gewijzigd door een minimum, een maximum, een exact bedrag of een geschonken overschot.
+sharing-help-item = Alleen wat niet iedereen aangaat, zoals de wijn. De rest van het totaal gaat naar het gemeenschappelijke onderdeel, verdeeld over wie daarbij is aangevinkt.
+sharing-help-rule = Hoe dit onderdeel wordt verdeeld: in gelijke delen, naar delen, in percentages of naar verhouding van het inkomen.
+sharing-help-paid = Wat het huishouden of de persoon al heeft betaald, volgens de ingevoerde betalingen.
+sharing-help-balance = Wat nog te betalen is, of wat er meer is betaald dan het aandeel. Voorbeeld: “Nog te betalen: 61,54 €”.
+sharing-advice-equal = { $count ->
+        [one] { $total } voor één persoon.
+       *[other] { $total } ÷ { $count } personen = { $amount } per persoon.
+    }
+sharing-advice-equal-varied = In gelijke delen over wie deelneemt, rekening houdend met de grenzen en de uitsluitingen.
+sharing-advice-parts = { $parts } delen in totaal: één deel is { $amount } waard.
+sharing-advice-parts-varied = Ieder betaalt volgens het aantal delen, rekening houdend met de grenzen en de uitsluitingen. Een leeg vakje telt als 1 deel.
+sharing-advice-percent-rest = Er ontbreekt { $rest }% om op 100% te komen.
+sharing-advice-percent-over = De percentages komen { $over }% boven de 100% uit.
+sharing-advice-percent-ok = De percentages komen precies uit op 100%.
+sharing-advice-percent-nobody = De percentages zijn al 100%: { $names } { $count ->
+        [one] zou niets betalen.
+       *[other] zouden niets betalen.
+    }
+sharing-advice-income = Ieder betaalt { $rate }% van het eigen inkomen.
+sharing-advice-income-missing = Typ ieders inkomen om naar verhouding van het inkomen te verdelen.
+sharing-advice-income-varied = Ieder betaalt hetzelfde deel van het eigen inkomen, rekening houdend met de grenzen en de uitsluitingen.
+sharing-advice-empty = Typ het bedrag dat verdeeld moet worden.
+sharing-apply-advice = De voorgestelde waarden overnemen
+sharing-help-apply-advice = Vult de lege vakjes met de grijze waarden. Vakjes die al zijn ingevuld, veranderen niet.
+sharing-from-incomes = Percentages volgens de inkomens
+sharing-help-from-incomes = Vervangt de percentages door het aandeel van elk inkomen in het totaal van de inkomens. Ze komen samen op 100%.
+sharing-reset-percents = Alles opnieuw verdelen
+sharing-help-reset-percents = Wist de percentages en verdeelt ze in gelijke delen over iedereen. Handig nadat u een persoon hebt toegevoegd.
+sharing-reset-percents-question = Alle percentages wissen en in gelijke delen over iedereen verdelen?
+sharing-open = Een project openen…
+sharing-save = Het project opslaan…
+sharing-pdf-distribution = Verdeling (PDF)
+sharing-pdf-payments = Stand van de betalingen (PDF)
+sharing-pdf-statements = Individuele afrekeningen (PDF)…
+sharing-statements-everyone = Iedereen
+sharing-excel = Exporteren naar Excel
+sharing-file-filter = Verdelingsproject
+sharing-replace-question = Als u dit project opent, wordt vervangen wat in het venster is ingevuld. Doorgaan?
+sharing-file-saved = Project opgeslagen: { $file }
+sharing-file-opened = Project geopend: { $file }
+sharing-file-not-project = Dit bestand is geen verdelingsproject van Radinus.
+sharing-file-too-recent = Dit project komt uit een nieuwere versie van Radinus: werk Radinus bij om het te openen.
+sharing-file-failed = Het bestand kon niet worden gelezen of geschreven: { $reason }
+sharing-statements-replace-question = { $count ->
+        [one] Er bestaat al een afrekening in deze map. Vervangen?
+       *[other] Er bestaan al { $count } afrekeningen in deze map. Vervangen?
+    }
+sharing-statements-written = { $count ->
+        [one] Eén afrekening geschreven in “{ $folder }”.
+       *[other] { $count } afrekeningen geschreven in “{ $folder }”.
+    }
+sharing-too-many-people = Een verdeling telt hoogstens 40 personen.
+sharing-too-many-items = Een verdeling telt hoogstens 20 onderdelen.
+sharing-too-many-payments = Een verdeling telt hoogstens 400 betalingen.
+sharing-invalid-amount = Dit bedrag is niet leesbaar: een positief getal.
+sharing-invalid-number = Dit getal is niet leesbaar: een positief getal.
+sharing-invalid-percent = Een percentage loopt van 0 tot 100.
+sharing-invalid-date = Deze datum is niet leesbaar.
+sharing-name-missing = Elke persoon moet een naam hebben.
+sharing-name-duplicate = Er is al een “{ $name }”: maak onderscheid, bijvoorbeeld met een initiaal.
+sharing-floor-above-cap = Het minimum ligt boven het maximum.
+sharing-item-label-missing = Dit onderdeel heeft geen naam.
+sharing-items-above-total = De onderdelen en de extra's van ieder overschrijden het totaal met { $amount }.
+sharing-payment-person = Kies wie heeft betaald.
+sharing-percent-total = De percentages komen uit op { $sum }%: het moet 100% zijn.
+sharing-percent-total-item = “{ $item }”: de percentages komen uit op { $sum }%: het moet 100% zijn.
+sharing-item-nobody = Niemand neemt deel aan “{ $item }”.
+sharing-item-no-weight = Niemand weegt mee in “{ $item }”: alle deelnemers staan op nul.
+sharing-income-missing = Het inkomen van { $name } ontbreekt.
+sharing-fixed-above = De exacte bedragen overschrijden de te verdelen som met { $amount }.
+sharing-floors-above = De minima overschrijden de te verdelen som met { $amount }.
+sharing-cap-alone = { $name } is de enige deelnemer aan “{ $item }”: het maximum kan niet worden gerespecteerd.
+sharing-caps-short = De maxima volstaan niet om de som te dekken: er ontbreekt { $amount }.
+sharing-impossible = Deze voorwaarden kunnen niet allemaal worden gerespecteerd: verruim een minimum of een maximum.
+sharing-constraint-floor = Minimum bereikt
+sharing-constraint-cap = Maximum bereikt
+sharing-constraint-fixed = Exact bedrag
+sharing-constraint-gift = Geschonken overschot
+sharing-and = { $first } en { $last }
+sharing-outside = Buiten de onderdelen
+sharing-alone = Eigen extra's
+sharing-rounding = Afronding
+sharing-headline-empty = Voeg de personen toe die de uitgave delen.
+sharing-headline-no-amount = Typ het totaal, of de onderdelen die verdeeld moeten worden.
+sharing-headline-equal = { $total } te verdelen: ieder betaalt { $amount }.
+sharing-headline-range = { $total } te verdelen: van { $min } tot { $max }, afhankelijk van de persoon.
+sharing-participants = { $count ->
+        [0] Geen deelnemers
+        [one] Eén deelnemer
+       *[other] { $count } deelnemers
+    }
+sharing-balance-due = Nog te betalen: { $amount }
+sharing-balance-over = Heeft { $amount } meer betaald dan het eigen aandeel
+sharing-balance-even = In orde
+sharing-summary-collected = { $collected } betaald van { $total }.
+sharing-summary-owing = { $count ->
+        [0] Iedereen is in orde.
+        [one] Slechts één persoon moet nog { $amount } betalen.
+       *[other] { $count } personen moeten nog in totaal { $amount } betalen.
+    }
+sharing-remaining-outside = Nog te betalen op de uitgave: { $amount }
+sharing-remaining-reimburse = Terug te betalen aan { $name }: { $amount }
+sharing-all-settled = Alles is vereffend: niemand is iemand iets verschuldigd.
+sharing-transfer = { $from } moet { $amount } betalen aan { $to }
+sharing-warning-over-paid = De betalingen overschrijden de uitgave met { $amount }: controleer de bedragen.
+sharing-note-income-zero = { $name } betaalt niets voor { $items }: het inkomen is 0.
+sharing-note-excluded = { $name } neemt niet deel aan “{ $item }”: het bijbehorende aandeel wordt over de anderen verdeeld.
+sharing-note-gift = Het overschot dat { $giver } schenkt, verlaagt het aandeel van de anderen: { $name } heeft nu meer betaald dan het eigen aandeel.
+sharing-note-outside = { $name } betaalt { $amount } buiten de eigen onderdelen: dat bedrag wordt afgetrokken van wat de anderen delen.
+sharing-note-keeper = Afgerond op hele eenheden: { $name } houdt de centen, zodat het totaal precies klopt.
+sharing-report-distribution = Verdeling
+sharing-report-sharing = De verdeling
+sharing-report-who-pays = Wie betaalt wat
+sharing-report-items = Detail per onderdeel
+sharing-report-payments = Stand van de betalingen
+sharing-report-as-of = Stand op { $date }
+sharing-report-balances = Aandeel, betaald, saldo
+sharing-report-statement = Afrekening — { $name }
+sharing-report-your-share = Uw aandeel
+sharing-statement-total = Totaal voor het huishouden: { $amount }
+sharing-statement-pay = Te betalen aan { $name }: { $amount }
+sharing-statement-receive = Te ontvangen van { $name }: { $amount }
+sharing-sheet-people = Personen
+sharing-sheet-items = Onderdelen
+sharing-sheet-result = Resultaat
+sharing-sheet-payments = Betalingen
+sharing-sheet-balances = Terugbetalingen

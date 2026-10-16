@@ -252,13 +252,16 @@ menu-accounts-checkbooks = Shekkivihkojen hallinta
 
 menu-statistics = Tilastot
 menu-statistics-balance-chart = Saldon kehitys -kuvaaja
+menu-statistics-balance-analysis = Saldon kehityksen analyysi
 menu-statistics-by-category = Tilastot kategorioittain
 menu-statistics-by-assignment = Tilastot kohdistuksittain
 menu-statistics-by-budget-line = Tilastot budjettikohdittain
 menu-statistics-by-payment-mode = Tilastot maksutavoittain
 menu-statistics-by-payee = Tilastot vastapuolittain ja kauppiaittain
 menu-statistics-by-project = Tilastot projekteittain
+menu-statistics-by-verification = Tilastot tarkistuksittain
 menu-statistics-dashboard = Tapahtumien koontinäyttö
+menu-statistics-crossed-balance = Ristiintaulukointi
 
 menu-budget = Budjetti
 menu-budget-entry = Budjetin syöttö
@@ -276,6 +279,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = Tapahtumamallit
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = Työkalut
 menu-settings = Asetukset
 menu-settings-about-author = Tietoja tekijästä
 menu-settings-about-radinus = Tietoja Radinuksesta
@@ -432,6 +437,15 @@ operations-selection-total = Valittujen tapahtumien summa yhteensä: { $amount }
 
 operations-column-date = Päivä
 operations-column-clearing-date = Täsmäytyspäivä
+operations-column-status = Tapahtuman tila
+operation-status-pointed = Täsmäytetty
+operation-status-committed = Varattu
+operation-status-planned = Suunniteltu
+operations-column-verification = Tarkistus
+operation-verification-to-verify = Tarkistettava
+operation-verification-verified = Tarkistettu
+operation-verification-doubtful = Epäilyttävä
+operation-verification-disputed = Riitautettu
 operations-column-label = Kuvaus
 operations-column-category = Kategoria
 operations-column-assignment = Kohdistus
@@ -507,6 +521,9 @@ filter-all = Kaikki tapahtumat
 filter-pointed = Vain täsmäytetyt tapahtumat
 filter-committed = Vain varatut tapahtumat
 filter-planned = Vain suunnitellut tapahtumat
+filter-by-status = Suodata tilan mukaan
+filter-by-verification = Suodata tarkistuksen mukaan
+filter-show-all = Näytä kaikki
 
 # --- Tapahtumalomake (F03) -------------------------------------------
 # Nimikkeet ovat kuvakaappauksesta ”Fiche operation transaction.png”,
@@ -540,6 +557,7 @@ operation-field-direction = Tapahtuman tyyppi:
 operation-field-amount = Summa
 operation-field-status = Tapahtuman tila
 operation-field-clearing-date = Täsmäytyspäivä
+operation-field-verification = Tarkistus
 operation-field-category = Luokka
 operation-field-assignment = Kohdistus
 operation-field-payment-mode = Tapa
@@ -562,6 +580,10 @@ operation-nothing-to-show = Ei näytettäviä tapahtumia.
 operation-label-required = Tapahtuman kuvaus on pakollinen.
 operation-date-required = Tapahtuman päivämäärä on pakollinen.
 operation-clearing-date-invalid = Täsmäytyspäivä ei ole kelvollinen päivämäärä.
+operation-clearing-date-required = Täsmäytetyllä tapahtumalla on oltava täsmäytyspäivä.
+operation-clearing-date-question =
+    Täsmäytetyllä tapahtumalla on oltava täsmäytyspäivä.
+    Haluatko tallentaa tapahtuman omalla päivämäärällä { $date }?
 operation-is-a-sub = Tämä rivi on osatapahtuma: sitä muokataan sen omalta lomakkeelta.
 operation-delete-form-open = Lomake ”{ $label }” on auki. Sulje se ennen poistamista.
 
@@ -600,6 +622,7 @@ sub-operation-is-the-complement = Tämä on Jäännös: se osa, joka on vielä j
 sub-operation-of = Jakaminen: ”{ $label }” ({ $amount })
 
 operations-pointed = { $count ->
+    [0] Ei täsmäytettäviä tapahtumia: valinta on jo täsmäytetty.
     [one] 1 tapahtuma täsmäytetty.
    *[other] { $count } tapahtumaa täsmäytetty.
 }
@@ -613,6 +636,7 @@ operations-select-one = Valitse vain yksi tapahtuma.
 operation-copy = Kopio on vielä tallentamatta: mitään ei ole vielä luotu.
 operations-show-children = Näytä kaikki osatapahtumat
 operations-hide-children = Piilota kaikki osatapahtumat
+operations-recurring-from = Luo toistuva tapahtuma tästä tapahtumasta
 
 # --- Vakavan poiston toinen vahvistus ---------------------------------
 # Pankkitilin poistaminen vie mukanaan koko sen historian: Kyllä/Ei
@@ -633,6 +657,7 @@ window-statistics-title = { $kind ->
     [payment-mode] Tilastot maksutavoittain
     [payee] Tilastot vastapuolittain ja kauppiaittain
     [project] Tilastot projekteittain
+    [verification] Tilastot tarkistuksittain
    *[category] Tilastot luokittain
 }
 
@@ -642,6 +667,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] TapahtumaTapa
     [payee] Vastapuoli
     [project] Projektit
+    [verification] Tarkistus
    *[category] LuokkaNimi
 }
 
@@ -651,6 +677,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] Ei maksutapaa
     [payee] Ei vastapuolta
     [project] Ei projektia
+    [verification] Tarkistettava
    *[category] Ei luokkaa
 }
 statistics-total = Yhteensä
@@ -692,6 +719,19 @@ accounts-stats-multiselect-help = Ohje: Valitse useita tilejä napsauttamalla ta
 statistics-year-question = Mitä vuotta haluat käsitellä? Radinus ulottuu vuodesta { $first } vuoteen { $last }.
 statistics-year-choose = Valitse vuosi
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = Ristiintaulukointi
+crossed-balance-window-name = Ristiintaulukointi
+crossed-balance-column = Luokka
+crossed-balance-no-data = Ei tapahtumia tässä kuussa valituilla tileillä.
+crossed-balance-month-question = Mitä kuukautta haluat tarkastella? Luku väliltä { $first }–{ $last }.
+crossed-balance-month-choose = Valitse kuukausi
+crossed-balance-next = Seuraava kuukausi
+crossed-balance-previous = Edellinen kuukausi
+
 # --- Taulukoiden vienti (hiiren oikea painike) ------------------------
 # Taulukon toiminto, ei ikkunan: se on kaikilla listoilla.
 
@@ -709,8 +749,16 @@ export-to-xml = Vie XML-muotoon (.xml)
 # Tilastoikkunan Vienti-valikko: yksi välilehti vuotta kohti, nimeltään
 # AN_2026. Tyhjät vuodet — asetettujen kytkinten mukaan — eivät ole mukana.
 export-menu = Vienti
+export-to = Vie muotoon
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = Kopioi solu
+copy-rows = Kopioi valitut rivit
+copy-failed = Kopiointi leikepöydälle epäonnistui.
 export-all-years-excel = Vie kaikki vuodet Exceliin
 export-all-years-ods = Vie kaikki vuodet LibreOffice Calciin
+export-all-months-excel = Vie näytetyn vuoden kaikki kuukaudet Exceliin
+export-all-months-ods = Vie näytetyn vuoden kaikki kuukaudet LibreOffice Calciin
 export-no-year = Yhdenkään vuoden kohdalla ei ole tapahtumia: vietävää ei ole.
 export-years-done = { $years } vuotta viety tiedostoon ”{ $file }”.
 export-to-json = Vie JSON-muotoon (.json)
@@ -724,6 +772,7 @@ statistics-window-name = { $kind ->
     [payment-mode] Tilastot maksutavoittain
     [payee] Tilastot vastapuolittain ja kauppiaittain
     [project] Tilastot projekteittain
+    [verification] Tilastot tarkistuksittain
    *[category] Tilastot luokittain
 }
 statistics-detail-name = Tilastojen erittely
@@ -766,6 +815,19 @@ curve-axis-balance = saldo
 curve-nothing = Yhtään tiliä ei ole valittu: piirrettävää kuvaajaa ei ole.
 curve-empty = Ei tapahtumia tällä ajanjaksolla.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = Saldon kehityksen analyysi
+analysis-heading = Saldon kehityksen analyysi
+analysis-hint = Vedä kuvaajan yli hiiren painike pohjassa nähdäksesi kyseisen jakson tapahtumat.
+analysis-zone = Alue:
+analysis-opening = Alkusaldo:
+analysis-closing = Loppusaldo:
+analysis-variation = Muutos:
+analysis-detail-name = Saldoanalyysi
+analysis-detail-none = Tällä alueella ei ole yhtään tapahtumaa.
+
 # --- F05 — Tapahtumien nopea luokittelu --------------------------------
 # Ikkuna, jossa luokitellaan **joukolla**: valitaan rivejä, rastitaan
 # muutettavat ominaisuudet ja sovelletaan ne kerralla — muistissa. Mitään ei
@@ -785,6 +847,7 @@ quick-check-payment-mode = Maksutapa
 quick-check-payee = Vastapuoli
 quick-check-project = Projekti
 quick-check-status = Tila
+quick-check-verification = Tarkistus
 quick-column-date = Päivä
 quick-column-label = Kuvaus
 quick-column-amount = Summa
@@ -794,6 +857,7 @@ quick-column-payment-mode = Maksutapa
 quick-column-payee = Vastapuoli
 quick-column-project = Projektit
 quick-column-status = Tila
+quick-column-verification = Tarkistus
 # Macissa Ctrl + napsautus on oikea napsautus: valintaan lisäävä näppäin on
 # siellä ⌘, ja ohjeen on mainittava se näppäin, joka toimii.
 quick-multiselect-help = Info: Valitse taulukosta useita kohteita hiiren napsautuksella ja [{ $modifier }]-näppäimellä
@@ -854,7 +918,7 @@ statement-no-match = Yksikään rivi ei vastaa suodatinta.
 statement-help = Info: Valitse taulukosta useita rivejä hiiren napsautuksella ja [{ $modifier }]-näppäimellä
 statement-choose-account = Tämä tiedosto sisältää useita tilejä. Minkä niistä haluat tuoda?
 statement-select-line = Valitse tiliotteelta vähintään yksi rivi.
-statement-title-open = Avaa tiliotetiedosto (.ofx)
+statement-title-open = Avaa tiliotetiedosto (OFX, QIF, CSV)
 statement-title-info = Tietoja avatusta tiedostosta
 statement-title-integrate = Liitä valinta tilille
 statement-title-validate = Liitä tämä tapahtuma tilille
@@ -863,6 +927,15 @@ statement-no-fitid = Huomio: tämä tiedosto ei anna tälle riville mitään tun
 statement-loaded = { $count ->
     [0] Tämä tiedosto ei sisällä yhtään tapahtumaa tälle tilille.
    *[other] { $count } riviä luettu, joista { $known } on jo tililläsi.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] { $count } riviä luettu; mikään niistä ei muistuta tapahtumaa, joka on jo tililläsi.
+    [one] { $count } riviä luettu, joista yksi muistuttaa tapahtumaa, joka on jo tililläsi (sama päivämäärä, sama kuvaus, sama summa).
+   *[other] { $count } riviä luettu, joista { $alike } muistuttaa tapahtumia, jotka ovat jo tililläsi (sama päivämäärä, sama kuvaus, sama summa).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] Vielä yksi muistuttaa tapahtumaa, joka on jo olemassa (sama päivämäärä, sama kuvaus, sama summa).
+   *[other] Vielä { $alike } muistuttaa tapahtumia, jotka ovat jo olemassa (sama päivämäärä, sama kuvaus, sama summa).
 }
 statement-integrated = { $count ->
     [0] Mitään ei liitetty: nämä rivit ovat jo tililläsi.
@@ -898,7 +971,23 @@ statement-file-info =
     Tiedoston tili: { $account }
     Ajanjakso: { $from } — { $to }
     Pankin ilmoittama saldo: { $balance }
-    { $count } tapahtumaa, joista { $known } on jo tililläsi.
+statement-qif-question = Tiedostossa ei ole mitään, mikä kertoisi, onko päivämäärä ”{ $date }” kirjoitettu muodossa päivä/kuukausi vai kuukausi/päivä. Se tarkoittaa:
+statement-qif-day-month = Päivä { $day }, kuukausi { $month } (päivä/kuukausi)
+statement-qif-month-day = Päivä { $day }, kuukausi { $month } (kuukausi/päivä)
+statement-qif-dates-mixed = Tämä tiedosto kirjoittaa päivämääränsä kahdella tavalla: ”{ $first }” luetaan päivä/kuukausi, ”{ $second }” kuukausi/päivä. Tiedostoa ei tuoda, jotta mikään päivämäärä ei vääristy.
+statement-qif-amounts-mixed = Tämä tiedosto kirjoittaa summansa kahdella tavalla: ”{ $first }” pisteellä, ”{ $second }” pilkulla. Tiedostoa ei tuoda, jotta mikään summa ei vääristy.
+statement-qif-opening = Alkusaldo { $amount } päivältä { $date }: se ei ole tapahtuma, eikä sitä tuoda.
+statement-qif-opening-undated = Alkusaldo { $amount }: se ei ole tapahtuma, eikä sitä tuoda.
+statement-qif-suspect = Rivi { $rank }, ”{ $label }” ({ $amount }), näyttää alkusaldolta: tarkista se ennen kuin liität sen.
+statement-qif-rejected = { $count ->
+    [one] Yhtä lukukelvotonta riviä ei tuoda: { $lines }.
+   *[other] { $count } lukukelvotonta riviä ei tuoda: { $lines }.
+}
+statement-qif-reason-date = päivämäärä
+statement-qif-reason-amount = summa
+statement-qif-reason-differ = ristiriitaiset summat
+statement-qif-no-account = Tätä tiliä ei ole enää tiedostossa: avaa tiedosto uudelleen.
+statement-balance-unknown = ei ilmoitettu tiedostossa
 statement-group-identification = Tapahtuman tunnistetiedot
 statement-group-amount = Tapahtuman summa
 statement-group-classification = Tapahtuman luokittelu tilastojen laskentaa varten
@@ -1526,6 +1615,9 @@ password-show = Näytä salasana
 password-remove-question = Poistetaanko tämän tietokannan suojaus?
 password-mismatch = Uuden salasanan kaksi syöttöä eroavat toisistaan
 password-wrong = Salasana ei käy
+database-too-recent = Tämä tietokanta on tallennettu Radinuksen uudemmalla versiolla (tietokannan versio { $found }; tämä versio lukee versioon { $supported } asti). Päivitä Radinus avataksesi sen.
+database-not-radinus = Tämä tiedosto ei ole Radinus-tietokanta.
+database-unreadable = Tietokantaa ei voitu lukea: { $reason }
 password-close-first = Sulje tämä tietokanta ennen salasanan vaihtamista
 password-now-protected = Tietokanta on suojattu salasanalla
 password-now-clear = Tietokantaa ei enää suojata
@@ -1758,6 +1850,11 @@ welcome-total-final = Loppusaldo
 welcome-total-real-detail = täsmäytetty + varattu
 welcome-total-final-detail = täsmäytetty + varattu + suunniteltu
 welcome-accounts = Tilisi
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = Summiin lasketut tilit: { $count } / { $total }
+welcome-tile-counted = Laske tämä tili mukaan summiin
 welcome-tile-bank = Pankissa
 welcome-tile-real = Todellinen
 welcome-tile-final = Lopullinen
@@ -1812,6 +1909,58 @@ preferences-leaf-zoom = Näytön koko
 preferences-field-zoom = Suurennus:
 preferences-zoom-reset = Oletusarvo
 preferences-zoom-hint = Kaikki suurenee yhdessä: teksti, kuvakkeet ja sarakkeet. Alle 100 %:n koossa näytölle mahtuu enemmän. Järjestelmän valikkorivi ja sen valintaikkunat sen sijaan noudattavat tietokoneesi asetuksia eivätkä näitä.
+preferences-branch-import = Tuonti
+preferences-leaf-verification = Tarkistus
+preferences-field-verification = Tuodut tapahtumat:
+preferences-verification-hint = ”Tarkistettu”: luotat pankkiisi, tuotu tapahtuma katsotaan oikeaksi. ”Tarkistettava”: jokainen tuotu tapahtuma odottaa tarkistustasi; sen jälkeen merkitset sen itse tilaan ”Tarkistettu” tapahtumaluettelossa. Asetus koskee vain tulevia tuonteja.
+preferences-leaf-qif = QIF-tiliotteet
+preferences-field-qif-order = Päivän ja kuukauden järjestys:
+preferences-qif-order-ask = Kysy minulta joka kerta
+preferences-qif-order-day-month = Aina päivä/kuukausi (05/03 = 5. maaliskuuta)
+preferences-qif-order-month-day = Aina kuukausi/päivä (05/03 = 3. toukokuuta)
+preferences-qif-order-help = Käytetään vain, jos mikään tiedoston päivämäärä ei ratkaise asiaa. Heti kun jokin päivämäärä, kuten 24/11, osoittaa järjestyksen, tiedosto ratkaisee tästä asetuksesta riippumatta.
+preferences-field-qif-label = Tapahtuman kuvaus:
+preferences-qif-label-both = Vastapuoli + muistio
+preferences-qif-label-payee = Vain vastapuoli
+preferences-qif-label-memo = Vain muistio
+preferences-qif-label-help = Kun tapahtumalla on sekä vastapuoli että muistio. Jos sillä on vain toinen niistä, käytetään sitä tästä asetuksesta riippumatta.
+preferences-qif-hint = Nämä asetukset koskevat kaikkia QIF-tiliotteita riippumatta siitä, mikä tietokanta on auki. ”Kysy minulta joka kerta” on turvallisin: tiedostoa, jonka päivämäärät ovat moniselitteisiä, ei koskaan lueta arvaamalla.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = Palauta oletussarakkeet
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = Näytä/Piilota
+columns-colour = Väritä sarake:
+columns-colour-none = Ei väriä
+columns-colour-red = Punainen
+columns-colour-orange = Oranssi
+columns-colour-pink = Vaaleanpunainen
+columns-colour-pastel-green = Pastellinvihreä
+columns-colour-green = Vihreä
+columns-colour-pastel-blue = Pastellinsininen
+columns-colour-blue = Sininen
+columns-colour-pastel-yellow = Pastellinkeltainen
+columns-colour-yellow = Keltainen
+preferences-leaf-columns = Taulukoiden sarakkeet
+preferences-table-operations-list = Tapahtumaluettelo
+preferences-columns-reset = Palauta
+preferences-columns-reset-all = Palauta kaikki
+preferences-columns-done = Sarakkeet on palautettu alkuperäiseen asetteluun.
+preferences-columns-hint = Jokainen taulukko muistaa sarakkeidensa järjestyksen, piilottamasi sarakkeet ja niiden leveyden. ”Palauta” palauttaa alkuperäisen asettelun heti.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = Palautus
+preferences-leaf-comfort = Mukavuusasetukset
+preferences-comfort-reset = Palauta mukavuusasetukset
+preferences-comfort-hint = Palauttaa kaikkien taulukoiden sarakkeet, aloitusikkunan tilien järjestyksen ja valintaruudut sekä näytön koon. Kieleen, valuuttaan ja tuotujen tapahtumien tarkistukseen ei kosketa.
+preferences-comfort-question = Palautetaanko mukavuusasetukset? Taulukoiden sarakkeet, aloitusikkuna ja näytön koko palaavat alkuperäiseen tilaansa.
+preferences-comfort-done = Mukavuusasetukset on palautettu.
 
 # --- Aloitusnäytön banneri -----------------------------------------------
 #
@@ -1876,3 +2025,943 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = Tämä ohjelma toimitetaan ilman mitään takuuta, siinä määrin kuin laki sallii.
 licence-info = Virallinen teksti avautuu selaimessasi osoitteessa gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = Lainalaskuri
+window-loan-title = Lainalaskuri
+loan-tab-credit = Laina
+loan-tab-afford = Pystynkö maksamaan sen takaisin?
+loan-field-kind = Lainan tyyppi
+loan-kind-consumer = Kulutusluotto
+loan-kind-mortgage = Asuntolaina
+loan-field-amount = Lainasumma
+loan-field-payment = Kuukausierä
+loan-field-months = Laina-aika
+loan-field-rate = Kiinteä korko
+loan-field-fees = Avausmaksu
+loan-field-insurance = Vakuutus kuukaudessa
+loan-unit-months = kk
+loan-unit-percent = %
+loan-invalid-field = Arvo ei ole luku: korjaa se, niin laskelma tehdään uudelleen.
+loan-report-button = PDF-raportti
+loan-monthly-table = Taulukko kuukausittain
+loan-months-count = { $count ->
+        [one] { $count } kuukausi
+       *[other] { $count } kuukautta
+    }
+loan-percent = { $value } %
+loan-notice-payment-too-low = Tämä erä ei kata korkoa: lainaa ei koskaan maksettaisi takaisin. Laina-aika jää 600 kuukauteen.
+loan-notice-too-long = Tämä erä vaatisi yli 600 kuukautta: laina-aika jää 600 kuukauteen.
+loan-figure-payment = Kuukausierä
+loan-figure-payment-insured = Erä vakuutuksineen
+loan-figure-taeg = Todellinen vuosikorko
+loan-figure-interest = Korkokulut
+loan-figure-insurance = Vakuutuskulut
+loan-figure-cost = Lainan kokonaiskustannus
+loan-figure-total-due = Maksettava kokonaissumma
+loan-figure-all-in = Takaisin maksettu yhteensä vakuutuksineen
+loan-part-capital = Lainasumma
+loan-part-interest = Korot
+loan-part-fees = Avausmaksu
+loan-part-insurance = Vakuutus
+loan-donut-cost-caption = yhteensä
+loan-chart-cost = Mitä laina maksaa
+loan-chart-capital = Jäljellä oleva pääoma
+loan-schedule-title = Lyhennystaulukko
+loan-schedule-yearly = Lyhennystaulukko vuosittain
+loan-column-number = Nro
+loan-column-year = Vuosi
+loan-column-date = Eräpäivä
+loan-column-payment = Erä
+loan-column-payments = Erät
+loan-column-interest = Korot
+loan-column-capital = Lyhennys
+loan-column-insurance = Vakuutus
+loan-column-remaining = Jäljellä oleva pääoma
+loan-history-label = Tarkasteltu jakso
+loan-period-last-12 = Viimeiset 12 kuukautta
+loan-accounts-title = Tarkastellut tilit
+loan-period-title = Jakso
+loan-column-account = Tili
+loan-column-bank = Pankki
+loan-column-balance = Todellinen saldo
+loan-unavailable-no-account = Valitse vähintään yksi tili tarkastellaksesi historiaasi.
+loan-unavailable-no-month = Tällä jaksolla ei ole vielä yhtään kokonaista kuukautta: valitse toinen.
+loan-verdict-title = Lyhyesti
+loan-verdict-green = Mahdollinen
+loan-verdict-orange = Tiukka
+loan-verdict-red = Riskialtis
+loan-verdict-no-income = Ei tuloja tällä jaksolla: velkaantumisastetta ei voi laskea.
+loan-check-debt-green = Velkaantumisaste { $ratio }: alle tämän menetelmän rajan { $green }.
+loan-check-debt-orange = Velkaantumisaste { $ratio }: välillä { $green }–{ $red }, rajalla.
+loan-check-debt-red = Velkaantumisaste { $ratio }: yli { $red }.
+loan-check-effort = Erä { $payment } vie { $share } siitä, mitä säästät { $kind ->
+        [good] hyvänä kuukautena
+        [hard] vaikeana kuukautena
+       *[usual] tavallisena kuukautena
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] Hyvä kuukausi
+        [hard] Vaikea kuukausi
+       *[usual] Tavallinen kuukausi
+    } ei jätä säästöön mitään: erä { $payment } otettaisiin varannostasi.
+loan-check-reserve-green = Saldosi pysyy positiivisena lainan loppuun asti.
+loan-check-reserve-red = Tämän lainan takia saldosi painuisi miinukselle: { $month }.
+loan-check-reserve-sooner = Saldosi painuisi miinukselle ({ $month }) { $count ->
+        [one] kuukautta
+       *[other] { $count } kuukautta
+    } aiemmin kuin ilman lainaa.
+loan-check-reserve-anyway = Saldosi painuisi miinukselle ilman lainaakin (noin: { $month }); laina ei juuri muuta sitä.
+loan-check-reserve-floor-green = Saldosi pysyy turvavarannon ({ $floor }) yläpuolella lainan loppuun asti.
+loan-check-reserve-floor-red = Tämän lainan takia saldosi laskisi turvavarannon ({ $floor }) alle: { $month }.
+loan-check-reserve-floor-sooner = Saldosi laskisi turvavarannon ({ $floor }) alle ({ $month }) { $count ->
+        [one] kuukautta
+       *[other] { $count } kuukautta
+    } aiemmin kuin ilman lainaa.
+loan-check-reserve-floor-anyway = Saldosi laskisi turvavarannon ({ $floor }) alle ilman lainaakin (noin: { $month }); laina ei juuri muuta sitä.
+loan-warning-deficit = Huomio: tällä jaksolla menosi ylittävät jo tulosi keskimäärin { $amount } kuukaudessa, ennen mitään lainaa.
+loan-figure-reference = Säästö { $kind ->
+        [good] hyvänä kuukautena
+        [hard] vaikeana kuukautena
+       *[usual] tavallisena kuukautena
+    }
+loan-figure-tipped = Kuukaudet, jotka laina veisi miinukselle
+loan-gauge-caption = velkaantumisaste
+loan-figure-income = Keskimääräiset tulot kuukaudessa
+loan-figure-spending = Keskimääräiset menot kuukaudessa
+loan-figure-saving = Keskimääräinen säästö kuukaudessa
+loan-figure-running = Käynnissä olevat lainat kuukaudessa
+loan-figure-new = Uusi erä vakuutuksineen
+loan-figure-rest = Elämiseen kuukaudessa
+loan-figure-debt = Velkaantumisaste
+loan-red-months-value = { $count } / { $total }
+loan-figure-balance-now = Todellinen saldo tänään
+loan-figure-balance-end = Arvioitu saldo lainan lopussa
+loan-chart-income = Mihin keskitulosi menevät
+loan-donut-income-caption = keskitulo
+loan-part-spending = Juoksevat menot
+loan-part-running = Käynnissä olevat lainat
+loan-part-new = Uusi laina
+loan-part-rest = Jäljelle
+loan-part-missing = Puuttuu
+loan-chart-history = Historiasi tämän lainan kanssa
+loan-chart-history-hint = Mitä kustakin kuukaudesta olisi jäänyt erän jälkeen. Kirkkaan punaisella kuukaudet, jotka laina veisi miinukselle; vaaleanpunaisella ne, jotka olivat miinuksella ilman sitäkin.
+loan-chart-projection = Arvioitu saldosi
+loan-mark-loan-end = Loppu: { $label }
+loan-mark-negative = Miinuksella
+loan-mark-floor = Varannon alla
+loan-mark-floor-line = Turvavaranto
+loan-running-title = Huomioidut käynnissä olevat lainat
+loan-running-column-label = Toistuva tapahtuma
+loan-running-column-monthly = Kuukaudessa
+loan-running-column-end = Viimeinen erä
+loan-no-running = Toistuvista tapahtumistasi ei tunnistettu yhtään käynnissä olevaa lainaa.
+loan-period-caption = { $from } – { $to } ({ $count ->
+        [one] { $count } kuukausi
+       *[other] { $count } kuukautta
+    })
+loan-transfers = { $count ->
+        [0] Valittujen tiliesi välillä ei tunnistettu siirtoja.
+        [one] Yksi siirto valittujen tiliesi välillä tunnistettiin ja jätettiin pois.
+       *[other] { $count } siirtoa valittujen tiliesi välillä tunnistettiin ja jätettiin pois.
+    }
+loan-method = Keskiarvot jakson kokonaisista kuukausista, täsmätyt ja kirjatut tapahtumat, ilman valittujen tiliesi välisiä siirtoja.
+loan-report-title = Lainalaskelma
+loan-report-made-on = laskelma { $date }
+loan-disclaimer = Suuntaa antava laskelma ilman sopimusarvoa. Vain pankin tarjous on sitova.
+loan-tab-rules = Arvioinnin asetukset
+loan-method-optimistic = Optimistinen
+loan-method-neutral = Neutraali
+loan-method-severe = Tiukka
+loan-method-line = Arviointimenetelmä: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = Arvio vastaa kolmeen kysymykseen, ja kukin menetelmä asettaa niille omat vaatimuksensa. Valitse itsellesi sopiva: välilehden ”Pystynkö maksamaan sen takaisin?” arvio seuraa sitä. Viimeinen rivi olettaa menojesi kasvavan vuosittain annetun prosentin verran; erä pysyy samana.
+loan-rule-row-debt = Hyväksytty velkaantumisaste
+loan-rule-row-reference = Vertailusäästö
+loan-rule-row-share = Osuus säästöstä, jonka erä saa viedä
+loan-rule-row-floor = Raja, jonka alle saldo ei saa laskea
+loan-rule-row-sooner = Jos saldo laskee sen alle ilman lainaakin
+loan-rule-row-growth = Menojesi kasvu vuodessa
+loan-rule-limits = vihreä enintään { $green }, oranssi enintään { $red }
+loan-rule-reference = { $kind ->
+        [good] hyvä kuukausi
+        [hard] vaikea kuukausi
+       *[usual] tavallinen kuukausi
+    }: { $amount }
+loan-rule-floor-zero = nolla
+loan-rule-floor-cushion = kuukauden menot: { $amount }
+loan-rule-sooner = oranssi, jos laina aikaistaa sitä { $orange }, punainen { $red }
+loan-unit-percent-year = % vuodessa
+loan-method-optimistic-explain = Optimistinen menetelmä olettaa hyvän kuukauden, hyväksyy enintään 40 %:n velkaantumisasteen eikä pidä varantoa: se kertoo, mikä on mahdollista, jos kaikki menee hyvin.
+loan-method-neutral-explain = Neutraali menetelmä olettaa tavallisen kuukauden ja noudattaa pankkien sääntöä, 33–35 %:n velkaantumisastetta: se on vertailuarvio.
+loan-method-severe-explain = Tiukka menetelmä olettaa vaikean kuukauden ja pitää kuukauden menot varantona yllätysten varalle: se kertoo, mikä kestää, vaikka asiat menisivät huonosti.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = Sähkölaitteen kulutus
+window-appliance-title = Sähkölaitteen kulutus
+appliance-device-title = Laite
+appliance-on-title = Päällä
+appliance-standby-title = Valmiustilassa
+appliance-field-on-watts = Teho käytössä
+appliance-field-on-hours = Käyttöaika päivässä
+appliance-field-days = Käyttöpäivät viikossa
+appliance-field-share = Käyttöajan osuus edullisena aikana
+appliance-field-standby-watts = Valmiustilan teho
+appliance-field-standby-hours = Valmiustila-aika käyttöpäivää kohden
+appliance-unit-watts = W
+appliance-unit-hours = h
+appliance-unit-days = / 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/kWh
+appliance-standby-hint = Jos kenttä jätetään tyhjäksi, valmiustila kestää loppupäivän. Päivinä, joina laitetta ei käytetä, se on silti kytkettynä: koko aika lasketaan valmiustilaksi. Irrotetun laitteen valmiustilan teho on 0 W.
+appliance-contract-title = Sopimuksesi
+appliance-field-option = Hinnoittelumalli
+appliance-option-base = Yleissähkö (yksi hinta)
+appliance-option-off-peak = Huippuaika / edullinen aika
+appliance-field-base = kWh-hinta
+appliance-field-peak = kWh-hinta huippuaikana
+appliance-field-off-peak = kWh-hinta edullisena aikana
+appliance-field-off-peak-hours = Edullisen ajan tunnit päivässä
+appliance-contract-hint = Nämä hinnat koskevat vain tätä laskelmaa. Tallennettu hinnoittelu asetetaan kohdassa Asetukset › Valinnat › Työkalut.
+appliance-contract-reset = Palauta tallennettu hinnoittelu
+appliance-period-day = Päivässä
+appliance-period-month = Kuukaudessa
+appliance-period-year = Vuodessa
+appliance-energy = { $value } kWh
+appliance-less-than = alle { $amount }
+appliance-detail-title = Vuoden erittely
+appliance-column-part = Kohde
+appliance-column-energy = Energia
+appliance-column-cost = Kustannus
+appliance-column-share = Osuus
+appliance-line-on = Päällä
+appliance-line-standby = Valmiustilassa
+appliance-line-on-peak = Päällä, huippuaika
+appliance-line-on-off-peak = Päällä, edullinen aika
+appliance-line-standby-peak = Valmiustilassa, huippuaika
+appliance-line-standby-off-peak = Valmiustilassa, edullinen aika
+appliance-line-total = Yhteensä
+appliance-chart-title = Mihin rahat menevät
+appliance-chart-caption = vuodessa
+appliance-standby-sentence = Pelkkä valmiustila maksaa vuodessa: { $amount }. Osuus laitteen kustannuksista: { $share }.
+appliance-note-plate = Laitteeseen tai sen ohjeeseen merkitty teho on enimmäisarvo: käytössä useimmat laitteet kuluttavat vähemmän. Saat todellisen luvun mittaamalla kulutuksen pistorasiaan kytkettävällä energiamittarilla ja syöttämällä sen lukeman.
+appliance-note-subscription = Perusmaksua ei lasketa mukaan: se maksetaan, oli laite kytkettynä tai ei.
+appliance-invalid-watts = Anna teho väliltä 0–100 000 W.
+appliance-invalid-hours = Anna aika väliltä 0–24 tuntia päivässä.
+appliance-invalid-days = Anna päivien määrä kokonaislukuna väliltä 0–7.
+appliance-invalid-share = Anna osuus väliltä 0–100 %.
+appliance-invalid-day-overflow = Käyttöaika ja valmiustila ylittävät yhteensä 24 tuntia päivässä.
+appliance-invalid-price = Anna kWh-hinta väliltä 0–100.
+appliance-invalid-off-peak-hours = Anna edullisen ajan tunnit kokonaislukuna väliltä 0–24.
+preferences-branch-tools = Työkalut
+preferences-leaf-electricity = Sähkön hinnoittelu
+preferences-electricity-blue = Palauta EDF:n Tarif Bleu
+preferences-electricity-hint = Sopimuksesi hinnoittelu, jota työkalu ”Sähkölaitteen kulutus” käyttää. Oletuksena: EDF:n Tarif Bleu (Ranska) 1.8.2026, hinnat sisältävät verot, mittari 3–6 kVA. Nämä hinnat muuttuvat usein helmi- ja elokuussa: kopioi hinnat laskustasi.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = Puskurirahastoni
+window-cushion-title = Puskurirahastoni
+cushion-question = Jos tulosi loppuisivat huomenna, kuinka monta kuukautta pärjäisit säästöilläsi?
+cushion-accounts-title = Tilisi
+cushion-column-account = Tili
+cushion-column-balance = Todellinen saldo
+cushion-column-savings = Säästöt
+cushion-column-spending = Menot
+cushion-accounts-hint = ”Säästöt”: rahat, joiden varaan laskisit vaikeina aikoina. ”Menot”: tilit, joilta arjen menot maksetaan.
+cushion-history-label = Tarkastelujakso
+cushion-backup-label = Varatulo kuukaudessa
+cushion-backup-hint = Tulot, jotka jatkuisivat: työttömyysturva, puolison palkka… Tyhjä: ei tuloja.
+cushion-categories-title = Huomioidut menot
+cushion-categories-hint = Poista valinta menoista, joista luopuisit vaikeina aikoina.
+cushion-categories-empty = Ei menoja tällä jaksolla.
+cushion-verdict-title = Puskurisi
+cushion-targets-title = Turvarajat
+cushion-projection-title = Säästösi vaikeina aikoina
+cushion-projection-hint = Mitä jäisi jäljelle kunakin kuukautena, jos tulosi loppuisivat tänään.
+cushion-note = Arvio perustuu historiaasi: vaikean kuukauden menot voivat poiketa keskiarvosta.
+cushion-invalid-backup = Summaa ei voi lukea: korjaa se, niin laskelma tehdään uudelleen.
+cushion-no-spending-account = Valitse vähintään yksi ”Menot”-tili.
+cushion-no-month = Tällä jaksolla ei ole vielä yhtään täyttä kuukautta.
+cushion-months = { $value } kk
+cushion-per-month = { $amount } kuukaudessa
+cushion-figure-holds = Ei rajaa
+cushion-gauge-caption = menoja katettuna
+cushion-verdict-short = Alle kolme kuukautta: yllättävä isku ajaisi sinut nopeasti ahdinkoon.
+cushion-verdict-fair = Kolmesta kuuteen kuukautta: kohtuullinen puskuri, jota kannattaa kasvattaa, jos voit.
+cushion-verdict-solid = Kuusi kuukautta tai enemmän: puskurisi on vankka.
+cushion-verdict-holds = Varatulosi kattaa menosi: säästösi eivät hupenisi.
+cushion-verdict-nothing = Jaksolla ei ole huomioituja menoja: katettavaa ei ole.
+cushion-tile-savings = Käytettävissä olevat säästöt
+cushion-tile-spending = Huomioidut menot
+cushion-tile-backup = Varatulo
+cushion-tile-burn = Säästöt hupenisivat
+cushion-tile-rhythm = Säästämistahti
+cushion-burn-none = Ei mitään
+cushion-target-title = { $months } kuukauden menot: { $amount }
+cushion-target-reached = Saavutettu.
+cushion-target-date = Puuttuu { $missing }. Nykyisellä säästämistahdilla saavutetaan arviolta: { $month }.
+cushion-target-never = Puuttuu { $missing }. Säästösi eivät kasvaneet jakson aikana: tällä tahdilla tätä rajaa ei saavuteta.
+cushion-mark-empty = Rahat loppu: { $month }
+cushion-period = Keskiarvo: { $count ->
+        [one] { $count } täysi kuukausi
+       *[other] { $count } täyttä kuukautta
+    }, jakso { $from } – { $to }. { $transfers ->
+        [0] Ei siirtoja tiliesi välillä.
+        [one] Yksi siirto tiliesi välillä, jätetty pois laskelmasta.
+       *[other] { $transfers } siirtoa tiliesi välillä, jätetty pois laskelmasta.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = Säästötavoite
+window-goal-title = Säästötavoite
+goal-accounts-title = Seuratut tilit
+goal-column-account = Tili
+goal-column-balance = Todellinen saldo
+goal-accounts-hint = Kahden seuratun tilin välinen siirto kumoutuu; siirto tilille, jota ei seurata, lasketaan menoksi.
+goal-period-label = Tarkastelujakso
+goal-period-range = Vuosiväli…
+goal-range-from = vuodesta
+goal-range-to = vuoteen
+goal-question-title = Kysymyksesi
+goal-question-when = Milloin minulla on tämä summa?
+goal-question-amount = Paljonko minulla on tavoitepäivänä?
+goal-question-effort = Paljonko pitää säästää, jotta minulla on tämä summa tavoitepäivänä?
+goal-field-target = Tavoitesumma
+goal-field-date = Tavoitepäivä
+goal-field-rate = Säästöjen vuosikorko
+goal-field-extra = Entä jos säästäisin lisää, kuukaudessa
+goal-options-hint = Tyhjät: ei korkoa, ei lisäsäästöä.
+goal-answer-title = Vastaus
+goal-chart-title = Saldosi eilen ja huomenna
+goal-chart-hint = Yhtenäinen viiva: viimeisten kahdentoista kuukauden todellinen saldo; katkoviiva: ennuste; vaalea alue: vaihteluväli kuukausien mukaan.
+goal-disclaimer = Historiaasi perustuva ennuste, ei lupaus: yllättävä tapahtuma voi muuttaa kaiken.
+goal-no-account = Valitse vähintään yksi seurattava tili.
+goal-no-month = Tällä jaksolla ei ole vielä yhtään täyttä kuukautta.
+goal-invalid-target = Anna tavoiteltava summa.
+goal-invalid-date = Valitse tuleva päivä seuraavan viidenkymmenen vuoden ajalta.
+goal-invalid-rate = Anna korko väliltä 0–100 %.
+goal-invalid-extra = Summaa ei voi lukea: korjaa se, niin laskelma tehdään uudelleen.
+goal-per-month = { $amount } kuukaudessa
+goal-tile-balance = Saldo tänään
+goal-tile-rhythm = Keskimääräinen tahti
+goal-tile-target = Tavoite
+goal-tile-reached = Saavutetaan arviolta
+goal-tile-date = Tavoitepäivä
+goal-tile-projected = Ennustettu saldo
+goal-tile-saved = Säästetty siihen mennessä
+goal-tile-interest = Josta korkoa
+goal-tile-needed = Säästettävä
+goal-when-already = Sinulla on jo { $amount }: seuraamiesi tilien saldo on yhteensä { $balance }.
+goal-when-reached = Sinulla on { $amount } { $months ->
+        [one] kuukauden kuluttua
+       *[other] { $months } kuukauden kuluttua
+    }, arviolta: { $month }.
+goal-when-range = Kuukausista riippuen aikaisintaan: { $early }, viimeistään: { $late }.
+goal-when-range-open = Aikaisintaan: { $early }. Heikoilla kuukausilla tavoitetta ei saavutettaisi.
+goal-when-never = Tällä tahdilla et saavuta summaa { $amount }.
+goal-zero = Saldosi putoaisi nollaan arviolta: { $month }.
+goal-amount = { $month }: sinulla olisi noin { $amount }.
+goal-amount-range = Kuukausista riippuen vähintään { $low } ja enintään { $high }.
+goal-effort-more = Tavoite { $amount }, ajankohta: { $month }. Sinun pitäisi säästää keskimäärin { $monthly } kuukaudessa eli { $gap } enemmän kuin nyt.
+goal-effort-less = Tavoite { $amount }, ajankohta: { $month }. { $monthly } kuukaudessa riittäisi eli { $gap } vähemmän kuin nyt: olet edellä aikataulusta.
+goal-effort-range = Kuukausista riippuen ero nykyiseen tahtiisi olisi vähintään { $low } ja enintään { $high } kuukaudessa.
+goal-chart-target = Tavoite: { $amount }
+goal-chart-today = Tänään
+goal-note-seasons = Ennuste seuraa vuodenaikoja: jokainen tuleva kuukausi saa jakson samojen kuukausien keskiarvon.
+goal-note-range = Vaihteluväli perustuu jakson heikkoihin ja vahvoihin kuukausiin: alimpaan ja ylimpään neljännekseen.
+goal-note-loan = Laina ”{ $label }” päättyy: { $month }. Sen jälkeen { $amount } enemmän kuukaudessa.
+goal-note-interest = Korko lasketaan kuukausittain, vuosikorko { $rate } %: likiarvo säästötilien puolen kuukauden jaksoihin perustuvasta laskentasäännöstä.
+goal-period = Tahti laskettu jaksolta { $from } – { $to }: { $count ->
+        [one] { $count } täysi kuukausi
+       *[other] { $count } täyttä kuukautta
+    }. { $transfers ->
+        [0] Ei siirtoja seuraamiesi tilien välillä.
+        [one] Yksi siirto seuraamiesi tilien välillä, jätetty pois laskelmasta.
+       *[other] { $transfers } siirtoa seuraamiesi tilien välillä, jätetty pois laskelmasta.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = Entä jos vähentäisin…?
+window-cut-title = Entä jos vähentäisin…?
+cut-axis-label = Ryhmittele
+cut-axis-category = Luokat
+cut-axis-payee = Vastapuolet
+cut-axis-budget-line = Budjettikohdat
+cut-table-title = Menosi kohta kohdalta
+cut-table-hint = Kirjoita vähennys (% tai { $sign } kuukaudessa) niille kohdille, joita haluaisit keventää. Vähennys ei voi ylittää itse menoa.
+cut-column-monthly = Kuukaudessa
+cut-column-cut = Vähennys
+cut-column-after = Jälkeen
+cut-column-yearly = Säästö vuodessa
+cut-total = Yhteensä
+cut-horizon-label = Aikajänne
+cut-settings-title = Asetukset
+cut-options-hint = Korko ja tavoitesumma ovat vapaaehtoisia.
+cut-report-button = PDF-raportti
+cut-chart-title = Saldosi ilman vähennyksiä ja niiden kanssa
+cut-chart-hint = Yhtenäinen viiva: viimeisten kahdentoista kuukauden todellinen saldo; harmaa katkoviiva: ennuste ilman vähennyksiä; sininen: vähennysten kanssa; vihreä: säästetty raha.
+cut-donut-title = Kuukausimenosi vähennysten jälkeen
+cut-donut-caption = kuukaudessa vähennysten jälkeen
+cut-donut-others = Muut kohdat
+cut-donut-saved = Säästetty
+cut-legend-with = Vähennysten kanssa
+cut-legend-without = Ilman vähennyksiä
+cut-years = { $years ->
+        [one] { $years } vuosi
+       *[other] { $years } vuotta
+    }
+cut-headline-none = Kirjoita taulukkoon vähennys nähdäksesi sen vaikutuksen.
+cut-headline = { $count ->
+        [one] Tällä vähennyksellä
+       *[other] Näillä { $count } vähennyksellä
+    } säästäisit { $monthly } enemmän kuukaudessa eli { $yearly } vuodessa.
+cut-tile-monthly = Säästö kuukaudessa
+cut-tile-yearly = Säästö vuodessa
+cut-tile-horizon = Säästö { $years ->
+        [one] { $years } vuodessa
+       *[other] { $years } vuodessa
+    }
+cut-tile-spending = Menot kuukaudessa
+cut-target-already = Sinulla on jo { $amount }.
+cut-target-sooner = Saavuttaisit summan { $amount } arviolta: { $with } (ilman vähennyksiä: { $without }), { $months ->
+        [0] eli et yhtään aiemmin
+        [one] eli kuukautta aiemmin
+       *[other] eli { $months } kuukautta aiemmin
+    }.
+cut-target-only-with = Näillä vähennyksillä saavuttaisit summan { $amount } arviolta: { $with }; ilman niitä, nykyisellä tahdillasi, et koskaan.
+cut-target-never = Näilläkään vähennyksillä et saavuttaisi summaa { $amount } nykyisellä tahdillasi.
+cut-note-seasons = Jokainen vähennys seuraa kohtansa vuodenaikoja: kohta, joka painaa eniten kesällä, säästää eniten kesällä.
+cut-note-capped = Syötetty vähennys ylitti menon: se on rajattu menon suuruiseksi.
+cut-invalid-cut = Tätä vähennystä ei voi lukea: anna prosentti väliltä 0–100 tai summa kuukaudessa.
+cut-report-settings = Asetukset
+cut-report-result = Tulos
+cut-report-accounts = Seuratut tilit
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = Suunnittele lomasi
+window-holiday-title = Suunnittele lomasi
+holiday-trip-title = Matka
+holiday-field-trip = Matkan tyyppi
+holiday-trip-stay = Lomamatka
+holiday-trip-cruise = Risteily
+holiday-field-adults = Aikuiset
+holiday-field-children = Lapset
+holiday-field-nights = Matkan kesto öinä
+holiday-field-days = Päivät
+holiday-field-months = Kuukausia lähtöön
+holiday-field-stops = Satamakäyntien määrä
+holiday-saved-title = Jo säästetty
+holiday-saved-hint = Valitse tilit, joille lomarahaa on jo pantu sivuun: niiden todellinen saldo lasketaan jo säästetyksi.
+holiday-budget-title = Budjetti
+holiday-budget-hint = Anna jokaiselle kohdalle summa, keitä se koskee ja kuinka pitkältä ajalta. Tyhjää kohtaa ei lasketa.
+holiday-optional-title = Valinnaiset rivit
+holiday-result-title = Tulos
+holiday-donut-title = Mihin matkarahat menevät
+holiday-donut-caption = matkaan
+holiday-child-label = Lapsen hinta
+holiday-count-label = Hytit
+holiday-open = Avaa projekti…
+holiday-save = Tallenna projekti…
+holiday-pdf = PDF-raportti
+holiday-excel = Vie Exceliin
+holiday-file-filter = Lomaprojekti
+holiday-replace-question = Tämän projektin avaaminen korvaa ikkunaan kirjoitetut tiedot. Jatketaanko?
+holiday-file-saved = Projekti tallennettu: { $file }
+holiday-file-opened = Projekti avattu: { $file }
+holiday-file-not-project = Tämä tiedosto ei ole Radinuksen lomaprojekti.
+holiday-file-too-recent = Tämä projekti on peräisin Radinuksen uudemmasta versiosta: päivitä Radinus avataksesi sen.
+holiday-file-failed = Tiedostoa ei voitu lukea tai kirjoittaa: { $reason }
+holiday-line-transport = Meno-paluumatkat
+holiday-line-lodging = Majoitus
+holiday-line-meals = Ateriat ja päivittäiset menot
+holiday-line-visits = Nähtävyydet ja vapaa-aika
+holiday-line-port = Matka satamaan
+holiday-line-cabins = Hytit
+holiday-line-service = Palvelumaksu (juomarahat)
+holiday-line-drinks = Juomapaketti
+holiday-line-excursions = Maaretket satamissa
+holiday-line-port-taxes = Satamamaksut
+holiday-line-wifi = Wifi aluksella
+holiday-line-onboard = Menot aluksella ja satamissa
+holiday-line-other = Muut kulut ja odottamattomat menot
+holiday-line-insurance = Peruutusturva
+holiday-line-stay-tax = Turistivero
+holiday-line-car = Auto perillä, polttoaine ja tiemaksut
+holiday-line-parking = Pysäköinti lentoasemalla tai asemalla
+holiday-line-bank = Pankkikulut ulkomailla
+holiday-line-formalities = Muodollisuudet (passi, viisumi, rokotukset)
+holiday-line-pets = Lemmikkien hoito
+holiday-span-trip = koko matka
+holiday-span-night = per yö
+holiday-span-day = per päivä
+holiday-span-stop = per satamakäynti
+holiday-who-all = kaikille
+holiday-who-person = per henkilö
+holiday-who-adults = per aikuinen
+holiday-cabins-count = { $count ->
+        [one] { $count } hytti
+       *[other] { $count } hyttiä
+    }
+holiday-days = { $days ->
+        [one] { $days } päivä
+       *[other] { $days } päivää
+    }
+holiday-invalid-count = Anna kokonaisluku.
+holiday-invalid-amount = Summaa ei voi lukea: anna positiivinen luku tai prosentti väliltä 0–100.
+holiday-headline-empty = Kirjoita budjetin summat nähdäksesi, mitä matka maksaa.
+holiday-headline-stay = Tämä lomamatka maksaisi { $total }: { $people ->
+        [one] yksi henkilö
+       *[other] { $people } henkilöä
+    }, { $nights ->
+        [0] ei yhtään yötä
+        [one] yksi yö
+       *[other] { $nights } yötä
+    }.
+holiday-headline-cruise = Tämä risteily maksaisi { $total }: { $people ->
+        [one] yksi henkilö
+       *[other] { $people } henkilöä
+    }, { $nights ->
+        [0] ei yhtään yötä
+        [one] yksi yö
+       *[other] { $nights } yötä
+    }.
+holiday-tile-total = Kokonaiskustannus
+holiday-tile-person = Per henkilö
+holiday-tile-person-day = Per henkilö ja päivä
+holiday-tile-saved = Jo säästetty
+holiday-tile-remaining = Vielä rahoitettava
+holiday-tile-monthly = Tarvittava säästö
+holiday-remaining-none = Ei mitään: kaikki on katettu
+holiday-monthly-none = Ei mitään säästettävää
+holiday-monthly-now = Lähtö tässä kuussa
+holiday-note-days = Päiviä on yksi enemmän kuin öitä: seitsemän yötä on kahdeksan päivää.
+holiday-note-child = Henkilöä kohden lapsi maksaa lapsen hinnan, jos se on annettu; jos kenttä on tyhjä, lapsi maksaa kuten aikuinen.
+holiday-note-percent = Vakuutuksen prosenttiosuus lasketaan matkan pääkohdista; pankkikulujen prosenttiosuus perillä tehdyistä menoista.
+holiday-sheet-budget = Budjetti
+holiday-sheet-result = Tulos
+holiday-column-line = Kohta
+holiday-column-amount = Summa
+holiday-column-child = Lapsen hinta
+holiday-column-who = Kenelle
+holiday-column-span = Kuinka pitkään
+holiday-column-cost = Kustannus
+holiday-disclaimer = Arvio, joka perustuu omiin summiisi: todelliset hinnat voivat vaihdella.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = Säästöprojekti
+cut-file-not-project = Tämä tiedosto ei ole Radinuksen säästöprojekti.
+cut-file-too-recent = Tämä projekti on peräisin Radinuksen uudemmasta versiosta: päivitä Radinus avataksesi sen.
+cut-sheet-items = Kohdat
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = Autoni päiväkirja
+window-car-title = Autoni päiväkirja
+car-unnamed = Autoni
+car-sheet-title = Auto
+car-field-plate = Rekisterinumero
+car-field-make = Merkki
+car-field-model = Malli
+car-field-engine = Käyttövoima
+car-field-first-hand = Ensimmäinen omistaja
+car-field-registered = Ensirekisteröinti
+car-field-acquired = Hankintapäivä
+car-field-acquired-km = Mittarilukema hankittaessa
+car-field-service = Huoltoväli
+car-field-service-or = tai
+car-unit-months-short = kk
+car-unit-km = km
+car-tariff-title = Kotilatauksen hinta
+car-tariff-hint = Tämä hinta säilytetään auton päiväkirjassa: se ei muuta valintojen hintaa.
+car-tariff-reset = Käytä valintojen hintaa
+car-engine-petrol = Bensiini
+car-engine-diesel = Diesel
+car-engine-lpg = Nestekaasu
+car-engine-e85 = E85 (bioetanoli)
+car-engine-hybrid = Hybridi
+car-engine-plug-in = Ladattava hybridi
+car-engine-electric = Sähkö
+car-engine-hydrogen = Vety
+car-energy-petrol = Bensiini
+car-energy-diesel = Diesel
+car-energy-lpg = Nestekaasu
+car-energy-e85 = E85
+car-energy-electricity = Sähkö
+car-energy-hydrogen = Vety
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = Energia
+car-rubric-upkeep = Tavallinen ylläpito
+car-rubric-service = Huolto
+car-rubric-wear = Kuluvat osat
+car-rubric-tyres = Renkaat
+car-rubric-breakdown = Viat
+car-rubric-insurance = Vakuutus
+car-rubric-inspection = Katsastus
+car-part-brake-pads = Jarrupalat
+car-part-brake-discs = Jarrulevyt
+car-part-timing-belt = Jakohihna
+car-part-clutch = Kytkin
+car-part-battery-12v = 12 V:n akku
+car-part-shock-absorbers = Iskunvaimentimet
+car-part-wipers = Pyyhkijänsulat
+car-part-spark-plugs = Sytytystulpat
+car-part-glow-plugs = Hehkutulpat
+car-part-particulate-filter = Hiukkassuodatin
+car-part-catalytic-converter = Katalysaattori
+car-part-fuel-cell-filter = Polttokennon suodatin
+car-part-exhaust = Pakoputkisto
+car-part-other = Muu osa…
+car-axle-all = Kaikki neljä rengasta
+car-axle-front = Eturenkaat
+car-axle-rear = Takarenkaat
+car-verdict-pass = Hyväksytty
+car-verdict-counter = Jälkitarkastus
+car-charge-station = Latausasemalla
+car-charge-home = Kotona
+car-slot-peak = Huippuaika
+car-slot-off-peak = Edullinen aika
+car-entry-new = Uusi rivi
+car-entry-edit = Muokkaa riviä
+car-field-date = Päivämäärä
+car-field-km = Mittarilukema
+car-field-rubric = Luokka
+car-field-amount = Summa
+car-field-garage = Korjaamo tai asema
+car-field-note = Huomautus
+car-field-energy = Energia
+car-field-quantity = Määrä
+car-field-charge = Lataus
+car-field-slot = Latausaika
+car-field-part = Osa
+car-field-part-name = Osan nimi
+car-field-axle = Vaihdetut renkaat
+car-field-verdict = Tulos
+car-field-months = Katetut kuukaudet
+car-field-battery = Akun kunto
+car-home-amount-hint = Kotilatauksen summa lasketaan auton kotilataushinnan mukaan.
+car-entry-add = Lisää päiväkirjaan
+car-entry-update = Tallenna rivi
+car-entry-cancel = Peruuta
+car-entry-delete = Poista rivi
+car-delete-question = Poistetaanko tämä rivi päiväkirjasta?
+car-from-operation = Ota tapahtuma…
+car-pick-account = Miltä tililtä meno on?
+car-pick-operation = Mikä tapahtuma?
+car-pick-take = Ota
+car-pick-none = Tällä tilillä ei ole menoja.
+car-pick-taken = Tapahtuma otettu: täydennä mittarilukema ja luokka ja lisää sitten rivi.
+car-history-title = Historia
+car-filter-all = Kaikki luokat
+car-history-empty = Ei vielä rivejä.
+car-history-hint = Napsauta riviä muokataksesi sitä.
+car-column-date = Päivämäärä
+car-column-km = Km
+car-column-rubric = Luokka
+car-column-detail = Tiedot
+car-column-amount = Summa
+car-column-garage = Korjaamo
+car-column-note = Huomautus
+car-column-share = Osuus
+car-column-per-km = Per km
+car-column-energy = Energia
+car-column-quantity = Määrä
+car-column-price = Keskihinta
+car-column-consumption = Kulutus
+car-column-part = Osa
+car-column-changes = Vaihdot
+car-column-last = Viimeisin vaihto
+car-column-life = Käyttöikä
+car-column-next = Seuraava vaihto
+car-total = Yhteensä
+car-summary-title = Mitä auto maksaa
+car-headline-empty = Täytä auton tiedot ja lisää sitten ensimmäinen rivi: tankkaus, huolto, korjaamon lasku…
+car-headline = { $since } lähtien autosi on maksanut sinulle { $total }.
+car-headline-km = { $since } lähtien autosi on maksanut sinulle { $total }, ja olet ajanut { $km }: { $cost } kilometriä kohden.
+car-tile-total = Kokonaiskustannus
+car-tile-month = Kuukaudessa
+car-tile-km = Kilometriä kohden
+car-tile-driven = Ajetut kilometrit
+car-tile-consumption = Kulutus
+car-tile-energy-km = Energia kilometriä kohden
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [one] { $months } kuukausi
+       *[other] { $months } kuukautta
+    }
+car-detail-battery = Akku: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = Luokittain
+car-energy-title = Energia
+car-parts-title = Kuluvat osat
+car-tyres-title = Renkaat
+car-battery-title = Akun kunto
+car-years-title = Mitä auto on maksanut vuosittain
+car-donut-title = Mihin rahat menevät
+car-donut-caption = yhteensä
+car-deadlines-title = Tulevat määräajat
+car-deadlines-empty = Ei vielä määräaikoja: kirjaa huolto, katsastus, vakuutus tai saman osan kaksi vaihtoa.
+car-deadline-service = Huolto
+car-deadline-inspection = Katsastus
+car-deadline-counter = Katsastuksen jälkitarkastus
+car-deadline-insurance = Vakuutuksen päättyminen
+car-when-date = { $date }
+car-when-km = { $km } kohdalla
+car-when-km-reached = { $km } kohdalla, ajotahdillasi arviolta: { $month }
+car-when-date-km = { $date } tai { $km } kohdalla, kumpi tulee ensin
+car-when-inspection-unknown = Kirjaa viimeisin katsastus, niin näet seuraavan päivämäärän.
+car-tone-late = Myöhässä
+car-tone-soon = Pian
+car-note-since = Kaikki lasketaan hankinnasta lähtien: auton tietoihin kirjatusta päivämäärästä ja mittarilukemasta.
+car-note-consumption = Kulutus mitataan tankkauksesta tankkaukseen: tankkaa aina täyteen ja kirjaa mittarilukema joka kerta.
+car-note-e85 = E85-auto käyttää sitä, mitä sille tankataan: tankkausta seuraavat kilometrit lasketaan kyseiselle polttoaineelle.
+car-note-home = Kotilataus hinnoitellaan auton kotilataushinnalla sinä päivänä, jona se kirjataan, ja se säilyttää tämän kustannuksen.
+car-note-inspection = Katsastus noudattaa Ranskan sääntöä: ensimmäinen neljän vuoden kuluessa ensirekisteröinnistä, sen jälkeen kahden vuoden välein; jälkitarkastus kahden kuukauden kuluessa.
+car-disclaimer = Määräajat ja käyttöiät ovat päiväkirjasta johdettuja arvioita: vain valmistajan huoltokirja on sitova.
+car-invalid-date = Anna kelvollinen päivämäärä, joka ei ole tulevaisuudessa.
+car-invalid-acquired = Hankintapäivä ei voi olla ennen ensirekisteröintiä.
+car-invalid-km = Anna mittarilukema kokonaisina kilometreinä.
+car-invalid-amount = Tätä summaa ei voi lukea.
+car-invalid-quantity = Kirjoita määrä: litroina, kilowattitunteina tai kiloina.
+car-invalid-part = Valitse vaihdettu osa tai kirjoita sen nimi.
+car-invalid-rubric = Valitse luokka.
+car-invalid-months = Anna kuukausien määrä kokonaislukuna.
+car-invalid-battery = Anna akun kunto väliltä 0–100 %.
+car-open = Avaa päiväkirja…
+car-save = Tallenna päiväkirja…
+car-report-button = PDF-raportti
+car-file-filter = Autopäiväkirja
+car-file-saved = Päiväkirja tallennettu: { $file }
+car-file-opened = Päiväkirja avattu: { $file }
+car-file-not-logbook = Tämä tiedosto ei ole Radinuksen autopäiväkirja.
+car-file-too-recent = Tämä päiväkirja on peräisin Radinuksen uudemmasta versiosta: päivitä Radinus avataksesi sen.
+car-replace-question = Tämän päiväkirjan avaaminen korvaa ikkunassa olevan päiväkirjan. Jatketaanko?
+car-sheet-history = Päiväkirja
+car-sheet-summary = Yhteenveto
+
+analysis-history-hint = Mitä pidempi historiasi on, sitä parempi tästä analyysistä tulee: ihanteellista on, että tapahtumia on vähintään vuoden ajalta.
+
+# --- F48 — Jaa meno (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = Jaa meno
+window-sharing-title = Jaa meno
+sharing-question = Kuka maksaa mitäkin?
+sharing-setup-title = Jako
+sharing-field-label = Nimike
+sharing-label-hint = Esimerkiksi ”Ravintola 12.10.” tai ”Bretagnen matka 2027”: se antaa nimen tiedostoille ja raporteille.
+sharing-field-total = Kokonaissumma
+sharing-total-hint = Jos kenttä on tyhjä, kokonaissumma on erien ja kunkin omien lisien summa.
+sharing-field-rule = Sääntö
+sharing-field-rounding = Pyöristys
+sharing-field-people = Henkilöt
+sharing-mode-whole = Yksi sääntö koko menolle
+sharing-mode-item = Yksi sääntö erää kohti
+sharing-rule-equal = Yhtä suuret osuudet
+sharing-rule-parts = Osien mukaan
+sharing-rule-percent = Prosenttien mukaan
+sharing-rule-income = Tulojen suhteessa
+sharing-rounding-cent = Sentin tarkkuudella
+sharing-rounding-euro = Koko yksikköön
+sharing-round-euro = Pyöristä koko yksiköihin
+sharing-hide-incomes = Piilota tulot raporteista ja viennistä
+sharing-people-title = Henkilöt
+sharing-people-hint = Yksi rivi per henkilö, yksi sarake per erä: rastita, kuka osallistuu mihinkin. Kaikki muu on valinnaista. Jos joku jättäytyy pois ja jättää ennakkomaksunsa: tarkka summa, joka vastaa hänen maksamaansa, eikä yhtään ruutua rastitettuna.
+sharing-add-person = Lisää henkilö
+sharing-person-default = Henkilö { $number }
+sharing-items-title = Erät
+sharing-items-hint = Vain se, mikä ei koske kaikkia, esimerkiksi viini. Loput kokonaissummasta menee yhteiseen erään.
+sharing-add-item = Lisää erä
+sharing-common = Yhteinen
+sharing-payments-title = Maksut
+sharing-payments-hint = Kuka maksoi, kuinka paljon ja milloin. Rivi ilman summaa ei vielä lasketa mukaan.
+sharing-payments-none = Ei vielä maksuja.
+sharing-add-payment = Lisää maksu
+sharing-result-title = Tulos
+sharing-balances-title = Maksujen tilanne
+sharing-transfers-title = Ehdotetut tilisiirrot
+sharing-delete = Poista
+sharing-delete-person-question = Tällä henkilöllä on maksuja: poistetaanko ne hänen mukanaan?
+sharing-disclaimer = Radinus ehdottaa jakoa: ystävien kesken kukin voi sopia toisinkin.
+sharing-column-person = Henkilö
+sharing-column-household = Talous
+sharing-column-income = Tulo
+sharing-column-parts = Osat
+sharing-column-percent = %
+sharing-column-floor = Vähintään
+sharing-column-cap = Enintään
+sharing-column-fixed = Tarkka summa
+sharing-column-alone = Omat lisät
+sharing-column-gift = Lahjoitettu ylijäämä
+sharing-column-share = Osuus
+sharing-column-typed = Kirjoitettu %
+sharing-column-constraint = Mikä vaikutti
+sharing-column-due = Maksettava
+sharing-column-item = Erä
+sharing-column-amount = Summa
+sharing-column-rule = Sääntö
+sharing-column-participants = Osallistujat
+sharing-column-unit = Talous tai henkilö
+sharing-column-members = Jäsenet
+sharing-column-paid = Maksettu
+sharing-column-balance = Saldo
+sharing-column-date = Päivä
+sharing-column-who = Kuka
+sharing-column-label = Nimike
+sharing-help-household = Saman talouden henkilöt tekevät tilityksen yhdessä: heidän maksunsa ja maksettavansa lasketaan yhteen, ja he saavat yhden erittelyn. Esimerkki: ”Martinin perhe” vanhemmille ja lapsille.
+sharing-help-income = Käytetään vain säännössä ”tulojen suhteessa”: mitä suuremmat tulot, sitä suurempi osuus. Kirjoita kuukausitulo.
+sharing-help-parts = Henkilö, jolla on 2 osaa, maksaa kaksi kertaa niin paljon kuin henkilö, jolla on 1 osa. Esimerkki: aikuinen 1, lapsi 0,5.
+sharing-help-percent = Osuus menosta, jonka henkilö maksaa. Prosenttien summan pitää olla yhteensä 100 %.
+sharing-help-floor = Henkilö maksaa vähintään tämän summan, vaikka hänen laskettu osuutensa olisi pienempi. Erotus keventää muiden osuutta.
+sharing-help-cap = Henkilö ei maksa koskaan tätä summaa enempää. Se, mitä hän ei maksa, siirtyy muille hänen eriensä osallistujille.
+sharing-help-fixed = Henkilö maksaa tämän tarkan summan, mitä tahansa tapahtuu, ja loput jaetaan muiden kesken. Esimerkki: joku jättäytyy pois ja jättää ennakkomaksunsa.
+sharing-help-alone = Se, minkä henkilö otti vain itselleen, esimerkiksi jälkiruoka tai kahvi. Hän maksaa sen kokonaan osuutensa lisäksi.
+sharing-help-gift = Jos henkilö maksoi enemmän kuin osuutensa: rastitettuna ylijäämä on lahjoitus ryhmälle, rastittamatta se maksetaan hänelle takaisin.
+sharing-help-items = Rastita henkilöt, jotka osallistuvat tähän erään. Yhteinen erä on se, mitä kokonaissummasta jää, kun muut erät on vähennetty.
+sharing-help-due = Henkilön maksettava yhteensä: hänen osuutensa eristä, omat lisät ja pyöristys.
+sharing-help-share = Osuuden suuruus prosentteina jaettavasta summasta.
+sharing-help-typed = Kirjoittamasi prosentti. Se voi poiketa todellisesta osuudesta, kun vähimmäismäärä, enimmäismäärä tai tarkka summa on vaikuttanut.
+sharing-help-constraint = Kertoo, onko henkilön osuutta muuttanut vähimmäismäärä, enimmäismäärä, tarkka summa vai lahjoitettu ylijäämä.
+sharing-help-item = Vain se, mikä ei koske kaikkia, esimerkiksi viini. Loput kokonaissummasta menee yhteiseen erään, jaettuna niiden kesken, jotka on siihen rastitettu.
+sharing-help-rule = Miten erä jaetaan: yhtä suuriin osuuksiin, osien mukaan, prosenttien mukaan tai tulojen suhteessa.
+sharing-help-paid = Se, minkä talous tai henkilö on jo maksanut, syötettyjen maksujen mukaan.
+sharing-help-balance = Se, mitä on vielä maksettava, tai se, mitä on maksettu osuutta enemmän. Esimerkki: ”Maksettavaa vielä: 61,54 €”.
+sharing-advice-equal = { $count ->
+        [one] { $total } yhdelle henkilölle.
+       *[other] { $total } ÷ { $count } henkilöä = { $amount } per henkilö.
+    }
+sharing-advice-equal-varied = Yhtä suurin osuuksin osallistujien kesken, ottaen huomioon rajat ja poissulkemiset.
+sharing-advice-parts = Osia yhteensä { $parts }: yksi osa on { $amount }.
+sharing-advice-parts-varied = Kukin maksaa osiensa mukaan, ottaen huomioon rajat ja poissulkemiset. Tyhjä ruutu lasketaan 1 osaksi.
+sharing-advice-percent-rest = 100 %:sta puuttuu vielä { $rest } %.
+sharing-advice-percent-over = Prosentit ovat { $over } % yli 100 %:n.
+sharing-advice-percent-ok = Prosentit ovat yhteensä tasan 100 %.
+sharing-advice-percent-nobody = Prosentit ovat jo yhteensä 100 %: { $names } { $count ->
+        [one] ei maksaisi mitään.
+       *[other] eivät maksaisi mitään.
+    }
+sharing-advice-income = Kukin maksaa { $rate } % tuloistaan.
+sharing-advice-income-missing = Kirjoita kunkin tulot, niin meno jaetaan tulojen suhteessa.
+sharing-advice-income-varied = Kukin maksaa saman osuuden tuloistaan, ottaen huomioon rajat ja poissulkemiset.
+sharing-advice-empty = Kirjoita jaettava summa.
+sharing-apply-advice = Käytä ehdotettuja arvoja
+sharing-help-apply-advice = Täyttää tyhjät ruudut harmailla arvoilla. Jo täytetyt ruudut eivät muutu.
+sharing-from-incomes = Prosentit tulojen mukaan
+sharing-help-from-incomes = Korvaa prosentit kunkin tulon osuudella kaikkien tulojen summasta. Ne ovat yhteensä 100 %.
+sharing-reset-percents = Jaa kaikki uudelleen
+sharing-help-reset-percents = Tyhjentää prosentit ja jakaa ne tasan kaikkien kesken. Kätevä, kun olet lisännyt henkilön.
+sharing-reset-percents-question = Tyhjennetäänkö kaikki prosentit ja jaetaanko ne tasan kaikkien kesken?
+sharing-open = Avaa projekti…
+sharing-save = Tallenna projekti…
+sharing-pdf-distribution = Jako (PDF)
+sharing-pdf-payments = Maksujen tilanne (PDF)
+sharing-pdf-statements = Henkilökohtaiset erittelyt (PDF)…
+sharing-statements-everyone = Kaikki
+sharing-excel = Vie Exceliin
+sharing-file-filter = Jakoprojekti
+sharing-replace-question = Tämän projektin avaaminen korvaa ikkunaan kirjoitetut tiedot. Jatketaanko?
+sharing-file-saved = Projekti tallennettu: { $file }
+sharing-file-opened = Projekti avattu: { $file }
+sharing-file-not-project = Tämä tiedosto ei ole Radinuksen jakoprojekti.
+sharing-file-too-recent = Tämä projekti on peräisin Radinuksen uudemmasta versiosta: päivitä Radinus avataksesi sen.
+sharing-file-failed = Tiedostoa ei voitu lukea tai kirjoittaa: { $reason }
+sharing-statements-replace-question = { $count ->
+        [one] Tässä kansiossa on jo yksi erittely. Korvataanko se?
+       *[other] Tässä kansiossa on jo { $count } erittelyä. Korvataanko ne?
+    }
+sharing-statements-written = { $count ->
+        [one] Yksi erittely kirjoitettu kansioon ”{ $folder }”.
+       *[other] { $count } erittelyä kirjoitettu kansioon ”{ $folder }”.
+    }
+sharing-too-many-people = Jaossa voi olla enintään 40 henkilöä.
+sharing-too-many-items = Jaossa voi olla enintään 20 erää.
+sharing-too-many-payments = Jaossa voi olla enintään 400 maksua.
+sharing-invalid-amount = Summaa ei voi lukea: anna positiivinen luku.
+sharing-invalid-number = Lukua ei voi lukea: anna positiivinen luku.
+sharing-invalid-percent = Prosentti on väliltä 0–100.
+sharing-invalid-date = Päivämäärää ei voi lukea.
+sharing-name-missing = Jokaisella henkilöllä täytyy olla nimi.
+sharing-name-duplicate = ”{ $name }” on jo olemassa: erota ne toisistaan, esimerkiksi alkukirjaimella.
+sharing-floor-above-cap = Vähimmäismäärä ylittää enimmäismäärän.
+sharing-item-label-missing = Tällä erällä ei ole nimeä.
+sharing-items-above-total = Erät ja kunkin omat lisät ylittävät kokonaissumman { $amount } verran.
+sharing-payment-person = Valitse, kuka maksoi.
+sharing-percent-total = Prosentit ovat yhteensä { $sum } %: niiden pitää olla 100 %.
+sharing-percent-total-item = ”{ $item }”: prosentit ovat yhteensä { $sum } %: niiden pitää olla 100 %.
+sharing-item-nobody = Kukaan ei osallistu erään ”{ $item }”.
+sharing-item-no-weight = Kukaan ei vaikuta erään ”{ $item }”: kaikki sen osallistujat ovat nollassa.
+sharing-income-missing = Henkilön { $name } tulo puuttuu.
+sharing-fixed-above = Tarkat summat ylittävät jaettavan summan { $amount } verran.
+sharing-floors-above = Vähimmäismäärät ylittävät jaettavan summan { $amount } verran.
+sharing-cap-alone = { $name } on ainoa, joka osallistuu erään ”{ $item }”: hänen enimmäismääräänsä ei voi noudattaa.
+sharing-caps-short = Enimmäismäärät eivät riitä kattamaan summaa: puuttuu { $amount }.
+sharing-impossible = Kaikkia näitä ehtoja ei voi noudattaa: höllennä vähimmäis- tai enimmäismäärää.
+sharing-constraint-floor = Vähimmäismäärä täyttyi
+sharing-constraint-cap = Enimmäismäärä täyttyi
+sharing-constraint-fixed = Tarkka summa
+sharing-constraint-gift = Lahjoitettu ylijäämä
+sharing-and = { $first } ja { $last }
+sharing-outside = Erien ulkopuolella
+sharing-alone = Omat lisät
+sharing-rounding = Pyöristys
+sharing-headline-empty = Lisää menon jakavat henkilöt.
+sharing-headline-no-amount = Kirjoita kokonaissumma tai jaettavat erät.
+sharing-headline-equal = { $total } jaettavana: kukin maksaa { $amount }.
+sharing-headline-range = { $total } jaettavana: { $min }–{ $max } henkilöstä riippuen.
+sharing-participants = { $count ->
+        [0] Ei osallistujia
+        [one] Yksi osallistuja
+       *[other] { $count } osallistujaa
+    }
+sharing-balance-due = Maksettavaa vielä: { $amount }
+sharing-balance-over = Maksanut { $amount } osuuttaan enemmän
+sharing-balance-even = Ajan tasalla
+sharing-summary-collected = { $collected } maksettu, kokonaissumma { $total }.
+sharing-summary-owing = { $count ->
+        [0] Kaikki ovat ajan tasalla.
+        [one] Vain yksi on vielä velkaa { $amount }.
+       *[other] { $count } henkilöä on vielä velkaa yhteensä { $amount }.
+    }
+sharing-remaining-outside = Menosta maksettavaa vielä: { $amount }
+sharing-remaining-reimburse = Palautettavaa henkilölle { $name }: { $amount }
+sharing-all-settled = Kaikki on maksettu: kukaan ei ole velkaa kenellekään.
+sharing-transfer = { $from } on velkaa { $amount } henkilölle { $to }
+sharing-warning-over-paid = Maksut ylittävät menon { $amount } verran: tarkista summat.
+sharing-note-income-zero = { $name } ei maksa mitään kohteesta { $items }: hänen tulonsa on 0.
+sharing-note-excluded = { $name } ei osallistu erään ”{ $item }”: hänen osuutensa jaetaan muiden kesken.
+sharing-note-gift = Henkilön { $giver } lahjoittama ylijäämä pienentää muiden osuutta: { $name } on nyt maksanut enemmän kuin osuutensa.
+sharing-note-outside = { $name } maksaa { $amount } omien erinsä ulkopuolelta: summa vähennetään siitä, minkä muut jakavat.
+sharing-note-keeper = Pyöristetty koko yksiköihin: { $name } pitää sentit, jotta kokonaissumma täsmää.
+sharing-report-distribution = Jako
+sharing-report-sharing = Jako
+sharing-report-who-pays = Kuka maksaa mitäkin
+sharing-report-items = Erien erittely
+sharing-report-payments = Maksujen tilanne
+sharing-report-as-of = Tilanne { $date }
+sharing-report-balances = Osuus, maksettu, saldo
+sharing-report-statement = Erittely — { $name }
+sharing-report-your-share = Osuutesi
+sharing-statement-total = Talouden yhteissumma: { $amount }
+sharing-statement-pay = Maksettavaa henkilölle { $name }: { $amount }
+sharing-statement-receive = Saatavaa henkilöltä { $name }: { $amount }
+sharing-sheet-people = Henkilöt
+sharing-sheet-items = Erät
+sharing-sheet-result = Tulos
+sharing-sheet-payments = Maksut
+sharing-sheet-balances = Palautukset

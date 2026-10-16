@@ -348,7 +348,6 @@ async function save(): Promise<void> {
 
     loadReserve(onScreen());
     showState();
-    await invoke("notify_operations_changed");
     closeCurrentWindow();
   } catch (error) {
     say(tError("ui-save-failed", error), true);

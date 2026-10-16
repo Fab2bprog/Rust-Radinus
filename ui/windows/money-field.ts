@@ -94,10 +94,29 @@ export function madePositive(text: string): string {
 /// it stands then.
 export const SIGN_CHANGED = "radinus:sign-changed";
 
+/// **What groups the thousands inside a field** (11/10/2026): the language's
+/// own separator when it is a space — French, Swedish, Russian… —, a narrow
+/// space otherwise. Written « 1.500,00 » (German) or « 1,500.00 » (English),
+/// an amount left the field in a form the core cannot read back, since a
+/// full stop and a comma both mean "decimals" to it: in eleven languages out
+/// of eighteen, an amount of a thousand or more could not be saved. The
+/// narrow space is read by the core in every language, and is never a
+/// decimal separator anywhere.
+export function fieldGrouping(thousands: string): string {
+  return thousands === "" || /^\s+$/.test(thousands) ? thousands : "\u202f";
+}
+
+/// An amount without its thousands separators, nor any space: what the gate
+/// judges, and what is grouped again on leaving the field.
+export function ungrouped(text: string, thousands: string): string {
+  const bare = thousands === "" ? text : text.split(thousands).join("");
+  return bare.replace(/\s/g, "");
+}
+
 /// Writes an amount out: two decimals, thousands grouped.
 export function writeAmount(text: string, thousands: string, decimal: string): string {
   const negative = text.trim().startsWith("-");
-  const body = text.replace("-", "");
+  const body = ungrouped(text, thousands).replace("-", "");
   const [whole = "", fraction = ""] = body.split(decimal);
   const units = whole.replace(/^0+(?=\d)/, "") || "0";
   const centimes = (fraction + "00").slice(0, 2);
@@ -115,10 +134,26 @@ export function writeAmount(text: string, thousands: string, decimal: string): s
   return negative && written.replace(/\D/g, "") !== "000" ? `-${written}` : written;
 }
 
+/// What a money field may be asked to do beyond the default.
+export interface MoneyFieldOptions {
+  /// **No sign at all** (« Partager une dépense », 11/10/2026): an amount
+  /// that can never be negative — a share, a cap, a payment. The two sign
+  /// keys do nothing, and a pasted negative amount does not go in.
+  unsigned?: boolean;
+  /// **Empty stays empty** on leaving the field, instead of becoming 0,00:
+  /// in an optional field, nothing and zero do not mean the same thing — an
+  /// empty cap is no cap, a cap of 0,00 forbids paying anything.
+  optional?: boolean;
+  /// **Left as typed** on leaving the field: for a window whose core writes
+  /// the fields back itself after each calculation (the credit simulation),
+  /// a second rewrite here would only get in its way.
+  asTyped?: boolean;
+}
+
 /// Turns a plain text input into a money field. Returns nothing: the field is
 /// the input itself, so everything that already reads `.value` keeps working
 /// — including the reserve that decides whether the fiche was modified.
-export function asMoneyField(input: HTMLInputElement): void {
+export function asMoneyField(input: HTMLInputElement, options: MoneyFieldOptions = {}): void {
   input.classList.add("form__field--amount");
   input.inputMode = "decimal";
   input.autocomplete = "off";
@@ -127,12 +162,17 @@ export function asMoneyField(input: HTMLInputElement): void {
   // Every way of putting text in a field goes through this: the keyboard,
   // pasting, dictation, dragging text in.
   input.addEventListener("beforeinput", (event) => {
-    const { decimal } = separators();
+    const { thousands, decimal } = separators();
     const inserted = (event as InputEvent).data ?? "";
     const start = input.selectionStart ?? input.value.length;
     const end = input.selectionEnd ?? input.value.length;
+    // A comma or a full stop both mean "here come the decimals", whichever
+    // the keyboard produced — **in what is being typed only**: the amount
+    // already in the field may carry thousands separators, and in German or
+    // Spanish those are full stops.
+    const typed = inserted.replace(/[.,]/g, decimal);
     const wouldBe =
-      input.value.slice(0, start) + inserted + input.value.slice(end);
+      input.value.slice(0, start) + typed + input.value.slice(end);
 
     // A deletion is always allowed: one has to be able to empty a field.
     if ((event as InputEvent).inputType.startsWith("delete")) {
@@ -147,6 +187,9 @@ export function asMoneyField(input: HTMLInputElement): void {
     // the normal gate below.
     if (inserted === "-" || inserted === "−" || inserted === "+") {
       event.preventDefault();
+      if (options.unsigned) {
+        return;
+      }
       const signed =
         inserted === "+" ? madePositive(input.value) : flipSignOf(input.value);
       const caret = Math.max(0, start + signed.length - input.value.length);
@@ -156,28 +199,100 @@ export function asMoneyField(input: HTMLInputElement): void {
       input.dispatchEvent(new Event(SIGN_CHANGED, { bubbles: true }));
       return;
     }
-    // A comma or a full stop both mean "here come the decimals", whichever
-    // the keyboard produced.
-    const normalized = wouldBe.replace(/[.,]/g, decimal);
-    if (!couldBecomeAnAmount(normalized, decimal)) {
+    // **The thousands separators are not judged** (11/10/2026): once an
+    // amount is written out, « 1 250,00 » carries them, and the gate used to
+    // refuse every key in it — a grouped amount could be erased, never
+    // corrected. They are set aside for the check, and written again on
+    // leaving the field.
+    const bare = ungrouped(wouldBe, thousands);
+    if (!couldBecomeAnAmount(bare, decimal) || (options.unsigned && bare.startsWith("-"))) {
       event.preventDefault();
       return;
     }
-    if (normalized !== wouldBe) {
+    if (typed !== inserted) {
       event.preventDefault();
-      input.value = normalized;
-      input.setSelectionRange(start + inserted.length, start + inserted.length);
+      input.value = wouldBe;
+      input.setSelectionRange(start + typed.length, start + typed.length);
       input.dispatchEvent(new Event("input", { bubbles: true }));
     }
   });
 
   // Leaving the field writes what is in it out properly.
   input.addEventListener("blur", () => {
+    if (options.asTyped || (options.optional && input.value.trim() === "")) {
+      return;
+    }
     const { thousands, decimal } = separators();
-    const written = writeAmount(input.value, thousands, decimal);
+    const written = writeAmount(input.value, fieldGrouping(thousands), decimal);
     if (written !== input.value) {
       input.value = written;
       input.dispatchEvent(new Event("input", { bubbles: true }));
     }
   });
+}
+
+/// Whether `text` could still become a positive number with at most
+/// `decimals` decimals — none for a whole number — as it is being typed.
+export function couldBecomeANumber(text: string, decimal: string, decimals: number): boolean {
+  const parts = text.split(decimal);
+  if (parts.length > 2 || (decimals === 0 && parts.length > 1)) {
+    return false;
+  }
+  const [whole, fraction = ""] = parts;
+  return /^\d*$/.test(whole) && /^\d*$/.test(fraction) && fraction.length <= decimals;
+}
+
+/// **A field that holds a positive number** — parts, a percentage, a rate,
+/// a price per kWh, a number of months — and nothing else (« Partager une
+/// dépense », then the tools, 11/10/2026). Digits, one decimal separator,
+/// `decimals` decimals at most — none for a whole number —, no sign. It is
+/// not rewritten on leaving: « 1,5 » parts stays « 1,5 ».
+export function asNumberField(input: HTMLInputElement, decimals = 2): void {
+  input.inputMode = decimals === 0 ? "numeric" : "decimal";
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  input.addEventListener("beforeinput", (event) => {
+    if ((event as InputEvent).inputType.startsWith("delete")) {
+      return;
+    }
+    const { decimal } = separators();
+    const inserted = (event as InputEvent).data ?? "";
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+    const typed = inserted.replace(/[.,]/g, decimal);
+    const wouldBe = input.value.slice(0, start) + typed + input.value.slice(end);
+    if (!couldBecomeANumber(wouldBe.replace(/\s/g, ""), decimal, decimals)) {
+      event.preventDefault();
+      return;
+    }
+    if (typed !== inserted) {
+      event.preventDefault();
+      input.value = wouldBe;
+      input.setSelectionRange(start + typed.length, start + typed.length);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+}
+
+/// What a tool's field holds: an amount (`"money"`, written out on leaving;
+/// `"money-as-typed"`, left alone), or a positive number with that many
+/// decimals — `0` for a whole number.
+export type FieldKind = "money" | "money-as-typed" | number;
+
+/// **Guards a page's fields, by their id** — one call per tool, listing every
+/// field that holds a figure (11/10/2026). A test checks that every numeric
+/// field of a tool's page is in that list: a field added tomorrow cannot be
+/// forgotten. A listed id missing from the page is a mistake, and says so.
+export function guardFields(kinds: Record<string, FieldKind>): void {
+  for (const [id, kind] of Object.entries(kinds)) {
+    const input = document.getElementById(id);
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error(`guardFields : pas de champ « ${id} »`);
+    }
+    if (kind === "money" || kind === "money-as-typed") {
+      asMoneyField(input, { unsigned: true, optional: true, asTyped: kind === "money-as-typed" });
+    } else {
+      asNumberField(input, kind);
+    }
+  }
 }

@@ -275,7 +275,7 @@ fn rings(
     // Les libellés des postes, pour nommer les parts. Un poste absent de la
     // table — supprimé depuis — n'a pas de nom : sa part rejoint « sans ».
     let mut names: std::collections::HashMap<i64, String> = std::collections::HashMap::new();
-    for element in crate::nomenclatures::list(conn, axis.nomenclature())? {
+    for element in axis.elements(conn)? {
         names.insert(element.id, element.label);
     }
 

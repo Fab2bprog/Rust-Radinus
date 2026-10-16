@@ -207,6 +207,12 @@ fn hold<'a>(
             radinus_core::database::OpenError::Locked => {
                 i18n::text(language, "password-wrong")
             }
+            // Une base enregistrée par un Radinus plus récent non plus : dire
+            // « aucune base n'est ouverte » ferait chercher une panne là où
+            // il suffit d'une mise à jour (03/10/2026).
+            too_recent @ radinus_core::database::OpenError::UnsupportedSchemaVersion { .. } => {
+                too_recent.said(language)
+            }
             _ => i18n::text(language, "backup-no-database"),
         })
 }

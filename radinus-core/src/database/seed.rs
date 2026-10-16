@@ -27,6 +27,16 @@ const TYPES_COMPTE: &[(i64, &str)] = &[
 /// Liste FERMEE (02_BASE_DE_DONNEES.md §5.2) — jamais modifiable par l'utilisateur.
 const STATUTS_OPERATION: &[(i64, &str)] = &[(1, "Pointé"), (2, "Engagé"), (3, "Prévu")];
 
+/// Liste FERMEE (Fabrice, 03/10/2026) — ce que l'utilisateur pense d'une
+/// écriture. Une opération naît « Vérifiée » (2) ; seul un import peut la
+/// faire naître « À vérifier » (1), si la préférence le demande.
+const VERIFICATIONS: &[(i64, &str)] = &[
+    (1, "À vérifier"),
+    (2, "Vérifiée"),
+    (3, "Douteuse"),
+    (4, "Contestée"),
+];
+
 const AFFECTATIONS: &[(i64, &str)] = &[
     (1, "Monsieur"),
     (2, "Madame"),
@@ -323,6 +333,17 @@ pub fn seed_statuts_operation(conn: &Connection) -> Result<()> {
     )
 }
 
+/// Les quatre vérifications. Publique pour la même raison.
+pub fn seed_verifications(conn: &Connection) -> Result<()> {
+    insert_pairs(
+        conn,
+        "Verification",
+        "IDVerification",
+        "Libelle",
+        VERIFICATIONS,
+    )
+}
+
 /// Les quinze statuts de chèque. Publique pour la même raison.
 pub fn seed_statuts_cheque(conn: &Connection) -> Result<()> {
     insert_statuts_cheque(conn)
@@ -347,6 +368,7 @@ fn insert_statuts_cheque(conn: &Connection) -> Result<()> {
 pub fn seed_initial_data(conn: &Connection) -> Result<()> {
     seed_types_compte(conn)?;
     seed_statuts_operation(conn)?;
+    seed_verifications(conn)?;
     insert_pairs(conn, "Affectation", "IDAffectation", "Libelle", AFFECTATIONS)?;
     insert_pairs(
         conn,
@@ -401,6 +423,7 @@ pub fn reset_to_blank(conn: &Connection) -> Result<()> {
         DELETE FROM ModeOperation;
         DELETE FROM Affectation;
         DELETE FROM StatutOperation;
+        DELETE FROM Verification;
         DELETE FROM TypeCompte;
         DELETE FROM TypeCategorie;
         DELETE FROM ParamSecurite;
@@ -435,6 +458,7 @@ mod tests {
         let conn = seeded_conn();
         assert_eq!(count(&conn, "TypeCompte"), 11);
         assert_eq!(count(&conn, "StatutOperation"), 3);
+        assert_eq!(count(&conn, "Verification"), 4);
         assert_eq!(count(&conn, "Affectation"), 7);
         assert_eq!(count(&conn, "ModeOperation"), 8);
         assert_eq!(count(&conn, "PosteBudget"), 10);

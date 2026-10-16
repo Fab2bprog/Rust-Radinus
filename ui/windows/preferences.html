@@ -16,7 +16,9 @@
          droite avec la disquette et la porte : le gabarit des fiches, dans le
          sens de toutes les autres fenêtres de Radinus.
 
-         **Une seule option écrit dans la table `Preferences`** : la devise.
+         **Trois options écrivent dans la table `Preferences`** : la devise,
+         la vérification des opérations importées (03/10/2026) et le tarif
+         d'électricité (09/10/2026).
          La langue, elle, reste dans `Parametres.UtiliseLangue` où elle a
          toujours été — la fenêtre écrit donc à deux endroits, et c'est voulu
          (décision de Fabrice, 03/08/2026). Rien d'autre n'entre dans
@@ -65,6 +67,131 @@
             </div>
           </div>
           <p class="pane__hint" id="zoom-hint"></p>
+        </section>
+
+        <!-- Feuille « Vérification », sous la branche « Importation » (Fabrice,
+             03/10/2026). Ce que vaut la colonne « Vérification » sur une
+             opération qui arrive d'un relevé ou d'un tableau : « Vérifiée »
+             pour qui fait confiance à sa banque, « À vérifier » pour qui
+             contrôle chaque ligne ticket en main. Une préférence de la base,
+             comme la devise. -->
+        <section class="pane" id="pane-verification" hidden>
+          <h2 class="pane__title" id="verification-title"></h2>
+          <div class="form">
+            <label class="form__label" for="verification" id="verification-label"></label>
+            <select class="form__field" id="verification"></select>
+          </div>
+          <p class="pane__hint" id="verification-hint"></p>
+        </section>
+
+        <!-- Feuille « Colonnes des tableaux » (Fabrice, 04/10/2026). Les
+             colonnes se règlent dans le tableau lui-même — on glisse un
+             en-tête, on coche au clic droit ; cette feuille n'offre que le
+             retour à la disposition d'origine : un menu déroulant qui nomme
+             la fenêtre, un bouton « Réinitialiser » pour ses tableaux, et
+             « Tout réinitialiser » dessous. Le filet de qui ne comprend plus
+             son tableau. Une préférence de la base : sans base, la feuille est
+             grise.
+
+             D'abord écrite avec une ligne et un bouton par tableau — neuf
+             lignes, neuf boutons, et davantage à chaque tableau ajouté.
+             Fabrice, le jour même : « ça fait beaucoup de boutons et de lignes
+             pour rien. Il aurait mieux valu mettre un menu déroulant indiquant
+             le nom de la fenêtre et un bouton réinitialiser. » Sans libellé
+             devant : « tu mets simplement le nom de la fenêtre et
+             réinitialiser, ça sera suffisamment clair ». -->
+        <section class="pane" id="pane-columns" hidden>
+          <h2 class="pane__title" id="columns-title"></h2>
+          <div class="table-layouts">
+            <select class="form__field table-layouts__window" id="columns-window"></select>
+            <button class="table-layouts__reset" id="columns-reset" type="button"></button>
+          </div>
+          <button class="table-layouts__all" id="columns-reset-all" type="button"></button>
+          <p class="pane__hint" id="columns-hint"></p>
+        </section>
+
+        <!-- La feuille « Réglages de confort » (Fabrice, 07/10/2026 : « il faut
+             avoir un bouton pour remettre à zéro les réglages de confort mais
+             pas le reste »). Un seul bouton : les colonnes de tous les
+             tableaux, l'ordre et les cases des comptes de l'accueil, la taille
+             de l'affichage. La langue, la devise et la vérification des
+             opérations importées ne bougent pas — et la phrase le dit, pour
+             qu'on n'ait pas à l'essayer pour le savoir. -->
+        <section class="pane" id="pane-comfort" hidden>
+          <h2 class="pane__title" id="comfort-title"></h2>
+          <button class="table-layouts__reset" id="comfort-reset" type="button"></button>
+          <p class="pane__hint" id="comfort-hint"></p>
+        </section>
+
+        <!-- La feuille « Relevés QIF », sous la branche « Importation »
+             (Fabrice, 15/10/2026, P-73 : « tu crées dans les Préférences une
+             petite section destinée à l'import de fichiers QIF, pour permettre
+             à l'utilisateur de trancher, avec des choix par défaut »). Deux
+             réglages **du logiciel**, dans `settings/radinus_config.json` et
+             non dans la base : la feuille vit sans base ouverte. Chaque
+             réglage a sa bulle. -->
+        <section class="pane" id="pane-qif" hidden>
+          <h2 class="pane__title" id="qif-title"></h2>
+          <div class="form">
+            <label class="form__label" for="qif-order" id="qif-order-label"></label>
+            <select class="form__field" id="qif-order">
+              <option value="ask" id="qif-order-ask"></option>
+              <option value="day-month" id="qif-order-day-month"></option>
+              <option value="month-day" id="qif-order-month-day"></option>
+            </select>
+
+            <label class="form__label" for="qif-label" id="qif-label-label"></label>
+            <select class="form__field" id="qif-label">
+              <option value="both" id="qif-label-both"></option>
+              <option value="payee" id="qif-label-payee"></option>
+              <option value="memo" id="qif-label-memo"></option>
+            </select>
+          </div>
+          <p class="pane__hint" id="qif-hint"></p>
+        </section>
+
+        <!-- La feuille « Tarif d'électricité », sous la branche « Outils »
+             (Fabrice, 09/10/2026 : « on pourra mémoriser cela, cela sera
+             enregistré en tant que préférences et modifiable dans le panneau
+             des préférences »). Le tarif que reprend l'outil « Consommation
+             d'un appareil électrique ». Le bouton « Revenir au Tarif Bleu
+             EDF » remplit les champs ; c'est la disquette qui enregistre. Une
+             préférence de la base : sans base, la feuille est grise. -->
+        <section class="pane" id="pane-electricity" hidden>
+          <h2 class="pane__title" id="electricity-title"></h2>
+          <div class="form">
+            <label class="form__label" for="electricity-option" id="electricity-option-label"></label>
+            <select class="form__field" id="electricity-option">
+              <option value="base" id="electricity-option-base"></option>
+              <option value="off-peak" id="electricity-option-off-peak"></option>
+            </select>
+
+            <label class="form__label" for="electricity-base" id="electricity-base-label"></label>
+            <span class="electricity__price" id="electricity-base-line">
+              <input class="form__field" id="electricity-base" inputmode="decimal" autocomplete="off" />
+              <span class="electricity__unit" data-price-unit></span>
+            </span>
+
+            <label class="form__label" for="electricity-peak" id="electricity-peak-label"></label>
+            <span class="electricity__price" id="electricity-peak-line">
+              <input class="form__field" id="electricity-peak" inputmode="decimal" autocomplete="off" />
+              <span class="electricity__unit" data-price-unit></span>
+            </span>
+
+            <label class="form__label" for="electricity-off-peak" id="electricity-off-peak-label"></label>
+            <span class="electricity__price" id="electricity-off-peak-line">
+              <input class="form__field" id="electricity-off-peak" inputmode="decimal" autocomplete="off" />
+              <span class="electricity__unit" data-price-unit></span>
+            </span>
+
+            <label class="form__label" for="electricity-off-peak-hours" id="electricity-off-peak-hours-label"></label>
+            <span class="electricity__price" id="electricity-off-peak-hours-line">
+              <input class="form__field" id="electricity-off-peak-hours" inputmode="numeric" autocomplete="off" />
+              <span class="electricity__unit" id="electricity-hours-unit"></span>
+            </span>
+          </div>
+          <button class="table-layouts__reset" id="electricity-blue" type="button"></button>
+          <p class="pane__hint" id="electricity-hint"></p>
         </section>
 
       </main>

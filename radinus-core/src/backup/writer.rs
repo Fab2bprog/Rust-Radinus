@@ -164,6 +164,9 @@ const TABLES: &[TableSpec] = &[
             ("IDCheque", Int),
             ("IDTiers", Int),
             ("IDProjets", Int),
+            // Base 11. En dernier : une 1.9.3 qui relirait l'archive trouve
+            // ses vingt champs là où elle les attend.
+            ("IDVerification", Int),
         ],
         ordering: Ordering::Columns("DatePointage, IDOperation"),
     },
@@ -841,7 +844,7 @@ mod tests {
         /// Tables that never enter an archive, and why.
         ///
         /// `ParamSecurite` holds the password and must not leave the database
-        /// (06_FORMATS_SAUVEGARDE_IMPORT_EXPORT.md §1.2). The other three are the
+        /// (06_FORMATS_SAUVEGARDE_IMPORT_EXPORT.md §1.2). The others are the
         /// *frozen* nomenclatures: their content comes from the software, and
         /// `schema::ensure_the_tables` refills them when it finds them empty —
         /// carrying them would be copying what Radinus can rewrite.
@@ -850,6 +853,7 @@ mod tests {
             "StatutOperation",
             "TypeCategorie",
             "TypeCompte",
+            "Verification",
         ];
 
         /// Columns deliberately left out of the archive, written `Table.Column`.

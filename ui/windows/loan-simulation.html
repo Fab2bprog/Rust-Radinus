@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Simulation de crédit</title>
+    <script type="module" src="/ui/windows/loan-simulation.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F41 — « Simulation de crédit » (Fabrice, 08/10/2026).
+
+         En haut, toujours visibles, les saisies : le type de crédit, les trois
+         curseurs liés — montant, mensualité, durée en mois — chacun doublé de
+         son champ, puis le taux, les frais et l'assurance. Le bouton du
+         rapport PDF est à côté d'eux.
+
+         Dessous, deux onglets : « Le crédit » (ce qu'il coûte, la dette qui
+         fond, le tableau d'amortissement) et « Puis-je le rembourser ? » (ce
+         que l'historique de la base dit des moyens de la personne). « Je veux
+         quelque chose de beau qui fasse classe. » -->
+    <div class="window window--loan">
+      <main class="window__content loan">
+        <section class="loan__controls">
+          <div class="loan__row">
+            <label class="loan__field loan__field--kind">
+              <span class="loan__label" id="kind-label"></span>
+              <select class="form__field" id="kind"></select>
+            </label>
+            <label class="loan__field">
+              <span class="loan__label" id="rate-label"></span>
+              <span class="loan__input">
+                <input class="form__field" id="rate" inputmode="decimal" autocomplete="off" />
+                <span class="loan__unit" id="rate-unit"></span>
+              </span>
+            </label>
+            <label class="loan__field">
+              <span class="loan__label" id="fees-label"></span>
+              <span class="loan__input">
+                <input class="form__field" id="fees" inputmode="decimal" autocomplete="off" />
+                <span class="loan__unit" data-sign></span>
+              </span>
+            </label>
+            <label class="loan__field">
+              <span class="loan__label" id="insurance-label"></span>
+              <span class="loan__input">
+                <input class="form__field" id="insurance" inputmode="decimal" autocomplete="off" />
+                <span class="loan__unit" data-sign></span>
+              </span>
+            </label>
+            <span class="loan__spacer"></span>
+            <div class="loan__report">
+              <button class="loan__pdf" id="pdf" type="button">
+                <img src="/ui/assets/icons/pdf.png" alt="" />
+                <span id="pdf-label"></span>
+              </button>
+              <label class="loan__monthly" id="monthly-line" hidden>
+                <input type="checkbox" id="monthly" />
+                <span id="monthly-label"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Les trois curseurs. « La limite des curseurs n'est pas la limite
+               des champs textes » : un montant tapé au-delà est calculé tel
+               quel, et son curseur reste en butée. -->
+          <div class="loan__sliders">
+            <div class="loan__slider" data-field="amount">
+              <span class="loan__label" id="amount-label"></span>
+              <span class="loan__input loan__input--big">
+                <input class="form__field" id="amount" inputmode="decimal" autocomplete="off" />
+                <span class="loan__unit" data-sign></span>
+              </span>
+              <input type="range" class="loan__range" id="amount-range" />
+            </div>
+            <div class="loan__slider" data-field="payment">
+              <span class="loan__label" id="payment-label"></span>
+              <span class="loan__input loan__input--big">
+                <input class="form__field" id="payment" inputmode="decimal" autocomplete="off" />
+                <span class="loan__unit" data-sign></span>
+              </span>
+              <input type="range" class="loan__range" id="payment-range" />
+            </div>
+            <div class="loan__slider" data-field="months">
+              <span class="loan__label" id="months-label"></span>
+              <span class="loan__input loan__input--big">
+                <input class="form__field" id="months" inputmode="numeric" autocomplete="off" />
+                <span class="loan__unit" id="months-unit"></span>
+              </span>
+              <input type="range" class="loan__range" id="months-range" />
+            </div>
+          </div>
+          <p class="loan__notice" id="notice" hidden></p>
+        </section>
+
+        <nav class="loan__tabs" role="tablist">
+          <button class="loan__tab" id="tab-credit" role="tab" type="button" aria-selected="true"></button>
+          <button class="loan__tab" id="tab-afford" role="tab" type="button" aria-selected="false"></button>
+          <button class="loan__tab" id="tab-rules" role="tab" type="button" aria-selected="false"></button>
+        </nav>
+
+        <!-- Onglet 1 : le crédit. -->
+        <section class="loan__pane" id="pane-credit" role="tabpanel">
+          <div class="loan__tiles" id="tiles"></div>
+          <div class="loan__charts">
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="cost-title"></h2>
+              <div class="loan__chart" id="cost-chart"></div>
+            </article>
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="capital-title"></h2>
+              <div class="loan__chart" id="capital-chart"></div>
+            </article>
+          </div>
+          <article class="loan__card loan__card--table">
+            <h2 class="loan__card-title" id="schedule-title"></h2>
+            <section class="list list--loan">
+              <header class="list__header" id="header"></header>
+              <div class="list__filter" id="filter"></div>
+              <div class="list__rows" id="rows" role="listbox"></div>
+            </section>
+          </article>
+        </section>
+
+        <!-- Onglet 2 : puis-je le rembourser ? -->
+        <section class="loan__pane" id="pane-afford" role="tabpanel" hidden>
+          <div class="loan__afford">
+            <div class="loan__side">
+              <article class="loan__card">
+                <h2 class="loan__card-title" id="accounts-title"></h2>
+                <label class="loan__field loan__field--wide">
+                  <span class="loan__label" id="history-label"></span>
+                  <select class="form__field" id="history"></select>
+                </label>
+                <!-- La plage d'années (10/10/2026) : deux listes, « de » et
+                     « à », montrées seulement quand on la choisit. -->
+                <div class="goal__range" id="range" hidden>
+                  <span class="loan__unit" id="range-from-label"></span>
+                  <select class="form__field" id="range-from"></select>
+                  <span class="loan__unit" id="range-to-label"></span>
+                  <select class="form__field" id="range-to"></select>
+                </div>
+                <table class="loan__accounts">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th id="account-column"></th>
+                      <th id="bank-column"></th>
+                      <th class="loan__number" id="balance-column"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="accounts"></tbody>
+                </table>
+              </article>
+              <article class="loan__card">
+                <h2 class="loan__card-title" id="running-title"></h2>
+                <table class="loan__accounts loan__running" id="running-table">
+                  <thead>
+                    <tr>
+                      <th id="running-label"></th>
+                      <th class="loan__number" id="running-monthly"></th>
+                      <th class="loan__number" id="running-end"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="running"></tbody>
+                </table>
+                <p class="loan__hint" id="running-empty"></p>
+              </article>
+            </div>
+
+            <div class="loan__main">
+              <p class="loan__unavailable" id="unavailable" hidden></p>
+              <div class="loan__analysis" id="analysis">
+                <article class="loan__card loan__verdict" id="verdict" data-verdict="green">
+                  <div class="loan__verdict-gauge" id="gauge"></div>
+                  <div class="loan__verdict-text">
+                    <span class="loan__verdict-head">
+                      <span class="loan__label" id="verdict-title"></span>
+                      <!-- La méthode retenue ; un clic ouvre ses réglages. -->
+                      <button class="loan__method-line" id="method-line" type="button"></button>
+                    </span>
+                    <strong class="loan__verdict-word" id="verdict-word"></strong>
+                    <!-- Les trois questions qui font le voyant, chacune avec sa
+                         pastille (08/10/2026) : on voit pourquoi le verdict
+                         est ce qu'il est. -->
+                    <ul class="loan__checks" id="checks"></ul>
+                    <dl class="loan__figures" id="figures"></dl>
+                  </div>
+                </article>
+                <!-- Une colonne : en demi-largeur, les graduations ne se lisaient
+                     plus. -->
+                <!-- Un historique déjà déficitaire est dit à part : il ne fait
+                     pas le verdict du crédit. -->
+                <p class="loan__warning" id="warning" hidden></p>
+                <div class="loan__charts loan__charts--stack">
+                  <article class="loan__card">
+                    <h2 class="loan__card-title" id="income-title"></h2>
+                    <div class="loan__chart" id="income-chart"></div>
+                  </article>
+                  <article class="loan__card">
+                    <h2 class="loan__card-title" id="history-title"></h2>
+                    <p class="loan__hint" id="history-hint"></p>
+                    <div class="loan__chart" id="bars-chart"></div>
+                  </article>
+                </div>
+                <article class="loan__card">
+                  <h2 class="loan__card-title" id="projection-title"></h2>
+                  <div class="loan__chart" id="projection-chart"></div>
+                </article>
+                <p class="loan__hint"><strong id="period-label"></strong> <span id="period"></span></p>
+                <p class="loan__hint" id="transfers"></p>
+                <p class="loan__hint" id="method"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- Onglet 3 : les réglages du jugement (Fabrice, 08/10/2026). Le
+             tableau des trois méthodes, écrit avec les chiffres de la personne,
+             une case en tête de chaque colonne pour choisir, et la hausse des
+             dépenses de chacune — « un champ par colonne », de 0 à 99 %. -->
+        <section class="loan__pane" id="pane-rules" role="tabpanel" hidden>
+          <article class="loan__card">
+            <h2 class="loan__card-title" id="rules-title"></h2>
+            <p class="loan__hint loan__rules-intro" id="rules-intro"></p>
+            <p class="loan__unavailable" id="rules-unavailable" hidden></p>
+            <table class="loan__rules" id="rules">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th class="loan__rules-head" data-method="optimistic">
+                    <label class="loan__method">
+                      <input type="radio" name="method" value="optimistic" />
+                      <span class="loan__method-name"></span>
+                    </label>
+                    <span class="loan__badge" data-verdict="green"></span>
+                  </th>
+                  <th class="loan__rules-head" data-method="neutral">
+                    <label class="loan__method">
+                      <input type="radio" name="method" value="neutral" checked />
+                      <span class="loan__method-name"></span>
+                    </label>
+                    <span class="loan__badge" data-verdict="green"></span>
+                  </th>
+                  <th class="loan__rules-head" data-method="severe">
+                    <label class="loan__method">
+                      <input type="radio" name="method" value="severe" />
+                      <span class="loan__method-name"></span>
+                    </label>
+                    <span class="loan__badge" data-verdict="green"></span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-row="0">
+                  <th class="loan__rules-label"></th>
+                  <td data-method="optimistic"></td>
+                  <td data-method="neutral"></td>
+                  <td data-method="severe"></td>
+                </tr>
+                <tr data-row="1">
+                  <th class="loan__rules-label"></th>
+                  <td data-method="optimistic"></td>
+                  <td data-method="neutral"></td>
+                  <td data-method="severe"></td>
+                </tr>
+                <tr data-row="2">
+                  <th class="loan__rules-label"></th>
+                  <td data-method="optimistic"></td>
+                  <td data-method="neutral"></td>
+                  <td data-method="severe"></td>
+                </tr>
+                <tr data-row="3">
+                  <th class="loan__rules-label"></th>
+                  <td data-method="optimistic"></td>
+                  <td data-method="neutral"></td>
+                  <td data-method="severe"></td>
+                </tr>
+                <tr data-row="4">
+                  <th class="loan__rules-label"></th>
+                  <td data-method="optimistic"></td>
+                  <td data-method="neutral"></td>
+                  <td data-method="severe"></td>
+                </tr>
+                <tr data-row="growth">
+                  <th class="loan__rules-label" id="growth-label"></th>
+                  <td data-method="optimistic">
+                    <span class="loan__input">
+                      <input class="form__field loan__growth" id="growth-optimistic" inputmode="numeric" autocomplete="off" />
+                      <span class="loan__unit" data-percent-year></span>
+                    </span>
+                  </td>
+                  <td data-method="neutral">
+                    <span class="loan__input">
+                      <input class="form__field loan__growth" id="growth-neutral" inputmode="numeric" autocomplete="off" />
+                      <span class="loan__unit" data-percent-year></span>
+                    </span>
+                  </td>
+                  <td data-method="severe">
+                    <span class="loan__input">
+                      <input class="form__field loan__growth" id="growth-severe" inputmode="numeric" autocomplete="off" />
+                      <span class="loan__unit" data-percent-year></span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="loan__explanation" id="explanation"></p>
+          </article>
+        </section>
+        <p class="loan__disclaimer" id="disclaimer"></p>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

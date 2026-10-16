@@ -63,10 +63,17 @@ interface Loaded {
 
 interface Picked {
   path: string;
-  /// « ofx » ou « csv » — **déduit du contenu du fichier, pas de son
+  /// « ofx », « qif » ou « csv » — **déduit du contenu du fichier, pas de son
   /// extension**. Un relevé OFX enregistré sous `.txt` reste un relevé OFX.
   kind: string;
   accounts: string[];
+}
+
+/// Ce que le chargement d'un QIF rend : le relevé, ou la question de l'ordre
+/// des dates, rédigée par le noyau, quand rien dans le fichier ne le prouve.
+interface QifLoaded {
+  question: { text: string; choices: string[]; keys: string[] } | null;
+  view: Loaded | null;
 }
 
 /// Ce qu'une demande d'intégration a donné, pour une ligne.
@@ -266,6 +273,14 @@ async function openFile(): Promise<void> {
       say(t("statement-empty"), true);
       return;
     }
+    // **Un QIF suit le chemin de l'OFX** — même choix du compte, même tableau,
+    // mêmes boutons (Fabrice, 15/10/2026 : « c'est un relevé bancaire aussi ») —
+    // avec une seule question de plus, quand le fichier ne dit pas l'ordre des
+    // dates.
+    if (picked.kind === "qif") {
+      await openQif(picked);
+      return;
+    }
     let chosen = picked.accounts[0];
     if (picked.accounts.length > 1) {
       const answer = await askForChoice(
@@ -291,6 +306,37 @@ async function openFile(): Promise<void> {
   } catch (error) {
     filePath = "";
     say(tError("ui-read-failed", error), true);
+  }
+}
+
+/// Ouvre un relevé QIF : le compte, puis, s'il le faut, l'ordre des dates.
+async function openQif(picked: Picked): Promise<void> {
+  let account = 0;
+  if (picked.accounts.length > 1) {
+    const answer = await askForChoice(t("statement-choose-account"), picked.accounts, t("ui-yes"), t("ui-no"));
+    if (answer === null) {
+      return;
+    }
+    account = picked.accounts.indexOf(answer);
+  }
+  let order: string | null = null;
+  // Deux passages au plus : la lecture, puis la lecture avec la réponse.
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const loaded: QifLoaded = await invoke<QifLoaded>("statement_load_qif", { accountId, path: picked.path, account, order });
+    if (loaded.view) {
+      filePath = picked.path;
+      table.clearSelection();
+      show(loaded.view);
+      return;
+    }
+    if (!loaded.question || order !== null) {
+      break;
+    }
+    const answer = await askForChoice(loaded.question.text, loaded.question.choices, t("ui-yes"), t("ui-no"));
+    if (answer === null) {
+      return;
+    }
+    order = loaded.question.keys[loaded.question.choices.indexOf(answer)] ?? null;
   }
 }
 

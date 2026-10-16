@@ -74,6 +74,7 @@ function say(message: string, alert = false): void {
 
 let mode: "A" | "M" | "L" = "A";
 let recordId = 0;
+let sourceOperation = 0;
 let accounts: Item[] = [];
 let combos: Combos | null = null;
 
@@ -237,10 +238,65 @@ async function erase(): Promise<void> {
   }
 }
 
+/// Ce que la fiche emprunte à une opération. Le reste de l'opération — sa
+/// date, son statut, son pointage, son chèque — n'a pas de sens pour une règle
+/// qui se répète.
+interface Source {
+  label: string;
+  amount: string;
+  direction: string;
+  account_id: number;
+  category_id: number;
+  assignment_id: number;
+  payment_mode_id: number;
+  payee_id: number;
+  project_id: number;
+}
+
+/// **Créer une règle à partir d'une opération** (Fabrice, 25/08/2026) : la
+/// fiche s'ouvre neuve, puis reçoit ce que l'opération sait donner — « comme
+/// si les champs avaient été remplis à la main ».
+///
+/// Ce qu'elle ne reçoit pas : la date prochaine, la fréquence, l'unité et la
+/// condition de fin. Une opération ne dit pas à quel rythme elle se répète —
+/// c'est précisément ce que l'utilisateur vient écrire. Ces champs gardent
+/// donc les valeurs d'une fiche neuve.
+///
+/// **Rien n'est écrit** : c'est une fiche pré-remplie qu'il enregistre
+/// lui-même, la règle de « Dupliquer » (26/07/2026).
+async function fillFromOperation(id: number): Promise<void> {
+  const source = await invoke<Source | null>("get_operation", { id });
+  if (source === null) {
+    say(t("operation-gone"), true);
+    return;
+  }
+  element<HTMLInputElement>("label").value = source.label;
+  element<HTMLInputElement>("amount").value = source.amount;
+  // La fiche opération porte le sens dans une lettre, la règle dans un signe.
+  element<HTMLSelectElement>("direction").value = source.direction === "D" ? "-1" : "1";
+  element<HTMLSelectElement>("account").value = String(source.account_id);
+  for (const [field, chosen] of [
+    ["category", source.category_id],
+    ["assignment", source.assignment_id],
+    ["payment-mode", source.payment_mode_id],
+    ["payee", source.payee_id],
+    ["project", source.project_id],
+  ] as const) {
+    element<HTMLSelectElement>(field).value = String(chosen);
+  }
+}
+
 async function load(): Promise<void> {
   if (recordId === 0) {
     showRule(null);
     applyMode();
+    if (sourceOperation !== 0) {
+      try {
+        await fillFromOperation(sourceOperation);
+      } catch (error) {
+        say(tError("ui-load-failed", error), true);
+      }
+    }
     return;
   }
   try {
@@ -268,6 +324,9 @@ function readParameters(query: string): void {
   const asked = parameters.get("mode");
   mode = asked === "M" || asked === "L" ? asked : "A";
   recordId = Number(parameters.get("id") ?? 0);
+  // L'opération dont cette règle est tirée, quand la fiche est ouverte depuis
+  // le menu Divers de la liste des opérations. Zéro le reste du temps.
+  sourceOperation = Number(parameters.get("from") ?? 0);
 }
 
 /// Redemandée sur une autre règle : la fenêtre est bâtie une fois et jamais

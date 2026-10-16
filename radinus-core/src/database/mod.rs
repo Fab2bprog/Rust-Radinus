@@ -58,6 +58,38 @@ pub enum OpenError {
     Locked,
 }
 
+impl OpenError {
+    /// **Pourquoi la base ne s'ouvre pas, dit à l'utilisateur dans sa langue.**
+    ///
+    /// `Display`, juste en dessous, est écrit en anglais : il est fait pour un
+    /// journal et pour un développeur. C'est pourtant lui que la fenêtre
+    /// montrait — Fabrice a lu « This Radinus database uses schema version
+    /// 11… » dans un Radinus réglé en français (03/10/2026). Seul le mot de
+    /// passe refusé avait sa phrase.
+    ///
+    /// Les quatre cas ont désormais la leur. L'erreur de lecture garde le
+    /// détail que SQLite donne, à la suite de la phrase : il n'est dans aucune
+    /// langue, et c'est lui qu'on demandera à l'utilisateur de recopier.
+    pub fn said(&self, language: crate::i18n::Language) -> String {
+        use crate::i18n::{text, text_with, text_with_all};
+        match self {
+            OpenError::Locked => text(language, "password-wrong"),
+            OpenError::NotARadinusDatabase => text(language, "database-not-radinus"),
+            OpenError::UnsupportedSchemaVersion { found, supported } => text_with_all(
+                language,
+                "database-too-recent",
+                &[
+                    ("found", &found.to_string()),
+                    ("supported", &supported.to_string()),
+                ],
+            ),
+            OpenError::Sqlite(reason) => {
+                text_with(language, "database-unreadable", "reason", &reason.to_string())
+            }
+        }
+    }
+}
+
 impl std::fmt::Display for OpenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -304,6 +336,34 @@ mod tests {
         let result = open_existing_database(&path, None);
         assert!(matches!(result, Err(OpenError::NotARadinusDatabase)));
         std::fs::remove_file(&path).ok();
+    }
+
+    /// **Un refus d'ouvrir se dit dans la langue de l'interface**, et dans
+    /// toutes : aucune phrase vide, aucune clef à la place d'une phrase, et
+    /// les deux numéros de version là où on les attend.
+    #[test]
+    fn un_refus_d_ouvrir_se_dit_dans_chaque_langue() {
+        use crate::i18n::Language;
+        let too_recent = OpenError::UnsupportedSchemaVersion { found: 11, supported: 10 };
+        assert_eq!(
+            too_recent.said(Language::French),
+            "Cette base a été enregistrée par une version plus récente de Radinus \
+             (base version 11 ; cette version lit jusqu'à la version 10). \
+             Mettez Radinus à jour pour l'ouvrir."
+        );
+        for language in Language::all() {
+            let said = too_recent.said(language);
+            assert!(said.contains("11") && said.contains("10"), "{language:?} : {said}");
+            for (error, key) in [
+                (OpenError::NotARadinusDatabase, "database-not-radinus"),
+                (OpenError::Locked, "password-wrong"),
+            ] {
+                let said = error.said(language);
+                assert!(!said.is_empty() && said != key, "{language:?} : {key}");
+            }
+        }
+        // Hors du français, la phrase n'est plus celle du code.
+        assert!(!too_recent.said(Language::French).contains("schema version"));
     }
 
     #[test]

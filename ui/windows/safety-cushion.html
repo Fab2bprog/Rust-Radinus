@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Mon matelas de sécurité</title>
+    <script type="module" src="/ui/windows/safety-cushion.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F43 — « Mon matelas de sécurité » (Fabrice, 09/10/2026).
+
+         « Si mes revenus s'arrêtaient demain, combien de mois tiendrais-je
+         avec mon épargne ? » À gauche, ce que la personne règle : ses comptes
+         (deux cases, « Épargne » et « Dépenses »), la période, le revenu de
+         secours, et les catégories qu'elle couperait en cas de coup dur. À
+         droite, la réponse : la jauge des mois couverts, les deux seuils de
+         prudence — trois et six mois —, et l'épargne qui fond. Rien n'est
+         enregistré, pas de rapport PDF. -->
+    <div class="window window--loan window--cushion">
+      <main class="window__content loan cushion">
+        <p class="cushion__question" id="question"></p>
+
+        <div class="loan__afford cushion__body">
+          <div class="loan__side">
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="accounts-title"></h2>
+              <label class="loan__field loan__field--wide">
+                <span class="loan__label" id="history-label"></span>
+                <select class="form__field" id="history"></select>
+              </label>
+              <!-- La plage d'années (10/10/2026). -->
+              <div class="goal__range" id="range" hidden>
+                <span class="loan__unit" id="range-from-label"></span>
+                <select class="form__field" id="range-from"></select>
+                <span class="loan__unit" id="range-to-label"></span>
+                <select class="form__field" id="range-to"></select>
+              </div>
+              <table class="loan__accounts cushion__accounts">
+                <thead>
+                  <tr>
+                    <th id="account-column"></th>
+                    <th class="loan__number" id="balance-column"></th>
+                    <th class="cushion__tick" id="savings-column"></th>
+                    <th class="cushion__tick" id="spending-column"></th>
+                  </tr>
+                </thead>
+                <tbody id="accounts"></tbody>
+              </table>
+              <p class="loan__hint cushion__hint" id="accounts-hint"></p>
+            </article>
+
+            <article class="loan__card">
+              <label class="loan__field">
+                <span class="loan__label" id="backup-label"></span>
+                <span class="loan__input">
+                  <input class="form__field cushion__backup" id="backup" inputmode="decimal" autocomplete="off" />
+                  <span class="loan__unit" id="sign"></span>
+                </span>
+              </label>
+              <p class="loan__hint cushion__hint" id="backup-hint"></p>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="categories-title"></h2>
+              <p class="loan__hint" id="categories-hint"></p>
+              <ul class="cushion__categories" id="categories"></ul>
+              <p class="loan__hint" id="categories-empty" hidden></p>
+            </article>
+          </div>
+
+          <div class="loan__main">
+            <p class="loan__unavailable" id="unavailable" hidden></p>
+            <div class="loan__analysis" id="analysis">
+              <article class="loan__card loan__verdict" id="verdict" data-verdict="green">
+                <div class="loan__verdict-gauge" id="gauge"></div>
+                <div class="loan__verdict-text">
+                  <span class="loan__label" id="verdict-title"></span>
+                  <p class="cushion__verdict" id="verdict-text"></p>
+                  <dl class="loan__figures" id="tiles"></dl>
+                </div>
+              </article>
+
+              <article class="loan__card" id="targets-card">
+                <h2 class="loan__card-title" id="targets-title"></h2>
+                <ul class="cushion__targets" id="targets"></ul>
+              </article>
+
+              <article class="loan__card">
+                <h2 class="loan__card-title" id="projection-title"></h2>
+                <p class="loan__hint" id="projection-hint"></p>
+                <div class="loan__chart" id="projection"></div>
+              </article>
+
+              <p class="loan__hint" id="period"></p>
+              <p class="loan__hint" id="note"></p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

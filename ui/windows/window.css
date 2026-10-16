@@ -291,6 +291,52 @@ body {
   cursor: pointer;
 }
 
+/* La feuille « Colonnes des tableaux » : le menu déroulant qui nomme la
+   fenêtre, et son bouton à côté. */
+.table-layouts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 460px;
+}
+
+.table-layouts__window {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.table-layouts__reset,
+.table-layouts__all {
+  font: inherit;
+  padding: 2px 10px;
+  cursor: pointer;
+}
+
+.table-layouts__all {
+  margin-top: 14px;
+}
+
+/* La feuille « Tarif d'électricité » (09/10/2026) : un prix et son unité. */
+.electricity__price {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.electricity__price[hidden] {
+  display: none;
+}
+
+.electricity__price .form__field {
+  width: 110px;
+  text-align: right;
+}
+
+.electricity__unit {
+  color: #4a5a66;
+  white-space: nowrap;
+}
+
 .pane__hint {
   margin: 12px 0 0;
   color: #4a5a66;
@@ -535,6 +581,23 @@ body {
   min-height: 0;
 }
 
+/* **Le défilement horizontal du tableau** (Fabrice, 21/08/2026), allumé par la
+   seule fenêtre qui le demande — la liste des opérations et ses seize
+   colonnes. Ailleurs, rien ne change.
+
+   Le cadre rogne : l'en-tête et les filtres se décalent par `transform` pour
+   suivre les lignes, et ce qui sort du cadre ne doit pas se voir. */
+.list--scrollable {
+  overflow: hidden;
+}
+
+/* Les lignes deviennent le seul endroit qui défile, dans les deux sens.
+   L'ascenseur horizontal se pose donc **sous la dernière ligne**, dans le
+   cadre du tableau, et l'ascenseur vertical reste où il a toujours été. */
+.list__rows--scrollable {
+  overflow: auto;
+}
+
 .list__row {
   display: grid;
   align-items: center;
@@ -556,6 +619,15 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* **Une donnée qui est là sans compter** : la date de pointage d'une opération
+   qui n'est pas pointée. Elle reste lisible, triable et exportée ; le gris dit
+   seulement qu'elle ne veut rien dire pour cette ligne-là. Le même langage que
+   le compte clôturé, qui est montré mais grisé. */
+.list__cell--faded {
+  color: #6b7a85;
+  font-style: italic;
 }
 
 /* Amounts line up on their right edge, and a debit is red — the original's
@@ -706,6 +778,10 @@ select.form__field {
   margin: 0;
   padding: 20px 22px;
   line-height: 1.45;
+  /* Une question écrite sur plusieurs lignes s'affiche sur plusieurs lignes
+     (Fabrice, 25/08/2026). Les phrases des `.ftl` sont coupées là où leur
+     auteur les a coupées — le panneau les recollait en un seul paragraphe. */
+  white-space: pre-line;
 }
 
 .dialog__buttons {
@@ -950,6 +1026,17 @@ textarea.form__field {
   color: #5b6b78;
 }
 
+/* **La date grisée reste lisible sur une ligne sélectionnée** (Fabrice,
+   25/08/2026). Le gris clair et le fond bleu-gris de la sélection étaient
+   pratiquement la même couleur : le texte disparaissait — au pire moment,
+   puisqu'une ligne est sélectionnée juste avant qu'on clique « Pointer ».
+   Sur ce fond-là, le gris se fonce ; l'italique, lui, ne dépend d'aucune
+   couleur et porte le sens dans tous les cas. Placé après le Complément, dont
+   la règle de cellule est aussi spécifique que celle-ci. */
+.list__row[aria-selected="true"] .list__cell--faded {
+  color: #333f48;
+}
+
 .list__tick {
   color: #2c6e2f;
 }
@@ -957,6 +1044,76 @@ textarea.form__field {
 /* Debits are red — the original's own rule (03_CHARTE_GRAPHIQUE.md). */
 .list__cell--numeric:nth-child(11) {
   color: var(--radinus-info-bar-alert-fg, #b00020);
+}
+
+/* **La liste des opérations nomme sa colonne Débit** au lieu de la compter :
+   depuis qu'elle porte « Statut opération » et « Vérification », le débit
+   n'est plus la onzième cellule, et la règle ci-dessus ne le trouvait plus. */
+.list__row .list__cell--debit {
+  color: var(--radinus-info-bar-alert-fg, #b00020);
+}
+
+/* **La vérification se lit à sa couleur** (Fabrice, 03/10/2026) : à vérifier
+   en noir, vérifiée en vert sombre, douteuse en orange sombre, contestée en
+   rouge. Deux sélecteurs à chaque fois — la cellule, sur toutes les lignes,
+   et la liste déroulante fermée de la ligne choisie, qui est sur fond blanc.
+
+   Placées après le Complément, dont la règle de cellule est aussi
+   spécifique : une ventilation d'une écriture contestée est rouge elle aussi.
+
+   Un troisième sélecteur depuis la statistique par vérification : le nom de
+   ses quatre lignes porte la même teinte. */
+.list__row .list__cell--verification[data-verification="2"],
+.matrix__label[data-verification="2"],
+select[data-verification="2"] {
+  color: #1e6b24;
+}
+
+.list__row .list__cell--verification[data-verification="3"],
+.matrix__label[data-verification="3"],
+select[data-verification="3"] {
+  color: #b35c00;
+}
+
+.list__row .list__cell--verification[data-verification="4"],
+.matrix__label[data-verification="4"],
+select[data-verification="4"] {
+  color: #c00000;
+  font-weight: 600;
+}
+
+/* Sur le fond bleu-gris d'une ligne choisie — une sous-opération, qui montre
+   le mot et non la liste — les trois teintes se foncent pour rester lisibles. */
+.list__row[aria-selected="true"] .list__cell--verification[data-verification="2"] {
+  color: #124a17;
+}
+
+.list__row[aria-selected="true"] .list__cell--verification[data-verification="3"] {
+  color: #7a3d00;
+}
+
+.list__row[aria-selected="true"] .list__cell--verification[data-verification="4"] {
+  color: #8b0000;
+}
+
+/* La liste ouverte : chaque choix dans sa couleur, là où le système accepte
+   d'en tenir compte (Windows, Linux). Sur macOS le menu est dessiné par le
+   système et reste noir — la liste fermée, elle, est teinte partout. */
+select[data-verification] option {
+  color: #000000;
+  font-weight: 400;
+}
+
+select[data-verification] option[value="2"] {
+  color: #1e6b24;
+}
+
+select[data-verification] option[value="3"] {
+  color: #b35c00;
+}
+
+select[data-verification] option[value="4"] {
+  color: #c00000;
 }
 
 /* The two lines of totals under the table. */
@@ -1018,6 +1175,116 @@ textarea.form__field {
 body.resizing-column {
   cursor: col-resize;
   user-select: none;
+}
+
+/* **Une colonne qu'on déplace** (Fabrice, 04/10/2026). Le trait vertical dit
+   où elle tombera ; il court de l'en-tête au bas du tableau, pour qu'on lise
+   la frontière sur les lignes et pas seulement sur les titres. */
+.list__drop-mark {
+  position: fixed;
+  z-index: 30;
+  width: 3px;
+  background-color: #f2a900;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+body.moving-column {
+  cursor: grabbing;
+  user-select: none;
+}
+
+body.moving-column .list__title {
+  cursor: grabbing;
+}
+
+.list__title--moving {
+  opacity: 0.55;
+}
+
+/* Le menu des colonnes : une coche devant celles qu'on voit. La place de la
+   coche est réservée sur toutes les entrées, pour que les titres s'alignent.
+   Le menu lui-même ne défile pas — il rognerait ses propres sous-menus ; ce
+   sont eux qui défilent quand ils sont plus hauts que la fenêtre. */
+
+/* **Les neuf teintes d'une colonne** (Fabrice, 05/10/2026 : « comme un calque
+   transparent de couleur qui s'applique dessus »). Une seule définition par
+   couleur, que la cellule et la pastille du menu lisent toutes deux : régler
+   une teinte se fait ici, en une ligne, et nulle part ailleurs.
+
+   Transparentes, et c'est ce qui compte : le calque se pose **par-dessus** le
+   fond de la ligne — l'alternance, le bleu d'une sous-opération, la ligne
+   choisie — qui reste lisible dessous, comme le rouge d'un débit et les
+   couleurs de la vérification restent lisibles dessus. */
+[data-tint="red"] {
+  --radinus-tint: rgba(230, 40, 40, 0.3);
+}
+
+[data-tint="orange"] {
+  --radinus-tint: rgba(250, 130, 0, 0.38);
+}
+
+[data-tint="pink"] {
+  --radinus-tint: rgba(245, 60, 175, 0.26);
+}
+
+[data-tint="pastel-green"] {
+  --radinus-tint: rgba(120, 205, 120, 0.2);
+}
+
+[data-tint="green"] {
+  --radinus-tint: rgba(30, 160, 60, 0.32);
+}
+
+[data-tint="pastel-blue"] {
+  --radinus-tint: rgba(110, 175, 240, 0.2);
+}
+
+[data-tint="blue"] {
+  --radinus-tint: rgba(30, 105, 220, 0.3);
+}
+
+[data-tint="pastel-yellow"] {
+  --radinus-tint: rgba(250, 225, 90, 0.28);
+}
+
+[data-tint="yellow"] {
+  --radinus-tint: rgba(250, 205, 0, 0.5);
+}
+
+/* En image de fond, et non en couleur de fond : la teinte s'ajoute à ce que la
+   cellule porte déjà au lieu de le remplacer. */
+/* **La cellule teintée occupe toute la hauteur de sa ligne** : les autres se
+   contentent de la hauteur de leur texte, centré, et une teinte posée là
+   laisserait un liseré entre deux lignes — une colonne en pointillés au lieu
+   d'une bande. L'interligne vaut la hauteur de la ligne, donc le texte reste
+   centré sans que la cellule change de nature. */
+.list__cell[data-tint] {
+  align-self: stretch;
+  line-height: var(--radinus-row-height, 24px);
+  background-image: linear-gradient(var(--radinus-tint), var(--radinus-tint));
+}
+
+/* La pastille d'une couleur dans le menu : la teinte, sur le blanc du menu. */
+.context-menu__swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 1px solid #9aa6ae;
+  background-color: #ffffff;
+  background-image: linear-gradient(var(--radinus-tint), var(--radinus-tint));
+}
+
+.context-menu__entry--check::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+}
+
+.context-menu__entry--check[aria-checked="true"]::before {
+  content: "✓";
 }
 
 /* The Période menu drops its choices under itself. */
@@ -1158,6 +1425,21 @@ body.resizing-column {
 .window-menu__nest:focus-within .window-menu__submenu,
 .window-menu__nest--open .window-menu__submenu {
   display: flex;
+}
+
+/* Les quatre vérifications du menu Filtre, dans leur couleur — les mêmes que
+   dans la colonne et dans le menu du clic droit. */
+.window-menu__submenu .window-menu__choice[data-verification="2"] {
+  color: #1e6b24;
+}
+
+.window-menu__submenu .window-menu__choice[data-verification="3"] {
+  color: #b35c00;
+}
+
+.window-menu__submenu .window-menu__choice[data-verification="4"] {
+  color: #c00000;
+  font-weight: 600;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1568,6 +1850,20 @@ body.splitting {
   bottom: 0;
 }
 
+/* **Le bilan croisé n'a pas de Cumul, donc sa Somme colle au bas** (Fabrice,
+   25/08/2026 : « la ligne Somme est remontée et ne colle plus en bas du
+   tableau, elle flotte en avant-dernière position »).
+
+   Les six statistiques empilent deux lignes de synthèse : le Cumul à zéro du
+   bas, la Somme vingt-deux pixels au-dessus de lui — la hauteur d'une ligne.
+   F27 reprend cette feuille de style mais n'a qu'une seule ligne de synthèse :
+   la Somme gardait son décalage et laissait sous elle le vide qu'occupait le
+   Cumul. Elle reprend donc sa place, et le trait qui la sépare du tableau
+   reste. */
+.window--crossed-balance .matrix__row--sum {
+  bottom: 0;
+}
+
 .matrix__row--sum .matrix__cell,
 .matrix__row--cumulative .matrix__cell {
   font-weight: 700;
@@ -1618,13 +1914,58 @@ body.splitting {
   text-decoration: underline;
 }
 
+/* **Le mois et l'année du bilan croisé, sur une seule ligne** (Fabrice,
+   25/08/2026 : « peut-être faudra-t-il réduire la police pour que mois/année
+   reste sur la même ligne dans la zone bleue »).
+
+   Le millésime seul s'écrit en 30 pixels ; « 09/2026 », c'est deux fois plus
+   de signes dans la même largeur de panneau. La police descend donc à 22, la
+   plus grande taille qui tienne — et elle ne descend qu'ici : les six
+   statistiques gardent la leur. */
+.panel__period {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  padding: 12px 0 4px;
+}
+
+.panel__period-part {
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.panel__period-part:hover {
+  text-decoration: underline;
+}
+
+.panel__period-slash {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
 .panel__year:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: -2px;
 }
 
-/* Un débit se lit en rouge dans le détail, comme dans F02. */
-.list__row--debit .list__cell:nth-last-child(2) {
+/* Un débit se lit en rouge dans le détail, comme dans F02. **La cellule du
+   montant se nomme elle-même** : elle était « l'avant-dernière », ce qui a
+   cessé d'être vrai le jour où l'on a pu déplacer les colonnes (04/10/2026).
+   À savoir : plus bas, la règle `.list__row--debit .list__cell` écrite pour le
+   rapprochement teint aussi **toute** la ligne d'un débit dans ce détail —
+   c'est ce qu'on voit à l'écran depuis qu'elle existe, et rien n'y a été
+   changé ici. */
+.list__row--debit .list__cell--amount {
   color: var(--radinus-negative-amount-fg);
 }
 
@@ -1664,6 +2005,75 @@ body.splitting {
   margin: 3px 0;
   border: none;
   border-top: 1px solid #d6dce1;
+}
+
+/* **Une entrée qui ouvre un sous-menu** (Fabrice, 03/10/2026) : ce qu'une
+   fenêtre ajoute en tête du menu du clic droit. Le sous-menu se pose à droite
+   de son entrée, au survol ou au clic ; il est dessiné par Radinus, et non
+   par le système — ses choix peuvent donc porter leur couleur partout. */
+.context-menu__nest {
+  position: relative;
+}
+
+.context-menu__entry--opener::after {
+  content: "▸";
+  float: right;
+  margin-left: 18px;
+}
+
+/* Éteinte : elle dit qu'elle existe, et qu'il faut d'abord choisir des
+   lignes. Ni survol ni curseur. */
+.context-menu__entry:disabled,
+.context-menu__entry:disabled:hover {
+  color: #a0a8ae;
+  background: none;
+  cursor: default;
+}
+
+.context-menu__submenu {
+  display: none;
+  position: absolute;
+  top: -4px;
+  left: 100%;
+  min-width: 170px;
+  padding: 3px 0;
+  background-color: #ffffff;
+  border: 1px solid #b9c2c9;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+}
+
+/* Près du bord droit de la fenêtre, il s'ouvre de l'autre côté. */
+.context-menu--near-the-edge .context-menu__submenu {
+  left: auto;
+  right: 100%;
+}
+
+/* Et près du bas, il remonte : son pied s'aligne sur son entrée au lieu de sa
+   tête. Celui des exports porte dix lignes et sortirait de la fenêtre. */
+.context-menu--near-the-bottom .context-menu__submenu {
+  top: auto;
+  bottom: -4px;
+}
+
+.context-menu__nest:hover .context-menu__submenu,
+.context-menu__nest:focus-within .context-menu__submenu,
+.context-menu__nest--open .context-menu__submenu {
+  display: block;
+}
+
+/* Les quatre vérifications, dans leur couleur — les mêmes que dans la
+   colonne. Survolé, le choix reprend le blanc sur bleu de tout le menu. */
+.context-menu__submenu .context-menu__entry[data-verification="2"]:not(:hover) {
+  color: #1e6b24;
+}
+
+.context-menu__submenu .context-menu__entry[data-verification="3"]:not(:hover) {
+  color: #b35c00;
+}
+
+.context-menu__submenu .context-menu__entry[data-verification="4"]:not(:hover) {
+  color: #c00000;
+  font-weight: 600;
 }
 
 /* --- F19, le tableau de bord ------------------------------------------
@@ -1898,6 +2308,85 @@ body.splitting {
   text-anchor: middle;
 }
 
+/* --- F40, l'analyse de l'évolution du solde -----------------------------
+   Le graphique de F25 en haut, le tableau des statistiques en bas, et le
+   splitter entre les deux. La fenêtre porte aussi `window--curves` : ses
+   rangées sont celles de F25. */
+.analysis__chart {
+  flex: 1 1 62%;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px 8px;
+}
+
+/* Le graphique se trace : la croix dit qu'on peut y poser une zone. */
+.chart__plot--zonable .chart {
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+/* **La zone** : un voile léger, et un trait franc à chaque bord. Le voile ne
+   doit rien cacher des courbes — c'est elles qu'on est en train de lire. */
+.chart__zone {
+  fill: rgba(245, 170, 0, 0.18);
+  pointer-events: none;
+}
+
+.chart__zone-edge {
+  stroke: #d98200;
+  stroke-width: 1.6;
+  pointer-events: none;
+}
+
+/* Le résumé de la zone, sur une ligne sous le graphique. */
+.analysis__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 22px;
+  min-height: 24px;
+  padding: 5px 12px;
+  border: 1px solid #d8dee3;
+  background-color: #ffffff;
+  color: #1f3550;
+}
+
+.analysis__hint {
+  margin: 0;
+  color: #6b7a88;
+  font-style: italic;
+}
+
+.analysis__figure {
+  display: none;
+  white-space: nowrap;
+}
+
+.analysis__debit {
+  color: var(--radinus-info-bar-alert-fg, #b00020);
+}
+
+/* Rien de tracé : la phrase seule. En cours de tracé : les dates. Tracée :
+   les dates et les cinq chiffres. */
+.analysis__summary[data-state="none"] .analysis__hint {
+  display: block;
+}
+
+.analysis__summary:not([data-state="none"]) .analysis__hint {
+  display: none;
+}
+
+.analysis__summary:not([data-state="none"]) .analysis__figure {
+  display: inline;
+}
+
+.analysis__summary[data-state="dragging"] .analysis__figure--result {
+  display: none;
+}
+
 /* --- F05 — Classification rapide des opérations ------------------------
    Cinq rangées : le menu, les deux bandeaux gris, le tableau, la barre
    d'état ; le panneau bleu les traverse toutes. Le tableau prend ce qui
@@ -1964,10 +2453,23 @@ body.splitting {
 .characteristics {
   display: grid;
   grid-template-columns: repeat(2, minmax(320px, 1fr));
-  grid-template-rows: repeat(3, auto);
+  grid-template-rows: repeat(4, auto);
   grid-auto-flow: column;
   gap: 4px 40px;
   padding: 0 4px;
+}
+
+/* **Sept, et non plus six** (Fabrice, 03/10/2026) : la vérification vient sous
+   le statut, dans la colonne de droite. La grille compte donc quatre rangs,
+   et la colonne de droite se nomme : à partir de la quatrième paire — le
+   tiers — chacune y est envoyée d'autorité, où elle prend le premier rang
+   libre. Sans cela le tiers finirait la première colonne, et l'on
+   retrouverait le bon nombre de cases dans le mauvais ordre.
+
+   Nommer la seule quatrième ne suffisait pas : la cinquième reprenait où le
+   remplissage automatique s'était arrêté, sous le mode de paiement. */
+.characteristic:nth-child(n + 4) {
+  grid-column: 2;
 }
 
 .characteristic {
@@ -2700,3 +3202,1862 @@ input[type="text"].form__field--locked {
 }
 
 
+
+/* ------------------------------------------------------------------ */
+/* F41 — Simulation de crédit (Fabrice, 08/10/2026).                    */
+/*                                                                      */
+/* « Je veux quelque chose de beau qui fasse classe. » Des cartes       */
+/* blanches aux coins doux sur le fond de la fenêtre, de grands         */
+/* chiffres bleu nuit, un filet d'or, et les trois couleurs du voyant   */
+/* gardées pour ce qui juge. Les couleurs sont celles des graphiques,   */
+/* que le noyau dessine (`loan_charts.rs`) : l'écran et le rapport PDF  */
+/* se ressemblent parce qu'ils partagent la même palette.               */
+/* ------------------------------------------------------------------ */
+
+.window--loan {
+  --loan-navy: #24506e;
+  --loan-ink: #1d2b34;
+  --loan-muted: #6b7a88;
+  --loan-line: #e3e8ed;
+  --loan-gold: #c39a3c;
+  --loan-paper: #ffffff;
+  --loan-soft: #f4f6f8;
+  --loan-green: #2e9a6a;
+  --loan-orange: #e48f2e;
+  --loan-red: #cf4436;
+  background-color: #eef1f4;
+}
+
+.loan {
+  gap: 10px;
+  padding: 12px 14px;
+  overflow: hidden;
+  color: var(--loan-ink);
+}
+
+/* Les saisies, toujours visibles au-dessus des deux onglets. */
+.loan__controls {
+  flex: none;
+  background: var(--loan-paper);
+  border: 1px solid var(--loan-line);
+  border-radius: 10px;
+  padding: 12px 16px 10px;
+  box-shadow: 0 1px 2px rgba(29, 43, 52, 0.06);
+}
+
+.loan__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.loan__spacer {
+  flex: 1;
+}
+
+.loan__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.loan__field .form__field {
+  width: 110px;
+}
+
+.loan__field--kind .form__field {
+  width: 220px;
+}
+
+.loan__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--loan-muted);
+}
+
+.loan__input {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.loan__unit {
+  color: var(--loan-muted);
+  white-space: nowrap;
+}
+
+.loan__input--big .form__field {
+  width: 150px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--loan-navy);
+  padding: 4px 8px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.form__field.form__field--invalid {
+  border-color: var(--loan-red);
+  background-color: #fdeceb;
+}
+
+/* Le bouton du rapport : le seul geste qui sort de la fenêtre. */
+.loan__report {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.loan__pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--loan-navy);
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px 7px 10px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(36, 80, 110, 0.35);
+}
+
+.loan__pdf img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 1px;
+}
+
+.loan__pdf:hover {
+  background: #1b405a;
+}
+
+.loan__monthly {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--loan-muted);
+}
+
+.loan__monthly[hidden] {
+  display: none;
+}
+
+/* Les trois curseurs, côte à côte. */
+.loan__sliders {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 12px;
+}
+
+.loan__slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px 6px;
+  border-radius: 8px;
+  background: var(--loan-soft);
+}
+
+.loan__range {
+  width: 100%;
+  accent-color: var(--loan-navy);
+  cursor: pointer;
+}
+
+.loan__notice {
+  margin: 8px 0 0;
+  color: var(--loan-red);
+  font-weight: 700;
+}
+
+.loan__notice[hidden] {
+  display: none;
+}
+
+/* Les deux onglets, posés comme des intercalaires. */
+.loan__tabs {
+  flex: none;
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--loan-line);
+}
+
+.loan__tab {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--loan-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+
+.loan__tab[aria-selected="true"] {
+  color: var(--loan-navy);
+  border-bottom-color: var(--loan-gold);
+}
+
+.loan__tab:hover {
+  color: var(--loan-navy);
+}
+
+/* Un onglet défile ; les saisies restent en place au-dessus. */
+.loan__pane {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 2px 2px 6px;
+}
+
+.loan__pane[hidden] {
+  display: none;
+}
+
+.loan__tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.loan__tile {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--loan-paper);
+  border: 1px solid var(--loan-line);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+/* Les quatre premiers chiffres sont ceux qu'on cherche : en plus grand. */
+.loan__tile:nth-child(-n + 4) .loan__tile-value {
+  font-size: 22px;
+}
+
+.loan__tile-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--loan-muted);
+}
+
+.loan__tile-value {
+  font-size: 17px;
+  color: var(--loan-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Un chiffre qui vient de changer s'éclaire un instant. */
+@keyframes loan-glow {
+  from {
+    background-color: rgba(195, 154, 60, 0.28);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.loan__changed {
+  animation: loan-glow 0.9s ease-out;
+  border-radius: 4px;
+}
+
+.loan__charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.loan__charts--stack {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.loan__charts--stack .loan__chart svg {
+  max-height: 280px;
+}
+
+.loan__field--wide .form__field {
+  width: 100%;
+}
+
+.loan__card {
+  background: var(--loan-paper);
+  border: 1px solid var(--loan-line);
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 2px rgba(29, 43, 52, 0.05);
+  min-width: 0;
+}
+
+.loan__card-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--loan-navy);
+}
+
+.loan__card-title::after {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 2px;
+  margin-top: 5px;
+  background: var(--loan-gold);
+}
+
+.loan__chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+}
+
+.loan__card--table {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  height: 420px;
+}
+
+.list--loan {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Onglet 2 : les comptes à gauche, le verdict et les graphiques à droite. */
+.loan__afford {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.loan__side,
+.loan__main,
+.loan__analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.loan__analysis[hidden],
+.loan__unavailable[hidden] {
+  display: none;
+}
+
+.loan__accounts {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.loan__accounts th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--loan-muted);
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--loan-line);
+}
+
+.loan__accounts td {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--loan-soft);
+}
+
+.loan__accounts tbody tr {
+  cursor: pointer;
+}
+
+.loan__accounts tbody tr:hover {
+  background: var(--loan-soft);
+}
+
+.loan__running tbody tr {
+  cursor: default;
+}
+
+.loan__accounts[hidden],
+.loan__hint[hidden] {
+  display: none;
+}
+
+.loan__number {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.loan__negative {
+  color: var(--radinus-negative-amount-fg);
+}
+
+.loan__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--loan-muted);
+}
+
+.loan__unavailable {
+  margin: 0;
+  padding: 18px;
+  border-radius: 10px;
+  background: var(--loan-paper);
+  border: 1px dashed var(--loan-line);
+  color: var(--loan-muted);
+  font-size: 14px;
+}
+
+/* Le verdict : la jauge, le mot, la phrase, et les chiffres. Le liseré de
+   gauche prend la couleur du voyant. */
+.loan__verdict {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  border-left: 6px solid var(--loan-green);
+}
+
+.loan__verdict[data-verdict="orange"] {
+  border-left-color: var(--loan-orange);
+}
+
+.loan__verdict[data-verdict="red"] {
+  border-left-color: var(--loan-red);
+}
+
+.loan__verdict-gauge svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.loan__verdict-word {
+  display: block;
+  font-size: 30px;
+  line-height: 1.1;
+  color: var(--loan-green);
+}
+
+.loan__verdict[data-verdict="orange"] .loan__verdict-word {
+  color: var(--loan-orange);
+}
+
+.loan__verdict[data-verdict="red"] .loan__verdict-word {
+  color: var(--loan-red);
+}
+
+/* L'en-tête du verdict : son intitulé, et la méthode retenue à droite, qui
+   ouvre ses réglages d'un clic. */
+.loan__verdict-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.loan__method-line {
+  font: inherit;
+  font-size: 12px;
+  color: var(--loan-navy);
+  background: var(--loan-soft);
+  border: 1px solid var(--loan-line);
+  border-radius: 999px;
+  padding: 2px 10px;
+  cursor: pointer;
+}
+
+.loan__method-line:hover {
+  border-color: var(--loan-gold);
+}
+
+/* --- Onglet 3 : le tableau des trois méthodes -------------------------- */
+
+.loan__rules-intro {
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.loan__rules {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.loan__rules[hidden] {
+  display: none;
+}
+
+.loan__rules th,
+.loan__rules td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--loan-line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.loan__rules-label {
+  width: 28%;
+  font-weight: 600;
+  color: var(--loan-muted);
+}
+
+.loan__rules-head {
+  border-top: 3px solid transparent;
+  border-radius: 8px 8px 0 0;
+}
+
+.loan__method {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--loan-navy);
+  cursor: pointer;
+}
+
+.loan__method input {
+  accent-color: var(--loan-navy);
+  width: 16px;
+  height: 16px;
+}
+
+.loan__badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--loan-green);
+}
+
+.loan__badge[data-verdict="orange"] {
+  background: var(--loan-orange);
+}
+
+.loan__badge[data-verdict="red"] {
+  background: var(--loan-red);
+}
+
+/* La colonne retenue se détache : un fond doré très léger et un filet d'or. */
+.loan__rules .loan__rules-chosen {
+  background: rgba(195, 154, 60, 0.09);
+}
+
+.loan__rules th.loan__rules-chosen {
+  border-top-color: var(--loan-gold);
+}
+
+.loan__growth {
+  width: 64px;
+  text-align: right;
+}
+
+.loan__explanation {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-left: 4px solid var(--loan-gold);
+  background: var(--loan-soft);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+}
+
+.loan__explanation[hidden],
+.loan__unavailable[hidden] {
+  display: none;
+}
+
+/* Les trois questions, chacune précédée de sa pastille. */
+.loan__checks {
+  list-style: none;
+  margin: 6px 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.loan__checks li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.loan__checks li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.3em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--loan-green);
+}
+
+.loan__checks li[data-tone="warn"]::before {
+  background: var(--loan-orange);
+}
+
+.loan__checks li[data-tone="bad"]::before {
+  background: var(--loan-red);
+}
+
+/* Une question sans objet : une pastille grise, qui ne juge pas. */
+.loan__checks li[data-tone="info"]::before {
+  background: var(--loan-muted);
+}
+
+.loan__warning {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fdf3e6;
+  border: 1px solid #f1d4a6;
+  color: #8a5a12;
+  font-size: 13px;
+}
+
+.loan__warning[hidden] {
+  display: none;
+}
+
+.loan__figures {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px 14px;
+  margin: 0;
+  font-size: 12.5px;
+}
+
+.loan__figures dt {
+  color: var(--loan-muted);
+}
+
+.loan__figures dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.loan__figures dd[data-tone="good"] {
+  color: var(--loan-green);
+}
+
+.loan__figures dd[data-tone="warn"] {
+  color: var(--loan-orange);
+}
+
+.loan__figures dd[data-tone="bad"] {
+  color: var(--loan-red);
+}
+
+.loan__disclaimer {
+  flex: none;
+  margin: 0;
+  font-size: 11px;
+  color: var(--loan-muted);
+  text-align: center;
+}
+
+/* Une fenêtre étroite : tout passe en une colonne. */
+@media (max-width: 1080px) {
+  .loan__charts,
+  .loan__afford,
+  .loan__verdict {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .loan__tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026). */
+/* La même maison que la simulation de crédit : ses jetons de couleur, */
+/* ses cartes et ses tuiles. Une page sans onglet, qui défile.         */
+/* ------------------------------------------------------------------ */
+
+.appliance {
+  overflow: auto;
+}
+
+.appliance__inputs {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.appliance__card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.appliance__card [hidden] {
+  display: none;
+}
+
+.appliance__group + .appliance__group {
+  border-top: 1px solid var(--loan-line);
+  padding-top: 10px;
+}
+
+.appliance__group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--loan-ink);
+}
+
+/* La pastille de chaque groupe a la couleur de sa part dans l'anneau. */
+.appliance__group-title::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--loan-navy);
+}
+
+.appliance__group-title--standby::before {
+  background: var(--loan-gold);
+}
+
+.appliance__prices .form__field {
+  width: 96px;
+  text-align: right;
+}
+
+.appliance__card .loan__field--kind .form__field {
+  width: 300px;
+}
+
+.appliance__hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--loan-muted);
+}
+
+.appliance__reset {
+  align-self: flex-start;
+  font: inherit;
+  font-size: 12px;
+  color: var(--loan-navy);
+  background: var(--loan-soft);
+  border: 1px solid var(--loan-line);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.appliance__reset:hover {
+  border-color: var(--loan-gold);
+}
+
+.appliance__tiles {
+  flex: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.appliance__tile {
+  border-top: 3px solid var(--loan-gold);
+}
+
+.appliance__tile .loan__tile-value {
+  font-size: 26px;
+}
+
+.appliance__energy {
+  font-size: 13px;
+  color: var(--loan-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.appliance__standby {
+  flex: none;
+  margin: 0;
+  padding: 8px 14px;
+  border-left: 3px solid var(--loan-gold);
+  background: var(--loan-paper);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+}
+
+.appliance__standby[hidden] {
+  display: none;
+}
+
+.appliance__result {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 12px;
+}
+
+.appliance__detail {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.appliance__detail th,
+.appliance__detail td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--loan-line);
+  text-align: left;
+}
+
+.appliance__detail th {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--loan-muted);
+}
+
+.appliance__detail .appliance__number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.appliance__total td {
+  font-weight: 700;
+  color: var(--loan-navy);
+  border-bottom: none;
+  border-top: 2px solid var(--loan-gold);
+}
+
+.appliance__dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: -1px;
+}
+
+.appliance__notes {
+  flex: none;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--loan-muted);
+}
+
+.appliance__notes p {
+  margin: 0 0 3px;
+}
+
+@media (max-width: 1000px) {
+  .appliance__inputs,
+  .appliance__result {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* F43 — Mon matelas de sécurité (Fabrice, 09/10/2026). La maison de  */
+/* la simulation de crédit : ses jetons, ses cartes, sa jauge.        */
+/* ------------------------------------------------------------------ */
+
+.cushion {
+  overflow: auto;
+}
+
+.cushion__question {
+  flex: none;
+  margin: 2px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--loan-navy);
+}
+
+.cushion__body {
+  flex: none;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+}
+
+.cushion__tick {
+  width: 64px;
+  text-align: center !important;
+}
+
+.cushion__hint {
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.cushion__backup {
+  width: 130px;
+  text-align: right;
+}
+
+.cushion__categories {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.cushion__categories li + li {
+  border-top: 1px solid var(--loan-soft);
+}
+
+.cushion__categories label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 2px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cushion__category-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cushion__category--off .cushion__category-name,
+.cushion__category--off .cushion__category-amount {
+  color: var(--loan-muted);
+  text-decoration: line-through;
+}
+
+.cushion__verdict {
+  margin: 6px 0 12px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--loan-green);
+}
+
+.loan__verdict[data-verdict="orange"] .cushion__verdict {
+  color: var(--loan-orange);
+}
+
+.loan__verdict[data-verdict="red"] .cushion__verdict {
+  color: var(--loan-red);
+}
+
+.cushion__targets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cushion__targets li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--loan-soft);
+  border-left: 4px solid var(--loan-orange);
+  font-size: 13px;
+}
+
+.cushion__targets li[data-tone="good"] {
+  border-left-color: var(--loan-green);
+}
+
+.cushion__targets strong {
+  color: var(--loan-navy);
+}
+
+#targets-card[hidden] {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .cushion__body,
+  .cushion__targets {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* F44 — Objectif Épargne (Fabrice, 10/10/2026). La maison de la      */
+/* simulation de crédit : ses jetons, ses cartes, ses tableaux.       */
+/* ------------------------------------------------------------------ */
+
+.goal {
+  overflow: auto;
+}
+
+.goal__body {
+  flex: none;
+  grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+}
+
+.goal__range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.goal__range[hidden],
+.goal__card [hidden],
+.goal__fields [hidden] {
+  display: none;
+}
+
+.goal__accounts td:first-child,
+.goal__accounts th:first-child {
+  width: 28px;
+}
+
+.goal__hint {
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.goal__questions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.goal__question {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--loan-line);
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.goal__question:has(input:checked) {
+  border-color: var(--loan-gold);
+  background: var(--loan-soft);
+  color: var(--loan-navy);
+  font-weight: 700;
+}
+
+.goal__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+}
+
+.goal__amount {
+  width: 130px;
+  text-align: right;
+}
+
+.goal__small {
+  width: 70px;
+  text-align: right;
+}
+
+.goal__month {
+  width: 130px;
+}
+
+.goal__year {
+  width: 70px;
+  text-align: right;
+}
+
+.goal__answer {
+  border-left: 6px solid var(--loan-green);
+}
+
+.goal__answer[data-tone="warn"] {
+  border-left-color: var(--loan-orange);
+}
+
+.goal__answer[data-tone="bad"] {
+  border-left-color: var(--loan-red);
+}
+
+.goal__headline {
+  margin: 6px 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--loan-navy);
+}
+
+.goal__answer[data-tone="bad"] .goal__headline {
+  color: var(--loan-red);
+}
+
+.goal__range-text {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--loan-muted);
+}
+
+.goal__range-text[hidden] {
+  display: none;
+}
+
+.goal__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.goal__tile {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: var(--loan-soft);
+  border-top: 3px solid var(--loan-gold);
+}
+
+.goal__tile-value {
+  font-size: 17px;
+  color: var(--loan-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.goal__chart svg {
+  max-height: 320px;
+}
+
+.goal__notes {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--loan-muted);
+}
+
+@media (max-width: 1000px) {
+  .goal__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* F45 — Et si je réduisais… ? (Fabrice, 10/10/2026). La maison de  */
+/* l'objectif d'épargne, et un tableau où l'on tape les réductions.  */
+/* ------------------------------------------------------------------ */
+
+.cut {
+  overflow: auto;
+}
+
+.goal__answer[data-tone="none"] {
+  border-left-color: var(--loan-line);
+}
+
+.goal__answer[data-tone="none"] .goal__headline {
+  color: var(--loan-muted);
+}
+
+.cut__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.cut__table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--loan-muted);
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--loan-line);
+}
+
+.cut__table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--loan-soft);
+}
+
+.cut__table tfoot td {
+  font-weight: 700;
+  color: var(--loan-navy);
+  border-top: 2px solid var(--loan-gold);
+  border-bottom: none;
+}
+
+.cut__cut {
+  white-space: nowrap;
+  width: 180px;
+}
+
+.cut__input {
+  width: 80px;
+  text-align: right;
+}
+
+.cut__input--capped {
+  border-color: var(--loan-orange);
+}
+
+.cut__unit {
+  width: 56px;
+  margin-left: 4px;
+}
+
+.cut__row--reduced td {
+  background: #fbf4e4;
+}
+
+.cut__row--reduced .cut__name {
+  font-weight: 700;
+}
+
+.cut__gain {
+  color: var(--loan-green);
+  font-weight: 700;
+}
+
+.cut__donut svg {
+  max-height: 260px;
+}
+
+/* ------------------------------------------------------------------ */
+/* F46 — Préparer mes vacances (Fabrice, 10/10/2026). La maison des    */
+/* autres outils : ses cartes, ses tuiles, son tableau à saisir.       */
+/* ------------------------------------------------------------------ */
+
+.holiday {
+  overflow: auto;
+}
+
+.holiday__body {
+  flex: none;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+}
+
+.holiday__trips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.holiday__people {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.holiday__files {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.holiday__file {
+  font: inherit;
+  font-size: 12px;
+  color: var(--loan-navy);
+  background: var(--loan-soft);
+  border: 1px solid var(--loan-line);
+  border-radius: 6px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+.holiday__file:hover {
+  border-color: var(--loan-gold);
+}
+
+.holiday__table td {
+  vertical-align: middle;
+}
+
+.holiday__table [hidden] {
+  display: none;
+}
+
+.holiday__table tr[hidden] {
+  display: none;
+}
+
+.holiday__amount {
+  white-space: nowrap;
+}
+
+.holiday__count {
+  width: 44px;
+  text-align: right;
+}
+
+.holiday__select {
+  width: 128px;
+}
+
+.holiday__cost {
+  white-space: nowrap;
+  font-weight: 700;
+  color: var(--loan-navy);
+}
+
+.holiday__heading td {
+  padding-top: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--loan-muted);
+  border-bottom: 1px solid var(--loan-line);
+}
+
+/* --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) -------------------- */
+
+.car {
+  overflow: auto;
+}
+
+.car__body {
+  flex: none;
+  grid-template-columns: minmax(330px, 390px) minmax(0, 1fr);
+}
+
+.car__grid {
+  display: grid;
+  /* minmax(0, …) : sans lui, une colonne s'élargit jusqu'à la largeur
+     naturelle d'un champ et déborde de la carte. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px 10px;
+}
+
+.car__grid > * {
+  min-width: 0;
+}
+
+.car__grid [hidden] {
+  display: none;
+}
+
+.car__grid .form__field {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.car__grid .loan__input .form__field {
+  width: auto;
+  min-width: 0;
+  flex: 1;
+}
+
+.car__wide {
+  grid-column: 1 / -1;
+}
+
+.car__check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  align-self: end;
+  padding-bottom: 6px;
+  font-size: 13px;
+}
+
+.car__reset {
+  margin-top: 8px;
+}
+
+.car__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.car__add {
+  flex: 1;
+  justify-content: center;
+}
+
+.car__delete {
+  color: var(--loan-red);
+}
+
+.car__entry[data-editing="true"] {
+  box-shadow: inset 4px 0 0 var(--loan-gold);
+}
+
+.car__deadlines {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.car__deadline {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: var(--loan-soft);
+  border-left: 4px solid var(--loan-line);
+  font-size: 13px;
+}
+
+.car__deadline strong {
+  color: var(--loan-navy);
+}
+
+.car__deadline[data-tone="late"] {
+  border-left-color: var(--loan-red);
+}
+
+.car__deadline[data-tone="soon"] {
+  border-left-color: var(--loan-orange);
+}
+
+.car__deadline[data-tone="later"] {
+  border-left-color: var(--loan-green);
+}
+
+.car__deadline--empty {
+  display: block;
+  color: var(--loan-muted);
+}
+
+.car__badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--loan-red);
+}
+
+.car__deadline[data-tone="soon"] .car__badge {
+  color: var(--loan-orange);
+}
+
+.car__history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.car__filter {
+  width: auto;
+}
+
+.car__scroll {
+  max-height: 340px;
+  overflow: auto;
+}
+
+.car__table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--loan-paper);
+}
+
+.car__row {
+  cursor: pointer;
+}
+
+.car__row:hover td {
+  background: var(--loan-soft);
+}
+
+.car__row--editing td {
+  background: #fbf4e4;
+}
+
+.car__note {
+  color: var(--loan-muted);
+}
+
+.car__dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* --- F48 — Partager une dépense (Fabrice, 11/10/2026, P-71) ------------------ */
+/* Une seule grille pour les personnes : une ligne chacune, une colonne par      */
+/* poste. Elle défile en largeur ; le nom reste en place.                        */
+
+.sharing {
+  overflow: auto;
+}
+
+.sharing__body {
+  flex: none;
+  grid-template-columns: minmax(310px, 350px) minmax(0, 1fr);
+}
+
+.sharing__modes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.sharing__check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.sharing__items td,
+.sharing__payments td,
+.sharing__grid td {
+  vertical-align: middle;
+}
+
+/* Une règle globale cachée en mode « par poste », une colonne de règle
+   cachée en mode global : `hidden` doit l'emporter sur les `display` des
+   classes partagées. */
+.sharing [hidden] {
+  display: none !important;
+}
+
+.sharing__common td {
+  font-weight: 700;
+  color: var(--loan-navy);
+}
+
+.sharing__add {
+  margin-top: 8px;
+}
+
+.sharing .loan__hint {
+  margin: 2px 0 8px;
+}
+
+#label {
+  width: 100%;
+}
+
+.sharing__items {
+  width: 100%;
+}
+
+.sharing__items .sharing__input {
+  width: 100%;
+  min-width: 70px;
+}
+
+.sharing__items .sharing__money {
+  width: 70px;
+}
+
+.sharing__items .sharing__item-rule {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.sharing__items td {
+  vertical-align: top;
+}
+
+/* Les conseils (P-72) : une phrase calme sous la règle, orange quand
+   quelqu'un ne paierait rien ou que les pourcentages débordent. */
+.sharing__advice {
+  margin: 4px 0 8px;
+  font-size: 12px;
+  color: var(--loan-muted);
+}
+
+.sharing__items .sharing__advice {
+  display: block;
+  margin: 3px 0 0;
+  font-size: 11px;
+  white-space: normal;
+}
+
+.sharing__items .sharing__common .sharing__advice {
+  font-weight: 400;
+}
+
+/* « En pourcentages » ou « Au prorata des revenus » se lisent en entier. */
+.sharing #rule {
+  width: 100%;
+}
+
+.sharing__advice--warn {
+  color: var(--loan-orange);
+}
+
+.sharing__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.sharing__add:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.sharing__input {
+  width: 120px;
+}
+
+.sharing__money {
+  width: 76px;
+  text-align: right;
+}
+
+.sharing__tiny {
+  width: 44px;
+  text-align: right;
+}
+
+.sharing__date {
+  width: 130px;
+}
+
+.sharing__select {
+  width: 140px;
+}
+
+.sharing__unit {
+  grid-column: 1 / -1;
+}
+
+.sharing__delete {
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--loan-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.sharing__delete:hover {
+  color: var(--loan-red);
+}
+
+.sharing__scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.sharing__grid {
+  width: max-content;
+  min-width: 100%;
+}
+
+.sharing__grid th {
+  white-space: nowrap;
+}
+
+/* Trois colonnes restent en place quand la grille défile : la suppression,
+   le nom, et ce que la personne doit — ce qu'on cherche des yeux. */
+.sharing__sticky,
+.sharing__sticky-delete,
+.sharing__sticky-due {
+  position: sticky;
+  box-sizing: border-box;
+  background: var(--loan-paper);
+  z-index: 1;
+}
+
+.sharing__sticky-delete {
+  left: 0;
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
+}
+
+.sharing__sticky {
+  left: 30px;
+  width: 146px;
+  min-width: 146px;
+  max-width: 146px;
+}
+
+.sharing__sticky .sharing__input {
+  width: 100%;
+}
+
+.sharing__sticky-due {
+  left: 176px;
+  min-width: 96px;
+  box-shadow: inset -1px 0 0 var(--loan-line);
+}
+
+.sharing__item-head {
+  text-align: center;
+  border-left: 1px solid var(--loan-line);
+}
+
+.sharing__item-head span {
+  display: block;
+}
+
+/* Le « ⓘ » des infobulles : discret, mais visible — une bulle qu'on ne
+   soupçonne pas n'aide personne. */
+.sharing__help {
+  display: inline;
+  margin-left: 2px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--loan-gold);
+  cursor: help;
+}
+
+.sharing__item-head .sharing__help {
+  display: inline;
+}
+
+[data-help] {
+  cursor: help;
+}
+
+.sharing__item-amount {
+  font-weight: 400;
+  color: var(--loan-muted);
+  font-size: 11px;
+}
+
+.sharing__cell {
+  text-align: center;
+  white-space: nowrap;
+  border-left: 1px solid var(--loan-line);
+}
+
+.sharing__cell .sharing__tiny {
+  margin-left: 4px;
+}
+
+.sharing__out {
+  display: block;
+  font-size: 11px;
+  color: var(--loan-muted);
+}
+
+.sharing__due {
+  font-weight: 700;
+  color: var(--loan-navy);
+  white-space: nowrap;
+}
+
+.sharing__typed,
+.sharing__constraint {
+  color: var(--loan-muted);
+  white-space: nowrap;
+}
+
+.sharing__row--invalid td,
+.sharing__row--invalid {
+  background: #fbeaea;
+}
+
+.sharing__warning {
+  margin: 6px 0 0;
+  color: var(--loan-red);
+  font-weight: 700;
+}
+
+.sharing__summary,
+.sharing__transfers {
+  margin: 0 0 10px;
+  padding-left: 18px;
+}
+
+.sharing__summary li {
+  font-weight: 700;
+  color: var(--loan-navy);
+}
+
+.sharing__transfers li {
+  font-weight: 700;
+}
+
+.sharing__subtitle {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  color: var(--loan-navy);
+}
+
+.sharing__units tr[data-tone="due"] .sharing__balance {
+  color: var(--loan-orange);
+  font-weight: 700;
+}
+
+.sharing__units tr[data-tone="even"] .sharing__balance {
+  color: var(--loan-green);
+  font-weight: 700;
+}
+
+.sharing__units tr[data-tone="over"] .sharing__balance {
+  color: var(--loan-navy);
+  font-weight: 700;
+}
+
+/* --- Un calcul refusé n'a pas de résultat (11/10/2026) ------------------------ */
+/* Ce qu'affichaient les résultats venait des chiffres d'avant : estompé tant   */
+/* que le champ refusé n'est pas corrigé. Les champs, eux, restent nets.        */
+
+.loan--stale #pane-credit,
+.loan--stale #pane-afford .loan__main,
+.loan--stale #rules tbody tr:not(:has(input)),
+.loan--stale #tiles,
+.loan--stale.cushion #analysis,
+.loan--stale.cut #answer,
+.loan--stale.cut #rows td[data-cell],
+.loan--stale.cut #total,
+.loan--stale.cut #chart,
+.loan--stale.cut #donut,
+.loan--stale.holiday #answer,
+.loan--stale.holiday .holiday__cost,
+.loan--stale.holiday #donut,
+.loan--stale.holiday #notes,
+.loan--stale #standby-sentence,
+.loan--stale .appliance__result {
+  opacity: 0.3;
+  transition: opacity 0.15s;
+}

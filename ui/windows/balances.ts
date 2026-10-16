@@ -52,23 +52,32 @@ const table = new Table<AccountRow>({
       title: () => t("accounts-column-bank-balance"),
       cell: (row) => row.balance_bank_text,
       key: (row) => row.balance_bank,
+      // Un solde s'affiche en toutes lettres et s'exporte en nombre, pour
+      // qu'un tableur puisse le sommer — la règle de toutes les colonnes
+      // d'argent (Fabrice, 26/07/2026).
+      money: (row) => row.balance_bank,
       numeric: true,
     },
     {
       title: () => t("accounts-column-real-balance"),
       cell: (row) => row.balance_real_text,
       key: (row) => row.balance_real,
+      money: (row) => row.balance_real,
       numeric: true,
     },
     {
       title: () => t("accounts-column-final-balance"),
       cell: (row) => row.balance_final_text,
       key: (row) => row.balance_final,
+      money: (row) => row.balance_final,
       numeric: true,
     },
   ],
   identity: (row) => row.id,
   rowClass: (row) => (row.id === TOTAL_ROW ? "list__row--total" : null),
+  // Le fichier exporté porte le nom de la fenêtre. La ligne TOTAL part avec
+  // les autres : un tableau exporte ce qu'on lit.
+  exportAs: () => ({ name: t("window-balances-title"), detail: "" }),
   emptyText: () => t("accounts-none"),
   filteredOutText: () => t("ui-no-match"),
   onActivate: (row) => open(row),
@@ -122,6 +131,12 @@ window.addEventListener("keydown", (event) => {
 /// vient de choisir.
 async function dress(): Promise<void> {
   table.buildHeader(element<HTMLElement>("header"), element<HTMLElement>("filter"));
+  // **Le menu du clic droit** : la copie d'une cellule ou des lignes, puis les
+  // dix exports. Il manquait ici depuis l'origine — la fenêtre utilisait le
+  // tableau commun sans jamais brancher son menu (relevé par Fabrice le
+  // 07/10/2026 : « absence totale de menu contextuel »). Le tableau ne le
+  // branche qu'une fois, quel que soit le nombre de rhabillages.
+  table.exportOnRightClick(say);
   element<HTMLElement>("close").title = t("ui-title-close");
 
   const failure = await invoke<string | null>("startup_error");

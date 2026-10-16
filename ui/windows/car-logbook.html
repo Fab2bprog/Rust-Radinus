@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Carnet de ma voiture</title>
+    <script type="module" src="/ui/windows/car-logbook.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F47 — « Carnet de ma voiture » (Fabrice, 10/10/2026).
+
+         « Quelque chose qui gère l'historique de la voiture. » À gauche, la
+         fiche — immatriculation, motorisation, première main, mise en
+         circulation, acquisition, rythme des révisions —, le tarif de la
+         recharge à la maison pour une voiture qui se branche, la ligne qu'on
+         ajoute ou qu'on modifie, et les fichiers. À droite, ce que coûte la
+         voiture, les échéances, l'historique, puis le détail : rubriques,
+         énergie, pièces, pneus, batterie, années. Le carnet vit côté Rust ;
+         la porte l'oublie. -->
+    <div class="window window--loan window--car">
+      <main class="window__content loan car">
+        <div class="loan__afford car__body">
+          <div class="loan__side">
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="sheet-title"></h2>
+              <div class="car__grid">
+                <label class="loan__field">
+                  <span class="loan__label" id="plate-label"></span>
+                  <input class="form__field" id="plate" autocomplete="off" spellcheck="false" />
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="engine-label"></span>
+                  <select class="form__field" id="engine"></select>
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="make-label"></span>
+                  <input class="form__field" id="make" autocomplete="off" />
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="model-label"></span>
+                  <input class="form__field" id="model" autocomplete="off" />
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="registered-label"></span>
+                  <input class="form__field" id="registered" type="date" />
+                </label>
+                <label class="loan__field car__check">
+                  <input type="checkbox" id="first-hand" />
+                  <span id="first-hand-label"></span>
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="acquired-label"></span>
+                  <input class="form__field" id="acquired" type="date" />
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="acquired-km-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="acquired-km" inputmode="numeric" autocomplete="off" />
+                    <span class="loan__unit" data-unit="km"></span>
+                  </span>
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="service-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__small" id="service-months" inputmode="numeric" autocomplete="off" />
+                    <span class="loan__unit" id="service-months-unit"></span>
+                  </span>
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="service-or-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="service-km" inputmode="numeric" autocomplete="off" />
+                    <span class="loan__unit" data-unit="km"></span>
+                  </span>
+                </label>
+              </div>
+            </article>
+
+            <article class="loan__card" id="tariff-card" hidden>
+              <h2 class="loan__card-title" id="tariff-title"></h2>
+              <div class="car__grid">
+                <label class="loan__field car__wide">
+                  <span class="loan__label" id="option-label"></span>
+                  <select class="form__field" id="option">
+                    <option value="base" id="option-base"></option>
+                    <option value="off-peak" id="option-off-peak"></option>
+                  </select>
+                </label>
+                <label class="loan__field" id="base-line">
+                  <span class="loan__label" id="base-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="tariff-base" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-unit="price"></span>
+                  </span>
+                </label>
+                <label class="loan__field" data-off-peak>
+                  <span class="loan__label" id="peak-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="tariff-peak" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-unit="price"></span>
+                  </span>
+                </label>
+                <label class="loan__field" data-off-peak>
+                  <span class="loan__label" id="off-peak-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="tariff-off-peak" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-unit="price"></span>
+                  </span>
+                </label>
+                <label class="loan__field" data-off-peak>
+                  <span class="loan__label" id="hours-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__small" id="tariff-hours" inputmode="numeric" autocomplete="off" />
+                    <span class="loan__unit" id="hours-unit"></span>
+                  </span>
+                </label>
+              </div>
+              <p class="loan__hint goal__hint" id="tariff-hint"></p>
+              <button class="holiday__file car__reset" id="tariff-reset" type="button"></button>
+            </article>
+
+            <article class="loan__card car__entry" id="entry-card" data-editing="false">
+              <h2 class="loan__card-title" id="entry-title"></h2>
+              <div class="car__grid">
+                <label class="loan__field">
+                  <span class="loan__label" id="date-label"></span>
+                  <input class="form__field" id="date" type="date" />
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="km-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="km" inputmode="numeric" autocomplete="off" />
+                    <span class="loan__unit" data-unit="km"></span>
+                  </span>
+                </label>
+                <label class="loan__field car__wide">
+                  <span class="loan__label" id="rubric-label"></span>
+                  <select class="form__field" id="rubric"></select>
+                </label>
+
+                <label class="loan__field" data-for="energy" id="energy-line">
+                  <span class="loan__label" id="energy-label"></span>
+                  <select class="form__field" id="energy"></select>
+                </label>
+                <label class="loan__field" data-for="energy">
+                  <span class="loan__label" id="quantity-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="quantity" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" id="quantity-unit"></span>
+                  </span>
+                </label>
+                <label class="loan__field" data-for="energy" id="charge-line">
+                  <span class="loan__label" id="charge-label"></span>
+                  <select class="form__field" id="charge"></select>
+                </label>
+                <label class="loan__field" data-for="energy" id="slot-line">
+                  <span class="loan__label" id="slot-label"></span>
+                  <select class="form__field" id="slot"></select>
+                </label>
+
+                <label class="loan__field car__wide" data-for="wear">
+                  <span class="loan__label" id="part-label"></span>
+                  <select class="form__field" id="part"></select>
+                </label>
+                <label class="loan__field car__wide" data-for="wear" id="part-name-line">
+                  <span class="loan__label" id="part-name-label"></span>
+                  <input class="form__field" id="part-name" autocomplete="off" />
+                </label>
+                <label class="loan__field car__wide" data-for="tyres">
+                  <span class="loan__label" id="axle-label"></span>
+                  <select class="form__field" id="axle"></select>
+                </label>
+                <label class="loan__field car__wide" data-for="inspection">
+                  <span class="loan__label" id="verdict-label"></span>
+                  <select class="form__field" id="verdict"></select>
+                </label>
+                <label class="loan__field" data-for="insurance">
+                  <span class="loan__label" id="months-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__small" id="months" inputmode="numeric" autocomplete="off" />
+                    <span class="loan__unit" id="months-unit"></span>
+                  </span>
+                </label>
+
+                <label class="loan__field" id="amount-line">
+                  <span class="loan__label" id="amount-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="amount" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-sign></span>
+                  </span>
+                </label>
+                <p class="loan__hint car__wide" id="home-hint" hidden></p>
+                <label class="loan__field" id="battery-line">
+                  <span class="loan__label" id="battery-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__small" id="battery" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit">%</span>
+                  </span>
+                </label>
+                <label class="loan__field car__wide">
+                  <span class="loan__label" id="garage-label"></span>
+                  <input class="form__field" id="garage" autocomplete="off" />
+                </label>
+                <label class="loan__field car__wide">
+                  <span class="loan__label" id="note-label"></span>
+                  <input class="form__field" id="note" autocomplete="off" />
+                </label>
+              </div>
+              <div class="car__actions">
+                <button class="holiday__file" id="take" type="button"></button>
+                <button class="loan__pdf car__add" id="add" type="button"><span id="add-label"></span></button>
+                <button class="holiday__file" id="cancel" type="button" hidden></button>
+                <button class="holiday__file car__delete" id="delete" type="button" hidden></button>
+              </div>
+            </article>
+
+            <article class="loan__card holiday__files">
+              <button class="holiday__file" id="open" type="button"></button>
+              <button class="holiday__file" id="save" type="button"></button>
+              <button class="loan__pdf" id="pdf" type="button">
+                <img src="/ui/assets/icons/pdf.png" alt="" />
+                <span id="pdf-label"></span>
+              </button>
+              <button class="holiday__file holiday__excel" id="excel" type="button"></button>
+            </article>
+          </div>
+
+          <div class="loan__main">
+            <article class="loan__card goal__answer" id="answer" data-tone="none">
+              <span class="loan__label" id="car-title"></span>
+              <p class="goal__headline" id="headline"></p>
+              <div class="goal__tiles car__tiles" id="tiles"></div>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="deadlines-title"></h2>
+              <ul class="car__deadlines" id="deadlines"></ul>
+            </article>
+
+            <article class="loan__card">
+              <div class="car__history-head">
+                <h2 class="loan__card-title" id="history-title"></h2>
+                <select class="form__field car__filter" id="filter"></select>
+              </div>
+              <p class="loan__hint" id="history-hint"></p>
+              <div class="car__scroll">
+                <table class="cut__table car__table">
+                  <thead>
+                    <tr>
+                      <th id="column-date"></th>
+                      <th class="loan__number" id="column-km"></th>
+                      <th id="column-rubric"></th>
+                      <th id="column-detail"></th>
+                      <th class="loan__number" id="column-amount"></th>
+                      <th id="column-garage"></th>
+                      <th id="column-note"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="rows"></tbody>
+                </table>
+              </div>
+              <p class="loan__hint" id="history-empty" hidden></p>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="rubrics-title"></h2>
+              <div class="loan__chart cut__donut" id="donut"></div>
+            </article>
+
+            <article class="loan__card" id="energy-card" hidden>
+              <h2 class="loan__card-title" id="energy-title"></h2>
+              <table class="cut__table">
+                <thead>
+                  <tr>
+                    <th id="energy-column-energy"></th>
+                    <th class="loan__number" id="energy-column-quantity"></th>
+                    <th class="loan__number" id="energy-column-amount"></th>
+                    <th class="loan__number" id="energy-column-price"></th>
+                    <th class="loan__number" id="energy-column-consumption"></th>
+                    <th class="loan__number" id="energy-column-per-km"></th>
+                  </tr>
+                </thead>
+                <tbody id="energy-rows"></tbody>
+              </table>
+            </article>
+
+            <article class="loan__card" id="parts-card" hidden>
+              <h2 class="loan__card-title" id="parts-title"></h2>
+              <table class="cut__table">
+                <thead>
+                  <tr data-lives></tr>
+                </thead>
+                <tbody id="parts-rows"></tbody>
+              </table>
+            </article>
+
+            <article class="loan__card" id="tyres-card" hidden>
+              <h2 class="loan__card-title" id="tyres-title"></h2>
+              <table class="cut__table">
+                <thead>
+                  <tr data-lives></tr>
+                </thead>
+                <tbody id="tyres-rows"></tbody>
+              </table>
+            </article>
+
+            <article class="loan__card" id="battery-card" hidden>
+              <h2 class="loan__card-title" id="battery-title"></h2>
+              <ul class="goal__notes car__battery" id="battery-list"></ul>
+            </article>
+
+            <article class="loan__card" id="years-card" hidden>
+              <h2 class="loan__card-title" id="years-title"></h2>
+              <div class="loan__chart" id="years"></div>
+            </article>
+
+            <ul class="goal__notes" id="notes"></ul>
+            <p class="loan__hint" id="disclaimer"></p>
+          </div>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

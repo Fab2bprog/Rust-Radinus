@@ -47,12 +47,15 @@ interface Row {
   payee: string;
   project: string;
   status: string;
+  verification: string;
   category_id: number;
   assignment_id: number;
   payment_mode_id: number;
   payee_id: number;
   project_id: number;
   status_id: number;
+  /// 1 à vérifier, 2 vérifiée, 3 douteuse, 4 contestée.
+  verification_id: number;
 }
 
 interface Lines {
@@ -81,7 +84,7 @@ interface Applied {
   pending: number;
 }
 
-/// **Les six caractéristiques, déclarées une fois.**
+/// **Les sept caractéristiques, déclarées une fois.**
 ///
 /// Elles servent trois fois — la case du bandeau, la colonne du tableau, et le
 /// champ envoyé à Rust — et les trois lisent cette liste. Écrire six blocs à
@@ -141,6 +144,18 @@ const CHARACTERISTICS = [
     text: (row: Row) => row.status,
     value: (row: Row) => row.status_id,
   },
+  // **La septième** (Fabrice, 03/10/2026) : ce que l'utilisateur pense de
+  // l'écriture. Sous le statut dans le bandeau, en dernière colonne dans le
+  // tableau, et sur le même principe que les six autres — elle va dans le
+  // brouillon, et n'est écrite qu'à l'enregistrement.
+  {
+    key: "verification",
+    field: "verification",
+    label: "quick-check-verification",
+    column: "quick-column-verification",
+    text: (row: Row) => row.verification,
+    value: (row: Row) => row.verification_id,
+  },
 ] as const;
 
 type Which = (typeof CHARACTERISTICS)[number]["key"];
@@ -193,14 +208,42 @@ let pending = 0;
 ///
 /// Choisir écrit dans le brouillon, en mémoire, et jamais sur le disque : la
 /// cellule et le bandeau mènent au même endroit.
-function classificationColumn(which: (typeof CHARACTERISTICS)[number], width: string) {
+function classificationColumn(
+  which: (typeof CHARACTERISTICS)[number],
+  width: string,
+  minWidth: number,
+) {
+  // **La vérification se lit à sa couleur**, la même que dans la liste du
+  // compte et dans les statistiques : noir, vert, orange, rouge. Sa clef est
+  // posée sur la cellule et sur sa liste déroulante ; c'est elle qui choisit
+  // la teinte. Les six autres colonnes ne portent aucune marque.
+  const coloured = which.key === "verification";
   return {
     title: () => t(which.column),
     cell: which.text,
     width,
+    minWidth,
+    ...(coloured
+      ? {
+          key: which.value,
+          render: (row: Row, cell: HTMLElement) => {
+            cell.textContent = which.text(row);
+            cell.classList.add("list__cell--verification");
+            cell.dataset.verification = String(which.value(row));
+          },
+        }
+      : {}),
     editor: {
       options: () => options.get(which.key) ?? [],
       value: which.value,
+      ...(coloured
+        ? {
+            decorate: (row: Row, combo: HTMLSelectElement) => {
+              combo.classList.add("list__combo--verification");
+              combo.dataset.verification = String(which.value(row));
+            },
+          }
+        : {}),
       change: (row: Row, chosen: number) => {
         void invoke("quick_classification_set", {
           accountId,
@@ -221,14 +264,28 @@ const table = new Table<Row>({
   // 40 000 : seules les lignes à l'écran sont construites.
   virtualized: true,
   rowHeight: 24,
+  // **Dix colonnes ne tiennent pas dans une fenêtre rétrécie** (Fabrice,
+  // 03/10/2026 : « j'aimerais aussi la présence d'un ascenseur horizontal dans
+  // la liste »). Le mécanisme est celui de la liste du compte : chaque colonne
+  // annonce la largeur sous laquelle elle refuse de descendre ; quand la
+  // fenêtre ne peut plus les loger toutes, le tableau déborde et son ascenseur
+  // se pose sous la dernière ligne.
+  horizontalScroll: true,
   columns: [
     {
       title: () => t("quick-column-date"),
       cell: (row) => row.date,
       key: (row) => row.date_value,
       width: "100px",
+      minWidth: 92,
     },
-    { title: () => t("quick-column-label"), cell: (row) => row.label, width: "2.4fr" },
+    {
+      title: () => t("quick-column-label"),
+      cell: (row) => row.label,
+      width: "2.4fr",
+      // La colonne qu'on lit : elle a droit à la place des autres.
+      minWidth: 180,
+    },
     {
       title: () => t("quick-column-amount"),
       cell: (row) => row.amount_text,
@@ -236,13 +293,18 @@ const table = new Table<Row>({
       money: (row) => row.amount,
       numeric: true,
       width: "1fr",
+      minWidth: 95,
     },
-    classificationColumn(CHARACTERISTICS[0], "1.2fr"),
-    classificationColumn(CHARACTERISTICS[1], "1fr"),
-    classificationColumn(CHARACTERISTICS[2], "1.1fr"),
-    classificationColumn(CHARACTERISTICS[3], "1.1fr"),
-    classificationColumn(CHARACTERISTICS[4], "1fr"),
-    classificationColumn(CHARACTERISTICS[5], "0.9fr"),
+    // Les sept menus. Leur plancher est celui d'une liste déroulante lisible :
+    // en dessous, on ne voit plus ce qu'elle propose.
+    classificationColumn(CHARACTERISTICS[0], "1.2fr", 120),
+    classificationColumn(CHARACTERISTICS[1], "1fr", 110),
+    classificationColumn(CHARACTERISTICS[2], "1.1fr", 115),
+    classificationColumn(CHARACTERISTICS[3], "1.1fr", 115),
+    classificationColumn(CHARACTERISTICS[4], "1fr", 105),
+    classificationColumn(CHARACTERISTICS[5], "0.9fr", 95),
+    // En dernière colonne (Fabrice, 03/10/2026).
+    classificationColumn(CHARACTERISTICS[6], "1fr", 110),
   ],
   identity: (row) => row.id,
   exportAs: () => ({
@@ -286,6 +348,12 @@ function buildCharacteristics(): void {
       line.classList.toggle("characteristic--armed", box.checked);
       refreshApplyButton();
     });
+    // Le menu de la vérification porte la couleur de ce qu'il a choisi.
+    if (which.key === "verification") {
+      menu.addEventListener("change", () => {
+        menu.dataset.verification = menu.value;
+      });
+    }
 
     line.append(box, label, menu);
     holder.append(line);
@@ -300,6 +368,11 @@ function fillCharacteristics(): void {
     if (!armed) {
       continue;
     }
+    // **Le choix en cours est gardé.** Les menus se remplissent à nouveau
+    // quand une nomenclature change ou que la langue bascule ; celui qui avait
+    // choisi « Douteuse » avant de changer de langue doit retrouver ce choix,
+    // dans les nouveaux mots.
+    const chosen = armed.menu.value;
     armed.menu.replaceChildren();
     for (const item of options.get(which.key) ?? []) {
       const entry = document.createElement("option");
@@ -307,7 +380,21 @@ function fillCharacteristics(): void {
       entry.textContent = item.label;
       armed.menu.append(entry);
     }
+    if (chosen !== "" && Array.from(armed.menu.options).some((entry) => entry.value === chosen)) {
+      armed.menu.value = chosen;
+    }
+    if (which.key === "verification") {
+      armed.menu.dataset.verification = armed.menu.value;
+    }
   }
+}
+
+/// **Les deux listes fermées**, le statut et la vérification : leurs mots
+/// viennent de la traduction, par leur clef. Lues à l'ouverture et relues à
+/// chaque changement de langue.
+async function readTheClosedLists(): Promise<void> {
+  options.set("status", await invoke<Item[]>("list_operation_statuses"));
+  options.set("verification", await invoke<Item[]>("list_operation_verifications"));
 }
 
 /// Ce que les six cases valent ensemble : le changement qu'on demande.
@@ -323,6 +410,7 @@ function askedChange(): Record<string, number | null> {
     payee: null,
     project: null,
     status: null,
+    verification: null,
   };
   for (const which of CHARACTERISTICS) {
     const armed = boxes.get(which.key);
@@ -588,7 +676,7 @@ void (async () => {
   options.set("payment-mode", combos.payment_mode);
   options.set("payee", combos.payee);
   options.set("project", combos.project);
-  options.set("status", await invoke<Item[]>("list_operation_statuses"));
+  await readTheClosedLists();
   fillCharacteristics();
 
   const year = wholeYear(new Date().getFullYear());
@@ -601,12 +689,21 @@ void (async () => {
   // d'autres comptes au fil de sa vie, et un titre qui nommerait le compte de
   // la première ouverture serait la pire sorte de faute : un écran juste sous
   // un titre faux.
-  onLanguageChanged(dress, {
+  onLanguageChanged(
+    async () => {
+      // Les deux listes fermées d'abord : `dress` relit les lignes, et leurs
+      // mots doivent déjà être ceux de la nouvelle langue dans les menus.
+      await readTheClosedLists();
+      fillCharacteristics();
+      await dress();
+    },
+    {
     key: "window-quick-classification-title",
     get argument(): string {
       return accountLabel;
     },
-  });
+    },
+  );
 })();
 
 /// **Une nomenclature a changé pendant que cette fenêtre vivait.**

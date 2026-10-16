@@ -1,4 +1,12 @@
-//! La matrice des statistiques, **sur six axes**.
+//! La matrice des statistiques, **sur sept axes**.
+//!
+//! **Six nomenclatures, et une liste fermée** (Fabrice, 03/10/2026). Le
+//! septième axe est la vérification — ce que l'utilisateur pense d'une
+//! écriture. Il entre dans le gabarit sans le changer, à deux écarts près, qui
+//! tiennent tous deux dans [`Axis`] : ses lignes ne viennent pas d'une
+//! nomenclature que l'utilisateur gère mais des quatre valeurs de la table
+//! `Verification`, et il n'a pas de ligne « Sans … » — une valeur qui ne veut
+//! rien dire est une écriture que personne n'a jugée, donc « À vérifier ».
 //!
 //! Référence : `04_SPECIFICATIONS_FENETRES.md` F20-F24, `PLAN_ACTION.md` §6.1,
 //! et la capture « statistique categorie operation.png ».
@@ -172,38 +180,70 @@ pub enum Axis {
     PaymentMode,
     Payee,
     Project,
+    /// La vérification : à vérifier, vérifiée, douteuse, contestée. Le seul
+    /// axe qui ne soit pas une nomenclature de l'utilisateur.
+    Verification,
 }
 
-/// Les six, dans l'ordre où Fabrice les a demandées le 26/07/2026 — c'est
-/// aussi l'ordre du menu.
-pub const AXES: [Axis; 6] = [
+/// Les six premières dans l'ordre où Fabrice les a demandées le 26/07/2026, la
+/// septième à leur suite (03/10/2026) — c'est aussi l'ordre du menu, et celui
+/// de leurs raccourcis, de 1 à 7.
+pub const AXES: [Axis; 7] = [
     Axis::Category,
     Axis::Assignment,
     Axis::BudgetLine,
     Axis::PaymentMode,
     Axis::Payee,
     Axis::Project,
+    Axis::Verification,
 ];
 
 impl Axis {
-    /// La nomenclature dont les éléments font les lignes.
-    pub fn nomenclature(self) -> crate::nomenclatures::Nomenclature {
+    /// La nomenclature dont les éléments font les lignes — ou rien pour la
+    /// vérification, qui est une liste fermée et non une nomenclature.
+    pub fn nomenclature(self) -> Option<crate::nomenclatures::Nomenclature> {
         use crate::nomenclatures::Nomenclature;
         match self {
-            Self::Category => Nomenclature::Category,
-            Self::Assignment => Nomenclature::Assignment,
-            Self::BudgetLine => Nomenclature::BudgetLine,
-            Self::PaymentMode => Nomenclature::PaymentMode,
-            Self::Payee => Nomenclature::Payee,
-            Self::Project => Nomenclature::Project,
+            Self::Category => Some(Nomenclature::Category),
+            Self::Assignment => Some(Nomenclature::Assignment),
+            Self::BudgetLine => Some(Nomenclature::BudgetLine),
+            Self::PaymentMode => Some(Nomenclature::PaymentMode),
+            Self::Payee => Some(Nomenclature::Payee),
+            Self::Project => Some(Nomenclature::Project),
+            Self::Verification => None,
         }
     }
 
     /// Le nom stable sous lequel cet axe voyage — appel IPC, étiquette de
     /// fenêtre, adresse de page. C'est celui de sa nomenclature : il n'y a
-    /// pas deux vocabulaires pour désigner la même chose.
+    /// pas deux vocabulaires pour désigner la même chose. La vérification,
+    /// qui n'en a pas, porte le sien.
     pub fn key(self) -> &'static str {
-        self.nomenclature().key()
+        match self.nomenclature() {
+            Some(kind) => kind.key(),
+            None => "verification",
+        }
+    }
+
+    /// **Les lignes de la matrice**, dans l'ordre où on les lit : les éléments
+    /// de la nomenclature, ou les quatre vérifications dans l'ordre de leur
+    /// clef. Le libellé d'une vérification est celui de la base ; le
+    /// contrôleur le remplace par le mot de la langue en cours.
+    pub(crate) fn elements(self, conn: &Connection) -> Result<Vec<crate::domain::NamedItem>> {
+        match self.nomenclature() {
+            Some(kind) => crate::nomenclatures::list(conn, kind),
+            None => crate::operations::verifications(conn),
+        }
+    }
+
+    /// **Cet axe a-t-il une ligne « Sans … » ?** Les six nomenclatures, oui :
+    /// une opération peut n'être rangée nulle part. La vérification, non —
+    /// toute opération en porte une, et celle qui porterait une valeur hors de
+    /// la liste est comptée « À vérifier » (Fabrice, 03/10/2026 : « s'il devait
+    /// y avoir une ligne qui serait sans vérification par erreur, elle devrait
+    /// être à vérifier »).
+    pub fn has_unclassified_row(self) -> bool {
+        self.nomenclature().is_some()
     }
 
     pub fn from_key(key: &str) -> Option<Self> {
@@ -219,7 +259,7 @@ impl Axis {
     /// sans catégorie — ou dont la catégorie a disparu — tombe dans « Sans
     /// poste budgétaire ». C'est la seule différence entre les six, et elle
     /// tient dans cette expression.
-    fn key_expression(self) -> &'static str {
+    pub(crate) fn key_expression(self) -> &'static str {
         self.dashboard_key()
     }
 
@@ -239,6 +279,15 @@ impl Axis {
                 "COALESCE((SELECT c.IDPosteBudget FROM Categorie c
                            WHERE c.IDCategorie = o.IDCategorie), 0)"
             }
+            // Une valeur qui n'est pas dans la liste n'est pas « sans
+            // vérification » : c'est une écriture que personne n'a jugée.
+            // Elle est rangée ici même sous « À vérifier » (1), si bien que la
+            // matrice et son détail, qui lisent tous deux cette expression,
+            // ne peuvent pas la compter à deux endroits différents.
+            Self::Verification => {
+                "CASE WHEN o.IDVerification IN (SELECT v.IDVerification FROM Verification v)
+                      THEN o.IDVerification ELSE 1 END"
+            }
         }
     }
 
@@ -246,7 +295,7 @@ impl Axis {
     /// clef. **Un classement supprimé depuis ne fait pas disparaître un
     /// montant** : l'opération bascule dans la ligne « Sans … », elle ne
     /// s'évapore pas.
-    fn source(self) -> (&'static str, &'static str) {
+    pub(crate) fn source(self) -> (&'static str, &'static str) {
         match self {
             Self::Category => ("Categorie", "IDCategorie"),
             Self::Assignment => ("Affectation", "IDAffectation"),
@@ -254,6 +303,7 @@ impl Axis {
             Self::PaymentMode => ("ModeOperation", "IDModeOperation"),
             Self::Payee => ("Tiers", "IDTiers"),
             Self::Project => ("Projets", "IDProjets"),
+            Self::Verification => ("Verification", "IDVerification"),
         }
     }
 }
@@ -277,17 +327,21 @@ pub fn by_axis(
     // Toutes les valeurs de l'axe, dans l'ordre où les listes les montrent, et
     // même celles qui ne portent rien cette année : la matrice est un plan de
     // comptes, pas un résumé de ce qui s'est passé.
-    for element in crate::nomenclatures::list(conn, axis.nomenclature())? {
+    for element in axis.elements(conn)? {
         position.insert(element.id, rows.len());
         rows.push(MatrixRow::empty(element.id, element.label));
     }
-    // Puis la ligne des non classées, en dernier, comme dans la capture.
-    position.insert(UNCLASSIFIED, rows.len());
-    rows.push(MatrixRow::empty(
-        UNCLASSIFIED,
-        unclassified_label.to_string(),
-    ));
-    let unclassified_at = rows.len() - 1;
+    // Puis la ligne des non classées, en dernier, comme dans la capture — sur
+    // les axes qui en ont une. La vérification n'en a pas : son expression
+    // ramène déjà tout ce qui est hors liste sur « À vérifier ».
+    if axis.has_unclassified_row() {
+        position.insert(UNCLASSIFIED, rows.len());
+        rows.push(MatrixRow::empty(
+            UNCLASSIFIED,
+            unclassified_label.to_string(),
+        ));
+    }
+    let unclassified_at = rows.len().saturating_sub(1);
 
     let mut matrix = Matrix {
         rows,
@@ -360,7 +414,11 @@ pub fn by_axis(
         // classement a disparu.**
         let at = *position.get(&value).unwrap_or(&unclassified_at);
 
-        let row = &mut matrix.rows[at];
+        // Une table de vérifications vide — une base blessée, que
+        // l'ouverture regarnit — ne laisse aucune ligne où poser un montant.
+        let Some(row) = matrix.rows.get_mut(at) else {
+            continue;
+        };
         row.months[month] += amount;
         row.filled[month] = true;
         row.total += amount;
@@ -559,7 +617,7 @@ pub fn behind_the_cell(
     found
 }
 
-fn placeholders(count: usize) -> String {
+pub(crate) fn placeholders(count: usize) -> String {
     std::iter::repeat_n("?", count)
         .collect::<Vec<_>>()
         .join(", ")
@@ -585,7 +643,7 @@ fn a_real_month(year: i32, month: u32) -> (i32, u32) {
     (year_within_bounds(year), month.clamp(1, 12))
 }
 
-fn first_day(year: i32, month: u32) -> String {
+pub(crate) fn first_day(year: i32, month: u32) -> String {
     let (year, month) = a_real_month(year, month);
     format!("{year:04}-{month:02}-01")
 }
@@ -598,7 +656,7 @@ fn first_day(year: i32, month: u32) -> String {
 /// côté et pas de l'autre. Celle de `welcome` rend des dates plutôt que du
 /// texte, ce dont la fenêtre a besoin pour nommer son mois, et celle-ci n'en
 /// est plus que la mise en forme.
-fn last_day(year: i32, month: u32) -> String {
+pub(crate) fn last_day(year: i32, month: u32) -> String {
     let (year, month) = a_real_month(year, month);
     // `from_ymd_opt` ne peut plus rendre `None` : le mois est dans 1..=12 et
     // l'année dans 1950..=2550. Le repli est là par principe — un noyau qui
@@ -1091,7 +1149,7 @@ mod tests {
         // depuis, comme dans une base restaurée d'une vieille archive.
         add_classified(&conn, 1, "2026-06-15", -12 * EURO, [999, 999, 999, 999, 999]);
 
-        for axis in AXES {
+        for axis in AXES.into_iter().filter(|axis| axis.has_unclassified_row()) {
             let built = by_axis(&conn, &[1], 2026, Switches::default(), axis, "Sans").expect("m");
             assert_eq!(
                 row(&built, "Sans").months[5],
@@ -1323,14 +1381,74 @@ mod tests {
         );
     }
 
+    /// **Le septième axe : la vérification** (Fabrice, 03/10/2026).
+    ///
+    /// Quatre lignes, toujours là, dans l'ordre de leur clef, et pas de ligne
+    /// « Sans … ». Chaque écriture tombe dans la sienne, et une valeur qui ne
+    /// veut rien dire tombe dans « À vérifier » — dans la matrice comme dans
+    /// le détail, qui doivent dire la même chose.
+    #[test]
+    fn la_verification_a_quatre_lignes_et_range_l_anomalie_sous_a_verifier() {
+        let conn = database();
+        add_classified(&conn, 1, "2026-03-10", -30 * EURO, [1, 1, 1, 1, 0]);
+        add_classified(&conn, 2, "2026-03-12", -20 * EURO, [1, 1, 1, 1, 0]);
+        add_classified(&conn, 3, "2026-03-20", -75 * EURO, [1, 1, 1, 1, 0]);
+        add_classified(&conn, 4, "2026-04-02", -12 * EURO, [1, 1, 1, 1, 0]);
+        add_classified(&conn, 5, "2026-03-25", -8 * EURO, [1, 1, 1, 1, 0]);
+        // 1 reste vérifiée (le défaut), 2 est à vérifier, 3 douteuse,
+        // 4 contestée, et 5 porte une valeur qui n'existe pas.
+        conn.execute_batch(
+            "UPDATE Operation SET IDVerification = 1 WHERE IDOperation = 2;
+             UPDATE Operation SET IDVerification = 3 WHERE IDOperation = 3;
+             UPDATE Operation SET IDVerification = 4 WHERE IDOperation = 4;
+             UPDATE Operation SET IDVerification = 42 WHERE IDOperation = 5;",
+        )
+        .expect("vérifications");
+
+        let built = by_axis(&conn, &[1], 2026, Switches::default(), Axis::Verification, "Sans")
+            .expect("matrice");
+        let ids: Vec<i64> = built.rows.iter().map(|line| line.id).collect();
+        assert_eq!(ids, [1, 2, 3, 4], "quatre lignes, dans l'ordre, et pas de « Sans »");
+
+        let march = |id: i64| built.rows[(id - 1) as usize].months[2];
+        assert_eq!(march(1), -20 * EURO + -8 * EURO, "l'anomalie est à vérifier");
+        assert_eq!(march(2), -30 * EURO);
+        assert_eq!(march(3), -75 * EURO);
+        assert_eq!(built.rows[3].months[3], -12 * EURO, "la contestée est en avril");
+        assert_eq!(built.sum_total, -145 * EURO, "rien n'est perdu, rien n'est compté deux fois");
+
+        let behind = |value: i64, month: u32| -> Vec<i64> {
+            behind_the_cell(
+                &conn,
+                &[1],
+                2026,
+                Switches::default(),
+                Axis::Verification,
+                Cell::Axis { value, month: Some(month) },
+            )
+            .expect("détail")
+            .iter()
+            .map(|(row, _)| row.id)
+            .collect()
+        };
+        assert_eq!(behind(1, 3), [2, 5], "le détail montre aussi l'anomalie");
+        assert_eq!(behind(2, 3), [1]);
+        assert_eq!(behind(4, 4), [4]);
+        assert!(behind(4, 3).is_empty());
+    }
+
     /// Les six axes voyagent sous un nom stable, et c'est celui de leur
     /// nomenclature : un seul vocabulaire pour désigner la même chose.
     #[test]
     fn every_axis_travels_under_the_name_of_its_nomenclature() {
         for axis in AXES {
             assert_eq!(Axis::from_key(axis.key()), Some(axis));
-            assert_eq!(axis.key(), axis.nomenclature().key());
+            if let Some(kind) = axis.nomenclature() {
+                assert_eq!(axis.key(), kind.key());
+            }
         }
+        // La septième n'est pas une nomenclature : elle porte son propre nom.
+        assert_eq!(Axis::Verification.key(), "verification");
         assert_eq!(Axis::from_key("bank"), None, "une banque ne classe rien");
         assert_eq!(Axis::from_key("n'importe quoi"), None);
     }

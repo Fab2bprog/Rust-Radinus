@@ -713,9 +713,59 @@ pub fn unspecified_label(language: Language) -> String {
     message(language, "nomenclature-unspecified", None).unwrap_or_default()
 }
 
+/// **Le mot d'une vérification, dans la langue de l'interface** — même règle
+/// que pour le statut, juste en dessous : la clef de `Verification` vient de
+/// la base, le mot de la traduction (Fabrice, 03/10/2026).
+pub fn verification_label(language: Language, id: i64) -> Option<String> {
+    let key = match id {
+        1 => "operation-verification-to-verify",
+        2 => "operation-verification-verified",
+        3 => "operation-verification-doubtful",
+        4 => "operation-verification-disputed",
+        _ => return None,
+    };
+    message(language, key, None)
+}
+
+/// **Le mot d'un statut d'opération, dans la langue de l'interface** (Fabrice,
+/// 01/10/2026 : « cela doit venir d'une traduction »).
+///
+/// On se repère par la clef de `StatutOperation` — 1 pointé, 2 engagé, 3 prévu
+/// — et jamais par son libellé : celui-ci a été écrit en français à la
+/// création de la base, et un Anglais lisait « Pointé » dans sa fiche. Une
+/// clef inconnue rend `None`, et l'appelant garde alors ce que la base dit.
+pub fn status_label(language: Language, id: i64) -> Option<String> {
+    let key = match id {
+        1 => "operation-status-pointed",
+        2 => "operation-status-committed",
+        3 => "operation-status-planned",
+        _ => return None,
+    };
+    message(language, key, None)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn les_quatre_verifications_se_traduisent_par_leur_clef() {
+        let fr = |id| verification_label(Language::French, id);
+        assert_eq!(fr(1).as_deref(), Some("À vérifier"));
+        assert_eq!(fr(2).as_deref(), Some("Vérifiée"));
+        assert_eq!(fr(3).as_deref(), Some("Douteuse"));
+        assert_eq!(fr(4).as_deref(), Some("Contestée"));
+        assert_eq!(fr(9), None);
+    }
+
+    #[test]
+    fn les_trois_statuts_se_traduisent_par_leur_clef() {
+        assert_eq!(status_label(Language::French, 1).as_deref(), Some("Pointé"));
+        assert_eq!(status_label(Language::French, 2).as_deref(), Some("Engagé"));
+        assert_eq!(status_label(Language::French, 3).as_deref(), Some("Prévu"));
+        assert_eq!(status_label(Language::English, 1).as_deref(), Some("Cleared"));
+        assert_eq!(status_label(Language::French, 9), None);
+    }
 
     #[test]
     fn french_bundle_builds_from_the_empty_resource() {

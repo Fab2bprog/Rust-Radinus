@@ -125,7 +125,7 @@ the comment at the top of every page names its own. A few worth knowing:
 | F07 | Soldes de vos comptes | The three balances of every account, and the total. |
 | F08 | Fiche compte | One account, and its Outils menu. |
 | F17 / F18 | Importation de relevés | Importing a bank statement, and reconciling one of its lines. |
-| F20–F24 | Statistiques | The cross-tabulated matrix, on six axes — one page for all six. |
+| F20–F24 | Statistiques | The cross-tabulated matrix, on seven axes — one page for all seven. |
 | F26 / F27 | Budget | Entering the budget, and checking whether it was kept. |
 
 ---

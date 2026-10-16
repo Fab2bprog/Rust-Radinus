@@ -38,9 +38,12 @@ import {
   money as moneyCell,
   onRightClick,
   text as textCell,
+  type MenuAddition,
+  type MenuHeadEntry,
   type Sheet,
   type SheetCell,
 } from "./export";
+import { copyText, oneCell, pureNumber } from "./clipboard";
 import { Table } from "./table";
 import { loadTexts, onLanguageChanged, t, tError } from "./texts";
 
@@ -98,6 +101,8 @@ interface DetailRow {
   payment_mode_id: number;
   payee_id: number;
   project_id: number;
+  /// 1 à vérifier, 2 vérifiée, 3 douteuse, 4 contestée.
+  verification_id: number;
 }
 
 /// Un élément d'une nomenclature, tel qu'un menu déroulant le propose.
@@ -219,23 +224,117 @@ function nomenclatureColumn(
   editable?: (row: DetailRow) => boolean,
 ) {
   return {
+    // Le nom de la colonne est celui de sa nomenclature : `category`, `payee`…
+    id: kind,
     title: () => t(title),
     cell: text,
     width,
+    // Le plancher d'une liste déroulante lisible : en dessous, on ne voit plus
+    // ce qu'elle propose.
+    minWidth: 110,
     editor: {
       options,
       value,
       editable,
       change: (row: DetailRow, picked: number) => {
+        // F02 regarde peut-être les mêmes opérations. Elle est prévenue par
+        // le contrôleur lui-même, à l'endroit où l'écriture a lieu : une
+        // fenêtre n'a plus à y penser (Fabrice, 25/08/2026).
         void invoke("set_operation_nomenclature", { id: row.id, kind, value: picked })
-          // F02 regarde peut-être les mêmes opérations : elle est prévenue,
-          // sans quoi elle continuerait d'afficher l'ancien classement.
-          .then(() => invoke("notify_operations_changed"))
           .then(() => reload())
           .catch((error) => say(tError("ui-save-failed", error), true));
       },
     },
   };
+}
+
+/// Les quatre vérifications, dans les mots de l'interface. Une liste fermée,
+/// lue à l'ouverture et relue à chaque changement de langue.
+let verifications: Item[] = [];
+
+/// **La colonne « Vérification » du détail** (Fabrice, 03/10/2026 : « il faut
+/// avoir dans cette liste une colonne vérification, afin que l'utilisateur
+/// puisse changer l'état de la vérification »).
+///
+/// Le même geste que dans la liste du compte : le mot dans sa couleur sur
+/// chaque ligne, la liste déroulante sur la ligne choisie, et choisir écrit
+/// tout de suite. **Dans les sept statistiques**, et pas seulement dans celle
+/// qui porte sur la vérification : contrôler une écriture se fait là où on la
+/// regarde.
+///
+/// Puis tout est recalculé, comme pour un classement. Dans la statistique par
+/// vérification, l'opération change de ligne dans la matrice et quitte donc
+/// le détail de la case où elle était ; dans les six autres, rien ne bouge
+/// que son mot.
+///
+/// Une sous-opération porte la vérification de sa mère : pas de liste sur une
+/// fille.
+function verificationColumn() {
+  const word = (row: DetailRow): string =>
+    verifications.find((item) => item.id === row.verification_id)?.label ?? "";
+  return {
+    id: "verification",
+    title: () => t("operations-column-verification"),
+    cell: word,
+    key: (row: DetailRow) => row.verification_id,
+    render: (row: DetailRow, cell: HTMLElement) => {
+      cell.textContent = word(row);
+      cell.classList.add("list__cell--verification");
+      cell.dataset.verification = String(row.verification_id);
+    },
+    width: "0.9fr",
+    minWidth: 110,
+    editor: {
+      options: () => verifications,
+      value: (row: DetailRow) => row.verification_id,
+      editable: isATopLevelOperation,
+      decorate: (row: DetailRow, combo: HTMLSelectElement) => {
+        combo.classList.add("list__combo--verification");
+        combo.dataset.verification = String(row.verification_id);
+      },
+      change: (row: DetailRow, picked: number) => {
+        void invoke("set_operation_verification", { id: row.id, verificationId: picked })
+          .then(() => reload())
+          .catch((error) => say(tError("ui-save-failed", error), true));
+      },
+    },
+  };
+}
+
+/// **Ce que le détail ajoute à son menu du clic droit** : l'entrée
+/// « Vérification », la même que dans la liste du compte (Fabrice, 03/10/2026 :
+/// « il faut ajouter aussi dans le menu contextuel la même option
+/// "Vérification" que dans le menu contextuel de la liste des transactions
+/// d'un compte »).
+///
+/// Le menu déroulant de la colonne change une ligne ; celui-ci change toute la
+/// sélection, d'un coup et par la même commande que F02. Sans ligne prise,
+/// l'entrée est grisée. Aucune phrase ne l'annonce : tout est recalculé, et
+/// c'est ce que l'on voit.
+///
+/// **Une ventilation vaut pour sa mère**, et le détail montre justement les
+/// ventilations à la place des mères : juger une fille, c'est juger l'écriture
+/// de la banque, donc ses sœurs suivent — même celles qui sont derrière une
+/// autre case. La matrice refaite le montre.
+function verificationOfTheSelection(): MenuAddition[] {
+  return [
+    {
+      label: t("operations-column-verification"),
+      enabled: detail.selected().length > 0,
+      choices: verifications.map((item) => ({
+        label: item.label,
+        mark: { name: "verification", value: String(item.id) },
+        run: () => {
+          void invoke("set_operations_verification", {
+            ids: detail.selected(),
+            verificationId: item.id,
+          })
+            .then(() => reload())
+            .catch((error) => say(tError("ui-save-failed", error), true));
+        },
+      })),
+    },
+  ];
 }
 
 /// **Une sous-opération n'a pas de mode de paiement à elle** (règle de
@@ -253,20 +352,52 @@ const detail = new Table<DetailRow>({
   container: element<HTMLDivElement>("rows"),
   virtualized: true,
   rowHeight: 24,
+  // **Onze colonnes ne tiennent pas dans une fenêtre rétrécie** (Fabrice,
+  // 03/10/2026 : « dans le tableau des détails qui liste les opérations, il
+  // n'y a pas non plus d'ascenseur horizontal »). Elles se comprimaient
+  // jusqu'à l'illisible. Le mécanisme est celui de la liste du compte et de la
+  // classification rapide : chaque colonne annonce la largeur sous laquelle
+  // elle refuse de descendre, et quand la fenêtre ne peut plus les loger
+  // toutes, le détail déborde et son ascenseur se pose sous la dernière ligne.
+  // Une seule liste sert les sept statistiques : elles l'ont toutes.
+  horizontalScroll: true,
+  // **Chacun ses colonnes, et une disposition par statistique** (Fabrice,
+  // 04/10/2026). Le même mécanisme que la liste du compte : on glisse un
+  // en-tête, on coche au clic droit sur les en-têtes, et l'ordre, la présence
+  // et les largeurs sont retenus. Les sept fenêtres partagent ce code mais pas
+  // leur réglage — le tableau porte le nom de son axe, donc ce qu'on règle
+  // dans « Stat par catégories » ne change rien dans « Stat par tiers ».
+  // Seul le détail du bas est concerné : la matrice du haut reste ce qu'elle
+  // est.
+  layoutName: `statistics-${AXIS}`,
   columns: [
     {
+      id: "date",
       title: () => t("statistics-column-date"),
       cell: (row) => row.date,
       key: (row) => row.date_value,
       width: "100px",
+      minWidth: 92,
     },
     {
+      id: "clearing-date",
       title: () => t("statistics-column-clearing-date"),
       cell: (row) => row.clearing_date,
       key: (row) => row.clearing_date_value,
       width: "110px",
+      minWidth: 100,
     },
-    { title: () => t("statistics-column-label"), cell: (row) => row.label, width: "2.4fr" },
+    {
+      id: "label",
+      title: () => t("statistics-column-label"),
+      cell: (row) => row.label,
+      width: "2.4fr",
+      // La colonne qu'on lit : elle a droit à la place des autres.
+      minWidth: 180,
+    },
+    // Entre le libellé et la catégorie (Fabrice, 03/10/2026) : on lit
+    // l'écriture, on la juge, puis on la classe.
+    verificationColumn(),
     nomenclatureColumn(
       "operations-column-category",
       "category",
@@ -309,14 +440,22 @@ const detail = new Table<DetailRow>({
       "0.8fr",
     ),
     {
+      id: "amount",
       title: () => t("statistics-column-amount"),
       cell: (row) => (row.amount < 0 ? row.debit : row.credit),
+      // Le rouge d'un débit tient à cette cellule, où que soit sa colonne.
+      render: (row, cell) => {
+        cell.textContent = row.amount < 0 ? row.debit : row.credit;
+        cell.classList.add("list__cell--amount");
+      },
       key: (row) => row.amount,
       money: (row) => row.amount,
       numeric: true,
       width: "1fr",
+      minWidth: 95,
     },
     {
+      id: "comments",
       title: () => t("statistics-column-comments"),
       cell: () => "",
       render: (row, cell) => {
@@ -332,6 +471,7 @@ const detail = new Table<DetailRow>({
         }
       },
       width: "110px",
+      minWidth: 90,
     },
   ],
   identity: (row) => row.id,
@@ -521,6 +661,12 @@ function draw(): void {
     const label = document.createElement("span");
     label.className = "matrix__label";
     label.textContent = row.label;
+    // **Dans la statistique par vérification, chaque ligne porte sa couleur**
+    // — noir, vert, orange, rouge, les mêmes que dans les listes. La clef de
+    // la ligne est celle de la vérification : c'est elle qui choisit la teinte.
+    if (AXIS === "verification") {
+      label.dataset.verification = String(row.id);
+    }
     line.append(label);
 
     for (let month = 0; month < 12; month += 1) {
@@ -868,6 +1014,33 @@ function readParameters(query: string): void {
   );
 }
 
+/// **« Copier la cellule » dans la matrice** (Fabrice, 07/10/2026) : la case
+/// sous le pointeur — un total, un libellé de ligne —, le montant en nombre
+/// pur. Pas de copie de lignes ici : on n'y choisit qu'une case.
+function copyMatrixCell(event: MouseEvent): MenuHeadEntry[] {
+  const under = (event.target as Element).closest<HTMLElement>(".matrix__row > *");
+  const text =
+    under === null
+      ? ""
+      : under.classList.contains("matrix__label")
+        ? oneCell(under.textContent ?? "")
+        : pureNumber(oneCell(under.textContent ?? ""));
+  return [
+    {
+      name: "copy-cell",
+      label: t("copy-cell"),
+      enabled: text !== "",
+      run: () => {
+        void copyText(text).then((done) => {
+          if (!done) {
+            say(t("copy-failed"), true);
+          }
+        });
+      },
+    },
+  ];
+}
+
 /// Le splitter : la frontière entre la matrice et le détail se déplace à la
 /// souris. Rien n'est retenu d'une fenêtre à l'autre — la hauteur est celle du
 /// document, et le document est ce qui fait foi.
@@ -992,6 +1165,12 @@ function comeBackToWhereWeWere(): void {
 /// bas, une fois passée la barrière de `startup_error` et les comptes lus dans
 /// l'adresse : la demander d'ici la demanderait à une base peut-être fermée.
 async function dress(alsoTheNumbers = true): Promise<void> {
+  // Les quatre vérifications, dans la langue en cours. Relues ici parce que
+  // c'est ici que la fenêtre change de langue : leurs mots viennent de la
+  // traduction, par leur clef. Sans base ouverte il n'y a rien à lire, et
+  // la fenêtre le dira plus bas.
+  verifications =
+    (await invoke<Item[] | null>("list_operation_verifications").catch(() => null)) ?? [];
   detail.buildHeader(element<HTMLElement>("header"), element<HTMLElement>("filter"));
   buildMenu();
   buildSwitches();
@@ -1024,8 +1203,15 @@ void (async () => {
   // détail par le clic droit sur lui, chacun exportant ce qu'il montre. Ni
   // ceux-là ni le splitter ne posent de mot, et ils ne se refont pas : ce sont
   // des écoutes, et une seconde ferait deux exports pour un clic.
-  onRightClick(element<HTMLElement>("matrix-zone"), () => matrixSheet(), say);
-  detail.exportOnRightClick(say);
+  onRightClick(
+    element<HTMLElement>("matrix-zone"),
+    () => matrixSheet(),
+    say,
+    undefined,
+    undefined,
+    copyMatrixCell,
+  );
+  detail.exportOnRightClick(say, verificationOfTheSelection);
   makeSplitterDraggable();
   detail.setRows([]);
 

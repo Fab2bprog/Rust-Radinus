@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Et si je réduisais… ?</title>
+    <script type="module" src="/ui/windows/spending-cut.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F45 — « Et si je réduisais… ? » (Fabrice, 10/10/2026).
+
+         « Imaginer que l'on réduise en pourcentage ou en valeur les dépenses
+         d'une ou plusieurs catégories et voir l'impact sur une projection dans
+         le futur. »
+
+         À gauche, ce qu'on règle : les comptes suivis et la période, le
+         classement (catégories, tiers ou postes budgétaires), l'horizon au
+         curseur, le taux et le montant visé facultatifs, et le rapport PDF. À
+         droite, la réponse, la courbe sans et avec les réductions, le tableau
+         des postes où l'on tape les réductions, et l'anneau des dépenses
+         après réduction. Les réductions s'oublient à la fermeture. -->
+    <div class="window window--loan window--cut">
+      <main class="window__content loan cut">
+        <div class="loan__afford goal__body">
+          <div class="loan__side">
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="accounts-title"></h2>
+              <label class="loan__field loan__field--wide">
+                <span class="loan__label" id="history-label"></span>
+                <select class="form__field" id="history"></select>
+              </label>
+              <div class="goal__range" id="range" hidden>
+                <span class="loan__unit" id="range-from-label"></span>
+                <select class="form__field" id="range-from"></select>
+                <span class="loan__unit" id="range-to-label"></span>
+                <select class="form__field" id="range-to"></select>
+              </div>
+              <table class="loan__accounts goal__accounts">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th id="account-column"></th>
+                    <th class="loan__number" id="balance-column"></th>
+                  </tr>
+                </thead>
+                <tbody id="accounts"></tbody>
+              </table>
+              <p class="loan__hint goal__hint" id="accounts-hint"></p>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="settings-title"></h2>
+              <div class="goal__fields">
+                <label class="loan__field loan__field--wide">
+                  <span class="loan__label" id="axis-label"></span>
+                  <select class="form__field" id="axis"></select>
+                </label>
+                <div class="loan__field loan__field--wide">
+                  <span class="loan__label"><span id="horizon-label"></span> : <strong id="years-text"></strong></span>
+                  <input type="range" class="loan__range" id="years" min="1" max="10" step="1" value="5" />
+                </div>
+                <label class="loan__field">
+                  <span class="loan__label" id="rate-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__small" id="rate" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" id="rate-unit"></span>
+                  </span>
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="target-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__amount" id="target" inputmode="decimal" autocomplete="off" />
+                    <span class="loan__unit" data-sign></span>
+                  </span>
+                </label>
+              </div>
+              <p class="loan__hint goal__hint" id="options-hint"></p>
+            </article>
+
+            <!-- Les fichiers (Fabrice, 10/10/2026 : « rajoute enregistrement et
+                 chargement JSON et aussi export Excel ») : comme pour les
+                 vacances, ouvrir et enregistrer un projet, le PDF, Excel. -->
+            <article class="loan__card holiday__files">
+              <button class="holiday__file" id="open" type="button"></button>
+              <button class="holiday__file" id="save" type="button"></button>
+              <button class="loan__pdf" id="pdf" type="button">
+                <img src="/ui/assets/icons/pdf.png" alt="" />
+                <span id="pdf-label"></span>
+              </button>
+              <button class="holiday__file holiday__excel" id="excel" type="button"></button>
+            </article>
+          </div>
+
+          <div class="loan__main">
+            <p class="loan__unavailable" id="unavailable" hidden></p>
+            <div class="loan__analysis" id="analysis">
+              <article class="loan__card goal__answer" id="answer" data-tone="none">
+                <p class="goal__headline" id="headline"></p>
+                <p class="goal__range-text" id="target-text" hidden></p>
+                <div class="goal__tiles" id="tiles"></div>
+              </article>
+
+              <article class="loan__card">
+                <h2 class="loan__card-title" id="table-title"></h2>
+                <p class="loan__hint" id="table-hint"></p>
+                <table class="cut__table">
+                  <thead>
+                    <tr>
+                      <th id="column-item"></th>
+                      <th class="loan__number" id="column-monthly"></th>
+                      <th class="cut__cut" id="column-cut"></th>
+                      <th class="loan__number" id="column-after"></th>
+                      <th class="loan__number" id="column-yearly"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="rows"></tbody>
+                  <tfoot id="total"></tfoot>
+                </table>
+              </article>
+
+              <article class="loan__card">
+                <h2 class="loan__card-title" id="chart-title"></h2>
+                <p class="loan__hint" id="chart-hint"></p>
+                <div class="loan__chart goal__chart" id="chart"></div>
+              </article>
+
+              <article class="loan__card">
+                <h2 class="loan__card-title" id="donut-title"></h2>
+                <div class="loan__chart cut__donut" id="donut"></div>
+              </article>
+
+              <ul class="goal__notes" id="notes"></ul>
+              <p class="loan__hint" id="period-text"></p>
+              <p class="loan__hint" id="disclaimer"></p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

@@ -385,7 +385,21 @@ fn every_command_a_window_calls_is_a_command_rust_answers() {
 /// laissait son bouton d'ouverture allumé là où il devait être grisé.
 #[test]
 fn every_window_that_can_be_handed_new_parameters_listens_for_them() {
-    const NO_PARAMETERS: [&str; 3] = ["main", "balances", "language-choice"];
+    // La simulation de crédit (08/10/2026) s'ouvre sans rien : elle n'a ni
+    // compte ni période à recevoir, elle les choisit elle-même.
+    const NO_PARAMETERS: [&str; 11] = [
+        "main",
+        "balances",
+        "language-choice",
+        "loan-simulation",
+        "appliance-cost",
+        "safety-cushion",
+        "savings-goal",
+        "spending-cut",
+        "holiday",
+        "car-logbook",
+        "sharing",
+    ];
 
     for spec in crate::windows::tests::every_spec() {
         if NO_PARAMETERS.contains(&spec.label.as_str()) {
@@ -511,6 +525,80 @@ fn every_data_event_a_window_waits_for_is_one_rust_sends() {
              rafraîchira jamais"
         );
     }
+}
+
+/// **Écrire une opération, c'est prévenir.**
+///
+/// Bug remonté par Fabrice le 25/08/2026 : la liste des opérations d'un compte,
+/// laissée ouverte, restait figée après une importation de relevé OFX. La cause
+/// n'était pas dans l'importation — c'était que prévenir était le travail de la
+/// fenêtre qui demandait l'écriture. La fiche opération y pensait, l'intégration
+/// en masse non.
+///
+/// Prévenir est devenu le travail du contrôleur. Ce test le garde : toute
+/// commande qui fait écrire une opération au noyau doit, dans le même corps,
+/// diffuser le changement. Une commande écrite demain et qui l'oublierait
+/// échouerait ici, et non chez l'utilisateur six mois plus tard.
+#[test]
+fn toute_commande_qui_ecrit_une_operation_previent_les_fenetres() {
+    // Les portes du noyau par lesquelles une opération est créée, modifiée ou
+    // effacée. Lire n'en fait pas partie : `get`, `list` et les soldes ne
+    // changent rien.
+    const WRITES: &[&str] = &[
+        "operations::create",
+        "operations::update",
+        "operations::delete",
+        "operations::point",
+        "operations::set_nomenclature",
+        "operations::set_status",
+        "operations::set_verification",
+        "operations::set_fitid",
+        "sub_operations::create",
+        "sub_operations::update",
+        "statements::integrate",
+        "transfers::perform",
+        "accounts::delete_all_operations",
+        "recurring::insert",
+        "recurring::erase",
+        "excel::run",
+        "bench.save",
+    ];
+
+    let source = read("src-tauri/src/commands.rs");
+    let mut writing: Vec<String> = Vec::new();
+    let mut muettes: Vec<String> = Vec::new();
+    for piece in source.split("\npub fn ").skip(1) {
+        let Some(name) = piece.split(['(', '<', ' ']).next() else {
+            continue;
+        };
+        let Some(brace) = piece.find(" {") else {
+            continue;
+        };
+        let body = piece.split_at(brace).1;
+        let body = body.split("\n}").next().unwrap_or(body);
+        if !WRITES.iter().any(|door| body.contains(door)) {
+            continue;
+        }
+        writing.push(name.to_string());
+        // Deux façons de prévenir : la règle commune, ou la diffusion en clair
+        // pour les commandes qui préviennent aussi d'autres fenêtres.
+        let announces =
+            body.contains("operations_changed(&app)") || body.contains("data-changed:operations");
+        if !announces {
+            muettes.push(name.to_string());
+        }
+    }
+
+    assert!(
+        writing.len() >= 12,
+        "les commandes qui écrivent des opérations n'ont pas été reconnues : {writing:?}"
+    );
+    assert!(
+        muettes.is_empty(),
+        "ces commandes écrivent une opération sans prévenir personne : {muettes:?} — \
+         une liste des opérations laissée ouverte restera figée devant l'utilisateur, \
+         exactement comme après l'importation OFX du 25/08/2026"
+    );
 }
 
 /// **Bâtisseur – bâti.** Toute page qu'une fenêtre demande doit être déclarée
@@ -1299,6 +1387,811 @@ fn keys_asked() -> BTreeSet<(String, String)> {
 /// Dans ce sens-là seulement : une clef servie que personne ne demande ne
 /// coûte que quelques octets, tandis qu'une clef demandée que personne ne
 /// sert s'affiche en toutes lettres sur un bouton.
+/// **Toute fenêtre de statistique obtient son vocabulaire** — la faute du
+/// 03/10/2026, prise à l'endroit où elle s'est produite.
+///
+/// La page `statistics.html` demande ses mots sous le nom de son axe
+/// (`loadTexts(AXIS)`). `ui_texts` ne reconnaissait que les nomenclatures ; le
+/// septième axe, la vérification, n'en est pas une, et sa fenêtre essuyait un
+/// refus avant d'avoir rien posé : vide, des clefs à la place des phrases, et
+/// « aucun compte » en rouge. Aucun test ne l'a vu, parce que le faux pont du
+/// navigateur répond à tout et que le test de Rust interrogeait Fluent sans
+/// passer par le guichet.
+///
+/// Celui-ci passe par le guichet : chaque axe y est reçu, sous son propre nom,
+/// et ce qu'on lui sert le nomme bien lui — pas la catégorie par défaut.
+#[test]
+fn chaque_axe_des_statistiques_obtient_son_vocabulaire() {
+    use radinus_core::i18n::Language;
+
+    let page = read("ui/windows/statistics.ts");
+    assert!(
+        page.contains("await loadTexts(AXIS);"),
+        "la page des statistiques ne demande plus son vocabulaire sous le nom de son axe : \
+         ce test ne garde plus ce qu'il croit garder"
+    );
+
+    let mut columns: Vec<String> = Vec::new();
+    for axis in radinus_core::statistics::AXES {
+        let kind = crate::commands::vocabulary_kind(axis.key()).unwrap_or_else(|refusal| {
+            panic!("la statistique « {} » se voit refuser son vocabulaire : {refusal}", axis.key())
+        });
+        assert_eq!(kind, axis.key());
+        let texts = crate::texts::dictionary(Language::French, Some(kind));
+        let column = texts
+            .get("statistics-axis-column")
+            .unwrap_or_else(|| panic!("« {} » n'a pas de titre de colonne", axis.key()));
+        assert!(!column.is_empty() && column != "statistics-axis-column");
+        columns.push(column.clone());
+    }
+    let count = columns.len();
+    columns.sort();
+    columns.dedup();
+    assert_eq!(columns.len(), count, "deux axes portent le même titre de colonne : {columns:?}");
+
+    // Les nomenclatures restent reçues, et n'importe quoi reste refusé.
+    for kind in radinus_core::nomenclatures::ALL {
+        assert_eq!(crate::commands::vocabulary_kind(kind.key()), Ok(kind.key()));
+    }
+    assert!(crate::commands::vocabulary_kind("n'importe quoi").is_err());
+}
+
+/// **Un tableau dont on règle les colonnes tient par quatre bouts**, et aucun
+/// compilateur n'en voit plus d'un à la fois (Fabrice, 04/10/2026 : « il est
+/// possible que je te demande de faire cela dans d'autres tableaux » — ce
+/// qu'il a fait le jour même, pour le détail des statistiques et du bilan
+/// croisé).
+///
+/// Le noyau liste les tableaux qui retiennent leur disposition ; une fenêtre
+/// donne ce nom à son tableau ; les préférences lui font une ligne, sous un
+/// libellé que le contrôleur va chercher ; et le tableau écoute un événement
+/// que Rust envoie. Un nom ajouté d'un seul côté donnerait, selon le côté : un
+/// tableau qui oublie tout sans rien dire, une ligne des préférences
+/// intitulée par son nom de code, ou un bouton « Réinitialiser » qui ne
+/// réinitialise rien.
+#[test]
+fn chaque_tableau_reglable_est_connu_des_quatre_cotes() {
+    use radinus_core::i18n::Language;
+
+    let known: BTreeSet<String> = radinus_core::preferences::TABLES_WITH_A_LAYOUT
+        .iter()
+        .map(|name| name.to_string())
+        .collect();
+    assert!(!known.is_empty());
+
+    // Ce que les fenêtres annoncent, en toutes lettres.
+    let mut named: BTreeSet<String> = BTreeSet::new();
+    for (file, text) in pages() {
+        for piece in text.split("layoutName: \"").skip(1) {
+            let name = piece.split('"').next().unwrap_or_default().to_string();
+            assert!(
+                known.contains(&name),
+                "{file} nomme son tableau « {name} », que le noyau ne connaît pas : sa \
+                 disposition ne sera jamais retenue"
+            );
+            assert!(
+                named.insert(name.clone()),
+                "deux tableaux portent le nom « {name} » : ils s'écraseraient l'un l'autre"
+            );
+        }
+    }
+    // Le détail des statistiques : une seule page pour sept fenêtres, qui
+    // fabrique son nom à partir de son axe — « une disposition par
+    // statistique ».
+    assert!(
+        read("ui/windows/statistics.ts").contains("layoutName: `statistics-${AXIS}`,"),
+        "la page des statistiques ne nomme plus son détail d'après son axe"
+    );
+    assert_eq!(radinus_core::preferences::STATISTICS_LAYOUT_PREFIX, "statistics-");
+    for axis in radinus_core::statistics::AXES {
+        named.insert(format!("statistics-{}", axis.key()));
+    }
+    assert_eq!(
+        named, known,
+        "le noyau et les fenêtres ne parlent pas des mêmes tableaux"
+    );
+
+    // Chaque fenêtre qui porte un tableau a son nom dans les préférences, dans
+    // toutes les langues, et deux fenêtres ne portent pas le même.
+    let windows = radinus_core::preferences::windows_with_layouts();
+    for language in Language::all() {
+        let mut said: BTreeSet<String> = BTreeSet::new();
+        for name in &windows {
+            let key = crate::commands::window_label_key(name)
+                .unwrap_or_else(|| panic!("« {name} » n'a pas de libellé dans les préférences"));
+            let label = radinus_core::i18n::text(language, key);
+            assert!(
+                !label.is_empty() && label != key,
+                "« {key} » n'est pas dit en {language:?} : la ligne des préférences porterait sa clef"
+            );
+            assert!(
+                said.insert(label.clone()),
+                "deux fenêtres se disent « {label} » en {language:?} : on ne saurait pas laquelle on réinitialise"
+            );
+        }
+    }
+    assert!(crate::commands::window_label_key("n-importe-quoi").is_none());
+    assert!(crate::commands::window_label_key("statistics-n-importe-quoi").is_none());
+
+    // L'événement : celui que Rust envoie est celui que le tableau écoute.
+    assert!(
+        read("ui/windows/table.ts")
+            .contains(&format!("\"{}\"", crate::commands::TABLE_LAYOUT_CHANGED)),
+        "le tableau n'écoute pas « {} »",
+        crate::commands::TABLE_LAYOUT_CHANGED
+    );
+}
+
+/// **Tout tableau a son menu du clic droit**, sauf ceux qu'on a décidé de
+/// laisser sans.
+///
+/// La faute du 07/10/2026, relevée par Fabrice dans « Soldes de vos comptes » :
+/// *« aucun moyen de faire un copier de cellule ou de ligne, aucun moyen
+/// d'exporter le tableau […] absence totale de menu contextuel »*. La fenêtre
+/// utilisait le tableau commun depuis l'origine et n'avait jamais appelé
+/// `exportOnRightClick` : une ligne oubliée, que rien ne signalait puisque le
+/// tableau marche très bien sans. Et j'avais annoncé la copie « dans tous les
+/// tableaux » sans vérifier que tous avaient un menu où la mettre.
+///
+/// Six autres tableaux sont dans le même cas. Fabrice a choisi de ne corriger
+/// que celui des soldes ; les autres sont nommés ici, **par décision et non
+/// par oubli**. Une fenêtre ajoutée demain qui oublierait la ligne échoue à ce
+/// test, et il faudra alors soit la brancher, soit l'écrire dans cette liste
+/// en sachant ce qu'on fait.
+#[test]
+fn tout_tableau_a_son_menu_du_clic_droit() {
+    // Le nombre de tableaux laissés sans menu, par page.
+    const LEFT_WITHOUT: [(&str, usize); 6] = [
+        ("attachments-manager.ts", 1),
+        ("csv-statement.ts", 2),
+        ("database-selector.ts", 1),
+        ("excel-association.ts", 1),
+        ("excel-fields.ts", 1),
+        ("excel-import.ts", 1),
+    ];
+    let mut seen = 0;
+    for (name, text) in pages() {
+        let tables = text.matches("new Table<").count();
+        if tables == 0 {
+            continue;
+        }
+        seen += 1;
+        let armed = text.matches(".exportOnRightClick(").count();
+        let allowed = LEFT_WITHOUT
+            .iter()
+            .find(|(page, _)| *page == name)
+            .map(|(_, count)| *count)
+            .unwrap_or(0);
+        assert_eq!(
+            tables - armed.min(tables),
+            allowed,
+            "{name} : {tables} tableau(x), {armed} menu(s) du clic droit branché(s), {allowed} \
+             laissé(s) sans par décision. Un tableau sans menu n'offre ni copie ni export."
+        );
+    }
+    assert!(seen > 15, "les tableaux n'ont pas été reconnus : {seen}");
+    for (page, _) in LEFT_WITHOUT {
+        assert!(
+            root().join("ui/windows").join(page).is_file(),
+            "{page} est nommée dans la liste et n'existe plus"
+        );
+    }
+}
+
+/// **Une couleur de colonne tient par quatre bouts** : le noyau, qui n'accepte
+/// d'enregistrer que les siennes ; le tableau, qui les met dans son menu ; la
+/// feuille de style, qui dit ce qu'est chaque teinte ; et les fichiers de
+/// langue, qui la nomment — sous une clef **fabriquée**, donc invisible au
+/// test des clefs demandées. Une couleur ajoutée d'un seul côté donnerait,
+/// selon le côté : un choix que la base refuse en silence, une colonne
+/// « teintée » d'aucune teinte, ou une entrée de menu intitulée par sa clef.
+#[test]
+fn chaque_couleur_de_colonne_est_connue_des_quatre_cotes() {
+    use radinus_core::i18n::Language;
+
+    let table = read("ui/windows/table.ts");
+    let listed = table
+        .split("export const COLUMN_COLOURS = [")
+        .nth(1)
+        .and_then(|rest| rest.split("] as const;").next())
+        .expect("la liste des couleurs du tableau");
+    let in_the_table: Vec<String> = listed
+        .split('"')
+        .skip(1)
+        .step_by(2)
+        .map(str::to_string)
+        .collect();
+    assert_eq!(
+        in_the_table,
+        radinus_core::preferences::COLUMN_COLOURS,
+        "le tableau et le noyau ne parlent pas des mêmes couleurs, ou pas dans le même ordre"
+    );
+    assert!(
+        table.contains("t(`columns-colour-${name}`)"),
+        "le tableau ne fabrique plus ses clefs ainsi : ce test ne garde plus rien"
+    );
+
+    let style = read("ui/windows/window.css");
+    for colour in radinus_core::preferences::COLUMN_COLOURS {
+        assert!(
+            style.contains(&format!("[data-tint=\"{colour}\"] {{\n  --radinus-tint:")),
+            "la feuille de style ne dit pas ce qu'est la teinte « {colour} »"
+        );
+    }
+
+    for language in Language::all() {
+        let texts = crate::texts::dictionary(language, None);
+        let mut said: BTreeSet<String> = BTreeSet::new();
+        for colour in radinus_core::preferences::COLUMN_COLOURS {
+            let key = format!("columns-colour-{colour}");
+            let name = texts.get(&key).cloned().unwrap_or_default();
+            assert!(
+                !name.is_empty() && name != key,
+                "« {key} » n'est pas dit en {language:?}"
+            );
+            assert!(
+                said.insert(name.clone()),
+                "deux couleurs se disent « {name} » en {language:?}"
+            );
+        }
+    }
+}
+
+/// **L'analyse de l'évolution du solde s'ouvre par quatre mains** : l'entrée
+/// de menu envoie « analysis » à la liste des comptes, qui appelle une
+/// commande, qui ouvre une fenêtre dont la page existe. C'est la couture des
+/// six statistiques du 26/07/2026 — un mot recopié à deux endroits, et une
+/// entrée de menu qui ouvre autre chose que ce qu'elle annonce le jour où
+/// l'un des deux change.
+///
+/// Et ce que Fabrice a exigé en la demandant (05/10/2026) : **« Graphique
+/// Évolution Solde » n'est pas touchée**. Le dessin est recopié, les deux
+/// pages ne s'importent pas l'une l'autre, et F25 ne sait rien de la zone.
+#[test]
+fn l_analyse_du_solde_s_ouvre_sur_sa_propre_fenetre() {
+    let menu = read("src-tauri/src/menu.rs");
+    assert!(menu.contains("(ANALYSIS_ITEM_ID, \"analysis\")"));
+    let chooser = read("ui/windows/accounts-list.ts");
+    assert!(
+        chooser.contains("axis === \"analysis\"") && chooser.contains("\"open_balance_analysis\""),
+        "la liste des comptes ne sait pas quoi ouvrir pour « analysis »"
+    );
+    let spec = crate::windows::balance_analysis_window(radinus_core::i18n::Language::French);
+    assert_eq!(spec.label, "balance-analysis");
+    assert!(root().join(&spec.url).is_file(), "la page de l'analyse n'existe pas");
+    assert!(
+        read("src-tauri/src/commands.rs").contains("get_webview_window(\"balance-analysis\")"),
+        "la porte de l'analyse ne ferme pas sa propre fenêtre"
+    );
+
+    let analysis = read("ui/windows/balance-analysis.ts");
+    let chart = read("ui/windows/balance-curves.ts");
+    assert!(
+        !analysis.contains("from \"./balance-curves\"") && !chart.contains("balance-analysis"),
+        "les deux fenêtres devaient rester indépendantes"
+    );
+    for word in ["balance_zone", "chart__zone", "setPointerCapture", "Table"] {
+        assert!(!chart.contains(word), "« Graphique Évolution Solde » a reçu « {word} »");
+    }
+    // Et l'analyse demande bien ses courbes au même calcul que le graphique.
+    assert!(analysis.contains("\"balance_curves\"") && analysis.contains("\"balance_zone\""));
+}
+
+/// **Les comptes de l'accueil et les réglages de confort tiennent par trois
+/// mains** (Fabrice, 07/10/2026) : la fenêtre appelle une commande par son
+/// nom, le contrôleur l'a inscrite, et l'accueil écoute l'événement que le
+/// contrôleur émet — un mot recopié à deux endroits, sans rien qui casse à la
+/// compilation le jour où l'un des deux change. Le bouton des préférences
+/// rendrait alors leur ordre aux tuiles sans que l'accueil, ouvert à côté, le
+/// montre.
+///
+/// Et la promesse faite en le demandant : **« pas le reste »**. La commande ne
+/// touche ni à la langue, ni à la devise, ni à la vérification des opérations
+/// importées.
+#[test]
+fn l_accueil_et_les_reglages_de_confort_tiennent_par_trois_mains() {
+    let registered = read("src-tauri/src/lib.rs");
+    let welcome = read("ui/main.ts");
+    let preferences = read("ui/windows/preferences.ts");
+    for (page, command) in [
+        (&welcome, "save_welcome_accounts"),
+        (&preferences, "reset_comfort_settings"),
+    ] {
+        assert!(page.contains(&format!("invoke(\"{command}\"")), "la fenêtre n'appelle pas {command}");
+        assert!(
+            registered.contains(&format!("commands::{command},")),
+            "{command} n'est pas inscrite"
+        );
+    }
+    assert!(
+        welcome.contains(&format!("\"{}\"", crate::commands::WELCOME_ACCOUNTS_CHANGED)),
+        "l'accueil n'écoute pas l'événement que les préférences émettent"
+    );
+
+    // La feuille des préférences existe des deux côtés, et elle ne demande pas
+    // de base : la taille de l'affichage vit sur le poste.
+    assert!(read("ui/windows/preferences.html").contains("id=\"pane-comfort\""));
+    assert!(preferences.contains("[\"comfort\", \"preferences-leaf-comfort\""));
+    let needs = preferences
+        .split('\n')
+        .find(|line| line.starts_with("const NEEDS_A_DATABASE"))
+        .expect("NEEDS_A_DATABASE");
+    assert!(!needs.contains("comfort"), "sans base, le bouton doit encore rendre la taille");
+
+    // « Pas le reste. »
+    let commands = read("src-tauri/src/commands.rs");
+    let start = commands.find("pub fn reset_comfort_settings").expect("la commande");
+    let body = &commands[start..];
+    let body = &body[..body.find("\n}\n").expect("la fin de la commande")];
+    for word in ["language", "currency", "import_verification"] {
+        assert!(!body.contains(word), "le confort ne touche pas à « {word} »");
+    }
+    // Et la clef de l'accueil est bien de celles que la table documente.
+    assert!(read("docs/Data_models.md").contains(radinus_core::preferences::WELCOME_ACCOUNTS_KEY));
+}
+
+/// **La simulation de crédit tient par quatre mains** (Fabrice, 08/10/2026) :
+/// l'entrée du menu Outils — inséré entre Nomenclatures et Paramètres le
+/// 09/10/2026 —, la
+/// fenêtre qu'elle ouvre, la page qui appelle cinq commandes, et le
+/// contrôleur qui les a inscrites. Un nom recopié à deux endroits, sans rien
+/// qui casse à la compilation le jour où l'un des deux change.
+#[test]
+fn la_simulation_de_credit_tient_par_quatre_mains() {
+    let menu = read("src-tauri/src/menu.rs");
+    let tools = &menu[menu.find("// --- Outils ---").expect("le menu Outils")..];
+    let tools = &tools[..tools.find("// --- Paramètres ---").expect("le menu Paramètres")];
+    assert!(tools.contains("LOAN_ITEM_ID,"), "la simulation de crédit n'est plus dans Outils");
+    let misc = &menu[menu.find("// --- Divers ---").expect("le menu Divers")..];
+    assert!(!misc[..misc.find("Menu::with_items(").unwrap()].contains("LOAN_ITEM_ID"));
+    // Outils entre Nomenclatures et Paramètres, dans la barre.
+    let bar = &menu[menu.find("Menu::with_items(\n        app,\n        &[").expect("la barre")..];
+    let (nomenclatures, outils, parametres) = (
+        bar.find("&nomenclature_menu,").expect("Nomenclatures"),
+        bar.find("&tools_menu,").expect("Outils"),
+        bar.find("&settings_menu,").expect("Paramètres"),
+    );
+    assert!(nomenclatures < outils && outils < parametres);
+    assert!(menu.contains("crate::windows::loan_simulation_window(language)"));
+
+    let spec = crate::windows::loan_simulation_window(radinus_core::i18n::Language::French);
+    assert_eq!(spec.label, "loan-simulation");
+    assert!(root().join(&spec.url).is_file(), "la page de la simulation n'existe pas");
+    assert!(read("src-tauri/src/commands.rs").contains("get_webview_window(\"loan-simulation\")"));
+    assert!(read("src-tauri/capabilities/default.json").contains("\"loan-simulation\""));
+    assert!(read("vite.config.ts").contains("\"loan-simulation\": \"ui/windows/loan-simulation.html\""));
+
+    let page = read("ui/windows/loan-simulation.ts");
+    let registered = read("src-tauri/src/lib.rs");
+    for command in [
+        "loan_choices",
+        "loan_defaults",
+        "loan_simulate",
+        "print_loan_report",
+        "close_loan_simulation",
+    ] {
+        assert!(page.contains(&format!("\"{command}\"")), "la page n'appelle pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
+    // **La fenêtre ne calcule rien** : pas un taux, pas une mensualité. Le
+    // seul calcul qu'elle fait est l'angle de l'aiguille entre deux positions
+    // que le noyau lui donne.
+    for word in ["Math.pow(1 +", "/ 12", "* 12"] {
+        assert!(!page.contains(word), "la page de la simulation calcule « {word} »");
+    }
+    // Les sept colonnes du tableau d'amortissement portent des noms que la
+    // disposition enregistrée accepte, et aucun n'est en double.
+    let names: BTreeSet<&str> = page
+        .split('\n')
+        .filter_map(|line| line.trim().strip_prefix("id: \""))
+        .filter_map(|rest| rest.strip_suffix("\","))
+        .collect();
+    assert_eq!(names.len(), 7, "{names:?}");
+    assert!(names
+        .iter()
+        .all(|name| name.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')));
+    assert!(page.contains("layoutName: \"loan-simulation\""));
+}
+
+/// **« Préparer mes vacances » tient par les mêmes mains** (Fabrice,
+/// 10/10/2026) : son entrée dans Outils, sous « Et si je réduisais… ? », la
+/// fenêtre, la page et ses sept commandes. Et la fenêtre **ne lit aucun
+/// fichier** : ouvrir un projet passe par le sélecteur ouvert côté Rust.
+#[test]
+fn les_vacances_tiennent_par_quatre_mains() {
+    let menu = read("src-tauri/src/menu.rs");
+    let tools = &menu[menu.find("// --- Outils ---").expect("le menu Outils")..];
+    let tools = &tools[..tools.find("// --- Paramètres ---").expect("le menu Paramètres")];
+    let (cut, holiday) = (
+        tools.find("CUT_ITEM_ID,").expect("« Et si je réduisais… ? »"),
+        tools.find("HOLIDAY_ITEM_ID,").expect("« Préparer mes vacances »"),
+    );
+    assert!(cut < holiday, "les vacances viennent sous la réduction des dépenses");
+    assert!(menu.contains("crate::windows::holiday_window(language)"));
+
+    let spec = crate::windows::holiday_window(radinus_core::i18n::Language::French);
+    assert_eq!(spec.label, "holiday");
+    assert!(root().join(&spec.url).is_file(), "la page des vacances n'existe pas");
+    assert!(read("src-tauri/src/commands.rs").contains("get_webview_window(\"holiday\")"));
+    assert!(read("src-tauri/capabilities/default.json").contains("\"holiday\""));
+    assert!(read("vite.config.ts").contains("holiday: \"ui/windows/holiday.html\""));
+
+    let page = read("ui/windows/holiday.ts");
+    let registered = read("src-tauri/src/lib.rs");
+    for command in [
+        "holiday_choices",
+        "holiday_compute",
+        "print_holiday_report",
+        "export_holiday",
+        "save_holiday_project",
+        "load_holiday_project",
+        "close_holiday",
+    ] {
+        assert!(page.contains(&format!("\"{command}\"")), "la page n'appelle pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
+    // **La fenêtre ne calcule rien**, et n'ouvre aucun fichier elle-même.
+    for word in ["* 100", "/ 100", ".reduce(", "plugin-dialog\";\nimport { open"] {
+        assert!(!page.contains(word), "la page des vacances fait « {word} »");
+    }
+    assert!(!read("src-tauri/capabilities/default.json").contains("dialog:allow-open"));
+}
+
+/// **« Carnet de ma voiture » tient par les mêmes mains** (Fabrice,
+/// 10/10/2026) : son entrée dans Outils, sous « Préparer mes vacances », la
+/// fenêtre, la page et ses commandes. Le carnet vit côté Rust ; la fenêtre ne
+/// calcule rien et **ne lit aucun fichier** — ouvrir un carnet passe par le
+/// sélecteur ouvert côté Rust. Et rien n'entre dans les préférences : le
+/// tarif modifié reste dans le carnet (« oui ça reste dans le fichier de la
+/// voiture »).
+#[test]
+fn le_carnet_de_la_voiture_tient_par_quatre_mains() {
+    let menu = read("src-tauri/src/menu.rs");
+    let tools = &menu[menu.find("// --- Outils ---").expect("le menu Outils")..];
+    let tools = &tools[..tools.find("// --- Paramètres ---").expect("le menu Paramètres")];
+    let (holiday, car) = (
+        tools.find("HOLIDAY_ITEM_ID,").expect("« Préparer mes vacances »"),
+        tools.find("CAR_ITEM_ID,").expect("« Carnet de ma voiture »"),
+    );
+    assert!(holiday < car, "le carnet vient sous les vacances");
+    assert!(menu.contains("crate::windows::car_logbook_window(language)"));
+
+    let spec = crate::windows::car_logbook_window(radinus_core::i18n::Language::French);
+    assert_eq!(spec.label, "car-logbook");
+    assert!(root().join(&spec.url).is_file(), "la page du carnet n'existe pas");
+    assert!(read("src-tauri/src/commands.rs").contains("get_webview_window(\"car-logbook\")"));
+    assert!(read("src-tauri/capabilities/default.json").contains("\"car-logbook\""));
+    assert!(read("vite.config.ts").contains("\"car-logbook\": \"ui/windows/car-logbook.html\""));
+
+    let page = read("ui/windows/car-logbook.ts");
+    let registered = read("src-tauri/src/lib.rs");
+    for command in [
+        "car_view",
+        "car_set_car",
+        "car_put_entry",
+        "car_delete_entry",
+        "car_reset_tariff",
+        "car_expenses",
+        "print_car_report",
+        "export_car",
+        "save_car_logbook",
+        "load_car_logbook",
+        "close_car_logbook",
+    ] {
+        assert!(page.contains(&format!("\"{command}\"")), "la page n'appelle pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
+    for word in ["* 100", "/ 100", ".reduce(", "save_preferences", "plugin-fs"] {
+        assert!(!page.contains(word), "la page du carnet fait « {word} »");
+    }
+    assert!(!read("src-tauri/capabilities/default.json").contains("dialog:allow-open"));
+    let commands = read("src-tauri/src/commands.rs");
+    let car = &commands[commands.find("// --- F47").expect("les commandes du carnet")..];
+    let car = &car[..car.find("\n// --- ").unwrap_or(car.len())];
+    assert!(!car.contains("set_electricity_tariff"), "le carnet n'écrit pas dans les préférences");
+}
+
+/// **Aucun champ chiffré d'un outil n'échappe au filtre** (Fabrice,
+/// 11/10/2026 : « on peut écrire des lettres dans un champ numérique, c'est
+/// pas bien du tout »). Chaque champ de la page qui attend un chiffre
+/// (`inputmode`) est déclaré à `guardFields` — ou passé à `asMoneyField` —,
+/// et la page ne bâtit aucun champ chiffré à la main : ceux qu'elle crée
+/// passent par le filtre, qui pose lui-même l'`inputMode`. Les outils entrent
+/// dans la liste au fur et à mesure qu'ils sont protégés.
+#[test]
+fn aucun_champ_chiffre_d_un_outil_n_echappe_au_filtre() {
+    const GUARDED: [&str; 8] = [
+        "loan-simulation",
+        "appliance-cost",
+        "safety-cushion",
+        "savings-goal",
+        "spending-cut",
+        "holiday",
+        "car-logbook",
+        "sharing",
+    ];
+    for page in GUARDED {
+        let html = read(&format!("ui/windows/{page}.html"));
+        let script = read(&format!("ui/windows/{page}.ts"));
+        assert!(!script.contains(".inputMode ="), "« {page} » pose un inputMode à la main, hors du filtre");
+        let mut rest = html.as_str();
+        while let Some(at) = rest.find("inputmode=") {
+            let tag_start = rest[..at].rfind('<').expect("une balise");
+            let tag_end = at + rest[at..].find('>').expect("la fin de la balise");
+            let tag = &rest[tag_start..tag_end];
+            let id = tag
+                .split("id=\"")
+                .nth(1)
+                .and_then(|after| after.split('"').next())
+                .unwrap_or_else(|| panic!("un champ chiffré sans identifiant dans « {page} » : {tag}"));
+            let declared = script.contains(&format!("  {id}: "))
+                || script.contains(&format!("  \"{id}\": "))
+                || script.contains(&format!("asMoneyField(field(\"{id}\")"));
+            assert!(declared, "le champ « {id} » de « {page} » n'est pas protégé par le filtre");
+            rest = &rest[tag_end..];
+        }
+    }
+}
+
+/// **« Partager une dépense » tient par les mêmes mains** (Fabrice,
+/// 11/10/2026, P-71) : son entrée dans Outils, sous le carnet de la voiture —
+/// **toujours allumée**, car l'outil ne lit rien dans la base (« oui on peut
+/// utiliser l'outil sans base ouverte ») —, la fenêtre, la page et ses huit
+/// commandes. La fenêtre ne calcule rien et **ne lit aucun fichier** ; et
+/// aucune de ses commandes ne touche la base.
+#[test]
+fn le_partage_d_une_depense_tient_par_quatre_mains() {
+    let menu = read("src-tauri/src/menu.rs");
+    let tools = &menu[menu.find("// --- Outils ---").expect("le menu Outils")..];
+    let tools = &tools[..tools.find("// --- Paramètres ---").expect("le menu Paramètres")];
+    let (car, sharing) = (
+        tools.find("CAR_ITEM_ID,").expect("« Carnet de ma voiture »"),
+        tools.find("SHARING_ITEM_ID,").expect("« Partager une dépense »"),
+    );
+    assert!(car < sharing, "le partage vient sous le carnet");
+    let entry = &tools[sharing..];
+    let entry = &entry[..entry.find(")?,").expect("la fin de l'entrée")];
+    assert!(entry.contains("true,") && !entry.contains("usable"), "l'entrée du partage est toujours allumée");
+    assert!(menu.contains("crate::windows::sharing_window(language)"));
+
+    let spec = crate::windows::sharing_window(radinus_core::i18n::Language::French);
+    assert_eq!(spec.label, "sharing");
+    assert!(root().join(&spec.url).is_file(), "la page du partage n'existe pas");
+    assert!(read("src-tauri/src/commands.rs").contains("get_webview_window(\"sharing\")"));
+    assert!(read("src-tauri/capabilities/default.json").contains("\"sharing\""));
+    assert!(read("vite.config.ts").contains("sharing: \"ui/windows/sharing.html\""));
+
+    let page = read("ui/windows/sharing.ts");
+    let registered = read("src-tauri/src/lib.rs");
+    for command in [
+        "sharing_compute",
+        "print_sharing_report",
+        "pick_sharing_folder",
+        "write_sharing_statements",
+        "export_sharing",
+        "save_sharing_project",
+        "load_sharing_project",
+        "close_sharing",
+    ] {
+        assert!(page.contains(&format!("\"{command}\"")), "la page n'appelle pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
+    for word in ["* 100", "/ 100", ".reduce(", "plugin-fs", "startup_error"] {
+        assert!(!page.contains(word), "la page du partage fait « {word} »");
+    }
+    assert!(!read("src-tauri/capabilities/default.json").contains("dialog:allow-open"));
+    let commands = read("src-tauri/src/commands.rs");
+    let sharing = &commands[commands.find("// --- F48").expect("les commandes du partage")..];
+    let sharing = &sharing[..sharing.find("\n// --- ").unwrap_or(sharing.len())];
+    assert!(!sharing.contains("database()") && !sharing.contains("AppState"), "le partage ne touche pas la base");
+}
+
+/// **« Et si je réduisais… ? » tient par les mêmes mains** (Fabrice,
+/// 10/10/2026) : son entrée dans Outils, sous l'objectif d'épargne, la
+/// fenêtre, la page et ses quatre commandes.
+#[test]
+fn la_reduction_des_depenses_tient_par_quatre_mains() {
+    let menu = read("src-tauri/src/menu.rs");
+    let tools = &menu[menu.find("// --- Outils ---").expect("le menu Outils")..];
+    let tools = &tools[..tools.find("// --- Paramètres ---").expect("le menu Paramètres")];
+    let (goal, cut) = (
+        tools.find("GOAL_ITEM_ID,").expect("l'objectif d'épargne"),
+        tools.find("CUT_ITEM_ID,").expect("« Et si je réduisais… ? »"),
+    );
+    assert!(goal < cut, "la réduction vient sous l'objectif d'épargne");
+    assert!(menu.contains("crate::windows::spending_cut_window(language)"));
+
+    let spec = crate::windows::spending_cut_window(radinus_core::i18n::Language::French);
+    assert_eq!(spec.label, "spending-cut");
+    assert!(root().join(&spec.url).is_file(), "la page de la réduction n'existe pas");
+    assert!(read("src-tauri/src/commands.rs").contains("get_webview_window(\"spending-cut\")"));
+    assert!(read("src-tauri/capabilities/default.json").contains("\"spending-cut\""));
+    assert!(read("vite.config.ts").contains("\"spending-cut\": \"ui/windows/spending-cut.html\""));
+
+    let page = read("ui/windows/spending-cut.ts");
+    let registered = read("src-tauri/src/lib.rs");
+    for command in [
+        "cut_choices",
+        "cut_compute",
+        "print_cut_report",
+        "export_cut",
+        "save_cut_project",
+        "load_cut_project",
+        "close_spending_cut",
+    ] {
+        assert!(page.contains(&format!("\"{command}\"")), "la page n'appelle pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
+    // **La fenêtre ne calcule rien** : ni pourcentage, ni moyenne, ni gain.
+    for word in ["/ 100", "* 12", "/ 12", ".reduce("] {
+        assert!(!page.contains(word), "la page de la réduction calcule « {word} »");
+    }
+    // Rien n'est mémorisé dans la base : le projet va dans un fichier choisi
+    // (Fabrice, 10/10/2026), et la fenêtre n'a pas le droit d'en ouvrir — le
+    // sélecteur s'ouvre côté Rust.
+    assert!(!page.contains("save_preferences") && !page.contains("preferences"));
+    assert!(!page.contains("plugin-fs") && !page.contains("open("));
+    assert!(!read("src-tauri/capabilities/default.json").contains("dialog:allow-open"));
+}
+
+/// **L'objectif d'épargne tient par les mêmes mains** (Fabrice,
+/// 10/10/2026) : son entrée dans Outils, sous le matelas de sécurité, la
+/// fenêtre, la page et ses trois commandes.
+#[test]
+fn l_objectif_d_epargne_tient_par_quatre_mains() {
+    let menu = read("src-tauri/src/menu.rs");
+    let tools = &menu[menu.find("// --- Outils ---").expect("le menu Outils")..];
+    let tools = &tools[..tools.find("// --- Paramètres ---").expect("le menu Paramètres")];
+    let (cushion, goal) = (
+        tools.find("CUSHION_ITEM_ID,").expect("le matelas de sécurité"),
+        tools.find("GOAL_ITEM_ID,").expect("l'objectif d'épargne"),
+    );
+    assert!(cushion < goal, "l'objectif vient sous le matelas de sécurité");
+    assert!(menu.contains("crate::windows::savings_goal_window(language)"));
+
+    let spec = crate::windows::savings_goal_window(radinus_core::i18n::Language::French);
+    assert_eq!(spec.label, "savings-goal");
+    assert!(root().join(&spec.url).is_file(), "la page de l'objectif n'existe pas");
+    assert!(read("src-tauri/src/commands.rs").contains("get_webview_window(\"savings-goal\")"));
+    assert!(read("src-tauri/capabilities/default.json").contains("\"savings-goal\""));
+    assert!(read("vite.config.ts").contains("\"savings-goal\": \"ui/windows/savings-goal.html\""));
+
+    let page = read("ui/windows/savings-goal.ts");
+    let registered = read("src-tauri/src/lib.rs");
+    for command in ["goal_choices", "goal_compute", "close_savings_goal"] {
+        assert!(page.contains(&format!("\"{command}\"")), "la page n'appelle pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
+    // **La fenêtre ne calcule rien** : ni moyenne, ni intérêts, ni mois.
+    for word in ["/ 12", "* 12", ".reduce(", "Math.pow"] {
+        assert!(!page.contains(word), "la page de l'objectif calcule « {word} »");
+    }
+    // **Pas de rapport PDF**, rien de mémorisé.
+    assert!(!page.contains("pdf") && !page.contains("print_") && !page.contains("save_"));
+}
+
+/// **Le matelas de sécurité tient par les mêmes mains** (Fabrice,
+/// 09/10/2026) : son entrée dans Outils, sous la consommation d'un appareil,
+/// la fenêtre, la page et ses trois commandes.
+#[test]
+fn le_matelas_de_securite_tient_par_quatre_mains() {
+    let menu = read("src-tauri/src/menu.rs");
+    let tools = &menu[menu.find("// --- Outils ---").expect("le menu Outils")..];
+    let tools = &tools[..tools.find("// --- Paramètres ---").expect("le menu Paramètres")];
+    let (appliance, cushion) = (
+        tools.find("APPLIANCE_ITEM_ID,").expect("la consommation d'un appareil"),
+        tools.find("CUSHION_ITEM_ID,").expect("le matelas de sécurité"),
+    );
+    assert!(appliance < cushion, "le matelas vient sous la consommation d'un appareil");
+    assert!(menu.contains("crate::windows::safety_cushion_window(language)"));
+
+    let spec = crate::windows::safety_cushion_window(radinus_core::i18n::Language::French);
+    assert_eq!(spec.label, "safety-cushion");
+    assert!(root().join(&spec.url).is_file(), "la page du matelas n'existe pas");
+    assert!(read("src-tauri/src/commands.rs").contains("get_webview_window(\"safety-cushion\")"));
+    assert!(read("src-tauri/capabilities/default.json").contains("\"safety-cushion\""));
+    assert!(read("vite.config.ts").contains("\"safety-cushion\": \"ui/windows/safety-cushion.html\""));
+
+    let page = read("ui/windows/safety-cushion.ts");
+    let registered = read("src-tauri/src/lib.rs");
+    for command in ["cushion_choices", "cushion_compute", "close_safety_cushion"] {
+        assert!(page.contains(&format!("\"{command}\"")), "la page n'appelle pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
+    // **La fenêtre ne calcule rien** : ni moyenne, ni mois couverts.
+    for word in ["/ 12", "* 3", "* 6", ".reduce("] {
+        assert!(!page.contains(word), "la page du matelas calcule « {word} »");
+    }
+    // **Pas de rapport PDF**, rien de mémorisé.
+    assert!(!page.contains("pdf") && !page.contains("print_") && !page.contains("save_"));
+}
+
+/// **La consommation d'un appareil tient par les mêmes mains** (Fabrice,
+/// 09/10/2026) : son entrée dans Outils, sous la simulation de crédit, la
+/// fenêtre, la page et ses commandes ; et la feuille des préférences qui
+/// enregistre le tarif.
+#[test]
+fn la_consommation_d_un_appareil_tient_par_quatre_mains() {
+    let menu = read("src-tauri/src/menu.rs");
+    let tools = &menu[menu.find("// --- Outils ---").expect("le menu Outils")..];
+    let tools = &tools[..tools.find("// --- Paramètres ---").expect("le menu Paramètres")];
+    let (loan, appliance) = (
+        tools.find("LOAN_ITEM_ID,").expect("la simulation de crédit"),
+        tools.find("APPLIANCE_ITEM_ID,").expect("la consommation d'un appareil"),
+    );
+    assert!(loan < appliance, "la consommation d'un appareil vient sous la simulation de crédit");
+    assert!(menu.contains("crate::windows::appliance_cost_window(language)"));
+
+    let spec = crate::windows::appliance_cost_window(radinus_core::i18n::Language::French);
+    assert_eq!(spec.label, "appliance-cost");
+    assert!(root().join(&spec.url).is_file(), "la page de l'appareil n'existe pas");
+    assert!(read("src-tauri/src/commands.rs").contains("get_webview_window(\"appliance-cost\")"));
+    assert!(read("src-tauri/capabilities/default.json").contains("\"appliance-cost\""));
+    assert!(read("vite.config.ts").contains("\"appliance-cost\": \"ui/windows/appliance-cost.html\""));
+
+    let page = read("ui/windows/appliance-cost.ts");
+    let preferences = read("ui/windows/preferences.ts");
+    let registered = read("src-tauri/src/lib.rs");
+    for command in ["electricity_tariff", "appliance_compute", "close_appliance_cost"] {
+        assert!(page.contains(&format!("\"{command}\"")), "la page n'appelle pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
+    for command in ["electricity_tariff", "electricity_blue_tariff", "save_preferences_electricity"] {
+        assert!(preferences.contains(&format!("\"{command}\"")), "les préférences n'appellent pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
+    // L'événement du tarif enregistré porte le même nom des deux côtés.
+    assert!(page.contains(&format!("\"{}\"", crate::commands::ELECTRICITY_TARIFF_CHANGED)));
+    // **La fenêtre ne calcule rien** : ni watts, ni kWh, ni prix.
+    for word in ["/ 1000", "* 365", "/ 24"] {
+        assert!(!page.contains(word), "la page de l'appareil calcule « {word} »");
+    }
+    // **Pas de rapport PDF** (« pas de rapport PDF pour cela »).
+    assert!(!page.contains("pdf") && !page.contains("print_"));
+}
+
+/// **Les noms de colonnes d'un tableau réglable sont de ceux que le noyau
+/// accepte, et aucun n'est en double.** Un nom refusé — une majuscule, un
+/// espace — ferait refuser toute la disposition à l'enregistrement, en
+/// silence : l'utilisateur déplacerait ses colonnes et les retrouverait à leur
+/// place de naissance à chaque ouverture.
+#[test]
+fn les_colonnes_d_un_tableau_reglable_portent_des_noms_que_le_noyau_accepte() {
+    for (file, count) in [
+        ("ui/windows/operations-list.ts", 18),
+        ("ui/windows/statistics.ts", 11),
+        ("ui/windows/crossed-balance.ts", 11),
+        ("ui/windows/balance-analysis.ts", 12),
+    ] {
+        let page = read(file);
+        let mut names: Vec<String> = page
+            .split('\n')
+            .filter_map(|line| line.trim().strip_prefix("id: \""))
+            .filter_map(|rest| rest.strip_suffix("\","))
+            .map(str::to_string)
+            .collect();
+        // Les cinq colonnes de nomenclature prennent pour nom leur `kind`.
+        assert!(
+            page.contains("id: kind,"),
+            "{file} : les colonnes de nomenclature ne se nomment plus par leur genre"
+        );
+        for kind in ["category", "assignment", "payment-mode", "payee", "project"] {
+            assert!(page.contains(&format!("\"{kind}\",")), "{file} : la colonne « {kind} » a disparu");
+            names.push(kind.to_string());
+        }
+        assert_eq!(names.len(), count, "{file} : {names:?}");
+
+        let movable: Vec<String> = names.into_iter().filter(|name| name != "fold").collect();
+        let layout = radinus_core::preferences::TableLayout {
+            order: movable.clone(),
+            hidden: vec![movable[0].clone()],
+            widths: movable.iter().map(|name| (name.clone(), 120)).collect(),
+            colors: movable.iter().map(|name| (name.clone(), "blue".to_string())).collect(),
+        };
+        assert!(layout.holds(), "{file} : le noyau refuserait cette disposition : {movable:?}");
+    }
+}
+
 #[test]
 fn toute_clef_qu_une_fenetre_demande_est_une_clef_que_le_dictionnaire_sert() {
     use radinus_core::i18n::Language;
@@ -1309,7 +2202,7 @@ fn toute_clef_qu_une_fenetre_demande_est_une_clef_que_le_dictionnaire_sert() {
         .into_keys()
         .collect();
     for kind in radinus_core::nomenclatures::ALL {
-        served.extend(crate::texts::dictionary(Language::French, Some(kind)).into_keys());
+        served.extend(crate::texts::dictionary(Language::French, Some(kind.key())).into_keys());
     }
 
     let unserved: Vec<String> = keys_asked()

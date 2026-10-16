@@ -125,7 +125,7 @@ tests in the same file: a rule and its proof travel together.
 | `recurring_operations.rs` | Recurring rules, the calendar they would produce, and the insertion of that calendar. |
 | `budget.rs` | The budget: entering it, and checking whether it was kept — two doors, two questions. |
 | `transfers.rs` | Moving an amount between two accounts: one gesture, two operations. |
-| `statistics.rs` | The cross-tabulated matrix, on six axes. |
+| `statistics.rs` | The cross-tabulated matrix, on seven axes — six nomenclatures and the verification. |
 | `dashboard.rs` | The dashboard. |
 | `balance_curve.rs` | The balance, day by day. |
 | `quick_classification.rs` | Classifying many operations at once, over a draft held in memory until it is saved. |
@@ -143,6 +143,7 @@ tests in the same file: a rule and its proof travel together.
 | `ofx_import.rs` | Reading an OFX bank statement, ported from the author's `Ofx_Import` class. |
 | `statements.rs` | What is done with a statement once read: matching against what the database already knows, and integrating a line. |
 | `csv_statement.rs` | A statement in CSV, and the window that cuts it into columns. |
+| `qif_import.rs` | Reading a QIF bank statement into the same `Statement` as OFX (P-73). |
 | `csv_excel_import.rs` | The three-step Excel import: capture zone, field mapping, policies. |
 | `exports.rs` | The two banking outputs of the export menu: OFX and QIF. |
 | `sheets.rs` | One sheet, three ways to write it — Excel, OpenDocument, CSV/XML/JSON. Written once for every table in the application. |

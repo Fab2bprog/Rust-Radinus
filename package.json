@@ -2,14 +2,15 @@
   "name": "radinus",
   "private": true,
   "license": "GPL-3.0-or-later",
-  "version": "2.0.4",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "test:ui": "npm run build && TZ=Europe/Paris node ui/tests/windows.test.mjs"
+    "test:ui": "npm run build && TZ=Europe/Paris node ui/tests/windows.test.mjs",
+    "test:ui:only": "npm run build && TZ=Europe/Paris node ui/tests/only.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

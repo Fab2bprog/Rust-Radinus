@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Préparer mes vacances</title>
+    <script type="module" src="/ui/windows/holiday.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F46 — « Préparer mes vacances » (Fabrice, 10/10/2026).
+
+         « Le but, c'est simplement de calculer combien vont me coûter mes
+         prochaines vacances. » À gauche, le voyage — séjour ou croisière,
+         adultes et enfants aux curseurs, les nuits, les mois avant le départ,
+         les escales d'une croisière —, les comptes qui portent déjà l'argent,
+         et les fichiers : ouvrir et enregistrer un projet, le rapport PDF,
+         l'export Excel. À droite, le résultat, le budget poste par poste et
+         l'anneau. Rien n'entre dans la base ; la porte efface tout. -->
+    <div class="window window--loan window--holiday">
+      <main class="window__content loan holiday">
+        <div class="loan__afford holiday__body">
+          <div class="loan__side">
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="trip-title"></h2>
+              <div class="holiday__trips">
+                <label class="goal__question">
+                  <input type="radio" name="trip" value="stay" checked />
+                  <span id="trip-stay"></span>
+                </label>
+                <label class="goal__question">
+                  <input type="radio" name="trip" value="cruise" />
+                  <span id="trip-cruise"></span>
+                </label>
+              </div>
+              <div class="holiday__people">
+                <span class="loan__label"><span id="adults-label"></span> : <strong id="adults-value"></strong></span>
+                <input type="range" class="loan__range" id="adults" min="1" max="20" step="1" value="1" />
+                <span class="loan__label"><span id="children-label"></span> : <strong id="children-value"></strong></span>
+                <input type="range" class="loan__range" id="children" min="0" max="20" step="1" value="0" />
+              </div>
+              <div class="goal__fields">
+                <label class="loan__field">
+                  <span class="loan__label" id="nights-label"></span>
+                  <span class="loan__input">
+                    <input class="form__field goal__small" id="nights" inputmode="numeric" autocomplete="off" />
+                    <span class="loan__unit" id="days-text"></span>
+                  </span>
+                </label>
+                <label class="loan__field">
+                  <span class="loan__label" id="months-label"></span>
+                  <input class="form__field goal__small" id="months" inputmode="numeric" autocomplete="off" />
+                </label>
+                <label class="loan__field" id="stops-line" hidden>
+                  <span class="loan__label" id="stops-label"></span>
+                  <input class="form__field goal__small" id="stops" inputmode="numeric" autocomplete="off" />
+                </label>
+              </div>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="saved-title"></h2>
+              <table class="loan__accounts goal__accounts">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th id="account-column"></th>
+                    <th class="loan__number" id="balance-column"></th>
+                  </tr>
+                </thead>
+                <tbody id="accounts"></tbody>
+              </table>
+              <p class="loan__hint goal__hint" id="saved-hint"></p>
+            </article>
+
+            <article class="loan__card holiday__files">
+              <button class="holiday__file" id="open" type="button"></button>
+              <button class="holiday__file" id="save" type="button"></button>
+              <button class="loan__pdf" id="pdf" type="button">
+                <img src="/ui/assets/icons/pdf.png" alt="" />
+                <span id="pdf-label"></span>
+              </button>
+              <button class="holiday__file holiday__excel" id="excel" type="button"></button>
+            </article>
+          </div>
+
+          <div class="loan__main">
+            <article class="loan__card goal__answer" id="answer" data-tone="none">
+              <span class="loan__label" id="result-title"></span>
+              <p class="goal__headline" id="headline"></p>
+              <div class="goal__tiles" id="tiles"></div>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="budget-title"></h2>
+              <p class="loan__hint" id="budget-hint"></p>
+              <table class="cut__table holiday__table">
+                <thead>
+                  <tr>
+                    <th id="column-line"></th>
+                    <th id="column-amount"></th>
+                    <th id="column-child"></th>
+                    <th id="column-who"></th>
+                    <th id="column-span"></th>
+                    <th class="loan__number" id="column-cost"></th>
+                  </tr>
+                </thead>
+                <tbody id="lines"></tbody>
+                <tbody id="optional"></tbody>
+              </table>
+            </article>
+
+            <article class="loan__card">
+              <h2 class="loan__card-title" id="donut-title"></h2>
+              <div class="loan__chart cut__donut" id="donut"></div>
+            </article>
+
+            <ul class="goal__notes" id="notes"></ul>
+            <p class="loan__hint" id="disclaimer"></p>
+          </div>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

@@ -208,8 +208,10 @@ pub fn refresh_complement(conn: &Connection, parent_id: i64) -> Result<bool> {
 }
 
 /// `Maj_ProprieteSousOp`: pushes the parent's status, payment mode, date,
-/// clearing date and recurring-rule GUID onto every one of its
-/// sub-operations, complement included. Keeping a ventilation coherent with
+/// clearing date, recurring-rule GUID **and verification** onto every one of
+/// its sub-operations, complement included. The verification is 3.0.0's own
+/// (base 11): what the user thinks of an entry is said of the bank's line, and
+/// a ventilation is not one. Keeping a ventilation coherent with
 /// what it ventilates is not optional — the original calls this after every
 /// change.
 pub fn sync_from_parent(conn: &Connection, parent_id: i64) -> Result<bool> {
@@ -219,7 +221,9 @@ pub fn sync_from_parent(conn: &Connection, parent_id: i64) -> Result<bool> {
     conn.execute(
         "UPDATE Operation
             SET IDStatutOperation = ?1, IDModeOperation = ?2, Date = ?3,
-                DatePointage = ?4, GUIDCalOpPeriode = ?5
+                DatePointage = ?4, GUIDCalOpPeriode = ?5,
+                IDVerification = (SELECT m.IDVerification FROM Operation m
+                                  WHERE m.IDOperation = ?6)
           WHERE IDOperationParent = ?6",
         rusqlite::params![
             parent.status_id,

@@ -275,6 +275,18 @@ async function chooseAccount(): Promise<void> {
         await invoke("open_balance_curves", { accountIds: table.selected() });
         return;
       }
+      // L'analyse de l'évolution du solde (F40) : la même question que le
+      // graphique, et une autre fenêtre.
+      if (axis === "analysis") {
+        await invoke("open_balance_analysis", { accountIds: table.selected() });
+        return;
+      }
+      // Le bilan croisé (F39) emprunte la même porte : il se calcule lui aussi
+      // sur plusieurs comptes, mais ses deux axes sont fixés par ce qu'il est.
+      if (axis === "crossed-balance") {
+        await invoke("open_crossed_balance", { accountIds: table.selected() });
+        return;
+      }
       await invoke("open_statistics", { axis, accountIds: table.selected() });
       return;
     }

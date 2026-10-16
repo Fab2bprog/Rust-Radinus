@@ -131,6 +131,12 @@ pub struct AppState {
     /// et au démarrage la base n'est branchée qu'une fois que l'utilisateur a
     /// dit laquelle. Voir [`AppState::attach`].
     attachments_dir: Mutex<PathBuf>,
+    /// **Le carnet de la voiture ouvert dans F47** (Fabrice, 10/10/2026).
+    ///
+    /// Il vit ici, comme le brouillon de la classification rapide : la
+    /// fenêtre montre, le noyau tient le carnet. `None` tant que la fenêtre
+    /// n'a rien demandé ; la porte le remet à `None` — la fenêtre oublie.
+    car: Mutex<Option<radinus_core::car::Logbook>>,
 }
 
 impl AppState {
@@ -268,6 +274,7 @@ impl AppState {
             data_root,
             application_root,
             attachments_dir: Mutex::new(PathBuf::new()),
+            car: Mutex::new(None),
         }
     }
 
@@ -288,6 +295,7 @@ impl AppState {
             data_root,
             application_root,
             attachments_dir: Mutex::new(PathBuf::new()),
+            car: Mutex::new(None),
         }
     }
 
@@ -518,6 +526,25 @@ impl AppState {
         if let Ok(mut journal) = self.journal.lock() {
             *journal = entries;
         }
+    }
+
+    /// **Agit sur le carnet de la voiture**, en le créant au besoin avec le
+    /// tarif d'électricité donné.
+    pub fn with_car<T>(
+        &self,
+        tariff: radinus_core::appliance::Tariff,
+        act: impl FnOnce(&mut radinus_core::car::Logbook) -> T,
+    ) -> Result<T, String> {
+        let mut guard = self.car.lock().map_err(to_ipc_error)?;
+        let book = guard.get_or_insert_with(|| radinus_core::car::Logbook::new(tariff));
+        Ok(act(book))
+    }
+
+    /// Remplace le carnet — un carnet ouvert, ou rien quand la porte se
+    /// ferme.
+    pub fn set_car(&self, book: Option<radinus_core::car::Logbook>) -> Result<(), String> {
+        *self.car.lock().map_err(to_ipc_error)? = book;
+        Ok(())
     }
 
     pub fn journal(&self) -> Vec<radinus_core::journal::Entry> {

@@ -258,13 +258,16 @@ menu-accounts-checkbooks = Gestionarea carnetelor de cecuri
 
 menu-statistics = Statistici
 menu-statistics-balance-chart = Grafic Evoluția soldului
+menu-statistics-balance-analysis = Analiză Evoluția soldului
 menu-statistics-by-category = Stat pe categorii
 menu-statistics-by-assignment = Stat pe alocări
 menu-statistics-by-budget-line = Stat pe poziții bugetare
 menu-statistics-by-payment-mode = Stat pe modalități de plată
 menu-statistics-by-payee = Stat pe terți și comercianți
 menu-statistics-by-project = Stat pe proiecte
+menu-statistics-by-verification = Stat pe verificări
 menu-statistics-dashboard = Tablou de bord al operațiunilor
+menu-statistics-crossed-balance = Bilanț încrucișat
 
 menu-budget = Buget
 menu-budget-entry = Introducere buget
@@ -282,6 +285,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = Șabloane de operațiuni
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = Instrumente
 menu-settings = Setări
 menu-settings-about-author = Despre autor
 menu-settings-about-radinus = Despre Radinus
@@ -441,6 +446,15 @@ operations-selection-total = Suma totală a operațiunilor selectate: { $amount 
 
 operations-column-date = Data
 operations-column-clearing-date = Data Reconciliere
+operations-column-status = Statut operațiune
+operation-status-pointed = Reconciliat
+operation-status-committed = Angajat
+operation-status-planned = Planificat
+operations-column-verification = Verificare
+operation-verification-to-verify = De verificat
+operation-verification-verified = Verificată
+operation-verification-doubtful = Îndoielnică
+operation-verification-disputed = Contestată
 operations-column-label = Descriere
 operations-column-category = Categorie
 operations-column-assignment = Alocare
@@ -517,6 +531,9 @@ filter-all = Toate operațiunile
 filter-pointed = Numai operațiunile reconciliate
 filter-committed = Numai operațiunile angajate
 filter-planned = Numai operațiunile planificate
+filter-by-status = Filtru după statut
+filter-by-verification = Filtru după verificare
+filter-show-all = Afișează tot
 
 # --- Fișa operațiunii (F03) -------------------------------------------
 # Titlurile sunt cele din captura „Fiche operation transaction.png”, cu
@@ -550,6 +567,7 @@ operation-field-direction = Tip Operațiune:
 operation-field-amount = Sumă
 operation-field-status = Statut operațiune
 operation-field-clearing-date = Data reconcilierii
+operation-field-verification = Verificare
 operation-field-category = Categorie
 operation-field-assignment = Alocare
 operation-field-payment-mode = Mod
@@ -572,6 +590,10 @@ operation-nothing-to-show = Nicio operațiune de afișat.
 operation-label-required = Descrierea operațiunii este obligatorie.
 operation-date-required = Data operațiunii este obligatorie.
 operation-clearing-date-invalid = Data reconcilierii nu este o dată validă.
+operation-clearing-date-required = O operațiune punctată trebuie să aibă obligatoriu o dată de punctare.
+operation-clearing-date-question =
+    O operațiune punctată trebuie să aibă obligatoriu o dată de punctare.
+    Doriți să înregistrați cu data operațiunii, { $date }?
 operation-is-a-sub = Acest rând este o suboperațiune: se modifică din fișa ei proprie.
 operation-delete-form-open = Fișa „{ $label }” este deschisă. Închideți-o înainte de ștergere.
 
@@ -611,6 +633,7 @@ sub-operation-is-the-complement = Acesta este Complementul: ceea ce rămâne de 
 sub-operation-of = Repartizarea „{ $label }” ({ $amount })
 
 operations-pointed = { $count ->
+    [0] Nicio operațiune de reconciliat: selecția este deja reconciliată.
     [one] O operațiune reconciliată.
     [few] { $count } operațiuni reconciliate.
    *[other] { $count } de operațiuni reconciliate.
@@ -625,6 +648,7 @@ operations-select-one = Selectați o singură operațiune.
 operation-copy = Copie de salvat: nu s-a creat încă nimic.
 operations-show-children = Afișare toate suboperațiunile
 operations-hide-children = Ascundere toate suboperațiunile
+operations-recurring-from = Creați o operațiune periodică pornind de la această operațiune
 
 # --- A doua confirmare a unei ștergeri grave --------------------------
 # Ștergerea unui cont bancar duce cu ea tot istoricul lui: un Da/Nu se apasă
@@ -645,6 +669,7 @@ window-statistics-title = { $kind ->
     [payment-mode] Statistici după modalitate de plata
     [payee] Statistici după terț și comerciant
     [project] Statistici după proiect
+    [verification] Statistici după verificare
    *[category] Statistici după categorie
 }
 
@@ -654,6 +679,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] ModOperatiune
     [payee] Terți
     [project] Proiecte
+    [verification] Verificare
    *[category] NumeCategorie
 }
 
@@ -663,6 +689,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] Fără modalitate de plata
     [payee] Fără terț
     [project] Fără proiect
+    [verification] De verificat
    *[category] Fără categorie
 }
 statistics-total = Total
@@ -705,6 +732,19 @@ accounts-stats-multiselect-help = Info: Utilizați clic de mouse + tasta [{ $mod
 statistics-year-question = Cu ce an doriți să lucrați? Radinus merge de la { $first } la { $last }.
 statistics-year-choose = Alegere an
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = Bilanț încrucișat
+crossed-balance-window-name = Bilanț încrucișat
+crossed-balance-column = Categorie
+crossed-balance-no-data = Nicio operațiune în această lună pentru conturile alese.
+crossed-balance-month-question = Pe ce lună doriți să lucrați? Un număr între { $first } și { $last }.
+crossed-balance-month-choose = Alegeți luna
+crossed-balance-next = Luna următoare
+crossed-balance-previous = Luna precedentă
+
 # --- Exportul tabelelor (clic dreapta) --------------------------------
 # O funcție a tabelului, nu a unei ferestre: toate listele o au.
 
@@ -722,8 +762,16 @@ export-to-xml = Export către XML (.xml)
 # Meniul Export al ferestrei de statistici: o filă pe an, denumită AN_2026.
 # Anii goi — cu comutatoarele așa cum au fost puse — nu figurează acolo.
 export-menu = Export
+export-to = Export către
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = Copiază celula
+copy-rows = Copiază rândurile selectate
+copy-failed = Copierea în clipboard a eșuat.
 export-all-years-excel = Export toți anii către Excel
 export-all-years-ods = Export toți anii către LibreOffice Calc
+export-all-months-excel = Exportați toate lunile anului afișat în Excel
+export-all-months-ods = Exportați toate lunile anului afișat în LibreOffice Calc
 export-no-year = Niciun an nu poartă operațiuni: nu este nimic de exportat.
 export-years-done = Ani exportați: { $years } — către „{ $file }”.
 export-to-json = Export către JSON (.json)
@@ -737,6 +785,7 @@ statistics-window-name = { $kind ->
     [payment-mode] Statistici după modalitate de plata
     [payee] Statistici după terț și comerciant
     [project] Statistici după proiect
+    [verification] Statistici după verificare
    *[category] Statistici după categorie
 }
 statistics-detail-name = Detaliu statistici
@@ -780,6 +829,19 @@ curve-axis-balance = sold
 curve-nothing = Niciun cont nu a fost ales: nu există niciun grafic de trasat.
 curve-empty = Nicio operațiune în această perioadă.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = Analiza evoluției soldului
+analysis-heading = Analiza evoluției soldului
+analysis-hint = Trasați o zonă pe grafic, cu butonul mouse-ului apăsat, pentru a vedea operațiunile din acea perioadă.
+analysis-zone = Zonă:
+analysis-opening = Sold inițial:
+analysis-closing = Sold final:
+analysis-variation = Variație:
+analysis-detail-name = Analiza soldului
+analysis-detail-none = Nicio operațiune în această zonă.
+
 # --- F05 — Clasificarea rapidă a operațiunilor -------------------------
 # Fereastra în care se clasifică **în masă**: se selectează rânduri, se bifează
 # caracteristicile de schimbat și se aplică dintr-o dată — în memorie.
@@ -799,6 +861,7 @@ quick-check-payment-mode = Mod
 quick-check-payee = Terț
 quick-check-project = Proiect
 quick-check-status = Stare
+quick-check-verification = Verificare
 quick-column-date = Data
 quick-column-label = Descriere
 quick-column-amount = Sumă
@@ -808,6 +871,7 @@ quick-column-payment-mode = Modalitate plată
 quick-column-payee = Terț
 quick-column-project = Proiecte
 quick-column-status = Stare
+quick-column-verification = Verificare
 # Pe un Mac, Ctrl + clic este un clic dreapta: tasta care adaugă la o selecție
 # este acolo ⌘, iar ajutorul trebuie să o indice pe cea care funcționează.
 quick-multiselect-help = Info: Utilizați clic de mouse + tasta [{ $modifier }] pe tabel pentru a selecta mai multe elemente
@@ -873,7 +937,7 @@ statement-no-match = Niciun rând nu corespunde filtrului.
 statement-help = Info: Utilizați clic de mouse + tasta [{ $modifier }] pe tabel pentru a selecta mai multe rânduri
 statement-choose-account = Acest fișier conține mai multe conturi. Pe care doriți să îl importați?
 statement-select-line = Selectați cel puțin un rând din extrasul de cont.
-statement-title-open = Deschiderea unui fișier de extras de cont (.ofx)
+statement-title-open = Deschiderea unui fișier de extras de cont (OFX, QIF, CSV)
 statement-title-info = Informații despre fișierul deschis
 statement-title-integrate = Integrarea selecției în cont
 statement-title-validate = Integrarea acestei operațiuni în cont
@@ -884,6 +948,17 @@ statement-loaded = { $count ->
     [one] { $count } rând citit, dintre care { $known } deja prezent în contul dumneavoastră.
     [few] { $count } rânduri citite, dintre care { $known } deja prezente în contul dumneavoastră.
    *[other] { $count } de rânduri citite, dintre care { $known } deja prezente în contul dumneavoastră.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] Rânduri citite: { $count }; niciunul nu seamănă cu o operațiune deja prezentă în contul dumneavoastră.
+    [one] Rânduri citite: { $count }, dintre care unul seamănă cu o operațiune deja prezentă în contul dumneavoastră (aceeași dată, aceeași descriere, aceeași sumă).
+    [few] Rânduri citite: { $count }, dintre care { $alike } seamănă cu operațiuni deja prezente în contul dumneavoastră (aceeași dată, aceeași descriere, aceeași sumă).
+   *[other] Rânduri citite: { $count }, dintre care { $alike } seamănă cu operațiuni deja prezente în contul dumneavoastră (aceeași dată, aceeași descriere, aceeași sumă).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] Încă unul seamănă cu o operațiune deja prezentă (aceeași dată, aceeași descriere, aceeași sumă).
+    [few] Încă { $alike } seamănă cu operațiuni deja prezente (aceeași dată, aceeași descriere, aceeași sumă).
+   *[other] Încă { $alike } seamănă cu operațiuni deja prezente (aceeași dată, aceeași descriere, aceeași sumă).
 }
 statement-integrated = { $count ->
     [0] Nimic nu a fost introdus: aceste rânduri sunt deja în contul dumneavoastră.
@@ -921,7 +996,24 @@ statement-file-info =
     Contul fișierului: { $account }
     Perioada: de la { $from } până la { $to }
     Soldul anunțat de bancă: { $balance }
-    { $count } operațiuni, dintre care { $known } deja prezente în contul dumneavoastră.
+statement-qif-question = Nimic din acest fișier nu indică dacă data „{ $date }” se scrie zi/lună sau lună/zi. Ea înseamnă:
+statement-qif-day-month = Ziua { $day }, luna { $month } (zi/lună)
+statement-qif-month-day = Ziua { $day }, luna { $month } (lună/zi)
+statement-qif-dates-mixed = Acest fișier își scrie datele în două moduri: „{ $first }” se citește zi/lună, „{ $second }” lună/zi. Nu este importat, pentru a nu denatura nicio dată.
+statement-qif-amounts-mixed = Acest fișier își scrie sumele în două moduri: „{ $first }” cu punct, „{ $second }” cu virgulă. Nu este importat, pentru a nu denatura nicio sumă.
+statement-qif-opening = Sold inițial de { $amount } la { $date }: nu este o operațiune, nu este importat.
+statement-qif-opening-undated = Sold inițial de { $amount }: nu este o operațiune, nu este importat.
+statement-qif-suspect = Rândul { $rank }, „{ $label }” ({ $amount }), seamănă cu un sold inițial: verificați-l înainte de a-l integra.
+statement-qif-rejected = { $count ->
+    [one] Un rând ilizibil nu este importat: { $lines }.
+    [few] { $count } rânduri ilizibile nu sunt importate: { $lines }.
+   *[other] { $count } de rânduri ilizibile nu sunt importate: { $lines }.
+}
+statement-qif-reason-date = dată
+statement-qif-reason-amount = sumă
+statement-qif-reason-differ = sume contradictorii
+statement-qif-no-account = Acest cont nu mai este în fișier: redeschideți fișierul.
+statement-balance-unknown = neindicat în fișier
 statement-group-identification = Identificarea operațiunii
 statement-group-amount = Suma operațiunii
 statement-group-classification = Clasificarea operațiunii pentru calculul statisticilor
@@ -1558,6 +1650,9 @@ password-show = Afișează parola
 password-remove-question = Retrageți protecția acestei baze?
 password-mismatch = Cele două introduceri ale parolei noi sunt diferite
 password-wrong = Parola nu se potrivește
+database-too-recent = Această bază a fost salvată de o versiune mai recentă de Radinus (versiunea bazei { $found }; această versiune citește până la versiunea { $supported }). Actualizați Radinus pentru a o deschide.
+database-not-radinus = Acest fișier nu este o bază Radinus.
+database-unreadable = Baza nu a putut fi citită: { $reason }
 password-close-first = Închideți această bază înainte de a-i schimba parola
 password-now-protected = Baza este protejată printr-o parolă
 password-now-clear = Baza nu mai este protejată
@@ -1794,6 +1889,11 @@ welcome-total-final = Sold final
 welcome-total-real-detail = reconciliat + angajat
 welcome-total-final-detail = reconciliat + angajat + planificat
 welcome-accounts = Conturile dumneavoastră
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = Conturi luate în calcul la totaluri: { $count } din { $total }
+welcome-tile-counted = Ia acest cont în calcul la totaluri
 welcome-tile-bank = În bancă
 welcome-tile-real = Real
 welcome-tile-final = Final
@@ -1848,6 +1948,58 @@ preferences-leaf-zoom = Mărimea afișării
 preferences-field-zoom = Mărire:
 preferences-zoom-reset = Valoare implicită
 preferences-zoom-hint = Totul se mărește împreună: textul, pictogramele, coloanele. Sub 100 %, încape mai mult pe ecran. Bara de meniuri a sistemului și casetele lui de dialog, în schimb, urmează reglajele calculatorului dumneavoastră și nu pe acestea.
+preferences-branch-import = Import
+preferences-leaf-verification = Verificare
+preferences-field-verification = Operațiuni importate:
+preferences-verification-hint = „Verificată”: aveți încredere în banca dumneavoastră, o operațiune importată este considerată corectă. „De verificat”: fiecare operațiune importată așteaptă controlul dumneavoastră; apoi o treceți chiar dumneavoastră la „Verificată” în lista operațiunilor. Această setare se aplică numai importurilor viitoare.
+preferences-leaf-qif = Extrase de cont QIF
+preferences-field-qif-order = Ordinea zilei și a lunii:
+preferences-qif-order-ask = Întrebați-mă de fiecare dată
+preferences-qif-order-day-month = Întotdeauna zi/lună (05/03 = 5 martie)
+preferences-qif-order-month-day = Întotdeauna lună/zi (05/03 = 3 mai)
+preferences-qif-order-help = Se folosește doar dacă nicio dată din fișier nu permite stabilirea ordinii. De îndată ce o dată precum 24/11 dovedește ordinea, decide fișierul, oricare ar fi această setare.
+preferences-field-qif-label = Descrierea operațiunii:
+preferences-qif-label-both = Terț + notă
+preferences-qif-label-payee = Doar terțul
+preferences-qif-label-memo = Doar nota
+preferences-qif-label-help = Când o operațiune are atât un terț, cât și o notă. Dacă are doar unul dintre ele, acela este folosit, oricare ar fi această setare.
+preferences-qif-hint = Aceste setări se aplică tuturor extraselor de cont QIF, oricare ar fi baza de date deschisă. „Întrebați-mă de fiecare dată” este varianta cea mai sigură: un fișier cu date ambigue nu este niciodată citit la întâmplare.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = Restabilește coloanele implicite
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = Afișează/Ascunde
+columns-colour = Colorează coloana:
+columns-colour-none = Nicio culoare
+columns-colour-red = Roșu
+columns-colour-orange = Portocaliu
+columns-colour-pink = Roz
+columns-colour-pastel-green = Verde pastel
+columns-colour-green = Verde
+columns-colour-pastel-blue = Albastru pastel
+columns-colour-blue = Albastru
+columns-colour-pastel-yellow = Galben pastel
+columns-colour-yellow = Galben
+preferences-leaf-columns = Coloanele tabelelor
+preferences-table-operations-list = Lista operațiunilor
+preferences-columns-reset = Reinițializează
+preferences-columns-reset-all = Reinițializează tot
+preferences-columns-done = Coloanele au revenit la dispunerea inițială.
+preferences-columns-hint = Fiecare tabel reține ordinea coloanelor, pe cele pe care le ascundeți și lățimea lor. „Reinițializează” îi redă imediat dispunerea inițială.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = Reinițializare
+preferences-leaf-comfort = Setări de confort
+preferences-comfort-reset = Reinițializează setările de confort
+preferences-comfort-hint = Readuce la starea inițială coloanele tuturor tabelelor, ordinea și casetele conturilor din fereastra de pornire și mărimea afișării. Limba, moneda și verificarea operațiunilor importate nu sunt modificate.
+preferences-comfort-question = Reinițializați setările de confort? Coloanele tabelelor, fereastra de pornire și mărimea afișării vor reveni la starea inițială.
+preferences-comfort-done = Setările de confort au fost reinițializate.
 
 # --- Bannerul ferestrei de întâmpinare ------------------------------------
 #
@@ -1912,3 +2064,970 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = Acest program este furnizat fără nicio garanție, în măsura permisă de lege.
 licence-info = Textul oficial se deschide în browserul dumneavoastră, pe gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = Simulare de credit
+window-loan-title = Simulare de credit
+loan-tab-credit = Creditul
+loan-tab-afford = Îl pot rambursa?
+loan-field-kind = Tipul creditului
+loan-kind-consumer = Credit de consum
+loan-kind-mortgage = Credit imobiliar
+loan-field-amount = Suma împrumutată
+loan-field-payment = Rata lunară
+loan-field-months = Durata
+loan-field-rate = Dobândă fixă
+loan-field-fees = Comision de analiză
+loan-field-insurance = Asigurare pe lună
+loan-unit-months = luni
+loan-unit-percent = %
+loan-invalid-field = Această valoare nu este un număr: corectați-o pentru a relua calculul.
+loan-report-button = Raport PDF
+loan-monthly-table = Tabel lună de lună
+loan-months-count = { $count ->
+        [one] { $count } lună
+        [few] { $count } luni
+       *[other] { $count } de luni
+    }
+loan-percent = { $value } %
+loan-notice-payment-too-low = Această rată nu acoperă dobânda: creditul nu ar fi rambursat niciodată. Durata rămâne la 600 de luni.
+loan-notice-too-long = Această rată ar necesita peste 600 de luni: durata rămâne la 600 de luni.
+loan-figure-payment = Rata lunară
+loan-figure-payment-insured = Rata cu asigurare
+loan-figure-taeg = DAE
+loan-figure-interest = Costul dobânzii
+loan-figure-insurance = Costul asigurării
+loan-figure-cost = Costul total al creditului
+loan-figure-total-due = Suma totală datorată
+loan-figure-all-in = Total rambursat, cu asigurare
+loan-part-capital = Suma împrumutată
+loan-part-interest = Dobândă
+loan-part-fees = Comision de analiză
+loan-part-insurance = Asigurare
+loan-donut-cost-caption = în total
+loan-chart-cost = Cât costă acest credit
+loan-chart-capital = Capital rămas
+loan-schedule-title = Grafic de rambursare
+loan-schedule-yearly = Grafic de rambursare, an cu an
+loan-column-number = Nr.
+loan-column-year = An
+loan-column-date = Scadență
+loan-column-payment = Rată
+loan-column-payments = Rate
+loan-column-interest = Dobândă
+loan-column-capital = Capital
+loan-column-insurance = Asigurare
+loan-column-remaining = Capital rămas
+loan-history-label = Perioada studiată
+loan-period-last-12 = Ultimele 12 luni
+loan-accounts-title = Conturi studiate
+loan-period-title = Perioadă
+loan-column-account = Cont
+loan-column-bank = Bancă
+loan-column-balance = Sold real
+loan-unavailable-no-account = Bifați cel puțin un cont pentru a vă studia istoricul.
+loan-unavailable-no-month = Această perioadă nu are încă nicio lună completă: alegeți alta.
+loan-verdict-title = Pe scurt
+loan-verdict-green = Realizabil
+loan-verdict-orange = La limită
+loan-verdict-red = Riscant
+loan-verdict-no-income = Niciun venit în această perioadă: gradul de îndatorare nu se poate calcula.
+loan-check-debt-green = Grad de îndatorare { $ratio }: sub pragul de { $green } al acestei metode.
+loan-check-debt-orange = Grad de îndatorare { $ratio }: între { $green } și { $red }, la limită.
+loan-check-debt-red = Grad de îndatorare { $ratio }: peste { $red }.
+loan-check-effort = Rata de { $payment } ia { $share } din ce puneți deoparte { $kind ->
+        [good] într-o lună bună
+        [hard] într-o lună grea
+       *[usual] într-o lună obișnuită
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] O lună bună
+        [hard] O lună grea
+       *[usual] O lună obișnuită
+    } nu vă lasă nimic deoparte: rata de { $payment } ar fi luată din rezerva dumneavoastră.
+loan-check-reserve-green = Soldul dumneavoastră rămâne pozitiv până la sfârșitul creditului.
+loan-check-reserve-red = Soldul dumneavoastră ar scădea sub zero în { $month }, din cauza acestui credit.
+loan-check-reserve-sooner = Soldul dumneavoastră ar scădea sub zero în { $month }, cu { $count ->
+        [one] o lună
+        [few] { $count } luni
+       *[other] { $count } de luni
+    } mai devreme decât fără acest credit.
+loan-check-reserve-anyway = Soldul dumneavoastră ar scădea sub zero în jurul lui { $month } chiar și fără acest credit, care nu schimbă aproape nimic.
+loan-check-reserve-floor-green = Soldul dumneavoastră rămâne peste rezerva de siguranță ({ $floor }) până la sfârșitul creditului.
+loan-check-reserve-floor-red = Soldul dumneavoastră ar scădea sub rezerva de siguranță ({ $floor }) în { $month }, din cauza acestui credit.
+loan-check-reserve-floor-sooner = Soldul dumneavoastră ar scădea sub rezerva de siguranță ({ $floor }) în { $month }, cu { $count ->
+        [one] o lună
+        [few] { $count } luni
+       *[other] { $count } de luni
+    } mai devreme decât fără acest credit.
+loan-check-reserve-floor-anyway = Soldul dumneavoastră ar scădea sub rezerva de siguranță ({ $floor }) în jurul lui { $month } chiar și fără acest credit, care nu schimbă aproape nimic.
+loan-warning-deficit = Atenție: în această perioadă, cheltuielile dumneavoastră depășesc deja veniturile cu { $amount } pe lună în medie, înainte de orice credit.
+loan-figure-reference = Economii { $kind ->
+        [good] într-o lună bună
+        [hard] într-o lună grea
+       *[usual] într-o lună obișnuită
+    }
+loan-figure-tipped = Luni pe care creditul le-ar duce pe minus
+loan-gauge-caption = îndatorare
+loan-figure-income = Venituri medii pe lună
+loan-figure-spending = Cheltuieli medii pe lună
+loan-figure-saving = Economii medii pe lună
+loan-figure-running = Credite în curs pe lună
+loan-figure-new = Noua rată, cu asigurare
+loan-figure-rest = De trai pe lună
+loan-figure-debt = Grad de îndatorare
+loan-red-months-value = { $count } din { $total }
+loan-figure-balance-now = Sold real astăzi
+loan-figure-balance-end = Sold estimat la sfârșitul creditului
+loan-chart-income = Unde merge venitul dumneavoastră mediu
+loan-donut-income-caption = venit mediu
+loan-part-spending = Cheltuieli curente
+loan-part-running = Credite în curs
+loan-part-new = Credit nou
+loan-part-rest = Rest
+loan-part-missing = Lipsesc
+loan-chart-history = Istoricul dumneavoastră cu acest credit
+loan-chart-history-hint = Ce ar fi rămas în fiecare lună, după plata ratei. Cu roșu aprins, lunile pe care creditul le-ar duce pe minus; cu roșu pal, cele care erau deja pe minus fără el.
+loan-chart-projection = Soldul dumneavoastră estimat
+loan-mark-loan-end = Sfârșit: { $label }
+loan-mark-negative = Pe minus
+loan-mark-floor = Sub rezervă
+loan-mark-floor-line = Rezervă de siguranță
+loan-running-title = Credite în curs luate în calcul
+loan-running-column-label = Operațiune periodică
+loan-running-column-monthly = Pe lună
+loan-running-column-end = Ultima rată
+loan-no-running = Niciun credit în curs recunoscut printre operațiunile dumneavoastră periodice.
+loan-period-caption = din { $from } până în { $to } ({ $count ->
+        [one] { $count } lună
+        [few] { $count } luni
+       *[other] { $count } de luni
+    })
+loan-transfers = { $count ->
+        [0] Niciun transfer între conturile bifate nu a fost recunoscut.
+        [one] Un transfer între conturile bifate a fost recunoscut și pus deoparte.
+        [few] { $count } transferuri între conturile bifate au fost recunoscute și puse deoparte.
+       *[other] { $count } de transferuri între conturile bifate au fost recunoscute și puse deoparte.
+    }
+loan-method = Medii pe lunile complete ale perioadei, operațiuni punctate și angajate, fără transferurile între conturile bifate.
+loan-report-title = Simulare de credit
+loan-report-made-on = simulare din { $date }
+loan-disclaimer = Simulare orientativă, fără valoare contractuală. Doar oferta băncii este obligatorie.
+loan-tab-rules = Setările evaluării
+loan-method-optimistic = Optimistă
+loan-method-neutral = Neutră
+loan-method-severe = Severă
+loan-method-line = Metoda de evaluare: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = Verdictul răspunde la trei întrebări, iar fiecare metodă își pune propriile exigențe. Alegeți-o pe cea care vi se potrivește: verdictul din fila „Îl pot rambursa?” o urmează. Ultimul rând presupune că cheltuielile dumneavoastră cresc în fiecare an cu procentul indicat; rata nu se schimbă.
+loan-rule-row-debt = Îndatorare acceptată
+loan-rule-row-reference = Economii de referință
+loan-rule-row-share = Partea din aceste economii pe care o poate lua rata
+loan-rule-row-floor = Pragul sub care soldul nu trebuie să coboare
+loan-rule-row-sooner = Dacă soldul coboară sub el chiar și fără credit
+loan-rule-row-growth = Creșterea cheltuielilor pe an
+loan-rule-limits = verde până la { $green }, portocaliu până la { $red }
+loan-rule-reference = { $kind ->
+        [good] o lună bună
+        [hard] o lună grea
+       *[usual] o lună obișnuită
+    }: { $amount }
+loan-rule-floor-zero = zero
+loan-rule-floor-cushion = o lună de cheltuieli: { $amount }
+loan-rule-sooner = portocaliu dacă îl grăbește cu { $orange }, roșu cu { $red }
+loan-unit-percent-year = % pe an
+loan-method-optimistic-explain = Metoda optimistă presupune o lună bună, acceptă o îndatorare de până la 40 % și nu păstrează nicio rezervă: arată ce este posibil dacă totul merge bine.
+loan-method-neutral-explain = Metoda neutră presupune o lună obișnuită și urmează regula băncilor, 33–35 % îndatorare: este evaluarea de referință.
+loan-method-severe-explain = Metoda severă presupune o lună grea și păstrează o lună de cheltuieli ca rezervă pentru neprevăzut: arată ce rezistă chiar dacă lucrurile merg prost.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = Consumul unui aparat electric
+window-appliance-title = Consumul unui aparat electric
+appliance-device-title = Aparatul
+appliance-on-title = Pornit
+appliance-standby-title = În standby
+appliance-field-on-watts = Putere în funcțiune
+appliance-field-on-hours = Timp de funcționare pe zi
+appliance-field-days = Zile de utilizare pe săptămână
+appliance-field-share = Partea de funcționare în orele în afara vârfului
+appliance-field-standby-watts = Putere în standby
+appliance-field-standby-hours = Timp în standby pe zi de utilizare
+appliance-unit-watts = W
+appliance-unit-hours = h
+appliance-unit-days = din 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/kWh
+appliance-standby-hint = Dacă rămâne gol, standby-ul durează restul zilei. În zilele fără utilizare, aparatul rămâne în priză: tot acest timp contează ca standby. Scos din priză, consumul său în standby este de 0 W.
+appliance-contract-title = Contractul dumneavoastră
+appliance-field-option = Opțiune tarifară
+appliance-option-base = De bază (un singur preț)
+appliance-option-off-peak = Ore de vârf / Ore în afara vârfului
+appliance-field-base = Preț per kWh
+appliance-field-peak = Preț per kWh în orele de vârf
+appliance-field-off-peak = Preț per kWh în orele în afara vârfului
+appliance-field-off-peak-hours = Ore în afara vârfului pe zi
+appliance-contract-hint = Aceste prețuri sunt valabile doar pentru acest calcul. Tariful salvat se setează în Setări › Preferințe › Instrumente.
+appliance-contract-reset = Revenire la tariful salvat
+appliance-period-day = Pe zi
+appliance-period-month = Pe lună
+appliance-period-year = Pe an
+appliance-energy = { $value } kWh
+appliance-less-than = mai puțin de { $amount }
+appliance-detail-title = Detaliul pe un an
+appliance-column-part = Element
+appliance-column-energy = Energie
+appliance-column-cost = Cost
+appliance-column-share = Pondere
+appliance-line-on = Pornit
+appliance-line-standby = În standby
+appliance-line-on-peak = Pornit, ore de vârf
+appliance-line-on-off-peak = Pornit, ore în afara vârfului
+appliance-line-standby-peak = În standby, ore de vârf
+appliance-line-standby-off-peak = În standby, ore în afara vârfului
+appliance-line-total = Total
+appliance-chart-title = Unde se duc banii
+appliance-chart-caption = pe an
+appliance-standby-sentence = Doar standby-ul costă { $amount } pe an: { $share } din costul aparatului.
+appliance-note-plate = Puterea înscrisă pe aparat sau în manualul său este un maxim: în funcțiune, majoritatea aparatelor consumă mai puțin. Pentru o valoare reală, măsurați-o cu o priză wattmetru și introduceți ce indică aceasta.
+appliance-note-subscription = Abonamentul nu este inclus: îl plătiți fie că aparatul este în priză, fie că nu.
+appliance-invalid-watts = Vă rugăm să introduceți o putere între 0 și 100.000 W.
+appliance-invalid-hours = Vă rugăm să introduceți o durată între 0 și 24 de ore pe zi.
+appliance-invalid-days = Vă rugăm să introduceți un număr întreg de zile, între 0 și 7.
+appliance-invalid-share = Vă rugăm să introduceți o pondere între 0 și 100%.
+appliance-invalid-day-overflow = Funcționarea și standby-ul depășesc 24 de ore pe zi.
+appliance-invalid-price = Vă rugăm să introduceți un preț per kWh între 0 și 100.
+appliance-invalid-off-peak-hours = Vă rugăm să introduceți un număr întreg de ore în afara vârfului, între 0 și 24.
+preferences-branch-tools = Instrumente
+preferences-leaf-electricity = Tariful energiei electrice
+preferences-electricity-blue = Revenire la Tarif Bleu EDF
+preferences-electricity-hint = Tariful contractului dumneavoastră, folosit de instrumentul „Consumul unui aparat electric”. Implicit: Tarif Bleu de la EDF (Franța) la 1 august 2026, prețuri cu toate taxele incluse, contor de 3 până la 6 kVA. Aceste prețuri se schimbă adesea în februarie și august: copiați-le pe cele de pe factura dumneavoastră.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = Fondul meu de urgență
+window-cushion-title = Fondul meu de urgență
+cushion-question = Dacă veniturile dumneavoastră s-ar opri mâine, câte luni ați rezista din economii?
+cushion-accounts-title = Conturile dumneavoastră
+cushion-column-account = Cont
+cushion-column-balance = Sold real
+cushion-column-savings = Economii
+cushion-column-spending = Cheltuieli
+cushion-accounts-hint = „Economii”: banii pe care contați în caz de necaz. „Cheltuieli”: conturile din care pleacă cheltuielile de zi cu zi.
+cushion-history-label = Perioada analizată
+cushion-backup-label = Venit de rezervă pe lună
+cushion-backup-hint = Ce ar continua să intre: indemnizația de șomaj, salariul partenerului… Gol: niciun venit.
+cushion-categories-title = Cheltuielile luate în calcul
+cushion-categories-hint = Debifați ce ați tăia în caz de necaz.
+cushion-categories-empty = Nicio cheltuială în această perioadă.
+cushion-verdict-title = Fondul dumneavoastră
+cushion-targets-title = Pragurile de prudență
+cushion-projection-title = Economiile dumneavoastră în caz de necaz
+cushion-projection-hint = Ce ar rămâne în fiecare lună dacă veniturile dumneavoastră s-ar opri astăzi.
+cushion-note = O estimare bazată pe istoricul dumneavoastră: cheltuielile dintr-o lună dificilă pot diferi de medie.
+cushion-invalid-backup = Această sumă nu poate fi citită: corectați-o pentru a relua calculul.
+cushion-no-spending-account = Bifați cel puțin un cont „Cheltuieli”.
+cushion-no-month = Această perioadă nu are încă nicio lună completă.
+cushion-months = { $value } luni
+cushion-per-month = { $amount } pe lună
+cushion-figure-holds = Fără limită
+cushion-gauge-caption = din cheltuieli acoperite
+cushion-verdict-short = Mai puțin de trei luni: un necaz v-ar pune repede în dificultate.
+cushion-verdict-fair = Între trei și șase luni: un fond corect, de întărit dacă puteți.
+cushion-verdict-solid = Șase luni sau mai mult: fondul dumneavoastră este solid.
+cushion-verdict-holds = Venitul de rezervă vă acoperă cheltuielile: economiile nu s-ar topi.
+cushion-verdict-nothing = Nicio cheltuială luată în calcul în această perioadă: nu este nimic de acoperit.
+cushion-tile-savings = Economii disponibile
+cushion-tile-spending = Cheltuieli luate în calcul
+cushion-tile-backup = Venit de rezervă
+cushion-tile-burn = Economiile s-ar topi cu
+cushion-tile-rhythm = Ritmul de economisire
+cushion-burn-none = Nimic
+cushion-target-title = { $months } luni de cheltuieli: { $amount }
+cushion-target-reached = Atins.
+cushion-target-date = Lipsesc { $missing }. În ritmul dumneavoastră de economisire, pragul va fi atins în jurul datei: { $month }.
+cushion-target-never = Lipsesc { $missing }. Economiile dumneavoastră nu au crescut în această perioadă: în acest ritm, pragul nu va fi atins.
+cushion-mark-empty = Economii epuizate: { $month }
+cushion-period = Medie pe { $count ->
+        [one] { $count } lună completă
+        [few] { $count } luni complete
+       *[other] { $count } de luni complete
+    } (perioada: { $from } – { $to }). { $transfers ->
+        [0] Niciun transfer între conturile dumneavoastră.
+        [one] Un transfer între conturile dumneavoastră, exclus din calcul.
+        [few] { $transfers } transferuri între conturile dumneavoastră, excluse din calcul.
+       *[other] { $transfers } de transferuri între conturile dumneavoastră, excluse din calcul.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = Obiectiv de economisire
+window-goal-title = Obiectiv de economisire
+goal-accounts-title = Conturile urmărite
+goal-column-account = Cont
+goal-column-balance = Sold real
+goal-accounts-hint = Un transfer între două conturi urmărite se anulează; un transfer către un cont neurmărit contează ca o ieșire.
+goal-period-label = Perioada de referință
+goal-period-range = Interval de ani…
+goal-range-from = de la
+goal-range-to = până la
+goal-question-title = Întrebarea dumneavoastră
+goal-question-when = Când voi avea această sumă?
+goal-question-amount = Cât voi avea la această dată?
+goal-question-effort = Cât să economisesc ca să am această sumă la această dată?
+goal-field-target = Suma țintă
+goal-field-date = Data țintă
+goal-field-rate = Dobânda anuală a economiilor
+goal-field-extra = Și dacă aș economisi în plus, pe lună
+goal-options-hint = Goale: fără dobândă, nimic în plus.
+goal-answer-title = Răspunsul
+goal-chart-title = Soldul dumneavoastră, ieri și mâine
+goal-chart-hint = Linie continuă: soldul real din ultimele douăsprezece luni; linie punctată: proiecția; zona deschisă: intervalul în funcție de luni.
+goal-disclaimer = O proiecție bazată pe istoricul dumneavoastră, nu o promisiune: un eveniment neprevăzut poate schimba totul.
+goal-no-account = Bifați cel puțin un cont de urmărit.
+goal-no-month = Această perioadă nu are încă nicio lună completă.
+goal-invalid-target = Vă rugăm să introduceți o sumă de atins.
+goal-invalid-date = Vă rugăm să alegeți o dată viitoare, în următorii cincizeci de ani.
+goal-invalid-rate = Vă rugăm să introduceți o dobândă între 0 și 100 %.
+goal-invalid-extra = Această sumă nu poate fi citită: corectați-o pentru a relua calculul.
+goal-per-month = { $amount } pe lună
+goal-tile-balance = Soldul de azi
+goal-tile-rhythm = Ritmul mediu
+goal-tile-target = Obiectiv
+goal-tile-reached = Atins aproximativ în
+goal-tile-date = Data țintă
+goal-tile-projected = Sold proiectat
+goal-tile-saved = Economisit până atunci
+goal-tile-interest = Din care dobânzi
+goal-tile-needed = De economisit
+goal-when-already = Aveți deja { $amount }: conturile dumneavoastră urmărite totalizează { $balance }.
+goal-when-reached = Veți avea { $amount } peste aproximativ { $months ->
+        [one] o lună
+        [few] { $months } luni
+       *[other] { $months } de luni
+    } (în jurul datei: { $month }).
+goal-when-range = În funcție de luni, între { $early } și { $late }.
+goal-when-range-open = Cel mai devreme în jurul datei: { $early }; cu luni slabe, obiectivul nu ar fi atins.
+goal-when-never = În acest ritm, nu veți atinge { $amount }.
+goal-zero = Soldul dumneavoastră ar scădea la zero în jurul datei: { $month }.
+goal-amount = În { $month }, ați avea aproximativ { $amount }.
+goal-amount-range = În funcție de luni, între { $low } și { $high }.
+goal-effort-more = Pentru a avea { $amount } în { $month }, ar trebui să economisiți în medie { $monthly } pe lună, adică { $gap } mai mult decât acum.
+goal-effort-less = Pentru a avea { $amount } în { $month }, ar ajunge { $monthly } pe lună, adică { $gap } mai puțin decât acum: sunteți în avans.
+goal-effort-range = În funcție de luni, diferența față de ritmul dumneavoastră ar fi între { $low } și { $high } pe lună.
+goal-chart-target = Obiectiv: { $amount }
+goal-chart-today = Astăzi
+goal-note-seasons = Proiecția urmează anotimpurile: fiecare lună viitoare preia media acelorași luni din perioadă.
+goal-note-range = Intervalul provine din lunile slabe și din lunile puternice ale perioadei: sfertul cel mai de jos și sfertul cel mai de sus.
+goal-note-loan = Creditul „{ $label }” se încheie în { $month }: { $amount } în plus pe lună după aceea.
+goal-note-interest = Dobânda este calculată în fiecare lună la o rată de { $rate } % pe an: o aproximare a regulii chenzinelor de la conturile de economii.
+goal-period = Ritm calculat pe { $count ->
+        [one] { $count } lună completă
+        [few] { $count } luni complete
+       *[other] { $count } de luni complete
+    } (perioada: { $from } – { $to }). { $transfers ->
+        [0] Niciun transfer între conturile dumneavoastră urmărite.
+        [one] Un transfer între conturile dumneavoastră urmărite, exclus din calcul.
+        [few] { $transfers } transferuri între conturile dumneavoastră urmărite, excluse din calcul.
+       *[other] { $transfers } de transferuri între conturile dumneavoastră urmărite, excluse din calcul.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = Și dacă aș reduce…?
+window-cut-title = Și dacă aș reduce…?
+cut-axis-label = Grupare după
+cut-axis-category = Categorii
+cut-axis-payee = Terți
+cut-axis-budget-line = Poziții bugetare
+cut-table-title = Cheltuielile dumneavoastră, poziție cu poziție
+cut-table-hint = Introduceți o reducere în % sau în { $sign } pe lună la pozițiile pe care ați dori să le diminuați. O reducere nu poate depăși cheltuiala însăși.
+cut-column-monthly = Pe lună
+cut-column-cut = Reducere
+cut-column-after = După
+cut-column-yearly = Câștig pe an
+cut-total = Total
+cut-horizon-label = Orizont
+cut-settings-title = Setări
+cut-options-hint = Dobânda și suma țintă sunt opționale.
+cut-report-button = Raport PDF
+cut-chart-title = Soldul dumneavoastră, fără și cu reduceri
+cut-chart-hint = Linie continuă: soldul real din ultimele douăsprezece luni; linie punctată gri: proiecția fără reduceri; albastru: cu reduceri; verde: banii câștigați.
+cut-donut-title = Cheltuielile dumneavoastră lunare după reduceri
+cut-donut-caption = pe lună după reduceri
+cut-donut-others = Alte poziții
+cut-donut-saved = Economisit
+cut-legend-with = Cu reducerile
+cut-legend-without = Fără reduceri
+cut-years = { $years ->
+        [one] { $years } an
+        [few] { $years } ani
+       *[other] { $years } de ani
+    }
+cut-headline-none = Introduceți o reducere în tabel pentru a-i vedea efectul.
+cut-headline = Reducând { $count ->
+        [one] această poziție
+        [few] aceste { $count } poziții
+       *[other] aceste { $count } de poziții
+    }, ați pune deoparte { $monthly } în plus pe lună, adică { $yearly } pe an.
+cut-tile-monthly = Câștig pe lună
+cut-tile-yearly = Câștig pe an
+cut-tile-horizon = Câștig în { $years ->
+        [one] { $years } an
+        [few] { $years } ani
+       *[other] { $years } de ani
+    }
+cut-tile-spending = Cheltuieli pe lună
+cut-target-already = Aveți deja { $amount }.
+cut-target-sooner = Ați atinge { $amount } în jurul datei: { $with } (fără reduceri: { $without }) — { $months ->
+        [0] niciun câștig de timp
+        [one] cu o lună mai devreme
+        [few] cu { $months } luni mai devreme
+       *[other] cu { $months } de luni mai devreme
+    }.
+cut-target-only-with = Cu aceste reduceri, ați atinge { $amount } în jurul datei: { $with }; fără ele, în ritmul actual, niciodată.
+cut-target-never = Chiar și cu aceste reduceri, nu ați atinge { $amount } în ritmul dumneavoastră actual.
+cut-note-seasons = Fiecare reducere urmează anotimpurile poziției sale: o poziție care cântărește mai ales vara aduce economii mai ales vara.
+cut-note-capped = O reducere introdusă depășea cheltuiala: a fost adusă la nivelul cheltuielii înseși.
+cut-invalid-cut = Această reducere nu poate fi citită: un procent între 0 și 100 sau o sumă pe lună.
+cut-report-settings = Setările
+cut-report-result = Rezultatul
+cut-report-accounts = Conturile urmărite
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = Îmi pregătesc vacanța
+window-holiday-title = Îmi pregătesc vacanța
+holiday-trip-title = Călătoria
+holiday-field-trip = Tipul călătoriei
+holiday-trip-stay = Sejur
+holiday-trip-cruise = Croazieră
+holiday-field-adults = Adulți
+holiday-field-children = Copii
+holiday-field-nights = Durata sejurului, în nopți
+holiday-field-days = Zile
+holiday-field-months = Luni până la plecare
+holiday-field-stops = Număr de escale
+holiday-saved-title = Economisit deja
+holiday-saved-hint = Bifați conturile în care banii pentru vacanță sunt deja puși deoparte: soldul lor real contează ca economisit deja.
+holiday-budget-title = Bugetul
+holiday-budget-hint = Pentru fiecare poziție, o sumă, pentru cine se aplică și pentru cât timp. O poziție goală nu se ia în calcul.
+holiday-optional-title = Poziții opționale
+holiday-result-title = Rezultatul
+holiday-donut-title = Unde se duc banii călătoriei
+holiday-donut-caption = pentru călătorie
+holiday-child-label = Preț copil
+holiday-count-label = Cabine
+holiday-open = Deschideți un proiect…
+holiday-save = Salvați proiectul…
+holiday-pdf = Raport PDF
+holiday-excel = Export în Excel
+holiday-file-filter = Proiect de vacanță
+holiday-replace-question = Deschiderea acestui proiect va înlocui ce este introdus în fereastră. Continuați?
+holiday-file-saved = Proiect salvat: { $file }
+holiday-file-opened = Proiect deschis: { $file }
+holiday-file-not-project = Acest fișier nu este un proiect de vacanță Radinus.
+holiday-file-too-recent = Acest proiect provine dintr-o versiune mai nouă de Radinus: actualizați Radinus pentru a-l deschide.
+holiday-file-failed = Fișierul nu a putut fi citit sau scris: { $reason }
+holiday-line-transport = Transport dus-întors
+holiday-line-lodging = Cazare
+holiday-line-meals = Mese și cheltuieli curente
+holiday-line-visits = Vizite și activități de agrement
+holiday-line-port = Drumul până în port
+holiday-line-cabins = Cabine
+holiday-line-service = Taxă de serviciu (bacșiș)
+holiday-line-drinks = Pachet de băuturi
+holiday-line-excursions = Excursii în escale
+holiday-line-port-taxes = Taxe portuare
+holiday-line-wifi = Wifi la bord
+holiday-line-onboard = Cheltuieli la bord și în escale
+holiday-line-other = Alte cheltuieli și neprevăzute
+holiday-line-insurance = Asigurare storno
+holiday-line-stay-tax = Taxă turistică
+holiday-line-car = Mașină la destinație, carburant și taxe de drum
+holiday-line-parking = Parcare la aeroport sau la gară
+holiday-line-bank = Comisioane bancare în străinătate
+holiday-line-formalities = Formalități (pașaport, viză, vaccinuri)
+holiday-line-pets = Îngrijirea animalelor
+holiday-span-trip = pentru sejur
+holiday-span-night = pe noapte
+holiday-span-day = pe zi
+holiday-span-stop = pe escală
+holiday-who-all = pentru toți
+holiday-who-person = de persoană
+holiday-who-adults = de adult
+holiday-cabins-count = { $count ->
+        [one] { $count } cabină
+        [few] { $count } cabine
+       *[other] { $count } de cabine
+    }
+holiday-days = { $days ->
+        [one] { $days } zi
+        [few] { $days } zile
+       *[other] { $days } de zile
+    }
+holiday-invalid-count = Introduceți un număr întreg.
+holiday-invalid-amount = Această sumă nu poate fi citită: un număr pozitiv sau un procent între 0 și 100.
+holiday-headline-empty = Introduceți sumele din buget pentru a vedea cât va costa călătoria.
+holiday-headline-stay = Acest sejur ar costa { $total } pentru { $people ->
+        [one] o persoană
+        [few] { $people } persoane
+       *[other] { $people } de persoane
+    } și { $nights ->
+        [0] nicio noapte
+        [one] o noapte
+        [few] { $nights } nopți
+       *[other] { $nights } de nopți
+    }.
+holiday-headline-cruise = Această croazieră ar costa { $total } pentru { $people ->
+        [one] o persoană
+        [few] { $people } persoane
+       *[other] { $people } de persoane
+    } și { $nights ->
+        [0] nicio noapte
+        [one] o noapte
+        [few] { $nights } nopți
+       *[other] { $nights } de nopți
+    }.
+holiday-tile-total = Cost total
+holiday-tile-person = De persoană
+holiday-tile-person-day = De persoană pe zi
+holiday-tile-saved = Economisit deja
+holiday-tile-remaining = Rămas de finanțat
+holiday-tile-monthly = Economii necesare
+holiday-remaining-none = Nimic: este acoperit
+holiday-monthly-none = Nimic de pus deoparte
+holiday-monthly-now = Plecare luna aceasta
+holiday-note-days = Zilele sunt nopțile plus una: șapte nopți înseamnă opt zile.
+holiday-note-child = De persoană, un copil plătește prețul pentru copii, dacă este indicat; dacă este gol, plătește ca un adult.
+holiday-note-percent = Un procent de asigurare se aplică pozițiilor principale ale călătoriei; cel al comisioanelor bancare, cheltuielilor făcute la destinație.
+holiday-sheet-budget = Buget
+holiday-sheet-result = Rezultat
+holiday-column-line = Poziție
+holiday-column-amount = Sumă
+holiday-column-child = Preț copil
+holiday-column-who = Pentru cine
+holiday-column-span = Pentru cât timp
+holiday-column-cost = Cost
+holiday-disclaimer = O estimare pe baza propriilor dumneavoastră sume: prețurile reale pot varia.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = Proiect de reducere
+cut-file-not-project = Acest fișier nu este un proiect de reducere Radinus.
+cut-file-too-recent = Acest proiect provine dintr-o versiune mai nouă de Radinus: actualizați Radinus pentru a-l deschide.
+cut-sheet-items = Poziții
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = Carnetul mașinii mele
+window-car-title = Carnetul mașinii mele
+car-unnamed = Mașina mea
+car-sheet-title = Mașina
+car-field-plate = Număr de înmatriculare
+car-field-make = Marcă
+car-field-model = Model
+car-field-engine = Motorizare
+car-field-first-hand = Primul proprietar
+car-field-registered = Prima înmatriculare
+car-field-acquired = Data achiziției
+car-field-acquired-km = Kilometraj la achiziție
+car-field-service = Revizie la fiecare
+car-field-service-or = sau la fiecare
+car-unit-months-short = luni
+car-unit-km = km
+car-tariff-title = Tariful încărcării acasă
+car-tariff-hint = Acest tarif este păstrat în carnetul mașinii: nu îl modifică pe cel din preferințe.
+car-tariff-reset = Preluați tariful din preferințe
+car-engine-petrol = Benzină
+car-engine-diesel = Diesel
+car-engine-lpg = GPL
+car-engine-e85 = E85 (bioetanol)
+car-engine-hybrid = Hibrid
+car-engine-plug-in = Hibrid plug-in
+car-engine-electric = Electric
+car-engine-hydrogen = Hidrogen
+car-energy-petrol = Benzină
+car-energy-diesel = Motorină
+car-energy-lpg = GPL
+car-energy-e85 = E85
+car-energy-electricity = Electricitate
+car-energy-hydrogen = Hidrogen
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = Energie
+car-rubric-upkeep = Întreținere curentă
+car-rubric-service = Revizie
+car-rubric-wear = Piese de uzură
+car-rubric-tyres = Anvelope
+car-rubric-breakdown = Defecțiuni
+car-rubric-insurance = Asigurare
+car-rubric-inspection = Inspecție tehnică (ITP)
+car-part-brake-pads = Plăcuțe de frână
+car-part-brake-discs = Discuri de frână
+car-part-timing-belt = Curea de distribuție
+car-part-clutch = Ambreiaj
+car-part-battery-12v = Baterie 12 V
+car-part-shock-absorbers = Amortizoare
+car-part-wipers = Ștergătoare
+car-part-spark-plugs = Bujii
+car-part-glow-plugs = Bujii incandescente
+car-part-particulate-filter = Filtru de particule
+car-part-catalytic-converter = Catalizator
+car-part-fuel-cell-filter = Filtrul pilei de combustie
+car-part-exhaust = Eșapament
+car-part-other = Altă piesă…
+car-axle-all = Toate cele patru anvelope
+car-axle-front = Anvelope față
+car-axle-rear = Anvelope spate
+car-verdict-pass = Admis
+car-verdict-counter = Reinspecție
+car-charge-station = La o stație de încărcare
+car-charge-home = Acasă
+car-slot-peak = Ore de vârf
+car-slot-off-peak = Ore în afara vârfului
+car-entry-new = Linie nouă
+car-entry-edit = Modificați linia
+car-field-date = Data
+car-field-km = Kilometraj
+car-field-rubric = Rubrică
+car-field-amount = Sumă
+car-field-garage = Service sau stație
+car-field-note = Notă
+car-field-energy = Energie
+car-field-quantity = Cantitate
+car-field-charge = Încărcare
+car-field-slot = Ora încărcării
+car-field-part = Piesă
+car-field-part-name = Numele piesei
+car-field-axle = Anvelope schimbate
+car-field-verdict = Rezultat
+car-field-months = Luni acoperite
+car-field-battery = Starea bateriei
+car-home-amount-hint = Suma unei încărcări acasă se calculează cu tariful mașinii.
+car-entry-add = Adăugați în carnet
+car-entry-update = Salvați linia
+car-entry-cancel = Anulați
+car-entry-delete = Ștergeți linia
+car-delete-question = Ștergeți această linie din carnet?
+car-from-operation = Preluați o operațiune…
+car-pick-account = Din ce cont provine cheltuiala?
+car-pick-operation = Ce operațiune?
+car-pick-take = Preluați
+car-pick-none = Nicio cheltuială în acest cont.
+car-pick-taken = Operațiune preluată: completați kilometrajul și rubrica, apoi adăugați linia.
+car-history-title = Istoricul
+car-filter-all = Toate rubricile
+car-history-empty = Nicio linie deocamdată.
+car-history-hint = Faceți clic pe o linie pentru a o modifica.
+car-column-date = Data
+car-column-km = Km
+car-column-rubric = Rubrică
+car-column-detail = Detaliu
+car-column-amount = Sumă
+car-column-garage = Service
+car-column-note = Notă
+car-column-share = Pondere
+car-column-per-km = Pe km
+car-column-energy = Energie
+car-column-quantity = Cantitate
+car-column-price = Preț mediu
+car-column-consumption = Consum
+car-column-part = Piesă
+car-column-changes = Schimbări
+car-column-last = Ultima schimbare
+car-column-life = Durată de viață
+car-column-next = Următoarea schimbare
+car-total = Total
+car-summary-title = Cât costă mașina
+car-headline-empty = Completați fișa, apoi adăugați o primă linie: un plin, o revizie, o factură de service…
+car-headline = Începând cu { $since }, mașina v-a costat { $total }.
+car-headline-km = Începând cu { $since }, mașina v-a costat { $total } pentru { $km } parcurși: { $cost } pe kilometru.
+car-tile-total = Cost total
+car-tile-month = Pe lună
+car-tile-km = Pe kilometru
+car-tile-driven = Kilometri parcurși
+car-tile-consumption = Consum
+car-tile-energy-km = Energie pe kilometru
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [one] { $months } lună
+        [few] { $months } luni
+       *[other] { $months } de luni
+    }
+car-detail-battery = Baterie: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = Pe rubrici
+car-energy-title = Energia
+car-parts-title = Piese de uzură
+car-tyres-title = Anvelope
+car-battery-title = Starea bateriei
+car-years-title = Cât a costat mașina în fiecare an
+car-donut-title = Unde se duc banii
+car-donut-caption = în total
+car-deadlines-title = Scadențele
+car-deadlines-empty = Nicio scadență deocamdată: notați o revizie, o inspecție tehnică, o asigurare sau două schimbări ale aceleiași piese.
+car-deadline-service = Revizie
+car-deadline-inspection = Inspecție tehnică (ITP)
+car-deadline-counter = Reinspecția tehnică
+car-deadline-insurance = Expirarea asigurării
+car-when-date = pe { $date }
+car-when-km = la { $km }
+car-when-km-reached = la { $km }, în ritmul dumneavoastră în jurul datei: { $month }
+car-when-date-km = pe { $date } sau la { $km }, care survine primul
+car-when-inspection-unknown = Notați ultima inspecție tehnică pentru a afla data următoarei.
+car-tone-late = Depășită
+car-tone-soon = În curând
+car-note-since = Totul se calculează de la achiziție: data și kilometrajul notate în fișă.
+car-note-consumption = Consumul se măsoară de la plin la plin: faceți plinul complet și notați kilometrajul de fiecare dată.
+car-note-e85 = O mașină E85 consumă ce i se dă: kilometrii de după un plin se socotesc pentru carburantul acelui plin.
+car-note-home = O încărcare acasă este calculată la tariful mașinii din ziua în care este notată și își păstrează acest cost.
+car-note-inspection = Inspecția tehnică urmează regula franceză: prima în cei patru ani de la prima înmatriculare, apoi la fiecare doi ani; o reinspecție, în termen de două luni.
+car-disclaimer = Scadențele și duratele de viață sunt estimări extrase din carnet: doar cartea de service a producătorului este de referință.
+car-invalid-date = O dată validă, care să nu fie în viitor, vă rog.
+car-invalid-acquired = Data achiziției nu poate fi anterioară primei înmatriculări.
+car-invalid-km = Un kilometraj în kilometri întregi, vă rog.
+car-invalid-amount = Această sumă nu poate fi citită.
+car-invalid-quantity = Introduceți cantitatea: litri, kWh sau kilograme.
+car-invalid-part = Alegeți piesa schimbată sau introduceți-i numele.
+car-invalid-rubric = Alegeți o rubrică.
+car-invalid-months = Un număr întreg de luni, vă rog.
+car-invalid-battery = O stare a bateriei între 0 și 100 %, vă rog.
+car-open = Deschideți un carnet…
+car-save = Salvați carnetul…
+car-report-button = Raport PDF
+car-file-filter = Carnet auto
+car-file-saved = Carnet salvat: { $file }
+car-file-opened = Carnet deschis: { $file }
+car-file-not-logbook = Acest fișier nu este un carnet auto Radinus.
+car-file-too-recent = Acest carnet provine dintr-o versiune mai recentă de Radinus: actualizați Radinus pentru a-l deschide.
+car-replace-question = Deschiderea acestui carnet îl va înlocui pe cel din fereastră. Continuați?
+car-sheet-history = Carnet
+car-sheet-summary = Sinteză
+
+analysis-history-hint = Cu cât istoricul dumneavoastră este mai lung, cu atât această analiză va fi mai bună: ideal este să aveți cel puțin un an de operațiuni.
+
+# --- F48 — Împărțirea unei cheltuieli (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = Împărțirea unei cheltuieli
+window-sharing-title = Împărțirea unei cheltuieli
+sharing-question = Cine plătește ce?
+sharing-setup-title = Împărțirea
+sharing-field-label = Denumire
+sharing-label-hint = De exemplu „Restaurant din 12/10” sau „Excursie în Bretania 2027”: denumirea dă numele fișierelor și al rapoartelor.
+sharing-field-total = Total
+sharing-total-hint = Dacă rămâne gol, totalul este suma articolelor și a extra-urilor fiecăruia.
+sharing-field-rule = Regulă
+sharing-field-rounding = Rotunjire
+sharing-field-people = Persoane
+sharing-mode-whole = O regulă pentru toată cheltuiala
+sharing-mode-item = O regulă pe articol
+sharing-rule-equal = Părți egale
+sharing-rule-parts = După părți
+sharing-rule-percent = În procente
+sharing-rule-income = Proporțional cu veniturile
+sharing-rounding-cent = La cent
+sharing-rounding-euro = La unitatea întreagă
+sharing-round-euro = Rotunjiți la unități întregi
+sharing-hide-incomes = Ascundeți veniturile în rapoarte și în export
+sharing-people-title = Persoanele
+sharing-people-hint = Un rând pe persoană, o coloană pe articol: bifați cine participă la ce. Tot restul este opțional. Cineva care se retrage lăsându-și avansul: o sumă exactă egală cu ce a plătit și nicio casetă bifată.
+sharing-add-person = Adăugați o persoană
+sharing-person-default = Persoana { $number }
+sharing-items-title = Articolele
+sharing-items-hint = Doar ce nu privește pe toată lumea, cum ar fi vinul. Restul totalului merge la articolul comun.
+sharing-add-item = Adăugați un articol
+sharing-common = Comun
+sharing-payments-title = Plățile
+sharing-payments-hint = Cine a plătit, cât și când. Un rând fără sumă nu contează încă.
+sharing-payments-none = Nicio plată deocamdată.
+sharing-add-payment = Adăugați o plată
+sharing-result-title = Rezultatul
+sharing-balances-title = Cum stau plățile
+sharing-transfers-title = Transferurile propuse
+sharing-delete = Ștergeți
+sharing-delete-person-question = Această persoană are plăți: le ștergeți împreună cu ea?
+sharing-disclaimer = Radinus propune o împărțire: între prieteni, fiecare rămâne liber să se înțeleagă altfel.
+sharing-column-person = Persoană
+sharing-column-household = Gospodărie
+sharing-column-income = Venit
+sharing-column-parts = Părți
+sharing-column-percent = %
+sharing-column-floor = Cel puțin
+sharing-column-cap = Cel mult
+sharing-column-fixed = Sumă exactă
+sharing-column-alone = Extra proprii
+sharing-column-gift = Surplus oferit
+sharing-column-share = Cotă
+sharing-column-typed = % introdus
+sharing-column-constraint = Ce s-a aplicat
+sharing-column-due = De plătit
+sharing-column-item = Articol
+sharing-column-amount = Sumă
+sharing-column-rule = Regulă
+sharing-column-participants = Participanți
+sharing-column-unit = Gospodărie sau persoană
+sharing-column-members = Membri
+sharing-column-paid = Achitat
+sharing-column-balance = Sold
+sharing-column-date = Data
+sharing-column-who = Cine
+sharing-column-label = Denumire
+sharing-help-household = Persoanele din aceeași gospodărie achită împreună: plățile lor și ce datorează se adună, iar ele primesc un singur extras. Exemplu: „Familia Martin” pentru părinți și copii.
+sharing-help-income = Folosit doar de regula „Proporțional cu veniturile”: cu cât venitul este mai mare, cu atât cota este mai mare. Introduceți venitul lunar.
+sharing-help-parts = O persoană cu 2 părți plătește de două ori mai mult decât o persoană cu 1 parte. Exemplu: adult 1, copil 0,5.
+sharing-help-percent = Partea din cheltuială pe care o plătește persoana. Procentele trebuie să însumeze 100 %.
+sharing-help-floor = Persoana va plăti cel puțin această sumă, chiar dacă cota calculată este mai mică. Diferența îi ușurează pe ceilalți.
+sharing-help-cap = Persoana nu va plăti niciodată mai mult decât această sumă. Ce nu plătește revine celorlalți participanți la articolele sale.
+sharing-help-fixed = Persoana plătește această sumă, indiferent ce se întâmplă, iar restul se împarte între ceilalți. Exemplu: cineva care se retrage și își lasă avansul.
+sharing-help-alone = Ce a luat persoana doar pentru ea, cum ar fi un desert sau o cafea. O plătește integral, în plus față de cotă.
+sharing-help-gift = Dacă persoana a plătit mai mult decât cota: bifat, surplusul este un dar pentru grup; nebifat, i se restituie.
+sharing-help-items = Bifați persoanele care participă la acest articol. Articolul comun este ceea ce rămâne din total după ce se scad celelalte articole.
+sharing-help-due = Ce datorează persoana în total: cota sa din articole, extra-urile proprii și rotunjirea.
+sharing-help-share = Ce reprezintă cota, ca procent din suma de împărțit.
+sharing-help-typed = Procentul pe care l-ați introdus. Poate diferi de cota reală atunci când s-a aplicat un minim, un maxim sau o sumă exactă.
+sharing-help-constraint = Arată dacă cota persoanei a fost modificată de un minim, un maxim, o sumă exactă sau un surplus oferit.
+sharing-help-item = Doar ce nu privește pe toată lumea, cum ar fi vinul. Restul totalului merge la articolul comun, împărțit între cei bifați la el.
+sharing-help-rule = Cum se împarte acest articol: în părți egale, după părți, în procente sau proporțional cu veniturile.
+sharing-help-paid = Ce a achitat deja gospodăria sau persoana, conform plăților introduse.
+sharing-help-balance = Ce rămâne de plătit sau ce s-a achitat în plus față de cotă. Exemplu: „Rămas de plătit: 61,54 €”.
+sharing-advice-equal = { $count ->
+        [one] { $total } pentru o singură persoană.
+        [few] { $total } ÷ { $count } persoane = { $amount } fiecare.
+       *[other] { $total } ÷ { $count } de persoane = { $amount } fiecare.
+    }
+sharing-advice-equal-varied = În părți egale între cei care participă, ținând cont de limite și de excluderi.
+sharing-advice-parts = Total părți: { $parts }. O parte valorează { $amount }.
+sharing-advice-parts-varied = Fiecare plătește după părțile sale, ținând cont de limite și de excluderi. O casetă goală contează ca 1 parte.
+sharing-advice-percent-rest = Mai lipsesc { $rest } % până la 100 %.
+sharing-advice-percent-over = Procentele depășesc 100 % cu { $over } %.
+sharing-advice-percent-ok = Procentele însumează exact 100 %.
+sharing-advice-percent-nobody = Procentele însumează deja 100 %: { $count ->
+        [one] { $names } nu ar plăti nimic.
+        [few] { $names } nu ar plăti nimic.
+       *[other] { $names } nu ar plăti nimic.
+    }
+sharing-advice-income = Fiecare plătește { $rate } % din venitul său.
+sharing-advice-income-missing = Introduceți venitul fiecăruia pentru a împărți proporțional cu veniturile.
+sharing-advice-income-varied = Fiecare plătește aceeași proporție din venitul său, ținând cont de limite și de excluderi.
+sharing-advice-empty = Introduceți suma de împărțit.
+sharing-apply-advice = Preluați valorile sugerate
+sharing-help-apply-advice = Completează casetele goale cu valorile afișate cu gri. Casetele deja completate nu se schimbă.
+sharing-from-incomes = Procente după venituri
+sharing-help-from-incomes = Înlocuiește procentele cu partea fiecărui venit din totalul veniturilor. Ele însumează 100 %.
+sharing-reset-percents = Reîmpărțiți totul
+sharing-help-reset-percents = Șterge procentele și le împarte în mod egal între toți. Util după ce ați adăugat o persoană.
+sharing-reset-percents-question = Ștergeți toate procentele și le împărțiți în mod egal?
+sharing-open = Deschideți un proiect…
+sharing-save = Salvați proiectul…
+sharing-pdf-distribution = Împărțire (PDF)
+sharing-pdf-payments = Situația plăților (PDF)
+sharing-pdf-statements = Extrase individuale (PDF)…
+sharing-statements-everyone = Toată lumea
+sharing-excel = Export în Excel
+sharing-file-filter = Proiect de împărțire
+sharing-replace-question = Deschiderea acestui proiect va înlocui ce este introdus în fereastră. Continuați?
+sharing-file-saved = Proiect salvat: { $file }
+sharing-file-opened = Proiect deschis: { $file }
+sharing-file-not-project = Acest fișier nu este un proiect de împărțire Radinus.
+sharing-file-too-recent = Acest proiect provine dintr-o versiune mai nouă de Radinus: actualizați Radinus pentru a-l deschide.
+sharing-file-failed = Fișierul nu a putut fi citit sau scris: { $reason }
+sharing-statements-replace-question = { $count ->
+        [one] Există deja un extras în acest dosar. Îl înlocuiți?
+        [few] Există deja { $count } extrase în acest dosar. Le înlocuiți?
+       *[other] Există deja { $count } de extrase în acest dosar. Le înlocuiți?
+    }
+sharing-statements-written = { $count ->
+        [one] Un extras scris în „{ $folder }”.
+        [few] { $count } extrase scrise în „{ $folder }”.
+       *[other] { $count } de extrase scrise în „{ $folder }”.
+    }
+sharing-too-many-people = O împărțire cuprinde cel mult 40 de persoane.
+sharing-too-many-items = O împărțire cuprinde cel mult 20 de articole.
+sharing-too-many-payments = O împărțire cuprinde cel mult 400 de plăți.
+sharing-invalid-amount = Această sumă nu poate fi citită: un număr pozitiv.
+sharing-invalid-number = Acest număr nu poate fi citit: un număr pozitiv.
+sharing-invalid-percent = Un procent merge de la 0 la 100.
+sharing-invalid-date = Această dată nu poate fi citită.
+sharing-name-missing = Fiecare persoană trebuie să aibă un nume.
+sharing-name-duplicate = Există deja „{ $name }”: deosebiți-le, de exemplu printr-o inițială.
+sharing-floor-above-cap = Minimul depășește maximul.
+sharing-item-label-missing = Acest articol nu are nume.
+sharing-items-above-total = Articolele și extra-urile fiecăruia depășesc totalul cu { $amount }.
+sharing-payment-person = Alegeți cine a plătit.
+sharing-percent-total = Procentele însumează { $sum } %: trebuie să fie 100 %.
+sharing-percent-total-item = „{ $item }”: procentele însumează { $sum } %: trebuie să fie 100 %.
+sharing-item-nobody = Nimeni nu participă la „{ $item }”.
+sharing-item-no-weight = Nimeni nu contează în „{ $item }”: toți participanții săi sunt la zero.
+sharing-income-missing = Lipsește venitul lui { $name }.
+sharing-fixed-above = Sumele exacte depășesc suma de împărțit cu { $amount }.
+sharing-floors-above = Minimele depășesc suma de împărțit cu { $amount }.
+sharing-cap-alone = La „{ $item }” participă doar { $name }: maximul nu poate fi respectat.
+sharing-caps-short = Maximele nu sunt suficiente pentru a acoperi suma: lipsesc { $amount }.
+sharing-impossible = Aceste condiții nu pot fi respectate toate: relaxați un minim sau un maxim.
+sharing-constraint-floor = Minim atins
+sharing-constraint-cap = Maxim atins
+sharing-constraint-fixed = Sumă exactă
+sharing-constraint-gift = Surplus oferit
+sharing-and = { $first } și { $last }
+sharing-outside = În afara articolelor
+sharing-alone = Extra proprii
+sharing-rounding = Rotunjire
+sharing-headline-empty = Adăugați persoanele care împart cheltuiala.
+sharing-headline-no-amount = Introduceți totalul sau articolele de împărțit.
+sharing-headline-equal = { $total } de împărțit: fiecare plătește { $amount }.
+sharing-headline-range = { $total } de împărțit: de la { $min } la { $max }, în funcție de persoană.
+sharing-participants = { $count ->
+        [0] Niciun participant
+        [one] Un participant
+        [few] { $count } participanți
+       *[other] { $count } de participanți
+    }
+sharing-balance-due = Rămas de plătit: { $amount }
+sharing-balance-over = A plătit cu { $amount } mai mult decât cota sa
+sharing-balance-even = La zi
+sharing-summary-collected = { $collected } achitați din { $total }.
+sharing-summary-owing = { $count ->
+        [0] Toată lumea este la zi.
+        [one] O singură persoană mai datorează { $amount }.
+        [few] { $count } persoane mai datorează { $amount } în total.
+       *[other] { $count } de persoane mai datorează { $amount } în total.
+    }
+sharing-remaining-outside = Rămas de plătit din cheltuială: { $amount }
+sharing-remaining-reimburse = De rambursat către { $name }: { $amount }
+sharing-all-settled = Totul este achitat: nimeni nu datorează nimic nimănui.
+sharing-transfer = { $from } trebuie să plătească { $amount } către { $to }
+sharing-warning-over-paid = Plățile depășesc cheltuiala cu { $amount }: verificați sumele.
+sharing-note-income-zero = { $name } nu plătește nimic pentru { $items }: venitul este 0.
+sharing-note-excluded = { $name } nu participă la „{ $item }”: cota respectivă este repartizată între ceilalți.
+sharing-note-gift = Surplusul oferit de { $giver } reduce cota celorlalți: { $name } a plătit acum mai mult decât cota sa.
+sharing-note-outside = { $name } plătește { $amount } în afara articolelor sale: suma este dedusă din ce împart ceilalți.
+sharing-note-keeper = Rotunjit la unități întregi: { $name } păstrează subdiviziunile, astfel încât totalul să iasă exact.
+sharing-report-distribution = Împărțire
+sharing-report-sharing = Împărțirea
+sharing-report-who-pays = Cine plătește ce
+sharing-report-items = Detaliu pe articole
+sharing-report-payments = Situația plăților
+sharing-report-as-of = Situația la { $date }
+sharing-report-balances = Cotă, achitat, sold
+sharing-report-statement = Extras — { $name }
+sharing-report-your-share = Cota dumneavoastră
+sharing-statement-total = Total pentru gospodărie: { $amount }
+sharing-statement-pay = De plătit către { $name }: { $amount }
+sharing-statement-receive = De primit de la { $name }: { $amount }
+sharing-sheet-people = Persoane
+sharing-sheet-items = Articole
+sharing-sheet-result = Rezultat
+sharing-sheet-payments = Plăți
+sharing-sheet-balances = Rambursări

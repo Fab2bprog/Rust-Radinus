@@ -99,6 +99,10 @@ pub struct Import {
     /// l'écart **après** une intégration — voir [`reconciliation`].
     pub available_balance: Option<i64>,
     pub lines: Vec<Line>,
+    /// Ce que la lecture a écarté ou signalé, en phrases — le solde initial
+    /// d'un QIF, ses lignes illisibles. L'icône d'information les redit.
+    /// Vide pour l'OFX et le CSV.
+    pub notes: Vec<String>,
 }
 
 impl Import {
@@ -124,6 +128,60 @@ impl Import {
             .filter(|line| line.looks_like_duplicate)
             .count()
     }
+
+    /// Combien ressemblent à une opération déjà présente **sans** que leur
+    /// FITID le certifie — le soupçon seul, jamais compté deux fois avec la
+    /// certitude.
+    pub fn alike_only(&self) -> usize {
+        self.lines
+            .iter()
+            .filter(|line| line.looks_like_duplicate && !line.fitid_known)
+            .count()
+    }
+
+    /// Le fichier porte-t-il des identifiants (FITID) ? C'est aussi ce qui
+    /// montre ou cache la colonne FITID.
+    pub fn has_identifiers(&self) -> bool {
+        self.lines.iter().any(|line| !line.fitid.trim().is_empty())
+    }
+}
+
+/// **Ce que le chargement annonce** — dans la barre d'information, et dans
+/// l'icône d'information du fichier.
+///
+/// La phrase disait « 106 lignes lues, dont 0 déjà présentes » d'un QIF déjà
+/// intégré, pendant que le tableau montrait ses 106 lignes en pastel :
+/// « là tu te contredis » (Fabrice, 15/10/2026). Elle ne comptait que les
+/// certitudes, les FITID déjà en base, et un QIF ou un CSV n'en porte jamais.
+/// Elle compte désormais **les deux, chacune avec son mot** : « déjà
+/// présentes » pour la certitude, « qui ressemblent » pour le soupçon — le
+/// même partage que le tableau entre la colonne FITID et le pastel.
+pub fn loaded_sentence(import: &Import, language: crate::i18n::Language) -> String {
+    use crate::i18n;
+    let count = import.lines.len() as i64;
+    let alike = import.alike_only() as i64;
+    if count == 0 {
+        return i18n::message_of(language, "statement-loaded", &[], &[("count", 0), ("known", 0)]);
+    }
+    if !import.has_identifiers() {
+        return i18n::message_of(
+            language,
+            "statement-loaded-unidentified",
+            &[],
+            &[("count", count), ("alike", alike)],
+        );
+    }
+    let certain = i18n::message_of(
+        language,
+        "statement-loaded",
+        &[],
+        &[("count", count), ("known", import.fitid_known() as i64)],
+    );
+    if alike == 0 {
+        return certain;
+    }
+    let also = i18n::message_of(language, "statement-loaded-also-alike", &[], &[("alike", alike)]);
+    format!("{certain} {also}")
 }
 
 /// Les trois montants du pied de F17 : ce que Radinus dit, ce que le fichier
@@ -140,8 +198,12 @@ impl Import {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Reconciliation {
     pub account: i64,
-    pub file: i64,
-    pub difference: i64,
+    /// **Vide quand le fichier ne donne pas de solde lisible** (Fabrice,
+    /// 15/10/2026 : « tu laisses vide si absence d'info, ou info corrompue ou
+    /// incorrecte »). Un QIF n'en porte jamais, un CSV non plus : afficher
+    /// 0,00 € ferait croire que la banque l'annonce, et l'écart serait faux.
+    pub file: Option<i64>,
+    pub difference: Option<i64>,
 }
 
 /// Les trois montants, à l'instant où on les demande.
@@ -164,16 +226,16 @@ pub fn reconciliation(
         [import.account_id],
         |row| row.get(0),
     )?;
-    let file = import.file_balance.unwrap_or(0);
+    let file = import.file_balance;
     let compared = if after_integration {
-        import.available_balance.or(import.file_balance).unwrap_or(0)
+        import.available_balance.or(import.file_balance)
     } else {
         file
     };
     Ok(Reconciliation {
         account,
         file,
-        difference: account - compared,
+        difference: compared.map(|compared| account - compared),
     })
 }
 
@@ -256,6 +318,7 @@ pub fn prepare(
         file_balance_date: statement.ledger_balance_date,
         available_balance: statement.available_balance,
         lines,
+        notes: Vec::new(),
     })
 }
 
@@ -367,9 +430,9 @@ pub fn integrate(
         "INSERT INTO Operation (IDOperation, Libelle, Date, Montant, IDModeOperation,
             IDCategorie, IDAffectation, IDCompte, DatePointage, FitID, ReferencePaiement,
             NumRelevBanque, IDStatutOperation, IDOperationParent, SoldePointe, EstParent,
-            GUIDCalOpPeriode, IDCheque, IDTiers, IDProjets, EstComplement)
+            GUIDCalOpPeriode, IDCheque, IDTiers, IDProjets, EstComplement, IDVerification)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, '', '', ?11, 0, 0, 0, '', 0,
-                 ?12, ?13, 0)",
+                 ?12, ?13, 0, ?14)",
         rusqlite::params![
             id,
             line.label,
@@ -384,6 +447,9 @@ pub fn integrate(
             classification.status_id,
             classification.payee_id,
             classification.project_id,
+            // Une ligne de relevé : vérifiée ou à vérifier, selon la
+            // préférence (Fabrice, 03/10/2026).
+            crate::preferences::import_verification(conn)?,
         ],
     )?;
 
@@ -484,6 +550,40 @@ mod tests {
     /// répondu oui, ou quand il n'y avait rien à demander.
     fn add(conn: &Connection, import: &mut Import, rank: usize) -> Outcome {
         integrate(conn, import, rank, &Classification::plain(), None, true).unwrap()
+    }
+
+    fn verifications(conn: &Connection) -> Vec<i64> {
+        conn.prepare("SELECT IDVerification FROM Operation WHERE IDCompte = 1 ORDER BY IDOperation")
+            .unwrap()
+            .query_map([], |row| row.get(0))
+            .unwrap()
+            .map(Result::unwrap)
+            .collect()
+    }
+
+    /// **Une ligne de relevé naît vérifiée, sauf si l'utilisateur a demandé à
+    /// tout contrôler lui-même** (Fabrice, 03/10/2026). Le statut, lui, ne
+    /// bouge pas : la banque l'a passée, elle est pointée dans les deux cas.
+    #[test]
+    fn la_preference_decide_de_la_verification_d_une_ligne_importee() {
+        let conn = database();
+        let mut import = loaded(&conn);
+
+        add(&conn, &mut import, 1);
+        crate::preferences::set_import_verification(&conn, crate::operations::TO_VERIFY).unwrap();
+        add(&conn, &mut import, 2);
+        crate::preferences::set_import_verification(&conn, crate::operations::VERIFIED).unwrap();
+        add(&conn, &mut import, 3);
+
+        assert_eq!(verifications(&conn), [2, 1, 2]);
+        let pointed: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM Operation WHERE IDCompte = 1 AND IDStatutOperation = 1",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(pointed, 3);
     }
 
     /// **Ouvrir un fichier n'écrit rien.** C'est la promesse de l'étape 3 : le
@@ -683,8 +783,8 @@ mod tests {
         let mut import = loaded(&conn);
 
         let opening = reconciliation(&conn, &import, false).unwrap();
-        assert_eq!(opening.file, 1_830_000_000, "au chargement : LEDGERBAL");
-        assert_eq!(opening.difference, -1_830_000_000);
+        assert_eq!(opening.file, Some(1_830_000_000), "au chargement : LEDGERBAL");
+        assert_eq!(opening.difference, Some(-1_830_000_000));
 
         add(&conn, &mut import, 1);
         add(&conn, &mut import, 2);
@@ -694,8 +794,105 @@ mod tests {
         assert_eq!(after.account, 1_830_000_000);
         assert_eq!(
             after.difference,
-            1_830_000_000 - 1_500_000_000,
+            Some(1_830_000_000 - 1_500_000_000),
             "après intégration : AVAILBAL, comme dans l'original"
+        );
+    }
+
+    /// **Sans solde dans le fichier, ni « Fichier » ni « Écart »** (Fabrice,
+    /// 15/10/2026) : un QIF ou un CSV n'en donne pas, et un 0,00 € ferait
+    /// croire que la banque l'annonce.
+    #[test]
+    fn sans_solde_dans_le_fichier_pas_d_ecart() {
+        let conn = database();
+        let mut import = loaded(&conn);
+        import.file_balance = None;
+        import.available_balance = None;
+        for after in [false, true] {
+            let balances = reconciliation(&conn, &import, after).unwrap();
+            assert_eq!((balances.file, balances.difference), (None, None));
+        }
+        // Le solde disponible seul suffit après une intégration, comme avant.
+        import.available_balance = Some(100_000_000);
+        let after = reconciliation(&conn, &import, true).unwrap();
+        assert_eq!(after.difference, Some(after.account - 100_000_000));
+    }
+
+    /// **Un relevé QIF entre comme un OFX** (15/10/2026) : même préparation,
+    /// même intégration ; le solde initial n'entre pas ; réimporté, le même
+    /// fichier sort en pastel — la ressemblance est son seul anti-doublon,
+    /// faute de FITID, et rien n'est affirmé sans identifiant.
+    #[test]
+    fn un_releve_qif_entre_comme_un_ofx() {
+        let conn = database();
+        let text = "!Type:Bank\r\nD24/11'2022\r\nT3,382.63\r\nPSolde initial\r\nL[CCP]\r\n^\r\n\
+                    D25/11'2022\r\nT-57.62\r\nPACHAT CB MAGASIN\r\n^\r\n\
+                    D26/11'2022\r\nT1,500.00\r\nPVIREMENT RECU\r\n^\r\n";
+        let options = crate::qif_import::Options {
+            order: None,
+            label: crate::qif_import::LabelChoice::default(),
+            today: NaiveDate::from_ymd_opt(2026, 10, 15).unwrap(),
+        };
+        let read = crate::qif_import::read(text, 0, "f.qif", options).unwrap();
+        let mut import = prepare(&conn, 1, &read.statement).unwrap();
+        assert_eq!(import.lines.len(), 2);
+        assert!(import.lines.iter().all(|line| !line.fitid_known && !line.looks_like_duplicate));
+        assert_eq!(import.file_balance, None);
+        for rank in [2, 3] {
+            add(&conn, &mut import, rank);
+        }
+        let total: i64 = conn
+            .query_row("SELECT SUM(Montant) FROM Operation WHERE IDCompte = 1", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(total, -57_620_000 + 1_500_000_000, "le solde initial n'est pas entré");
+        let again = prepare(&conn, 1, &read.statement).unwrap();
+        assert!(again.lines.iter().all(|line| line.looks_like_duplicate), "réimporté, le même QIF sort en pastel");
+        assert!(again.lines.iter().all(|line| !line.fitid_known), "et rien n'est affirmé sans identifiant");
+    }
+
+    /// **La phrase du chargement ne contredit pas le tableau** (Fabrice,
+    /// 15/10/2026 : « tu les as éclaircies, là tu te contredis »). Sans FITID,
+    /// elle compte ce qui ressemble ; avec, ce qui est certain, puis ce qui
+    /// ressemble seulement — jamais deux fois la même ligne.
+    #[test]
+    fn la_phrase_du_chargement_dit_ce_que_montre_le_tableau() {
+        const FR: crate::i18n::Language = crate::i18n::Language::French;
+        let conn = database();
+        let text = "!Type:Bank\nD24/11'2022\nT-57.62\nPACHAT\n^\nD26/11'2022\nT1,500.00\nPVIREMENT\n^\n";
+        let options = crate::qif_import::Options {
+            order: None,
+            label: crate::qif_import::LabelChoice::default(),
+            today: NaiveDate::from_ymd_opt(2026, 10, 15).unwrap(),
+        };
+        let read = crate::qif_import::read(text, 0, "f.qif", options).unwrap();
+        let mut first = prepare(&conn, 1, &read.statement).unwrap();
+        assert_eq!(
+            loaded_sentence(&first, FR),
+            "2 lignes lues ; aucune ne ressemble à une opération déjà présente dans votre compte."
+        );
+        add(&conn, &mut first, 1);
+        add(&conn, &mut first, 2);
+        let again = prepare(&conn, 1, &read.statement).unwrap();
+        assert_eq!(
+            loaded_sentence(&again, FR),
+            "2 lignes lues, dont 2 qui ressemblent à des opérations déjà présentes dans votre compte \
+             (même date, même libellé, même montant)."
+        );
+
+        // L'OFX : la certitude d'abord, puis le seul soupçon.
+        let conn = database();
+        let mut import = loaded(&conn);
+        assert_eq!(loaded_sentence(&import, FR), "3 lignes lues, dont 0 déjà présentes dans votre compte.");
+        add(&conn, &mut import, 1);
+        add(&conn, &mut import, 2);
+        // La première entrée perd son FITID : elle ne peut plus que ressembler.
+        conn.execute("UPDATE Operation SET FitID = '' WHERE FitID = 'P_A'", []).unwrap();
+        let statement = ofx_import::read(SAMPLE, "123456A789").unwrap();
+        let again = prepare(&conn, 1, &statement).unwrap();
+        assert_eq!(
+            loaded_sentence(&again, FR),
+            "3 lignes lues, dont 1 déjà présentes dans votre compte. \
+             Une autre ressemble à une opération déjà présente (même date, même libellé, même montant)."
         );
     }
 

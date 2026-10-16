@@ -98,6 +98,8 @@ interface OperationRecord {
   payee_id: number;
   project_id: number;
   comment: string;
+  /// 1 à vérifier, 2 vérifiée, 3 douteuse, 4 contestée.
+  verification_id: number;
 }
 
 const EMPTY_RECORD: OperationRecord = {
@@ -114,7 +116,15 @@ const EMPTY_RECORD: OperationRecord = {
   payee_id: 0,
   project_id: 0,
   comment: "",
+  verification_id: 2,
 };
+
+/// Le statut « pointée », tel que la base le numérote depuis toujours.
+const POINTED = 1;
+
+/// « Vérifiée » : ce que vaut une opération que l'on saisit soi-même, ticket
+/// en main (Fabrice, 03/10/2026).
+const VERIFIED = 2;
 
 /// Every field of the window and the member it holds, written once so that
 /// reading the screen, filling it and comparing it are the same list. A field
@@ -137,6 +147,7 @@ const NUMBER_FIELDS: [keyof OperationRecord, string][] = [
   ["payment_mode_id", "payment-mode"],
   ["payee_id", "payee"],
   ["project_id", "project"],
+  ["verification_id", "verification"],
 ];
 
 /// The five nomenclature combos, and the list each is filled from.
@@ -321,6 +332,15 @@ let combos: Combos = {
   project: [],
 };
 let statuses: Item[] = [];
+/// La troisième liste fermée : les quatre vérifications.
+let verifications: Item[] = [];
+
+/// **La vérification se lit à sa couleur**, la même que dans la liste des
+/// opérations : noir, vert, orange, rouge.
+function showTheVerificationColour(): void {
+  const combo = element<HTMLSelectElement>("verification");
+  combo.dataset.verification = combo.value;
+}
 
 /// Reads the record **by the key the list sent**, fills the reserve from what
 /// was read, and only then puts it on the screen. The fields are never the
@@ -381,6 +401,9 @@ async function applyParameters(): Promise<void> {
       } = source;
       loaded = record;
       accountId = account;
+      // **Ni son jugement** : une copie est une opération que l'on saisit,
+      // et dupliquer une écriture contestée n'en conteste pas une seconde.
+      loaded.verification_id = VERIFIED;
       // La copie n'est pas l'enregistrement dont elle est la copie : ni sa
       // clef, ni son chèque, ni sa ventilation ne la suivent.
       recordId = null;
@@ -426,12 +449,22 @@ async function applyParameters(): Promise<void> {
     // not in the list cannot be selected, and the field would fall back to
     // the first one — a category chosen behind the user's back.
     fillCombo("status", statuses, loaded.status_id);
+    fillCombo("verification", verifications, loaded.verification_id);
     for (const [id, list, member] of NOMENCLATURE_COMBOS) {
       fillCombo(id, combos[list], loaded[member] as number);
     }
 
+    // Une fiche que l'on ne peut ni modifier ni enregistrer montre ce que la
+    // base contient, et rien d'autre : proposer une date en lecture seule ou
+    // sur une sous-opération — dont le pointage vient de sa mère — serait
+    // mentir sur l'enregistrement sans que personne puisse rien y faire.
+    if (mode !== "L" && !isASubOperation()) {
+      theClearingDateIsProposed(loaded);
+    }
+
     loadReserve(loaded);
     showRecord(loaded);
+    showTheVerificationColour();
     declareRecord(mode === "A" ? null : recordId);
     say(line, isASubOperation());
     attachmentsLine.textContent = attachments;
@@ -468,8 +501,25 @@ async function save(): Promise<void> {
       amount: operation.amount,
       date: operation.date,
       clearingDate: operation.clearing_date,
+      statusId: operation.status_id,
     });
     if (refusal) {
+      // **Le refus du pointage sans date s'affiche dans un panneau, et il
+      // propose une issue** (Fabrice, 25/08/2026). Une phrase au bas de la
+      // fenêtre passait inaperçue ; celle-ci arrête l'utilisateur et lui offre
+      // la seule réponse raisonnable — la date de l'opération. Non le laisse
+      // sur sa fiche, telle qu'il l'a laissée.
+      if (refusal === t("operation-clearing-date-required")) {
+        const question = await invoke<string>("clearing_date_question", {
+          date: operation.date,
+        });
+        if (!(await askYesNo(question, t("ui-yes"), t("ui-no")))) {
+          return;
+        }
+        field("clearing-date").value = operation.date;
+        await save();
+        return;
+      }
       say(refusal, true);
       element<HTMLInputElement>("label").focus();
       return;
@@ -494,7 +544,6 @@ async function save(): Promise<void> {
     loadReserve(onScreen());
     showState();
     declareRecord(null);
-    await invoke("notify_operations_changed");
     closeCurrentWindow();
   } catch (error) {
     say(tError("ui-save-failed", error), true);
@@ -594,6 +643,60 @@ function settleTheAmountAndItsType(): void {
 // screen, never an intermediate state.
 amountField.addEventListener(SIGN_CHANGED, theTypeFollowsTheAmount);
 directionField.addEventListener("change", theAmountFollowsTheType);
+
+/// **La date de pointage suit le statut** (Fabrice, 21/08/2026, après des
+/// retours d'utilisateurs : « il y a une date de pointage alors que le statut
+/// de l'écriture n'est pas en pointé »).
+///
+/// Vers prévu ou engagé, elle se vide : la banque n'a rien passé, il n'y a
+/// rien à dater, et la date attendue est déjà celle de l'opération. Vers
+/// pointée, elle prend la date de l'opération — la même règle que le bouton
+/// « Pointer » de la liste, pour que l'on ne perde pas une date en hésitant
+/// entre deux statuts.
+///
+/// **L'utilisateur garde la main** : ce qu'il écrit ensuite dans le champ
+/// reste, quel que soit le statut. Ceci n'est qu'un défaut proposé au moment
+/// où il change d'avis, jamais une interdiction.
+function theClearingDateFollowsTheStatus(): void {
+  const clearing = field("clearing-date");
+  if (Number(field("status").value) === POINTED) {
+    if (clearing.value.trim() === "") {
+      clearing.value = field("date").value;
+    }
+    return;
+  }
+  clearing.value = "";
+}
+
+/// **Une opération pointée sans date de pointage ouvre sa fiche avec une date
+/// proposée** (Fabrice, 25/08/2026, à l'audit du correctif ci-dessus).
+///
+/// La règle « une opération pointée porte une date » a un revers : les
+/// opérations héritées, pointées de longue date et sans date de pointage —
+/// une base venue du WinDev, une archive restaurée — deviennent impossibles à
+/// enregistrer. L'utilisateur ouvre la fiche pour corriger un libellé et se
+/// heurte à un refus qui parle d'un champ dont il n'a jamais eu besoin.
+///
+/// Alors la fiche propose la date de l'opération, comme elle le fait déjà
+/// quand on passe une opération en pointé. La valeur est visible, modifiable,
+/// et surtout : **elle n'est écrite que si l'utilisateur enregistre** — or
+/// s'il enregistre, c'est qu'il enregistrait de toute façon. Consulter une
+/// fiche puis la fermer n'écrit rien, et c'est pourquoi la proposition entre
+/// dans la réserve avec le reste : elle n'est pas une modification de
+/// l'utilisateur, elle ne doit pas réclamer d'être sauvée.
+///
+/// Le refus, lui, reste — pour le seul cas où il a du sens : quelqu'un qui
+/// efface volontairement la date d'une opération pointée.
+function theClearingDateIsProposed(record: OperationRecord): void {
+  if (record.status_id === POINTED && record.clearing_date.trim() === "") {
+    record.clearing_date = record.date;
+  }
+}
+
+element<HTMLSelectElement>("status").addEventListener(
+  "change",
+  theClearingDateFollowsTheStatus,
+);
 
 for (const [, id] of TEXT_FIELDS) {
   field(id).addEventListener("input", showState);
@@ -717,6 +820,17 @@ void listen<{
   ] as const) {
     element<HTMLSelectElement>(id).value = String(value);
   }
+  // **Un modèle écrit ce qu'écrirait la main** (Fabrice, 25/08/2026) : « si la
+  // personne utilise un modèle c'est comme si elle tapait les infos à la main
+  // en plus vite ».
+  //
+  // Poser une valeur dans un champ ne déclenche aucun événement, donc la règle
+  // qui lie la date de pointage au statut ne jouait pas. Un modèle « prévu »
+  // laissait la date du jour dans le champ et créait l'opération non pointée
+  // avec une date de pointage — alors que le même statut choisi à la main dans
+  // la liste déroulante vidait le champ sous les yeux de l'utilisateur. Deux
+  // chemins, deux écritures : c'est cela que le rappel ci-dessous supprime.
+  theClearingDateFollowsTheStatus();
   say(t("operation-template-applied"));
 });
 
@@ -968,6 +1082,7 @@ function dress(): void {
     ["amount-label", "operation-field-amount"],
     ["status-label", "operation-field-status"],
     ["clearing-date-label", "operation-field-clearing-date"],
+    ["verification-label", "operation-field-verification"],
     ["category-label", "operation-field-category"],
     ["assignment-label", "operation-field-assignment"],
     ["payment-mode-label", "operation-field-payment-mode"],
@@ -1059,6 +1174,7 @@ void (async () => {
   const failure = await invoke<string | null>("startup_error");
   if (!failure) {
     statuses = await invoke<Item[]>("list_operation_statuses");
+    verifications = await invoke<Item[]>("list_operation_verifications");
     combos = await invoke<Combos>("list_operation_combos");
   }
 
@@ -1070,8 +1186,33 @@ void (async () => {
   // main. Le lui faire lire pour son seul titre serait une lecture de plus au
   // moment où la fenêtre se rhabille — la fiche est rhabillée, son étiquette
   // attend que quelqu'un lui donne le nom du compte.
-  onLanguageChanged(dress);
+  onLanguageChanged(() => {
+    dress();
+    void relistTheClosedLists();
+  });
 })();
+
+element<HTMLSelectElement>("verification").addEventListener("change", showTheVerificationColour);
+
+/// **Les statuts et les vérifications changent de langue avec la fenêtre.**
+/// Leurs mots viennent de la traduction, par leur clef : on relit les deux
+/// listes et on les repose sur place, le choix en cours conservé — rhabiller
+/// une fiche ne doit ni la vider ni la déclarer modifiée.
+async function relistTheClosedLists(): Promise<void> {
+  const failure = await invoke<string | null>("startup_error").catch(() => "?");
+  if (failure) {
+    return;
+  }
+  statuses = await invoke<Item[]>("list_operation_statuses");
+  verifications = await invoke<Item[]>("list_operation_verifications");
+  fillCombo("status", statuses, Number(element<HTMLSelectElement>("status").value));
+  fillCombo(
+    "verification",
+    verifications,
+    Number(element<HTMLSelectElement>("verification").value),
+  );
+  showTheVerificationColour();
+}
 
 /// **Une nomenclature a changé pendant que cette fenêtre vivait.**
 ///

@@ -719,10 +719,10 @@ fn insert_operations(
             IDAffectation, IDCompte, IDStatutOperation, DatePointage,
             SoldePointe, FitID, ReferencePaiement, NumRelevBanque,
             IDOperationParent, EstParent, GUIDCalOpPeriode, IDCheque,
-            IDTiers, IDProjets, EstComplement
+            IDTiers, IDProjets, EstComplement, IDVerification
          ) VALUES (
             ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10,
-            ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21
+            ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22
          )",
     )?;
     for row in &archive.operations {
@@ -749,6 +749,7 @@ fn insert_operations(
             o.payee_id,
             o.project_id,
             o.is_complement,
+            o.verification_id,
         ])?;
     }
     Ok(archive.operations.len())
@@ -1544,6 +1545,49 @@ mod tests {
             preferences::read(&conn, preferences::CURRENCY_KEY).unwrap(),
             Some("CHF".to_string()),
             "la devise a été perdue en passant par l'archive"
+        );
+
+        drop(conn);
+        std::fs::remove_file(&db).ok();
+        std::fs::remove_file(&zip).ok();
+    }
+
+    /// **La disposition d'un tableau fait le même voyage** (Fabrice,
+    /// 04/10/2026 : « je ne sais pas, au niveau de la sauvegarde, ce qui est le
+    /// cas maintenant : vérifie »). C'était le cas par construction — la table
+    /// part entière — et c'est désormais tenu : qui sauvegarde puis restaure
+    /// retrouve ses colonnes.
+    #[test]
+    fn la_disposition_d_un_tableau_survit_a_une_sauvegarde_et_a_sa_restauration() {
+        use crate::preferences;
+        let db = scratch("colonnes", "sqlite");
+        let zip = scratch("colonnes", "zip");
+        std::fs::remove_file(&db).ok();
+        std::fs::remove_file(&zip).ok();
+
+        let chosen = preferences::TableLayout {
+            order: vec!["label".into(), "date".into(), "debit".into()],
+            hidden: vec!["debit".into()],
+            widths: [("label".to_string(), 320)].into_iter().collect(),
+            colors: [("date".to_string(), "pastel-blue".to_string())].into_iter().collect(),
+        };
+        {
+            let conn = crate::database::create_new_database(&db).unwrap();
+            assert!(preferences::set_table_layout(&conn, "operations-list", &chosen).unwrap());
+            writer::write_archive(&conn, &zip).unwrap();
+            // Entre la sauvegarde et la restauration, l'utilisateur a tout remis
+            // d'origine : c'est bien l'archive qui doit parler.
+            preferences::reset_table_layout(&conn, "operations-list").unwrap();
+        }
+
+        let mut conn = crate::database::open_existing_database(&db, None)
+            .unwrap()
+            .conn;
+        restore_file_into(&mut conn, &zip).unwrap();
+        assert_eq!(
+            preferences::table_layout(&conn, "operations-list").unwrap(),
+            Some(chosen),
+            "la disposition a été perdue en passant par l'archive"
         );
 
         drop(conn);

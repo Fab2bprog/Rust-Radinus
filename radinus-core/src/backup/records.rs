@@ -853,6 +853,14 @@ pub struct OperationRow {
         deserialize_with = "lenient::integer"
     )]
     pub id_projets: i64,
+    /// **Absent de toute sauvegarde antérieure à la base 11**, 1.9.3 comprise :
+    /// il vaut alors 0, que [`OperationRow::to_domain`] lit comme « Vérifiée ».
+    #[serde(
+        rename = "IDVerification",
+        default = "lenient::missing_integer",
+        deserialize_with = "lenient::integer"
+    )]
+    pub id_verification: i64,
 }
 
 impl OperationRow {
@@ -884,6 +892,24 @@ impl OperationRow {
             payee_id: self.id_tiers,
             project_id: self.id_projets,
             is_complement,
+            // **Deux cas, et ce ne sont pas les mêmes** (Fabrice, 03/10/2026).
+            //
+            // Une sauvegarde ancienne ne porte pas ce champ — il vaut alors 0 :
+            // l'opération date d'avant que la question ne se pose, elle est
+            // tenue pour vérifiée, sinon dix ans d'historique demanderaient à
+            // être contrôlés.
+            //
+            // Un champ qui est là mais dont la valeur ne veut rien dire, c'est
+            // une anomalie : personne n'a jugé cette écriture, elle est donc
+            // « À vérifier » — « s'il devait y avoir une ligne qui serait sans
+            // vérification par erreur, elle devrait être à vérifier ». La
+            // ranger sous « Vérifiée » cacherait justement celle qu'il faut
+            // regarder.
+            verification_id: match self.id_verification {
+                0 => crate::operations::VERIFIED,
+                known @ 1..=4 => known,
+                _ => crate::operations::TO_VERIFY,
+            },
         }
     }
 
@@ -909,6 +935,7 @@ impl OperationRow {
             id_cheque: o.check_id,
             id_tiers: o.payee_id,
             id_projets: o.project_id,
+            id_verification: o.verification_id,
             // `libelle` above already carries LEGACY_COMPLEMENT_LABEL for
             // rows where is_complement is set (the Complement mechanism, §9,
             // always names the sub-operation that way) — nothing extra to do
@@ -1515,7 +1542,38 @@ mod tests {
             id_cheque: 0,
             id_tiers: 0,
             id_projets: 0,
+            id_verification: 0,
         }
+    }
+
+    /// Une sauvegarde d'avant la base 11 ne porte pas `IDVerification` : ses
+    /// opérations sont vérifiées, comme elles l'étaient sans qu'on le dise.
+    /// Une valeur présente mais absurde, elle, est une anomalie : à vérifier.
+    #[test]
+    fn une_operation_sans_verification_est_tenue_pour_verifiee() {
+        let ancienne: OperationRow = serde_json::from_str(
+            r#"{ "IDOperation":1, "Libelle":"RETRAIT", "Date":"20260115", "Montant":-100, "IDCompte":1, "IDStatutOperation":1 }"#,
+        )
+        .unwrap();
+        assert_eq!(ancienne.to_domain().verification_id, 2);
+
+        let douteuse: OperationRow = serde_json::from_str(
+            r#"{ "IDOperation":1, "Libelle":"RETRAIT", "Date":"20260115", "Montant":-100, "IDCompte":1, "IDStatutOperation":1, "IDVerification":3 }"#,
+        )
+        .unwrap();
+        assert_eq!(douteuse.to_domain().verification_id, 3);
+
+        let absurde: OperationRow = serde_json::from_str(
+            r#"{ "IDOperation":1, "Libelle":"RETRAIT", "Montant":-100, "IDCompte":1, "IDStatutOperation":1, "IDVerification":42 }"#,
+        )
+        .unwrap();
+        assert_eq!(absurde.to_domain().verification_id, 1, "une anomalie se regarde");
+
+        let nulle: OperationRow = serde_json::from_str(
+            r#"{ "IDOperation":1, "Libelle":"RETRAIT", "Montant":-100, "IDCompte":1, "IDStatutOperation":1, "IDVerification":null }"#,
+        )
+        .unwrap();
+        assert_eq!(nulle.to_domain().verification_id, 2, "un champ vide vaut un champ absent");
     }
 
     #[test]
@@ -1555,6 +1613,7 @@ mod tests {
             "IDCheque",
             "IDTiers",
             "IDProjets",
+            "IDVerification",
         ] {
             assert!(obj.contains_key(key), "missing JSON field {key}");
         }

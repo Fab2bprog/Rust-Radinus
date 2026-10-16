@@ -1641,6 +1641,1374 @@ belongs to a test machine and not to the line that will be released.
 
 ---
 
+## P-40 — A clearing date belongs to pointed operations only (21–25/08/2026)
+
+**Ruled by Fabrice**, after users reported *« il y a une date de pointage alors
+que le statut de l'écriture n'est pas en pointé »*, and refined over the audit
+of the fix on 25/08/2026.
+
+**Nine rules, and they hold together.** Nothing writes a clearing date on an
+operation that is not pointed — the recurring generator, which dated every
+instalment it produced, now dates only the ones already in the past. In a fiche
+the field follows the status: emptied towards planned or committed, filled with
+the operation's own date towards pointed, and the user may always type over it.
+A pointed operation must carry its date, and the fiche refuses to save without
+one — in a panel, not a line at the foot of the window, with a second line
+offering the operation's date. Where the software points in bulk it writes the
+operation's date **only where the field is empty**, and never over an existing
+one. **Nothing is ever erased or rewritten in an existing database**: the dates
+inherited from earlier versions stay where they are and go, fiche by fiche, as
+their status is touched. In the list a date carried by a non-pointed operation
+shows in grey and italic, and a non-pointed row shows no balance at all. The
+« Pointer » button skips what is already pointed. A template writes what the
+hand would write.
+
+**What was deliberately left alone, and why.** The statement window keeps its
+free choice of status: an OFX file only ever contains transactions the bank has
+already passed, so the date there is always true, and *« pour être libre, parce
+que sur 10 000 cas il y a toujours des exceptions »*. The fiche keeps emptying
+the field when the status leaves "pointed", even though the Pointer button never
+touches an existing date: *« le comportement de la fiche ne concerne qu'une
+opération et demande une validation. Le bouton Pointer en un clic non désiré
+peut détruire X informations »* — it is the size of the damage that decides,
+not the symmetry of the rules. Quick classification may stamp a date on an
+inherited row that is pointed without one: a silent repair, accepted as such.
+
+## P-41 — Writing an operation is the controller's job to announce (25/08/2026)
+
+**Ruled by Fabrice**, after finding that an operations list left open stayed
+frozen once a statement had been imported.
+
+**The bug was not where it looked.** The import wrote correctly; it simply told
+nobody. Announcing was the job of the window that *asked* for the write, so
+every window had to remember — the operation fiche remembered, the bulk
+statement integration did not, and neither did five other paths. Offered the
+choice between adding the missing calls and moving the duty, he chose the
+second: *« option pour la seconde solution »*.
+
+**Announcing now happens where the write happens**, in the controller, and a
+window has nothing left to know. Two windows are told, not one: writing an
+operation moves the balances, so the accounts list is as stale as the operations
+list. A crossing test reads the controller, finds every command that makes the
+core write an operation, and requires it to announce in the same breath — the
+command written six months from now is caught there rather than at a user's
+desk. The lesson is general and worth writing down: **a duty every caller must
+remember is a duty that will be forgotten** — it belongs where the thing itself
+happens, not in the list of things to think about.
+
+## P-42 — The crossed balance crosses two nomenclatures, not one and time (25/08/2026)
+
+**Ruled by Fabrice**: *« une nouvelle fenêtre de type statistique que nous
+allons appeler Bilan croisé […] les catégories représenteront les lignes du
+tableau et en colonne on n'aura plus du tout les mois mais les affectations »*.
+
+**The six statistics all answer the same question in six ways** — one
+nomenclature against the twelve months of a year. F39 asks a different one:
+what did each assignment spend, under each category, *this month*. The time
+axis is spent on the second nomenclature, so the period shrinks to a month and
+one steps through months with the clocks that used to step through years.
+
+**Three consequences follow from that alone.** There is no Cumul row: a running
+total adds the months in order, and assignments have no order. Every category
+and every assignment is shown even when empty, since columns that changed
+places from one month to the next would be impossible to compare — and he
+judged the width objection unfounded, *« il sera très rare que la personne ait
+30 affectations »*, while asking for the horizontal scrollbar anyway. The export
+follows the period: twelve tabs, one per month of the shown year, where the six
+statistics export one tab per year.
+
+**Everything else is the template of the six, on purpose.** Not a copy: the
+same shared table, the same switches, the same colours, the same detail panel.
+Six copies of a window are six copies of every fault it takes a day to remove.
+
+## P-43 — A fiche that was not validated starts from zero (30/08/2026)
+
+**Ruled by Fabrice**, after reporting that the reconciliation fiche kept part
+of the previous line's answers. Asked whether reopening it on the *same* line
+should give back what had been typed there: *« si on a pas intégré la fiche
+c'est que l'on a pas validé donc c'est normal de recommencer cette fiche à
+zéro »*.
+
+**It says what Radinus already says everywhere else.** Nothing exists until it
+is validated — the rule of "Duplicate" (26/07/2026), the rule of the recurring
+operation created from an operation, the rule the transfer window follows when
+it resets itself. A fiche left without validating produced nothing, so there is
+nothing to find again, and one that gave back half a draft would mostly make
+its author believe he had finished it.
+
+**And it can be seen.** "Opened is blank" is checked at a glance. "Remembers
+sometimes" is checked only by recalling what one did the time before — and in
+F18 the two halves of the fiche were remembering in opposite directions: what
+had been typed was lost, what had been chosen was kept, and which of the two
+depended on whether Validate had been pressed before giving up.
+
+**"From zero" is not "back to the bank's words"** — it is *the line as the
+statement holds it today*. `statement_amend` is sent before any question, so a
+correction confirmed with Validate and then abandoned at the duplicate question
+has already entered the statement; the list refreshes with it, which is
+Fabrice's own rule of 27/07/2026. The reopened fiche shows that corrected
+label, and rightly: it belongs to the statement now. What returns to zero is
+the classification, which never belonged to anything but the fiche.
+
+**The fault was one of shape, and that is why it was missed.** In the transfer
+window the reset is a named function two paths can call. In F18 it was written
+*inside* the construction block: there was nothing to call, so nothing was
+called. It is the third time this family has bitten — the title that did not
+follow (P-14), the nomenclatures that did not reload, and this. The crossing
+test can require a window to listen for its parameters; it cannot require it to
+make itself new. Only a check written per window can, and F18 now has three.
+
+## P-44 — The status is the bank's, the verification is the user's (03/10/2026)
+
+**Decided.** An operation carries a second closed list next to its status:
+`Verification` — 1 *À vérifier*, 2 *Vérifiée*, 3 *Douteuse*, 4 *Contestée*.
+The status says what the bank did with the entry; the verification says what
+the user thinks of it. Neither ever writes the other, and the verification
+enters no balance and no statistic. Schema version 11.
+
+**Why.** Fabrice, using the software, on 03/10/2026: an imported statement line
+arrives *pointed*, and that is right — the bank has passed it. But *« j'ai
+certains utilisateurs qui ne font pas confiance à leur banque […] ils
+vérifient tout et conservent leur ticket papier. Pour eux pointé veut dire
+qu'ils sont d'accord pour être débités, qu'ils reconnaissent la légitimité de
+cette écriture »*. One word was carrying two facts, and the import was ticking
+the second on the user's behalf before he had looked at anything.
+
+**Three ways were on the table.** Importing as *engagé* cost nothing, but would
+have made that status mean both "a cheque not yet debited" and "a line not yet
+checked". A fourth status touched every balance, every switch and every
+statistic. A separate field mixes nothing and moves no figure — Fabrice chose
+it, and chose a list over a tick box: a box cannot tell "not looked at yet"
+from "looked at, and it is wrong", and the second is the case these users care
+about.
+
+**The rules.**
+
+- **Everything that is typed is verified.** The fiche, a transfer, a recurring
+  operation, a template, a duplicate: the user wrote it, receipt in hand. The
+  column's default is 2, so an `INSERT` that does not name it is right without
+  knowing it exists — and a duplicate of a disputed entry is not disputed.
+- **Only an import can be born "to verify", and only if asked.** A preference
+  of the database (`verification_import`), two answers: 2, the default — nothing
+  changes for whoever trusts his bank — or 1. *Doubtful* and *disputed* are
+  judgements; an import carries none.
+- **Operations already in a database are verified.** Otherwise ten years of
+  history would ask to be checked the morning after the update.
+- **A sub-operation has none of its own.** What is judged is the bank's line,
+  and a ventilation is not one: it carries its mother's, pushed by
+  `sync_from_parent`, and neither the list nor the core lets it be set.
+- **A backup older than schema 11 restores as verified.** A value outside the
+  list was first restored as verified too; P-45 corrects that the same day.
+  `Verification` itself never travels: it is a frozen nomenclature, refilled by
+  the software like `StatutOperation`.
+
+**The migration is no migration.** The column has a default, so
+`ensure_the_tables` adds it to a version-10 database on its own; the missing
+table is created and refilled by `FROZEN`. No hand-written step, nothing to
+replay if it is interrupted. A database is **not copied before being brought
+up** — true of every step so far, and worth a decision of its own the day a
+step rewrites data instead of adding to it.
+
+**It is read by its colour** — black, dark green, dark orange, red, Fabrice's
+choice. On the cell and on the closed list everywhere; the open list is drawn
+by the system and macOS ignores colours there.
+
+**A fault found on the way.** Debits were red by a style rule aimed at "the
+eleventh cell" of a row. The « Statut opération » column, added two days
+earlier, moved the debit to the twelfth, and debits went black without a test
+noticing. A rule that counts cells breaks the day a column is added; the cell
+now names itself (`list__cell--debit`) and a check holds the colour.
+
+## P-45 — A seventh statistic, and what "no verification" means (03/10/2026)
+
+**Decided.** The verification becomes a seventh axis of the statistics — four
+rows, twelve months, amounts — on the template of the six. The detail under
+the matrix carries a « Vérification » column in all seven. And a verification
+that means nothing is *to verify*, never *verified*.
+
+**The axis is the first that is not a nomenclature.** The six cross a list the
+user manages; this one crosses a closed list of four. `Axis::nomenclature`
+therefore answers `Option`, and two questions that used to be asked of the
+nomenclature are now asked of the axis: `elements`, which gives the rows, and
+`has_unclassified_row`. Everything else — the leaves rule, the switches, Somme
+and Cumul, the cell and its detail — is untouched, which is the point of
+having validated one statistic before deriving the others (26/07/2026).
+
+**No « Sans vérification » row — and Fabrice's correction.** Every operation
+carries a verification, so the row would always be empty. The first plan sent
+a value outside the list to *verified*, by analogy with an old backup. Fabrice:
+*« s'il devait y avoir une ligne qui serait sans vérification par erreur, elle
+devrait être à vérifier ? »* He was right, and the analogy was the fault: they
+are two different cases.
+
+- **The field is absent** — a backup written before the question existed. The
+  operation predates it and is *verified*, or ten years of history would ask to
+  be checked.
+- **The field is there and means nothing** — a damaged database, a file edited
+  by hand. Nobody judged that entry; hiding it under *verified* would hide the
+  very one to look at. It is *to verify*.
+
+The rule is written once for the statistic, inside the axis's SQL expression,
+so the matrix and its detail cannot count the anomaly in two different places.
+The backup reader follows it: `0`, which is what an absent or empty field
+reads as, restores as verified; any other value outside 1–4 restores as to
+verify.
+
+**The column goes in all seven, and that is the cheaper way.** The seven share
+one page and one detail table: adding the column once puts it everywhere, and
+restricting it to the new statistic would have needed a condition. Fabrice
+asked whether "everywhere" cost more; it cost less. The crossed balance has a
+copy of that table of its own and is left alone for now — decided apart.
+
+**The shortcuts are renumbered.** The statistics take ⌘⇧1 to ⌘⇧7 in the order
+of the menu, and the crossed balance moves from ⌘⇧7 to ⌘⇧8. Keeping it on 7
+and giving the newcomer 8 would have spared a shortcut nobody had learned:
+*« je préfère renumérotation car je n'ai pas encore publié »*.
+
+**A fault it shipped with, and why no test saw it.** The window of the new
+statistic opened empty the first time: no cell, keys in place of sentences,
+"no account" in red. The page asks for its vocabulary under the name of its
+axis, and `ui_texts` only knew nomenclatures — the two lists had coincided
+exactly for as long as every statistic was a nomenclature. The request was
+refused, and the window stopped before it had laid out anything. The browser
+harness answers every `ui_texts` call, and the Rust test of the axis names
+asked Fluent directly, so neither went through the counter where the refusal
+was. `vocabulary_kind` now receives a nomenclature or an axis, and a crossing
+test (`chaque_axe_des_statistiques_obtient_son_vocabulaire`) goes through it
+for every axis. The lesson is the one of P-41: check at the door the call
+actually passes, not beside it.
+
+## P-46 — The verification joins the quick classification, as a draft (03/10/2026)
+
+**Decided.** The verification is the seventh characteristic of F05: a column in
+last position in the table, a tick box and its list under the status in the
+banner. *« On ne change pas le principe de ce qui est dans cette fenêtre. »*
+
+**So here, and only here, choosing a verification does not write it.** In the
+operations list and in the statistics, the drop-down list writes at once. In
+F05 it goes into the draft with everything else and waits for the diskette —
+the rule Fabrice dictated for this window on 27/07/2026: one classifies fast
+because no gesture is final. A seventh characteristic that wrote on its own
+would have been the one cell of the window that could not be undone by
+leaving.
+
+**It follows the status, not the classifications.** `descends_to_children`
+and `can_be_cleared` already separated the two kinds: what describes the bank's
+movement — the payment mode, the status — goes down to the daughters and has
+no « Non précisé » ; what describes what the money was for does not go down
+and can be cleared. The verification is of the first kind: it judges the bank's
+line. It writes neither the status nor the clearing date.
+
+**The draft refuses a value outside the four.** The six others take what their
+list offers and nothing checks them; a verification of 9 would have been
+written to the database at the save, where nothing holds it back any more.
+`Characteristic::accepts` stops it at both doors — the banner and the cell.
+
+**The banner keeps its two columns.** Six pairs filled a grid of two columns
+by three rows, column by column. A seventh, left to the automatic filling,
+would have opened a third column. The grid now has four rows and the right-hand
+column is named: from the fourth pair on, each is sent there and takes the
+first free row. Naming only the fourth was tried first and put the project
+under the payment mode — caught by the check that holds the six in place.
+
+**And the list gets a horizontal scrollbar**, asked for in the same breath:
+ten columns no longer fit in a narrowed window. It is `horizontalScroll` and a
+`minWidth` per column, the mechanism of the operations list (21/08/2026) —
+nothing new was written for it.
+
+## P-47 — A window may add to its own right-click menu (03/10/2026)
+
+**Decided.** The right-click menu of a table is common to every table of
+Radinus and exports what the table shows. A window may now put entries of its
+own at the head of it, each opening a sub-menu of choices. The operations list
+is the first: « Vérification », then the four values, applied to the whole
+selection.
+
+**"Only at this place."** Fabrice: *« je veux modifier ce menu pour l'instant
+uniquement à cet endroit »*. The menu therefore did not learn about
+verifications; it learned to accept what a window hands it
+(`MenuAddition`, in `export.ts`). A table that hands nothing has the menu it
+always had — the check on the categories list still holds its ten entries word
+for word, and would fail the day an addition leaked into it.
+
+**The gesture is the Pointer button's.** A selection and one value. A selected
+sub-operation stands for its mother, each mother is treated once, an operation
+that already carries the value is not counted, and everything goes in one
+transaction — a selection half-changed would not show on screen, which is what
+would make it serious. The right-click does not move the selection: it acts on
+the rows already taken, and with none taken the entry is greyed rather than
+hidden, so that it says it exists and what it is waiting for.
+
+**No sentence.** The plan had one — "3 operations set to Doubtful" — in
+eighteen languages. Fabrice: *« je ne pense pas qu'il soit nécessaire de faire
+une phrase »*. The table is reread and the colours change under the user's
+eyes; that is the confirmation. Only a failure speaks.
+
+**Then the detail of the statistics, the same day.** *« Il faut ajouter aussi
+dans le menu contextuel la même option "Vérification" que dans le menu
+contextuel de la liste des transactions d'un compte »* — wherever the column
+is, so in the seven statistics. It was a matter of handing the same addition
+to the detail's table: the menu already knew how to receive it, which is what
+the mechanism was written for. The matrix above keeps its exports only, and
+the crossed balance, whose detail has no such column, is not concerned. One
+consequence is worth knowing there: the detail shows sub-operations in place
+of their mothers, and judging a daughter judges her mother — so her sisters
+follow, even those behind another cell.
+
+**The sub-menu is drawn by Radinus, not by the system**, so the four choices
+carry their colours on macOS too — which the drop-down list of the column
+cannot do there. It opens to the right of its entry, and to the left when the
+click was near the right edge of the window.
+
+## P-48 — The operations list's right-click menu is three entries that open (03/10/2026)
+
+**Decided.** In the operations list, and there only, the right-click menu is
+« Statut opération ▸ », « Vérification ▸ », « Exporter vers ▸ ». Fabrice: *« en
+premier, avant Vérification, nous allons créer une option "Statut opération"
+qui pointera sur un sous-menu qui contiendra les options pointé, engagé, prévu.
+Les options d'exportation seront déplacées dans un sous-menu, on y accédera via
+l'option "Exporter vers". Ce nouveau menu ne concernera que la liste des
+opérations. »*
+
+**The status of a selection** is the gesture of P-47 with another value:
+`operations::set_status_many`, one transaction, a sub-operation standing for
+its mother, each mother once. It goes through `set_status`, so the clearing
+date follows the one rule there is — pointé dates an empty field, and never
+touches a date already there. No sentence, as for the verification.
+
+**The exports are nested on request.** `onRightClick` takes an optional
+`exportsUnder`: given, the ten formats go into a sub-menu under that name;
+absent, they stay in a row. A table that asks nothing has the menu it had,
+which is why the detail of the statistics and the nomenclature lists did not
+move. « Exporter vers » is never greyed: exporting needs no selection.
+
+**The short names are not translated.** Under « Exporter vers » the entries
+read « Excel (.xlsx) », « CSV (.csv) »… They are proper names, the same in the
+eighteen languages, and are written in `FORMATS` rather than in the language
+files; only « Exporter vers » (`export-to`) is a translated text.
+
+**A sub-menu of ten lines can leave the window by the bottom**, which the
+four verifications could not: near the bottom edge it now opens upwards, as it
+already opened leftwards near the right edge.
+
+## P-49 — Each user his own columns: order, presence and widths are remembered (04/10/2026)
+
+**Decided.** In the operations list, the user moves a column by dragging its
+header, shows and hides columns from a right-click on the header row, and the
+order, the hidden columns and the widths are remembered. Fabrice: *« en
+fonction des utilisateurs et de leurs goûts personnels, tous n'utilisent pas
+les mêmes colonnes, tous ne souhaitent pas le même ordre. […] Bien entendu il
+faudrait un système très ergonomique. »*
+
+**One layout for all accounts.** *« Je pencherais pour une disposition commune
+à tous les comptes, ce serait la préférence de la fenêtre. »* Two lists open
+side by side therefore show the same: saving sends `table-layout-changed`, and
+every other table of that name rereads. A table does not reread its own echo.
+
+**Stored in `Preferences`, one key per table.** Fabrice's own idea: *« on
+pourrait utiliser la table de préférence, et proposer dans Paramètres →
+Préférences simplement une réinitialisation des colonnes »*, then *« il
+faudrait dans la base une préférence par tableau »*. A key more is not a
+schema change: version 11 stays, an older Radinus ignores it, and the backup —
+which carries the whole table — carries it. The list of tables is closed, in
+the core (`TABLES_WITH_A_LAYOUT`): a name that is not in it writes nothing,
+which is what keeps the rule of 03/08/2026 — nothing enters that table
+unasked. The column width that the module quoted as the very example of what
+does not slip in « au passage » came in that day, but asked for: *« on doit
+aussi mémoriser la largeur des colonnes »*.
+
+**One column always remains — whichever.** I had proposed that Date and
+Libellé could not be hidden. Fabrice: *« plutôt que de préférer une colonne
+proprement dite comme non masquable, on pourrait exiger à la place qu'il reste
+simplement une colonne, n'importe laquelle »*. It is simpler and decides
+nothing in the user's place; and it guarantees what matters — while a column
+remains, a header remains, hence the right-click that brings the others back.
+The last one is greyed in the menu. *« Au pire des cas il pourra toujours
+aller dans les préférences. »*
+
+**The « + » stays first and out of the menu** (agreed): hiding it would make
+sub-operations unreachable. It is `fixed`; fixed columns come first.
+
+**On any trouble, the table is reset.** *« En cas de problème il doit y avoir
+une réinitialisation de la préférence au niveau du tableau. »* Two barriers:
+the core deletes on read what does not parse or does not hold; the table
+refuses what names a column it does not have, opens as born, and asks for the
+key to be removed. Without a word — the user can do nothing about it and the
+table is readable. **A column the layout does not name is not trouble**: it
+was born after the layout was saved. It takes its born place, after its left
+neighbour, and the rest is kept — resetting at every update would cost the
+user his setting for a column he did not ask for.
+
+**The reset is in two places.** In the header menu, because that is where one
+stands when the columns are in a mess; in the preferences, as the net of the
+one who no longer understands his table. The preferences list one line per
+table, built from the core's list, plus « Tout réinitialiser »; the buttons
+act at once, without the save button and without a question (agreed).
+
+**Written once, in the shared table.** A window gives `layoutName` and an
+`id` to each column; a table that gives nothing is exactly what it was. All
+per-column state — filter, sort, width — is now kept by the column's born
+rank, not its place on screen, so a moved column keeps its own.
+
+**Pointer events, not the browser's drag-and-drop.** *« Il faut que ce système
+soit compatible macOS, Windows et Linux. »* Native drag-and-drop behaves
+differently in WebKit, WebView2 and WebKitGTK, and Tauri intercepts part of it
+on Windows. The move is written like the width handle, which already works on
+the three; the menu is drawn by Radinus, like the rows' menu. A move starts
+after six pixels — under that it is a click, and a click sorts.
+
+**Refused: fitting a column to its content by double-click.** Asked, *« comme
+dans Excel »*; but the double-click on that line already gives the column its
+born width back (25/07/2026), and the two cannot share a gesture. Fabrice:
+*« non, alors on ne fait pas cela »*. The double-click is unchanged.
+
+**Three things that follow.** Hiding a column clears its filter and its sort:
+a filter acting with nothing on screen to say so hides rows for no visible
+reason. The right-click export follows the columns shown — a table exports
+what one reads. And once a width has been pulled, a column left in `fr` gets
+a floor (`minmax(min, fr)`): among columns frozen in pixels it received what
+was left, that is nothing as soon as the table overflowed, and it was there
+without being seen — which, now that the layout is remembered, would have
+lasted from one opening to the next. A handle merely clicked no longer
+freezes anything, for the same reason.
+
+## P-50 — The detail of the statistics and of the crossed balance: one layout per statistic (04/10/2026)
+
+**Decided.** The columns of the list at the bottom of the seven statistics and
+of the crossed balance are the user's own, as in the operations list (P-49).
+Fabrice: *« le même principe dans tous les tableaux des fenêtres statistiques :
+mais attention, pas n'importe lesquels. Je parle des tableaux qui listent les
+transactions lorsque l'on clique sur une cellule. Ceux du bas de la fenêtre. »*
+The matrix above is not concerned, in any of these windows.
+
+**One layout per statistic.** I had proposed a single layout for the seven —
+they share one page and the same eleven columns. Fabrice: *« une disposition
+par statistique »*. The page therefore names its table after its axis
+(`statistics-<axis>`), and the core lists the seven names; a test holds that
+list against `statistics::AXES`, so an eighth axis without its name fails
+there instead of quietly forgetting its columns. Two windows of the same
+statistic stay in step; two different statistics do not hear each other.
+
+**The crossed balance is in, with the « Vérification » column.** *« Inclus la
+colonne Vérification, et inclus les modifications sur les colonnes. »* It had
+been left aside on 03/10/2026 (« décider à part pour le bilan croisé »). The
+column is the one of the statistics, at the same place, with the drop-down
+list and the right-click entry. Nothing was needed below the window: the
+detail already arrived with each operation's verification.
+
+**No fixed column here.** There is no « + » in these lists; the eleven columns
+move and hide, and one always remains.
+
+**The preferences name each table by its menu entry.** Nine lines now. The
+detail of a statistic is called what its window is called in the general menu
+— « Stat par catégories » — which is how the user knows it, and which already
+exists in the eighteen languages: nothing was translated a second time. The
+controller hands the label with the name; the window composes nothing.
+
+**The amount is red by its class.** The stylesheet coloured « the last cell
+but one » of a debit row; a column that moves cannot be counted. The cell now
+names itself (`list__cell--amount`). To know: a later rule written for the
+reconciliation (`.list__row--debit .list__cell`) also tints the *whole* debit
+row in this detail, and has since it exists — that is what the screen shows,
+and it was left as it is.
+
+## P-51 — The preferences reset the tables of a *window*, chosen in a drop-down list (04/10/2026)
+
+**Decided, and it corrects P-49 and P-50.** The « Colonnes des tableaux » leaf
+is a drop-down list that names a window, one « Réinitialiser » button beside
+it, and « Tout réinitialiser » below. No label before the list.
+
+**The fault.** I had written one line and one button per table. With the
+statistics and the crossed balance that made nine lines and nine buttons, and
+one more for every table to come. Fabrice: *« tu as fait un truc un peu bête
+au niveau de l'ergonomie. […] ça fait beaucoup de boutons et de lignes pour
+rien. Il aurait mieux valu mettre un menu déroulant indiquant le nom de la
+fenêtre et un bouton réinitialiser qui pointe sur le menu déroulant. »* An
+action this rare does not deserve a button per object; a list that grows
+costs nothing, a column of buttons does.
+
+**Windows, not tables.** *« Il s'agit du nom de la fenêtre, on réinitialise
+les tableaux contenus dans une fenêtre. Demain il peut y en avoir plusieurs
+dans une fenêtre. »* The button sends the window's name
+(`reset_window_table_layouts`) and the core knows which tables it holds.
+Today each window holds one, named after it; the day a window holds two they
+will be named `<window>.<table>` — `preferences::window_of` already reads
+that — and neither the preferences nor the keys already stored will change.
+
+**No label.** I had asked whether « Tableau : » should precede the list.
+*« Tu mets simplement le nom de la fenêtre et réinitialiser, je pense que ça
+sera suffisamment clair. »* Nothing new was translated.
+
+## P-52 — The Filtre menu: two filters that combine, one choice in each (05/10/2026)
+
+**Decided.** The Filtre menu of the operations list is « Toutes les
+opérations », a rule, « Filtre Statut ▸ » and « Filtre Vérification ▸ ».
+Fabrice: *« on mettra un séparateur en dessous de "Toutes les opérations", puis
+une option Filtre Statut, avec comme sous-menu uniquement les opérations
+pointées, engagées et prévues. C'est juste un changement ergonomique. […] En
+dessous on va rajouter Filtre Vérification, avec en sous-menu les options
+présentes dans la table Vérification. »*
+
+**One per sub-menu, and they add up.** *« On pourra combiner, choisir
+opérations pointées et filtre À vérifier, il pourra donc y avoir deux éléments
+cochés mais un seul par sous-menu. »* The core applies both
+(`operations::list_for_account`), on the mothers, like the period: the foot of
+the window adds up what the table shows. A verification outside the list — a
+damaged database — is kept by « À vérifier », as in the statistic by
+verification: the filter that exists to find what nobody has judged must not
+miss it.
+
+**« Toutes les opérations » unticks everything** — *« pour rester cohérent »* —
+and is ticked only when no filter acts. The ticks are read from the two
+filters themselves, never from a remembered click.
+
+**Three things agreed on my proposal.** A second click on a ticked choice
+lifts it: without that, dropping one of the two filters would mean lifting
+both and ticking the other again. The entry of a sub-menu is ticked while a
+choice is made in it, so one sees what filters without opening anything. And
+the filter is not remembered from one opening to the next, as before.
+
+**« Afficher tout » at the head of each sub-menu, the same day.** Fabrice:
+*« c'est bête mais j'ai peur que les utilisateurs âgés ne comprennent pas si on
+ne le met pas »*. He was right, and not only for them: the second click was
+the only way to lift one filter, and nothing in the menu said so. The entry
+lifts the filter of its own sub-menu and is ticked when no choice is made
+there — so each sub-menu always shows exactly one tick. The second click was
+kept: it costs nothing to those who do not know it.
+
+**The verifications are put in the menu when it opens**, not when it is
+built: the menu bar is built with the window's words, before the database has
+handed its lists, and a sub-menu filled then would be empty until the first
+change of language.
+
+## P-53 — A column can be tinted; the header menu becomes two sub-menus (05/10/2026)
+
+**Decided.** The right-click menu of a table's header row is « Afficher/Masquer
+▸ », « Colorer la colonne : … ▸ », a rule, « Rétablir les colonnes par
+défaut ». Fabrice: *« il y aurait un menu Afficher/Masquer qui contiendrait un
+sous-menu avec le menu actuel. Et en dessous il y aurait une option Colorer,
+lorsque l'on cliquerait sur cette dernière on aurait le choix entre des
+couleurs »* — nine, in his order: rouge, orange, rose, vert pastel, vert, bleu
+pastel, bleu, jaune pastel, jaune. And *« Aucune couleur »* at the head, which
+I had proposed, on the model of « Afficher tout » in the Filtre menu.
+
+**A transparent layer.** His words: *« comme un calque transparent de couleur
+qui s'applique dessus »*. The tint is a background *image* over the cell, so it
+adds to what the row already shows — the alternation, the blue of a
+sub-operation, the selected row — instead of replacing it, and the red of a
+debit and the colours of the verification stay readable on top. A tinted cell
+takes the full height of its row: left at the height of its text it drew a
+dotted column, not a band.
+
+**« Colorer » acts on the header that was clicked, and says so.** A menu that
+tinted « a column » without naming it would aim wrong half the time. The label
+comes whole from Fluent, colon included, and the column's title follows it —
+a substitution, as for an error message, not a composition. On the « + », or
+beside every header, the entry is greyed.
+
+**The database keeps a name, never a colour code.** `colors` in the layout
+maps a column to one of nine names; the core refuses any other. What « rouge »
+looks like is one line of the stylesheet, read by the cell and by the swatch
+of the menu alike — Fabrice will judge the tints on his screen, and adjusting
+one must not touch a single database. A test holds the four ends together:
+core, table, stylesheet, and the eighteen language files.
+
+**A layout stored before the colours still reads.** The field defaults to
+empty. Without that, the first opening after the update would have rejected,
+then deleted, the layout the user had made the day before.
+
+**Agreed on my proposals.** The header is not tinted — sort marker and
+magnifier stay readable. Neither the exports nor the PDF carry the colours: a
+mark on the screen, each user's own. « Rétablir les colonnes par défaut »
+stays at the first level, since it puts everything back, colours included. The
+ticks leave the menu open; choosing a colour closes it, since one picks only
+one.
+
+## P-54 — « Analyse Évolution du solde »: a zone dragged on the chart, and its operations (05/10/2026)
+
+**Decided.** A new window, F40, under « Graphique Évolution du solde » in the
+Statistiques menu. Fabrice: *« On va faire une nouvelle fenêtre. Tu vas partir
+de l'exemple de la fenêtre qui montre "Graphique Évolution Solde". […] En bas
+de la fenêtre on aurait le même tableau qui détaille les transactions que dans
+les statistiques catégories. Ce que je voudrais, c'est que lorsque
+l'utilisateur clique sur le graphique et maintient la souris appuyée, il trace
+le début et la fin d'une zone temporelle. On pourrait imaginer une barre
+verticale, puis au fur et à mesure que l'on maintient le clic en avançant on
+colore une zone, et à ce moment-là le détail des opérations apparaît dans le
+tableau du bas pour les comptes qui avaient été sélectionnés. »*
+
+**Two windows, and F25 is not touched.** I asked whether the zone and the
+table should simply be added to the existing chart. *« Je veux deux fenêtres
+distinctes. Tu ne touches pas à Graphique Évolution Solde : car on se
+concentre sur le solde. Analyse, c'est une vision plus approfondie. »*
+
+**The chart's drawing is copied, not shared — his ruling, against my
+recommendation.** I proposed to move the drawing into a module both windows
+would use; a fix of the line would then hold for both. *« Recopie le code pour
+qu'il soit indépendant. »* So `balance-analysis.ts` carries its own copy, and
+says so at its head. The cost is known and accepted: a correction of the
+drawing is to be made twice. A crossing test holds the independence — neither
+page imports the other, and F25 knows nothing of the zone.
+
+**The zone is computed beside the curve.** `balance_curve::zone` uses the
+curve's own definition of the balance: the account's three carried amounts
+plus its first-level operations, with no status filter. The opening balance is
+that of **the evening before the first day** (agreed), the closing balance
+that of the last day, and the change is therefore, to the cent, the sum of the
+rows shown. Two definitions in two modules would have drifted, and an analysis
+whose detail does not add up to its total is worth nothing. The curves
+themselves come from F25's command — it is the same computation.
+
+**Mothers, and a « Compte » column.** The detail of the statistics shows
+sub-operations in place of their mothers; here it is the bank's entry that
+moves the balance. *« Je pense qu'il faut montrer les mères aussi. Colonne
+Compte : oui. »* The rest is the statistics' detail — and that table too is a
+copy, for the same reason as the chart.
+
+**The gesture.** Pressing sets a bar on the day under the pointer — the
+nearest day, the one the hover bubble names. Dragging stretches a veil, either
+way, and the two dates follow the hand; **the table is read on release only**,
+since rereading it at every pixel on an account of several thousand operations
+would make the gesture stutter. Past the edge of the chart the zone stops at
+the edge instead of being dropped. A click takes one day. Pointer events with
+capture: the same code on the three systems, mouse and trackpad alike. The
+zone stays until another is drawn, survives a reread (an operation edited
+below changes neither its dates nor its place), and is cleared when the
+period, the year or the accounts change — it would no longer mean the same.
+
+**No shortcut**, as agreed. I had told Fabrice that the chart had none; that
+was wrong — it has ⌘G, and the dashboard ⌘T. ⌘⇧9 is free if one is wanted.
+
+## P-55 — Copying a cell, copying rows (07/10/2026)
+
+**Decided, after a user's remark.** Fabrice: *« Je viens de me rendre compte
+d'une chose très bête à la suite d'une critique d'un utilisateur. On ne peut
+pas faire de Copier de ligne/cellule dans un tableau. »* It was true
+everywhere: rows are not selectable as text — click and drag takes rows, not
+letters — and nothing copied. To take one amount out of a list, one had to
+export it to a file.
+
+**Three rulings.** No column titles in what is copied. Amounts *« en nombre
+pur »*. *« Tous les tableaux d'un coup »* — the mechanism is the shared
+table's, so every list has it; and « Copier la cellule » alone in the
+matrices of the statistics and of the crossed balance, where one picks a
+single cell.
+
+**What « pure number » means.** The currency sign and the grouping go, the
+decimal separator stays the language's: it is the one the user's spreadsheet
+expects, and what makes it read a number rather than a text. The conversion
+is made from the text shown (`clipboard.ts`, `pureNumber`), on number columns
+only — « 3,14 kg » in a label is a label. An amount is recognised by its two
+decimals; a cheque number grouped by three, a date, a year come back as they
+are.
+
+**Rows as one sees them.** In the order of the screen, with the columns
+shown, in their order — the rule of the export. Tabs between cells, line
+breaks between rows; a cell's own tabs and line breaks become spaces, or a
+comment on two lines would shift everything after it.
+
+**On the key itself, not on the browser's « copy » event.** Radinus has no
+Édition menu, and without one WebKit does not send that event. The table
+listens for ⌘C / Ctrl+C and steps aside whenever the user is copying
+something else: in a field, a drop-down list, or with text highlighted. With
+Shift or Alt it is not the copy key — AltGr on Windows *is* Ctrl+Alt.
+
+**Two ways to the clipboard.** The modern interface first, which may be absent
+or refused; then the old copy command on a text area set down for the time of
+the gesture. Neither is certain in the three engines Radinus lives in, both
+are called during a user's gesture. If neither writes, the window says so.
+None of this could be checked against a real clipboard from here: the checks
+hold what is sent, not what the system does with it.
+
+## P-56 — « Soldes de vos comptes » gets its right-click menu; six tables stay without (07/10/2026)
+
+**The fault.** Fabrice: *« Il n'y a pas de menu contextuel sur ce tableau.
+Aucun moyen de faire un copier de cellule ou de ligne. Aucun moyen d'exporter
+le tableau via menu contextuel […] bref absence totale de menu contextuel. »*
+The window uses the shared table and had never called `exportOnRightClick` —
+one line, missing since the window was written, which nothing reported because
+the table works perfectly well without it. And P-55 said « every table » for
+the copy without my having checked that every table had a menu to put it in:
+⌘C worked there, the two menu entries could not appear.
+
+**Corrected for that window**: the menu, the name of the window on the
+exported file, and its three balances exported as numbers, like every money
+column.
+
+**Six other tables are in the same state, and stay so by his choice.** Asked
+whether to switch them all on, Fabrice chose the balances alone. They are the
+attachments manager, the database selector, the two tables of the CSV
+statement, the Excel import, the Excel association, and one of the two tables
+of the Excel fields. ⌘C copies their selected rows — that lives in the shared
+table — but they offer no right-click menu.
+
+**A crossing test now holds the line**
+(`tout_tableau_a_son_menu_du_clic_droit`): every page that builds a table must
+switch its menu on, except those six, named in the test. A window added
+tomorrow that forgets the line fails there.
+
+## P-57 — The welcome window's accounts: one row, a tick box, an order; and a reset of the comfort settings (07/10/2026)
+
+**Asked by Fabrice**, in three sentences. *« Lorsqu'on rétrécit la fenêtre
+j'aimerais un ascenseur horizontal pour faire scroller les comptes. »* *« Avant
+chaque nom de compte […] je veux une boîte à cocher. Le but sera de faire
+comptabiliser ou non les soldes dans les 3 zones carrées du dessus […]. Les
+carrés pourront aussi être déplacés par drag and drop et réordonnés dans cette
+zone. Évidemment cela sera mémorisable dans les préférences. »* And for the
+preferences: *« il faut avoir un bouton pour remettre à zéro les réglages de
+confort mais pas le reste »*.
+
+**This revises P-8.** P-8 said the welcome window takes no setting and
+remembers nothing from one opening to the next; P-8 bis already let it be
+leafed through. It now keeps two things in the database: the order of its
+tiles and the accounts it does not count. It is still the view that answers
+without a click — nothing has to be set for it to answer — but « nothing is
+remembered there » is no longer true, by the decision of the one who wrote the
+rule.
+
+**One row, and a scrollbar.** The tiles no longer wrap: eleven accounts used
+to push the two rings off the screen. They widen while there is room and never
+go under their born width; past that the row scrolls inside its card.
+
+**The tick box.** Ticked at birth. Unticked, the account leaves the three
+totals **and the two rings** — asked whether the rings should follow, Fabrice:
+*« oui ils doivent suivre les cases à cocher »*. The tile stays, set back, and
+still opens its operations; ticking is not opening. As soon as one box is off,
+the line under « Solde en banque » says so — « Comptes comptés dans les
+totaux : 3 sur 5 » — because a total that leaves something out without saying
+it is a wrong total for whoever forgot the box. With every box off the totals
+are zero and the rings empty. « Soldes de vos comptes » is not concerned: its
+TOTAL line is still every account.
+
+**The order.** A tile is taken and put down elsewhere in the row, with the
+same gesture and the same mark as the columns of the tables — pointer events,
+not the browser's drag and drop, for the same reason: macOS, Windows and
+Linux. Under six points it is a click and the account opens. A new account
+arrives last and ticked.
+
+**Stored under one key, `accueil.comptes`**, in the `Preferences` table of the
+database: the order and the exclusions belong to the accounts of that
+database. The welcome window sends both at each gesture; the core recounts.
+
+**« Réinitialiser les réglages de confort »** — a new leaf of the preferences,
+under its own branch « Réinitialisation ». It puts back the columns of every
+table, the welcome window's order and boxes, and the display size. **Not the
+language, not the currency, not the verification of imported operations**:
+those change what Radinus writes or shows as data. It is the only reset button
+that asks first, because it undoes at once what took weeks to adjust. The
+display size lives on the machine and not in the database: without an open
+database the button still resets it, and that alone.
+
+**Not verified here**: the gesture and the scrollbar on a real macOS, Windows
+and Linux window. Touch screens scroll the row with a finger and cannot
+reorder by touch.
+
+## P-58 — F41, the credit simulation: a calculator, and what the history says (08/10/2026)
+
+**Asked by Fabrice**, who said he knew little about loans and asked to be
+listened to. He brought a consumer-loan simulation from La Banque Postale
+(12 000 €, 6,41 %, 22 months, 120 € of fees, 9,50 € of insurance a month:
+585,36 € a month, APR 7,73 %), and described its tool: three sliders, each
+doubled by a text field — amount, wished monthly payment, term — that move one
+another. Then: *« calculer un crédit c'est bien, mais aurait-tu une idée au
+regard de l'historique disponible dans Radinus pour conseiller la personne sur
+ses facultés à rembourser le crédit […] savoir si c'est jouable ou pas et dans
+quelle mesure »*, *« je veux quelque chose de chiffré mais aussi de visuel »*,
+a printable PDF report, and *« quelque chose de beau qui fasse classe »*.
+
+**What he settled, point by point.** Fixed rate only (« on reste sur du
+fixe »). The term in months. Consumer or mortgage from a drop-down; the
+sliders stop at 75 000 € / 84 months and 500 000 € / 360 months, the text
+fields at 100 million and 600 months (« la limite des curseurs n'est pas la
+limite des champs textes »). Amount or term moved → the payment follows;
+payment moved → the term follows, rounded up to the whole month, and the
+payment is readjusted on it. Menu Divers, under the calculator. The accounts in
+a table with a tick box each; the period from a drop-down: last 12 months, or
+the calendar year N down to N-5. Two tabs. The verdict thresholds as proposed.
+A PDF report button always visible; the schedule in full for a consumer loan,
+year by year for a mortgage unless « Tableau mois par mois » is ticked. No
+mock-up: « Go, Code! ».
+
+**The method — he asked for it: « tu calcules avec ce que tu as comme tu peux.
+Il faudra me dire ta méthode. »**
+
+- *The loan.* Monthly rate = annual rate ÷ 12. The fees are financed — added
+  to the principal — as La Banque Postale does. Each month's interest is
+  rounded to the cent and the last payment clears the balance. The APR is
+  actuarial: the monthly rate that equates what is received (the amount, not
+  the fees) with the payments, compounded to the year; optional insurance is
+  outside it. On his own simulation Radinus gives 585,38 € and 7,74 %: two
+  cents and one hundredth apart, because the bank counts its first instalment
+  « à 30 jours » on a 365-day year and Radinus counts whole months. Said to
+  him, and written in the module.
+- *The history.* Mother operations only; cleared and committed only (a
+  planned operation in the past did not happen); the operation's date, or its
+  clearing date. Complete months only: « last 12 months » are the twelve
+  finished months before the current one; year N runs to the last finished
+  month, so the test reads « 2 months out of 9 » in October.
+- *Transfers between own accounts.* Radinus does not mark them, and imported
+  ones are linked to nothing. They are recognised by pairs: a debit on a
+  ticked account and a credit of the same exact amount on another ticked
+  account, at most five days apart; each operation serves once, with the
+  nearest. A pair counts as neither income nor spending. A transfer to an
+  unticked account counts as spending — the money leaves what is studied.
+- *Current loans.* Their payments are already in the spending, since they were
+  paid. They are needed apart only for the debt ratio and the projection.
+  Recognised among the recurring operations of the ticked accounts: a rule
+  that debits, monthly, quarterly or yearly, and that ends — at a date, or
+  after a number of repetitions — after today. A rent or a subscription has no
+  end; a loan has one. Labels are never read. The window lists what it
+  retained.
+- *The figures.* Average income and spending; debt ratio = (current loans +
+  new payment with insurance) ÷ average income; left to live on = income −
+  spending − new payment; months in the red = months of the period where that
+  would have been negative; projected balance = today's real balance of the
+  ticked accounts, plus each month's average saving, minus the new payment,
+  plus a current loan's payment once it has ended.
+- *The verdict.* Green: ratio ≤ 33 %, left to live on ≥ 0, no month in the
+  red. Orange: ratio up to 35 %, or one or two months in the red. Red: above
+  35 %, left to live on negative, three months in the red or more, or no income
+  at all.
+
+**One drawing for the screen and the paper.** The charts — gauge, two rings,
+bars, two curves — are SVG written by the core (`loan_charts`), set as they are
+in the window and given to Typst for the PDF. A screenshot would have depended
+on the system and the window's size. The gauge's needle glides between two
+angles the core gives; it is the window's only arithmetic, and a crossing test
+holds that it does no other.
+
+**Nothing is stored** — « une calculette ». No new preference key except the
+layout of the schedule's columns, under the existing mechanism
+(`tableau.loan-simulation`). The accounts are named by their label only, never
+by their number, on screen and in the report.
+
+**Not verified here**: the window on a real macOS, Windows and Linux; the PDF
+opened by each system's viewer; the slider gesture under a real hand.
+
+## P-59 — The verdict of F41 judges the loan, not the past (08/10/2026, revising P-58)
+
+**The fault, found by Fabrice the same day.** *« Même emprunter 100 euros sur
+74 mois […] la jauge me donne un pourcentage d'endettement réaliste, cependant
+dans l'encadré "En résumé" il me dit "Risqué" […] avec 0,39 % d'endettement il
+me dit risqué. »* The rule of P-58 put the voyant to red when the average left
+to live on was negative or three months were in the red — whatever the loan.
+Both judged the history: a household that already spends a little more than
+it earns over the period, or that has three heavy months a year (taxes,
+holidays, a big purchase), was « Risqué » for a loan of one euro. Fabrice:
+*« il faut faire mieux à ce niveau »*; on the rule below, *« essaye, on
+verra »*.
+
+**The voyant now answers three questions, each about what the loan
+changes**, and takes the worst of the three answers:
+
+1. **Is the debt ratio reasonable?** Unchanged: green up to 33 %, orange up
+   to 35 %, red above (and red without any income).
+2. **Does the payment fit in what an ordinary month puts aside?** The
+   ordinary month is the *median* of what each month of the period left —
+   a one-off purchase or bonus no longer skews it. Green if the payment takes
+   at most half of it, orange up to all of it, red beyond. When an ordinary
+   month puts nothing aside, the question has no object: its dot is grey and
+   the third question judges.
+3. **Does the balance hold to the end?** The projection is made twice, with
+   and without the loan. Green if it stays positive. Red if it goes below zero
+   *because of* the loan — without it, it would hold. If it would go below
+   zero anyway, the loan is judged on how much sooner it makes that happen:
+   less than 3 months, green; 3 to 11, orange; a year or more, red. Without
+   the loan the projection looks beyond the loan's last payment, so that a
+   balance about to fall a month after it is not « saved » by the loan that
+   makes it fall a month earlier.
+
+**What became information and not judgement.** The months in the red are
+counted only when the loan tips them — positive without it, negative with it;
+on the bars, a month already in the red without the loan is pale red, a
+month the loan tips is bright red. A history already in deficit before any
+loan is said in a warning of its own, above the charts: « vos dépenses
+dépassent déjà vos revenus de … par mois en moyenne, avant tout crédit ».
+
+**Each answer is written under the verdict**, with its dot, on screen and in
+the report: one sees why the verdict is what it is.
+
+With this rule, 100 € over 74 months is « Jouable », with the warning if the
+history is in deficit — the case a test now holds.
+
+## P-60 — Three ways of judging a loan: optimistic, neutral, severe (08/10/2026)
+
+**Asked by Fabrice**, the evening after P-59: *« pourrait-on garder ta méthode
+de calcul et en faire deux autres : une plus sévère et une moins sévère. Le
+but c'est de donner au final trois méthodes de jugement […] En fonction de son
+choix la personne pourra mieux évaluer ses risques. Mais il faudrait être
+explicatif. »* Then: a third tab, « Réglages du jugement », showing the table
+with a choice to make.
+
+**The same three questions, three levels of demand.** P-59 is the neutral
+method, unchanged except for the rise in spending below.
+
+| | Optimistic | Neutral | Severe |
+|---|---|---|---|
+| Debt ratio: green up to / orange up to | 35 % / 40 % | 33 % / 35 % | 30 % / 33 % |
+| Reference month | a good month (better than 3 in 4) | an ordinary month (the median) | a difficult month (worse than 3 in 4) |
+| Share of its savings the payment may take | 3/4 / all | 1/2 / all | 1/3 / 2/3 |
+| Level the balance must not fall below | zero | zero | one month of average spending |
+| Brought forward even without the loan: orange / red | 6 / 24 months | 3 / 12 months | 1 / 6 months |
+| Rise in spending per year, to start with | 0 % | 2 % | 3 % |
+
+The reference month is read as a rank among the months of the period —
+the 75th, 50th or 25th percentile of what each month left — between its two
+nearest neighbours.
+
+**The rise in spending.** Prices rise, the payment does not: on a long loan
+the gap counts. Fabrice did not follow the first wording, which was explained
+to him; he then asked for *« un champ texte numérique (supérieur ou égal à 0)
+[…] compris comme étant un pourcentage »*, **one per column**, from 0 to 99, a
+whole number. The rise applies month after month to the average spending in
+the projection, the income and the payment staying as they are; it does not
+touch the history.
+
+**Explanatory.** The third tab shows the table with the person's own figures
+(« un mois difficile : 275,00 € », « un mois de dépenses : 2 129,17 € »), a
+radio button at the head of each column with that method's verdict for the
+loan in a coloured badge, the chosen column set off in gold, the rise fields
+in the last line, and under the table one sentence saying what the chosen
+method assumes. The verdict of the second tab follows the chosen method, and
+says which one in a small button that opens the third tab. The gauge's zones
+follow the method's thresholds; the severe method's safety reserve is drawn as
+a dashed red line on the projected balance. The PDF report gives the chosen
+method's verdict and detail, the three verdicts in one line, and the sentence.
+
+**Neutral by default, nothing remembered** (« choix mémorisé : non »): the
+method and the three percentages come back to their starting values each time
+Radinus starts. No preference key.
+
+## P-61 — A main menu « Outils », between Nomenclatures and Paramètres (09/10/2026)
+
+Fabrice: *« Nous allons déplacer l'option du menu "Simulation de crédit". Nous
+allons créer une nouvelle option principale entre Nomenclatures et
+Paramètres : Outils. »* The credit simulation leaves Divers, where P-58 had
+put it under the calculator, and becomes the only entry of the new menu. Like
+Comptes or Statistiques, the whole menu is greyed until a database with at
+least one account is open — its entry reads the history. The text key follows
+the move (`menu-tools-loan-simulation`), and so does the window's name in the
+preferences' list of tables.
+
+## P-62 — « Consommation d'un appareil électrique », and the electricity tariff as a preference (09/10/2026)
+
+Fabrice: *« Évaluer combien coûte la consommation d'un appareil électrique. »*
+A second entry in Outils, under the credit simulation. Three rulings shaped
+it. **No list of appliances and no assumed value** — *« je suis contre les
+tableaux d'appareil et liste d'appareil courant, parce que tu ne peux faire
+que des hypothèses : tu n'as pas les chiffres réels. Moi je veux un résultat
+réel »*: every figure about the device is typed by the person, the fields
+start empty, and a note says that the power on the plate is a maximum and that
+a plug-in power meter gives the real one. **An honest result** — *« qui
+tienne compte de la consommation allumée, ou en veille, mais aussi coût heure
+creuse ou heure pleine »*: running and standby are counted apart; on days
+without use the appliance stays plugged in and all that time is standby;
+running time is split by the share the person gives, standby by the number of
+off-peak hours in the day, since it runs day and night. The standing charge is
+left out: it is paid whether the appliance is plugged in or not.
+
+**The tariff is a preference of the database**, key `tarif.electricite`,
+asked for by Fabrice (*« on pourra mémoriser cela, cela sera enregistré en
+tant que préférences et modifiable dans le panneau de paramètres /
+préférences »*) — the rule of 03/08/2026 is kept. It defaults to EDF's Tarif
+Bleu (*« on prendra le tarif actuel par défaut en France »*), prices
+including tax on 1 August 2026: Base 0,2001 €/kWh for a 3–6 kVA meter; peak
+0,2142 €, off-peak 0,1589 €, 8 off-peak hours. These prices change, usually
+in February and August: they are to be checked at each release. A new branch
+« Outils » in the preferences carries the leaf « Tarif d'électricité », with
+« Revenir au Tarif Bleu EDF », saved with the disk like everything else
+there. Prices changed in the calculation window apply to that calculation
+only (« Fait selon ta sagesse »): the window is a calculator, and a price
+tried for a comparison must not overwrite the contract. Not a comfort
+setting: the comfort reset leaves it alone. **No PDF report** (*« Pas de
+rapport PDF pour cela »*).
+
+## P-63 — « Mon matelas de sécurité » (09/10/2026)
+
+Chosen by Fabrice among several proposals (*« j'aime bien : Mon matelas de
+sécurité »*), after setting aside a buy-or-lease car comparison (*« trop de
+paramètres »*) and a heating calculator. Its rulings: spending categories can
+be **unticked** (what one would cut in a hard time); a **fallback income**
+field (*« oui »*); the running loans are **not** shown apart (*« non »*); the
+thresholds are **fixed** at 3 and 6 months, the usual rule of prudence; **no
+PDF report**; in **Outils**. Nothing is stored. Method choices made on the
+way: transfers are recognised on all the accounts of the database, not only
+the ticked ones — moving 200 € to an unticked livret is not spending; a
+ventilated operation counts by its daughters, as in the statistics; the
+saving pace is what the savings accounts gained on average per month over
+the period, received transfers included; the projected savings stop at zero,
+because below it the curve would be a debt. The default ticks follow the
+account type: a cheque account for spending, a livret or CEL for savings; a
+PEL, PERP or term account cannot be drawn on without breaking it, so it is
+left unticked, as is « Autres ».
+
+## P-64 — « Objectif Épargne » (10/10/2026)
+
+Fabrice: *« si je continue au rythme actuel, dans combien de temps aurais-je
+tel solde et combien aurais-je épargné, ou la question inverse : combien de
+temps épargner pour arriver à tel montant »*. Rulings: **the three
+questions** (when, how much at a date, how much per month); **a range**
+around the probable answer, from the lowest and highest quarter of the
+months; **loans ending** free their instalment afterwards; an optional
+**annual rate**, counted monthly — an approximation of the fortnight rule of
+livrets; an optional **extra effort**; in Outils, no PDF, nothing stored.
+Then, on the history: *« peut-être faudrait-il rajouter une option d'année
+type ou moyenne sur une plage d'années »* — so the period menu gains **a
+range of years**, and the projection always follows **the typical year**:
+each coming month takes the average of the same calendar months of the
+period. Bringing the range of years to the credit simulation and the safety
+cushion is left for later (*« on fera ça plus tard »*). The name is
+Fabrice's: *« Objectif Épargne est très bien »*. Method choices on the way:
+a transfer between two followed accounts cancels out, one to an account not
+followed is money going out; the shown past is the real balance at the end
+of each of the last twelve months, computed back from today's.
+
+## P-65 — The range of years in the credit simulation and the safety cushion (10/10/2026)
+
+Left for later in P-64, then asked for: the period menu of « Simulation de
+crédit » and « Mon matelas de sécurité » gains the range of years of
+« Objectif Épargne » (`loan::Period`, now shared by the three tools). The
+typical year is applied to the credit simulation's projected balance
+(*« oui appliquer l'année type, je suis d'accord avec toi »*), not to the
+cushion, which looks at a hard blow rather than at the seasons. The bars of
+« Votre historique avec ce crédit » keep one bar per real month even over
+five years — up to 69 thinner bars, at most twelve labels — rather than
+twelve averaged bars: the real months that would have gone red are the point
+of that chart (*« fais comme tu penses que c'est le mieux »*). One test had to
+change: with the typical year, the severe method's reserve now holds in a
+history whose next months are its strongest.
+
+## P-66 — « Et si je réduisais… ? » (10/10/2026)
+
+Fabrice: *« imaginer que l'on réduise en pourcentage ou en valeur les
+dépenses d'une ou plusieurs catégories et voir l'impact sur une projection
+dans le futur »*. Rulings: items **by categories, payees or budget lines**,
+at choice; **a window of its own** (*« c'est un nouvel outil »*) with an
+optional target amount; the horizon on **a slider from 1 to 10 years**; an
+optional **interest rate**; the cuts **forgotten when the window is closed**
+(*« on oublie les chiffres à la fermeture de la fenêtre pour l'instant »*) —
+nothing enters `Preferences`; and, first refused then asked for, **a PDF
+report** (*« ça peut être complexe à saisir et c'est une façon de sauvegarder
+les infos »*), which therefore carries everything needed to type the cuts
+again. Method choices: the projection is that of « Objectif Épargne »; a cut
+never exceeds the spending; a cut follows the seasons of its item (−20 % on
+an item that weighs in summer saves in summer); transfers between followed
+accounts are not spending; a ventilated operation counts by its daughters.
+The table hint names the currency in use, so it is written by the
+controller, not the view.
+
+## P-67 — « Préparer mes vacances » (10/10/2026)
+
+Fabrice first set aside a richer planner (past trips by project, a saving
+plan against the history): *« le but c'est simplement de calculer combien vont
+me coûter mes prochaines vacances »*. Then, item by item: people on **a
+slider from 1 to 20**; the nights, the months before departure; transport,
+accommodation, meals, visits, other costs, each **« for everyone » or « per
+person »** and **per night / per day / for the stay** (*« paramétrable »*);
+the result **per person, per person per day, still to fund, saving needed
+per month**; **a stay or a cruise** (*« ok »*), with the cruise's own items
+(cabins, service charge, drinks package, excursions per port of call, port
+taxes, wifi); **all the optional lines** (*« on garde tous »*); **adults and
+children** (*« oui »*) — a child price beside each per-person line, empty
+meaning the adult price; the already saved as **the balance of one or more
+chosen accounts**; **a PDF report** and **an Excel export**; everything
+**forgotten when the window is closed**; and, his idea, **projects saved and
+reopened as JSON files** (*« ça évite de tout retaper »*), the ticked
+accounts found again by label (*« on laisse coché »*). Method choices: days
+are nights plus one; the tourist tax counts adults only; the insurance
+percentage applies to the main items, the bank fees percentage to on-site
+spending; the monthly saving is rounded up to the cent; amounts in the JSON
+file are written neutrally so a project saved in French reopens in English;
+a newer file version is refused rather than half read.
+
+## P-68 — « Et si je réduisais… ? » keeps its projects in files (10/10/2026)
+
+Fabrice: *« dans l'outil “Et si je réduisais ?”, rajoute enregistrement et
+chargement JSON et aussi export Excel »* — what F46 already does. P-66 still
+holds: the window forgets everything when closed, and nothing enters
+`Preferences`; the file is the memory one chooses to keep. Method choices,
+those of P-67: amounts written neutrally, a newer version refused, the
+accounts by label only, the picker opened on the Rust side. Peculiar to this
+tool: each cut carries the **label** of its item beside its key, because keys
+differ from one database to another; on opening, the key is kept if the label
+still matches, else the item is found by its label, else the cut is dropped.
+The « unclassified » line keeps its key. The workbook writes values, not
+formulas, like the other exports.
+
+## P-69 — The tools' door asks before forgetting (10/10/2026)
+
+Fabrice: *« un clic sur le bouton de sortie doit se faire avec un panneau de
+confirmation de sortie (même genre que dans classification rapide) »*, for
+« Et si je réduisais… ? » and « Préparer mes vacances ». The same three-way
+question and the same words as the quick classification: save the project
+and leave, discard and leave, stay; Escape stays. As there, it is asked only
+when something would be lost — figures typed and not saved or opened since
+(the window compares what it would send with what it last saved or opened);
+an empty window, or one just saved, closes at once. If the save picker is
+cancelled or the write fails, the window stays.
+
+## P-70 — « Carnet de ma voiture » (10/10/2026)
+
+Fabrice wanted a car tool (*« coût entretien, carburants, kilométrage, coût
+résolution panne, coût changement pièces d'usure, coût changement pneus,
+coûts révisions annuelles »*), turned down a cost-of-ownership summary drawn
+from the bank history, and asked for *« quelque chose qui gère l'historique
+de la voiture »* built on his own list. Rulings, point by point: **eight
+categories** — his seven, energy replacing fuel (*« carburant devient
+énergie »*), plus insurance and the roadworthiness test (*« oui pour
+l'assurance et le contrôle technique »*); no tolls nor parking, which depend
+on the trips and not on the car (*« qu'on ait une petite voiture ou une
+Ferrari ça coûte pareil »*); **eight powertrains**, E85 added (*« on peut
+ajouter E85 »*), each with its energy unit and its starting list of wear
+parts, which the user completes; a **first-owner** flag, the **first
+registration**, the **date and mileage when acquired**, and the registration
+number on the sheet; one car per **JSON file, saved by hand**, with the exit
+door's three-way question; the filling from a bank transaction **optional**
+(*« oui mais facultatif »*) — a copy, no lasting link, since the file does
+not know the database; the upcoming dates **shown in the window only**;
+**PDF and Excel** (*« oui aux 2 »*); the **battery health** followed
+(*« oui »*); a home charge priced with the appliance tool's tariff,
+**editable in the window and kept in the car's file** (*« oui ça reste dans
+le fichier de la voiture »*) — nothing enters `Preferences`. Method choices:
+everything counts from the acquisition; consumption is measured from one
+full tank to the next, and for an E85 car the kilometres after a fill-up go
+to that fill-up's fuel; a part's lifetime is the mileage between two changes,
+from zero for a first owner's original part; the roadworthiness test follows
+the French rule; a home charge keeps the cost computed on the day it is
+noted, so a later tariff change does not rewrite the history; an unreadable
+entry in a file is skipped rather than refusing the whole logbook. The
+logbook lives on the Rust side (`AppState::with_car`), like the quick
+classification's draft: the window shows, the core keeps.
+
+## P-71 — F48 « Partager une dépense » (11/10/2026)
+
+*Built on 11/10/2026, in 3.0.0.* Fabrice: *« un outil de partage de dépense :
+partager une somme avec des contraintes »*. Worked out with him point by point
+on 10–11/10/2026; his rulings are quoted, the rest are method choices he read
+and did not contest. The window's question: **« Qui paie quoi ? »**.
+
+**What it covers.** **One sum to share** between people — not a running
+« who owes whom » ledger between several spenders, and not a couple's monthly
+charges. **A calculator**: it reads and writes nothing in the database, so it
+is **the first tool usable without an open database** (*« oui on peut
+utiliser l'outil sans base ouverte »*); the other tools stay greyed as they
+are. Limits: **40 people, 20 items** (*« grosso modo la contenance d'un bus,
+on doit pouvoir partager les frais d'un voyage »*), and 400 payments.
+
+**The words on screen** (Fabrice, 11/10/2026: *« c'est pas facile de comprendre à
+quoi servent ces cases »*): the floor reads **« Au minimum »**, the cap **« Au
+maximum »** (*« plutôt Au minimum ? et Au maximum ? »*), the fixed amount
+**« Montant exact »**, « for him alone » **« Ses extras »**, the gift **« Surplus
+offert »**, and the column saying which of them played **« Ce qui a joué »**
+(*« on peut les garder mais il faut des infos bulle »*). **Every column carries
+a tooltip**, marked « ⓘ » beside its heading: a short definition and a
+concrete example (the Martin family, the dessert, the drop-out), served by the
+core in the eighteen languages; a UI check fails if a column of the people's
+grid has none. The entry below keeps the method's own terms.
+
+**The people.** One row each, in the order typed (never re-sorted): a
+**name**, mandatory and unique (*« on doit pouvoir mettre le nom de chaque
+personne qui contribue »*) — compared without case nor surrounding spaces,
+since « Paul doit à Paul » would mean nothing. Behind the name, a fixed
+identifier: renaming carries payments, ticks and constraints along; deleting
+someone who has payments asks first. Then, all optional: an **income**, a
+number of **parts**, a **floor**, a **cap**, a **fixed amount**, a **« for
+him alone »** amount, and a **household** (*« ok »*, below).
+
+**The sum.** A **total**, from which the items that do not concern everyone
+are carved out (« Vin : 60 € », ticked for the drinkers only — *« ceux qui ne
+boivent pas d'alcool ne veulent pas payer pour eux »*); what remains is an
+automatic **« Commun »** item. No total typed: the total is the sum of the
+items. **No discounts nor vouchers** — the total is typed net (*« superflu »*).
+On screen, **people in rows, items in columns**: each cell is a tick
+(takes part or not), turned into a percentage or parts field when the
+item's rule asks for it; names and item headers stay put while scrolling.
+
+**The rule.** **One rule for the whole expense, or one per item, as the user
+chooses** (*« règle par poste ou pour toutes les dépenses au choix »*): equal
+shares, parts, percentages, or in proportion to incomes. All four are weights
+— the engine has one way of splitting. Percentages **must total 100 %, or the
+calculation is refused** (*« doit faire 100 % donc refuser »*), checked where
+they are typed: over everyone for a whole-expense rule, over an item's
+participants for a per-item rule, and the message names the item. A person
+excluded from an item under a whole-expense percentage rule has his share of
+that item spread over the others in proportion to theirs — said in words, not
+silently. A person with a fixed amount has no percentage: the others' total
+100 % between them. Parts typed on a person are only the starting value; a
+per-item parts rule takes its own (one glass for A, three for B). The
+« Commun » item starts on equal shares, can take another rule, and can leave
+someone out (*« oui »*). An income of 0 is accepted and weighs 0, said in the
+result: « Léo ne paie rien sur la location : son revenu est de 0 »
+(*« on accepte »*).
+
+**The constraints.** A fixed amount is a floor equal to a cap: one mechanism,
+a range per person, open by default. The constraints bear on a person's
+**total**. A person outside his range has **his weight multiplied** — down
+for a cap, up for a floor — in each of his items until his total lands on
+the bound: what he does not pay falls on that item's other participants by
+that item's rule, so nobody pays for an item he is not in. Repeated until
+every range holds. What a person owes **beyond his own items** — a deposit
+kept after dropping out, a gift larger than what he consumed, the floor of
+someone whose income is 0 — is taken off the other items in proportion to
+their amount, and shown as « hors postes ». **« For him alone »** (his dessert, his
+coffee) is always his: outside floors and caps, never passed on — a cap is
+solidarity, not a way of making others pay one's own choices. What cannot be
+done is said plainly: fixed amounts above the sum, caps that do not cover it
+(« il manque 85,00 € »), floors above it, an item left with nobody to absorb a
+cap. Rounding: **to the cent, or to the euro by a tick box**. To the cent,
+each item falls exactly — leftover cents go to the largest remainders — and a
+fixed amount, floor or cap reached is met to the cent. To the euro, everyone
+without a binding constraint pays a round amount, the difference shown as
+« Arrondi »; when the total is not round, one person keeps the cents, and the
+result says who.
+
+**The payments.** *« Qui a réglé et à hauteur de quel montant, ce qu'il reste
+à régler par personne »*: a list of payments — who, how much, **an optional
+date** (*« utile »*), an optional label. Each person's balance is his share
+minus what he paid: still to pay, up to date, or paid more than his share.
+Paying more is not an error (*« on a le droit d'être généreux »*): a person
+who paid more has an **« offert »** box, **unticked by default**; ticked, his
+share becomes what he paid and the rest is shared among the others — and the
+result explains when that leaves someone else having paid more than his new
+share. A partial gift (an amount instead of the box) can come later without
+changing the rest. Payments above the whole expense are a **warning, not a
+refusal**. **No treasurer** (*« on se fiche du trésorier, Radinus est un
+logiciel pour particuliers, entre amis ils s'arrangent »*): while the expense
+is not fully paid, the result shows what remains due, outside and per person;
+once it is, it **proposes the transfers** — the fewest, largest debtor to
+largest creditor, at most one fewer than the people — as a suggestion only.
+
+**Households** (*« ok »*). An optional « Foyer » column: each member keeps his
+own share (a child's half part, his exclusions), but payments and balance
+count per household — the father's 600 € cover the whole family — the
+personal PDF becomes one per household, and transfers go from household to
+household. **Someone who drops out** after a non-refundable deposit
+(*« ok »*): a fixed amount equal to what he paid, unticked from every item —
+no special status; the hint of the people's card gives the example.
+
+**Files** (*« comme dans les autres outils »*). A **label** for the sharing
+(« Voyage Bretagne 2027 ») names the files and titles the reports. **JSON
+project**, as P-67: a mark (`radinus-projet-partage`) and a version, a newer
+version refused, amounts written neutrally; only what is typed, never the
+result, which is recomputed on opening; each person's identifier kept so the
+links survive a renaming. Payments arrive over months, so the exit door asks
+before forgetting, as P-69. **Three PDF reports** (*« un PDF général qui
+montre la répartition générale, un PDF par personne qui synthétise ce qu'elle
+doit payer, un PDF qui montre l'état des paiements actuel »*):
+
+1. **The general distribution** — the label, the total, the rule, each
+   person's share in money and percent with the constraint that played, the
+   detail per item, the explanatory sentences. No payments: it does not move
+   when money comes in.
+2. **One file per person** (per household where there is one), written into a
+   chosen folder as `<label> - <name>.pdf`, the name cleaned of characters a
+   file name refuses, a number added if two names clean to the same; one
+   « replace? » for the lot, not forty; one person alone can be printed. His
+   share and the items he is in, his dated payments, what remains — « À verser
+   à Paul : 120,00 € » once transfers are proposed. Nothing about anyone else.
+3. **The state of payments**, dated (« État au 11/10/2026 »): a summary line
+   (people up to date, people still owing and how much, collected over
+   total), the table of shares, paid and balances, the payments by date, and
+   the transfers or what remains due.
+
+On 20 items a grid does not fit an A4 page: the reports list the items rather
+than draw them as columns. A **« Masquer les revenus »** box, ticked by
+default, applies to the general distribution, the state of payments and the
+Excel export; the personal PDF never shows an income. The **Excel workbook**:
+sheets Personnes, Postes, Règlements, Résultat, Remboursements — values, not
+formulas, as the other exports: caps carried over several rounds are not
+honest formulas, and the workbook is a snapshot, edited through Radinus and
+its JSON.
+
+## P-72 — The sharing's advice (11/10/2026)
+
+*« C'est lui qui est obligé de calculer les parts, probablement avec une
+calculatrice… Il faudrait afficher des valeurs conseillées »* (Fabrice,
+11/10/2026). F48 now says what the rule gives and suggests figures — the
+**core** computes the advice (`sharing::advise`), the window only shows it.
+
+1. **The headline says what one wants to know**: « 120,00 € à partager :
+   chacun paie 60,00 € », or « de 20,00 € à 100,00 € selon chacun » when
+   shares differ — not the number of people, which the grid already shows.
+2. **A sentence under the rule**, live (under each item's rule in per-item
+   mode): « 90,00 € ÷ 3 personnes = 30,00 € chacun », « 4 parts au total :
+   une part vaut 25,00 € », « Il manque 60 % pour arriver à 100 % »,
+   « Chacun paie 1,8 % de son revenu ». When a limit or an exclusion plays,
+   the sentence stays general rather than give a figure that would be false.
+3. **Suggested values in grey** in the empty boxes — the rest of the
+   percentages shared among the empty boxes by the largest remainder
+   (33,34 / 33,33 / 33,33: the total falls exactly), 1 for an empty part.
+   **A grey value counts for nothing until taken**: it is a placeholder, never
+   written, recomputed at every gesture — so the advice follows the people
+   added or the boxes typed (*« lorsque l'on ajoute les personnes les valeurs
+   conseillées changent ; s'il y a déjà des valeurs dans les cases, ça change
+   le calcul »*): typed values are kept, only the rest is advised.
+4. **Three buttons**: « Reprendre les valeurs conseillées » fills the empty
+   boxes, never touching a typed one; « Pourcentages d'après les revenus »
+   (when every income is known; incomes already typed stay in view under a
+   percentage rule) gives percentages that make exactly 100 %;
+   « Tout répartir à nouveau » clears the percentages after a question and
+   shares them equally — the case of a person added after the percentages
+   already made 100 %, which the sentence announces **in orange**: « Les
+   pourcentages font déjà 100 % : Zoé ne paierait rien. »
+5. **Advice is given even when the calculation is refused** — it is when the
+   percentages do not make 100 % that one needs it most; the fields are read
+   leniently for it (an unreadable field counts as empty).
+
+## P-73 — QIF bank statements (15/10/2026)
+
+*« Je souhaiterais que dans l'importation de relevés bancaires, en plus du
+format OFX (que tu ne touches pas, merci), on puisse importer du QIF »* —
+*« ergonomiquement de la même façon que les fichiers OFX, car c'est un relevé
+bancaire aussi »* — *« je veux quelque chose de robuste et de fiable »*.
+
+1. **The same window.** Same yellow folder, same account question, same
+   table, same buttons; no cutting window as for CSV. The format is
+   recognised from the content (`!Type:`, `!Account`…), **after** the OFX
+   test, which is unchanged. A module of its own, `qif_import`, returns the
+   OFX `Statement`; nothing downstream knows where it came from.
+2. **Decide over the whole account, refuse a contradiction, ask or set
+   aside what cannot be proven.** Day/month order and decimal separator are
+   proven by the file (`24/11`, `-57.62`); a file proving both ways is
+   refused with both lines quoted; with no proof of the order, the window
+   asks — unless the Preferences give a standing answer (point 7), and the
+   file always wins over it. An operation without a readable date or amount
+   is set aside **and announced with its number**; `T` and `U` that
+   disagree likewise.
+3. **The opening balance** (« Solde initial », « Opening Balance »), first
+   record, category the account itself in brackets, is set aside and
+   announced. Two clues must agree; one alone keeps the line and flags it.
+4. **Nothing is invented**: no FITID (duplicates by resemblance only, as
+   CSV), no file balance. **« Fichier » and « Écart » stay empty when the
+   balance is absent, corrupt or incorrect** (*« tu laisses vide si absence
+   d'info ou info corrompue ou incorrecte »*), for every format — an OFX with
+   a readable `LEDGERBAL` is unchanged.
+5. **The label**: the payee (`P`) and the memo (`M`) joined when both exist —
+   or payee only, or memo only, by the Preferences (point 7). With only one
+   of the two, that one, whatever the setting.
+6. **Proven on Fabrice's two Microsoft Money exports**, « compatibilité
+   stricte » and « relative »: 106 operations, the opening balance of
+   3 382,63 € set aside, the same statement from both. Those files stay out
+   of the project (bank secrecy); the tests use an invented file of the same
+   shape, plus a round trip through Radinus's own QIF export and thousands of
+   generated files that must never make the reader fall.
+7. **A « Relevés QIF » page in the Preferences**, under « Importation »
+   (*« pour permettre à l'utilisateur de trancher, avec des choix par
+   défaut »*): the day/month order — « Me demander à chaque fois »
+   (default), always day/month, always month/day — and the label — payee +
+   memo (default), payee only, memo only —, each with its tooltip. **Settings
+   of the software, not of the database**: in `settings/radinus_config.json`
+   beside the language and the zoom, so the page lives with no database
+   open. An unreadable value in that file reads as the default — never a
+   guessed date. The answer to the window's question beats the setting; a
+   date in the file beats both.
+8. **The loading sentence says what the table shows** (*« là tu te
+   contredis »*): « 106 lignes lues, dont 106 qui ressemblent à des
+   opérations déjà présentes » for a file without identifiers; for an OFX,
+   the certain ones (« déjà présentes ») then « une autre ressemble… » for
+   the suspicion alone. Integrating pastel lines in bulk still asks nothing —
+   the original's behaviour —, an open question left to Fabrice.
+
 ## How to add to this file
 
 One entry per ruling: an id, a date, what was decided in one sentence, and

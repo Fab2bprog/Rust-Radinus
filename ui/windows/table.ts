@@ -16,15 +16,75 @@
 // sorting on the first column only walks that order backwards, and sorting on
 // another column uses the key the caller gives with it.
 
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
+import { copyText, oneCell, pureNumber } from "./clipboard";
 import {
   contextLine,
   money as exportMoney,
   onRightClick,
   text as exportText,
+  type MenuAddition,
+  type MenuHeadEntry,
   type Sheet,
 } from "./export";
+import { t } from "./texts";
+
+/// **La disposition d'un tableau** : l'ordre de ses colonnes, celles qui sont
+/// masquées, et les largeurs tirées à la main, en pixels (Fabrice,
+/// 04/10/2026). Les colonnes y sont repérées par leur `id`, jamais par leur
+/// rang. C'est la forme que le noyau enregistre dans `Preferences`.
+export interface TableLayout {
+  order: string[];
+  hidden: string[];
+  widths: Record<string, number>;
+  /// La couleur dont une colonne est teintée, par son nom. Absent d'une
+  /// disposition enregistrée avant le 05/10/2026.
+  colors?: Record<string, string>;
+}
+
+/// **Les neuf couleurs dont une colonne peut se teinter** (Fabrice,
+/// 05/10/2026), dans l'ordre où il les a dictées. Les mêmes noms que dans le
+/// noyau (`preferences::COLUMN_COLOURS`), qui refuse tout autre ; la teinte
+/// elle-même est dans la feuille de style, sous `data-tint`.
+export const COLUMN_COLOURS = [
+  "red",
+  "orange",
+  "pink",
+  "pastel-green",
+  "green",
+  "pastel-blue",
+  "blue",
+  "pastel-yellow",
+  "yellow",
+] as const;
+
+/// L'événement par lequel une fenêtre apprend qu'un tableau a changé de
+/// disposition ailleurs. Il porte le nom du tableau.
+const LAYOUT_CHANGED = "table-layout-changed";
+
+/// De combien la souris doit bouger, bouton enfoncé sur un en-tête, pour que
+/// le geste soit un déplacement de colonne et non un clic de tri.
+const MOVE_THRESHOLD = 6;
+
+/// Le plancher d'une colonne en `fr` qui n'annonce pas de minimum, dans un
+/// tableau dont des largeurs ont été tirées à la main.
+const LEAST_SHARE = 60;
 
 export interface Column<Row> {
+  /// **Le nom de la colonne**, fixe et propre au tableau : `date`, `label`…
+  /// C'est par lui que la disposition enregistrée la retrouve. Un rang ne
+  /// survit pas à la colonne qu'une version suivante glisse au milieu ; un
+  /// nom, si. Des minuscules, des chiffres et des tirets.
+  ///
+  /// Ne sert que dans un tableau qui a un `layoutName`. Une colonne sans nom
+  /// y est tenue pour `fixed`.
+  id?: string;
+  /// **Une colonne qui ne se déplace ni ne se masque**, et que le menu des
+  /// colonnes ne cite pas — le « + » qui déplie les sous-opérations (Fabrice,
+  /// 04/10/2026 : d'accord pour qu'il reste en tête). Les colonnes fixes
+  /// viennent en premier, dans l'ordre où elles sont déclarées.
+  fixed?: boolean;
   /// Header text. A function, not a string: the columns are described when
   /// the module loads and the window only has its words a moment later.
   title: () => string;
@@ -58,9 +118,22 @@ export interface Column<Row> {
     change: (row: Row, value: number) => void;
     /// Rows that may not be edited, if any.
     editable?: (row: Row) => boolean;
+    /// Le dernier mot sur la liste elle-même, une fois bâtie et réglée sur
+    /// la valeur de la ligne — une couleur, une marque. La colonne
+    /// « Vérification » s'en sert pour teindre son choix.
+    decorate?: (row: Row, combo: HTMLSelectElement) => void;
   };
   /// Width, as a CSS grid track. Defaults to an equal share.
   width?: string;
+  /// **En dessous de cette largeur, la colonne ne se comprime plus** — le
+  /// tableau déborde et son ascenseur horizontal apparaît. En pixels, et par
+  /// colonne : une case à cocher tient dans 34, un libellé demande 200.
+  ///
+  /// N'a d'effet que si la fenêtre a demandé `horizontalScroll`. Sans elle,
+  /// les colonnes en `fr` se partagent la place et se serrent jusqu'à
+  /// l'illisible sans que rien ne dépasse — il n'y a alors rien à faire
+  /// défiler.
+  minWidth?: number;
 }
 
 /// Ce que le tableau sait dire de lui-même quand on l'exporte : d'où il vient.
@@ -101,6 +174,30 @@ export interface TableOptions<Row> {
   /// height, which `rowHeight` gives in pixels.
   virtualized?: boolean;
   rowHeight?: number;
+  /// **Un ascenseur horizontal sous les lignes** (Fabrice, 21/08/2026 : dans
+  /// la liste des opérations, « l'absence de cela fait que certaines colonnes
+  /// sont inaccessibles »).
+  ///
+  /// Éteint par défaut, et volontairement : les quatorze autres listes de
+  /// Radinus tiennent dans leur fenêtre, et leur en-tête n'a aucune raison de
+  /// se mettre à bouger. Seule la fenêtre qui en a besoin l'allume, en
+  /// donnant un `minWidth` à ses colonnes.
+  ///
+  /// L'ascenseur appartient au **tableau** et se pose sous sa dernière ligne ;
+  /// l'en-tête et la ligne des filtres suivent le défilement, faute de quoi
+  /// les titres mentiraient sur les colonnes qu'ils surmontent.
+  horizontalScroll?: boolean;
+  /// **Le nom sous lequel la disposition de ce tableau est mémorisée**
+  /// (Fabrice, 04/10/2026 : « il faudrait dans la base une préférence par
+  /// tableau »). Le donner suffit à tout allumer : on glisse un en-tête pour
+  /// déplacer sa colonne, le clic droit sur les en-têtes coche et décoche les
+  /// colonnes et offre de tout rétablir, et l'ordre, la présence et les
+  /// largeurs sont retenus à la fin de chaque geste.
+  ///
+  /// Le nom doit être l'un de ceux que le noyau connaît
+  /// (`preferences::TABLES_WITH_A_LAYOUT`) : un nom inconnu n'enregistre rien.
+  /// Un tableau qui n'en donne pas reste exactement ce qu'il était.
+  layoutName?: string;
   /// D'où vient ce tableau, pour la ligne de tête du fichier exporté. Une
   /// fonction, parce que la période ou l'année changent pendant la vie de la
   /// fenêtre — elle est appelée au moment de l'export, pas avant.
@@ -151,9 +248,31 @@ export class Table<Row> {
   private sortColumn = 0;
   private ascending = true;
   private filters: string[] = [];
+  // Ces quatre listes sont rangées **par le rang de la colonne dans
+  // `options.columns`**, celui de sa naissance, et non par sa place à l'écran :
+  // une colonne déplacée garde son filtre, son tri et sa largeur. Une colonne
+  // masquée n'y a pas d'entrée.
   private headerCells: HTMLElement[] = [];
   private markers: HTMLElement[] = [];
   private filterInputs: HTMLInputElement[] = [];
+  private funnels: HTMLElement[] = [];
+  /// **Toutes les colonnes, dans l'ordre où on les lit**, masquées comprises —
+  /// par leur rang de naissance. Les fixes d'abord.
+  private order: number[] = [];
+  /// Celles qu'on ne montre pas.
+  private hidden = new Set<number>();
+  /// La couleur dont chaque colonne est teintée, par son rang de naissance ;
+  /// chaîne vide pour « aucune ».
+  private colours: string[] = [];
+  /// Vient-on de lâcher une colonne ? Le clic que le navigateur envoie après
+  /// le relâchement ne doit pas trier.
+  private justMoved = false;
+  /// Les enregistrements partis d'ici et dont l'écho n'est pas encore revenu :
+  /// la fenêtre n'a pas à relire ce qu'elle vient elle-même d'écrire.
+  private ownEchoes = 0;
+  /// Les en-têtes déjà branchés sur le menu des colonnes.
+  private menuArmed = new WeakSet<HTMLElement>();
+  private columnsMenu: HTMLElement | null = null;
   /// The width of each column, as a CSS grid track. It starts at what the
   /// column asked for and follows the handle the user drags.
   private widths: string[] = [];
@@ -161,6 +280,9 @@ export class Table<Row> {
   private filterRow: HTMLElement | null = null;
   /// Le clic droit est-il déjà branché ? Voir [`exportOnRightClick`].
   private rightClickArmed = false;
+  /// Où dire qu'une copie a échoué. La fenêtre le donne en branchant son clic
+  /// droit ; avant cela, un échec ne se dit nulle part.
+  private said: ((message: string, alert?: boolean) => void) | null = null;
   /// The slice drawn last time. Scrolling within the same slice redraws
   /// nothing: rebuilding the identical rows under a moving finger is what
   /// made the list wobble, and it also killed the drop-down the user had just
@@ -170,6 +292,34 @@ export class Table<Row> {
   constructor(private readonly options: TableOptions<Row>) {
     this.filters = options.columns.map(() => "");
     this.widths = options.columns.map((column) => column.width ?? "1fr");
+    this.order = this.bornOrder();
+    this.colours = options.columns.map(() => "");
+    // **⌘C sur macOS, Ctrl+C ailleurs : copier les lignes choisies** (Fabrice,
+    // 07/10/2026). Sur la touche elle-même, et non sur l'événement « copier »
+    // du navigateur : Radinus n'a pas de menu Édition, et sans lui WebKit
+    // n'envoie pas cet événement-là.
+    document.addEventListener("keydown", (event) => this.copyOnTheKey(event));
+    if (options.layoutName !== undefined) {
+      const name = options.layoutName;
+      void this.recallLayout();
+      // Une autre fenêtre a changé les colonnes de ce tableau — une autre
+      // liste d'opérations, ou les préférences qui réinitialisent.
+      void listen<string>(LAYOUT_CHANGED, (event) => {
+        if (event.payload !== name) {
+          return;
+        }
+        if (this.ownEchoes > 0) {
+          this.ownEchoes -= 1;
+          return;
+        }
+        void this.recallLayout();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          this.closeColumnsMenu();
+        }
+      });
+    }
     if (options.virtualized) {
       // Scrolling redraws the slice that is now in view, and nothing else.
       options.container.addEventListener("scroll", () => this.render());
@@ -178,6 +328,653 @@ export class Table<Row> {
         `${options.rowHeight ?? 26}px`,
       );
     }
+    if (options.horizontalScroll) {
+      // Le cadre du tableau rogne ce qui dépasse, et les lignes deviennent le
+      // seul endroit qui défile — dans les deux sens.
+      options.container.parentElement?.classList.add("list--scrollable");
+      options.container.classList.add("list__rows--scrollable");
+      // **L'en-tête et les filtres ne défilent pas d'eux-mêmes** : ils sont
+      // hors du conteneur qui porte l'ascenseur. On les décale de ce que les
+      // lignes ont défilé, ce qui les fait suivre au pixel près.
+      options.container.addEventListener("scroll", () => this.followSideways());
+    }
+  }
+
+  // --- La disposition : ordre, présence, largeurs ---------------------------
+
+  /// Une colonne que l'utilisateur peut déplacer et masquer.
+  private movable(index: number): boolean {
+    const column = this.options.columns[index];
+    return (
+      this.options.layoutName !== undefined && column.id !== undefined && column.fixed !== true
+    );
+  }
+
+  /// L'ordre de naissance : les fixes d'abord, puis les autres, chacune dans
+  /// l'ordre où la fenêtre les a déclarées. Sans `layoutName` rien n'est
+  /// mobile, donc c'est l'ordre déclaré tel quel.
+  private bornOrder(): number[] {
+    const all = this.options.columns.map((_, index) => index);
+    if (this.options.layoutName === undefined) {
+      return all;
+    }
+    return [
+      ...all.filter((index) => !this.movable(index)),
+      ...all.filter((index) => this.movable(index)),
+    ];
+  }
+
+  /// Les colonnes qu'on voit, dans l'ordre où on les voit.
+  private shown(): number[] {
+    return this.order.filter((index) => !this.hidden.has(index));
+  }
+
+  private bornWidth(index: number): string {
+    return this.options.columns[index].width ?? "1fr";
+  }
+
+  /// **La disposition en cours**, telle qu'elle s'enregistre.
+  layout(): TableLayout {
+    const columns = this.options.columns;
+    const name = (index: number): string => columns[index].id as string;
+    const widths: Record<string, number> = {};
+    for (const index of this.order) {
+      const width = this.widths[index];
+      if (this.movable(index) && width !== this.bornWidth(index) && width.endsWith("px")) {
+        widths[name(index)] = Math.round(parseFloat(width));
+      }
+    }
+    const colors: Record<string, string> = {};
+    for (const index of this.order) {
+      if (this.movable(index) && this.colours[index] !== "") {
+        colors[name(index)] = this.colours[index];
+      }
+    }
+    return {
+      order: this.order.filter((index) => this.movable(index)).map(name),
+      hidden: this.order.filter((index) => this.hidden.has(index)).map(name),
+      widths,
+      colors,
+    };
+  }
+
+  /// **Pose une disposition**, ou celle de naissance pour `null`.
+  ///
+  /// Rend `false` quand ce qu'on lui tend ne se tient pas pour ce tableau —
+  /// une colonne qu'il ne connaît pas, tout masqué, une largeur qui n'en est
+  /// pas une. Il se met alors dans sa disposition de naissance (Fabrice,
+  /// 04/10/2026 : « en cas de problème il doit y avoir une réinitialisation
+  /// de la préférence au niveau du tableau »).
+  ///
+  /// **Une colonne que la disposition ne cite pas n'est pas une faute** :
+  /// c'est une colonne née après l'enregistrement, dans une version plus
+  /// récente. Elle prend la place qu'elle a de naissance — juste après sa
+  /// voisine de gauche — et le reste du réglage est gardé. Réinitialiser à
+  /// chaque mise à jour ferait perdre son réglage à l'utilisateur pour une
+  /// colonne qu'il n'a pas demandée.
+  applyLayout(layout: TableLayout | null): boolean {
+    const born = this.bornOrder();
+    let order = born;
+    let hidden = new Set<number>();
+    let widths = this.options.columns.map((_, index) => this.bornWidth(index));
+    let colours = this.options.columns.map(() => "");
+    let sound = true;
+
+    if (layout !== null) {
+      const read = this.readLayout(layout, born);
+      if (read === null) {
+        sound = false;
+      } else {
+        ({ order, hidden, widths, colours } = read);
+      }
+    }
+
+    const same =
+      order.join() === this.order.join() &&
+      widths.join() === this.widths.join() &&
+      colours.join() === this.colours.join() &&
+      hidden.size === this.hidden.size &&
+      [...hidden].every((index) => this.hidden.has(index));
+    if (!same) {
+      this.order = order;
+      this.hidden = hidden;
+      this.widths = widths;
+      this.colours = colours;
+      this.forgetWhatIsHidden();
+      this.redress();
+    }
+    return sound;
+  }
+
+  /// Lit une disposition contre les colonnes de ce tableau. `null` si elle ne
+  /// se tient pas.
+  private readLayout(
+    layout: TableLayout,
+    born: number[],
+  ): { order: number[]; hidden: Set<number>; widths: string[]; colours: string[] } | null {
+    const columns = this.options.columns;
+    const byName = new Map<string, number>();
+    born.forEach((index) => {
+      if (this.movable(index)) {
+        byName.set(columns[index].id as string, index);
+      }
+    });
+    if (
+      !Array.isArray(layout.order) ||
+      !Array.isArray(layout.hidden) ||
+      typeof layout.widths !== "object" ||
+      layout.widths === null
+    ) {
+      return null;
+    }
+
+    const order = born.filter((index) => !this.movable(index));
+    const placed = new Set<number>();
+    for (const name of layout.order) {
+      const index = byName.get(name);
+      if (index === undefined || placed.has(index)) {
+        return null;
+      }
+      placed.add(index);
+      order.push(index);
+    }
+    // Les colonnes nées depuis : chacune après sa voisine de gauche.
+    born.forEach((index, rank) => {
+      if (!this.movable(index) || placed.has(index)) {
+        return;
+      }
+      const neighbour = rank === 0 ? -1 : order.indexOf(born[rank - 1]);
+      order.splice(neighbour + 1, 0, index);
+      placed.add(index);
+    });
+
+    const hidden = new Set<number>();
+    for (const name of layout.hidden) {
+      const index = byName.get(name);
+      if (index === undefined || hidden.has(index)) {
+        return null;
+      }
+      hidden.add(index);
+    }
+    // Il reste toujours une colonne mobile à l'écran : tant qu'il y en a une,
+    // il y a un en-tête où cliquer pour réafficher les autres.
+    if (hidden.size >= byName.size) {
+      return null;
+    }
+
+    const widths = columns.map((_, index) => this.bornWidth(index));
+    for (const [name, width] of Object.entries(layout.widths)) {
+      const index = byName.get(name);
+      if (index === undefined || typeof width !== "number" || !(width >= 20 && width <= 4000)) {
+        return null;
+      }
+      widths[index] = `${Math.round(width)}px`;
+    }
+
+    // Les couleurs. Leur absence n'est pas une faute — une disposition d'avant
+    // elles n'en porte pas ; une couleur que ce tableau ne connaît pas en est
+    // une.
+    const colours = columns.map(() => "");
+    const stated = layout.colors ?? {};
+    if (typeof stated !== "object" || stated === null) {
+      return null;
+    }
+    for (const [name, colour] of Object.entries(stated)) {
+      const index = byName.get(name);
+      if (index === undefined || !(COLUMN_COLOURS as readonly string[]).includes(colour)) {
+        return null;
+      }
+      colours[index] = colour;
+    }
+    return { order, hidden, widths, colours };
+  }
+
+  /// Relit la disposition enregistrée et la pose. Une disposition que ce
+  /// tableau refuse est ôtée de la base : elle serait relue, et refusée, à
+  /// chaque ouverture.
+  private async recallLayout(): Promise<void> {
+    const name = this.options.layoutName;
+    if (name === undefined) {
+      return;
+    }
+    try {
+      const stored = await invoke<TableLayout | null>("table_layout", { table: name });
+      if (!this.applyLayout(stored ?? null)) {
+        this.ownEchoes += 1;
+        await invoke("reset_table_layout", { table: name }).catch(() => {
+          this.ownEchoes -= 1;
+        });
+      }
+    } catch {
+      // Sans réponse, le tableau garde la disposition qu'il a : un réglage de
+      // confort qui ne se lit pas ne doit pas empêcher de lire ses opérations.
+    }
+  }
+
+  /// **Retient la disposition**, à la fin d'un geste — une colonne lâchée, une
+  /// coche, une poignée relâchée. Jamais pendant : tirer une poignée écrirait
+  /// cent fois dans la base.
+  private remember(): void {
+    const name = this.options.layoutName;
+    if (name === undefined) {
+      return;
+    }
+    this.ownEchoes += 1;
+    invoke<boolean>("save_table_layout", { table: name, layout: this.layout() })
+      .then((written) => {
+        // Rien d'écrit, donc aucun écho à attendre.
+        if (!written) {
+          this.ownEchoes -= 1;
+        }
+      })
+      .catch(() => {
+        this.ownEchoes -= 1;
+      });
+  }
+
+  /// « Rétablir les colonnes par défaut » : l'ordre, la présence et les
+  /// largeurs de naissance, ici et dans la base.
+  private restoreBornLayout(): void {
+    const name = this.options.layoutName;
+    if (name === undefined) {
+      return;
+    }
+    this.applyLayout(null);
+    this.ownEchoes += 1;
+    invoke("reset_table_layout", { table: name }).catch(() => {
+      this.ownEchoes -= 1;
+    });
+  }
+
+  /// **Une colonne masquée ne filtre ni ne trie plus.** Un filtre qui
+  /// continuerait d'agir sans que rien à l'écran ne dise lequel cacherait des
+  /// lignes sans raison visible — ce qu'une fenêtre qui compte de l'argent ne
+  /// peut pas se permettre.
+  private forgetWhatIsHidden(): void {
+    for (const index of this.hidden) {
+      this.filters[index] = "";
+      if (this.sortColumn === index) {
+        this.sortColumn = 0;
+        this.ascending = true;
+      }
+    }
+  }
+
+  /// Rebâtit l'en-tête et les lignes sur la disposition en cours, **en gardant
+  /// les filtres ouverts** : déplacer une colonne ne doit pas effacer ce qu'on
+  /// cherchait. Avant que la fenêtre n'ait bâti son en-tête, il n'y a rien à
+  /// rebâtir — elle le fera sur la disposition déjà posée.
+  private redress(): void {
+    this.drawnSlice = null;
+    if (this.header === null || this.filterRow === null) {
+      return;
+    }
+    const sought = [...this.filters];
+    const open = new Set<number>();
+    this.filterInputs.forEach((input, index) => {
+      if (!input.hidden) {
+        open.add(index);
+      }
+    });
+    this.buildHeader(this.header, this.filterRow);
+    for (const index of this.shown()) {
+      if (!open.has(index)) {
+        continue;
+      }
+      const input = this.filterInputs[index];
+      input.hidden = false;
+      input.value = sought[index];
+      this.filters[index] = sought[index];
+      this.funnels[index].ariaPressed = "true";
+    }
+    this.filterRow.classList.toggle("list__filter--open", open.size > 0);
+    this.render();
+  }
+
+  /// Déplace une colonne devant une autre — ou en dernier pour `null`.
+  private moveColumn(index: number, before: number | null): void {
+    const order = this.order.filter((other) => other !== index);
+    const at = before === null ? order.length : order.indexOf(before);
+    order.splice(at < 0 ? order.length : at, 0, index);
+    if (order.join() === this.order.join()) {
+      return;
+    }
+    this.order = order;
+    this.redress();
+    this.remember();
+  }
+
+  /// Montre ou masque une colonne. La dernière colonne mobile visible ne se
+  /// masque pas.
+  private toggleColumn(index: number): void {
+    if (this.hidden.has(index)) {
+      this.hidden.delete(index);
+    } else {
+      if (this.lastOneShown(index)) {
+        return;
+      }
+      this.hidden.add(index);
+      this.forgetWhatIsHidden();
+    }
+    this.redress();
+    this.remember();
+  }
+
+  /// Cette colonne est-elle la seule mobile encore visible ?
+  private lastOneShown(index: number): boolean {
+    const left = this.shown().filter((other) => this.movable(other));
+    return left.length === 1 && left[0] === index;
+  }
+
+  /// **Glisser un en-tête déplace sa colonne.** Le geste ne commence qu'après
+  /// quelques pixels : en deçà, c'est un clic, et un clic trie.
+  ///
+  /// Écrit avec les événements du pointeur, comme la poignée de largeur, et
+  /// non avec le glisser-déposer du navigateur : celui-ci ne se comporte pas
+  /// pareil dans les trois moteurs que Radinus habite — WebKit sur macOS,
+  /// WebView2 sous Windows, WebKitGTK sous Linux — et Tauri en intercepte une
+  /// partie sous Windows (Fabrice, 04/10/2026 : « il faut que ce système soit
+  /// compatible macOS, Windows et Linux »).
+  private startMoving(index: number, cell: HTMLElement, event: PointerEvent): void {
+    const startX = event.clientX;
+    const container = this.options.container;
+    let mark: HTMLElement | null = null;
+    let before: number | null = index;
+
+    const move = (moved: PointerEvent): void => {
+      if (mark === null) {
+        if (Math.abs(moved.clientX - startX) < MOVE_THRESHOLD) {
+          return;
+        }
+        mark = document.createElement("div");
+        mark.className = "list__drop-mark";
+        document.body.append(mark);
+        document.body.classList.add("moving-column");
+        cell.classList.add("list__title--moving");
+      }
+      // Au bord du tableau, il défile : une colonne doit pouvoir aller plus
+      // loin que ce qu'on voit.
+      const frame = container.getBoundingClientRect();
+      if (moved.clientX > frame.right - 24) {
+        container.scrollLeft += 18;
+      } else if (moved.clientX < frame.left + 24) {
+        container.scrollLeft -= 18;
+      }
+      // Le trait se pose sur la frontière la plus proche du pointeur.
+      const candidates = this.shown().filter((other) => this.movable(other));
+      let x = 0;
+      before = null;
+      for (const other of candidates) {
+        const box = this.headerCells[other].getBoundingClientRect();
+        if (moved.clientX < box.left + box.width / 2) {
+          before = other;
+          x = box.left;
+          break;
+        }
+        x = box.right;
+      }
+      const top = (this.header as HTMLElement).getBoundingClientRect().top;
+      mark.style.left = `${Math.round(x) - 1}px`;
+      mark.style.top = `${top}px`;
+      mark.style.height = `${frame.bottom - top}px`;
+    };
+    const stop = (): void => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+      if (mark === null) {
+        return;
+      }
+      mark.remove();
+      document.body.classList.remove("moving-column");
+      cell.classList.remove("list__title--moving");
+      // Le navigateur envoie un clic après le relâchement : ce n'est pas une
+      // demande de tri.
+      this.justMoved = true;
+      window.setTimeout(() => {
+        this.justMoved = false;
+      }, 0);
+      this.moveColumn(index, before);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+  }
+
+  private closeColumnsMenu(): void {
+    this.columnsMenu?.remove();
+    this.columnsMenu = null;
+  }
+
+  /// Teinte une colonne — ou lui ôte sa teinte, pour la chaîne vide.
+  private colourColumn(index: number, colour: string): void {
+    if (this.colours[index] === colour) {
+      return;
+    }
+    this.colours[index] = colour;
+    this.drawnSlice = null;
+    this.render();
+    this.remember();
+  }
+
+  /// **Le menu des colonnes**, au clic droit sur la ligne d'en-têtes.
+  ///
+  /// ```text
+  /// Afficher/Masquer         ▸  une coche par colonne
+  /// Colorer la colonne : X   ▸  Aucune couleur ─ les neuf couleurs
+  /// ─────────────────────────
+  /// Rétablir les colonnes par défaut
+  /// ```
+  ///
+  /// D'abord un seul niveau — les coches, puis « Rétablir ». Fabrice,
+  /// 05/10/2026 : « il y aurait un menu Afficher/Masquer qui contiendrait un
+  /// sous-menu avec le menu actuel. Et en dessous il y aurait une option
+  /// Colorer. »
+  ///
+  /// **« Colorer » teinte la colonne dont on a cliqué l'en-tête**, et la
+  /// nomme : un menu qui colorerait « une colonne » sans dire laquelle se
+  /// tromperait de cible une fois sur deux. Sur une colonne fixe — le « + » —
+  /// ou à côté de tout en-tête, l'entrée est grisée.
+  ///
+  /// Dessiné par Radinus, comme le menu des lignes : le même sur les trois
+  /// systèmes. **Les coches laissent le menu ouvert** — masquer cinq colonnes
+  /// ne doit pas demander cinq clics droits ; choisir une couleur le ferme,
+  /// puisqu'on n'en choisit qu'une.
+  private openColumnsMenu(x: number, y: number, clicked: number | null): void {
+    this.closeColumnsMenu();
+    const menu = document.createElement("div");
+    menu.className = "context-menu context-menu--columns";
+    menu.role = "menu";
+    this.columnsMenu = menu;
+
+    /// Une entrée qui ouvre un sous-menu, au survol ou au clic.
+    const nest = (label: string, name: string, enabled: boolean): HTMLElement => {
+      const box = document.createElement("div");
+      box.className = "context-menu__nest";
+      box.dataset.menu = name;
+      const opener = document.createElement("button");
+      opener.type = "button";
+      opener.className = "context-menu__entry context-menu__entry--opener";
+      opener.textContent = label;
+      opener.disabled = !enabled;
+      box.append(opener);
+      if (enabled) {
+        const nested = document.createElement("div");
+        nested.className = "context-menu__submenu";
+        box.append(nested);
+        opener.addEventListener("click", () => {
+          box.classList.toggle("context-menu__nest--open");
+        });
+      }
+      return box;
+    };
+
+    // --- Afficher/Masquer.
+    const shown = nest(t("columns-show-hide"), "show-hide", true);
+    const checks = shown.querySelector(".context-menu__submenu") as HTMLElement;
+    const fill = (): void => {
+      checks.replaceChildren();
+      for (const index of this.order) {
+        if (!this.movable(index)) {
+          continue;
+        }
+        const column = this.options.columns[index];
+        const entry = document.createElement("button");
+        entry.type = "button";
+        entry.className = "context-menu__entry context-menu__entry--check";
+        entry.role = "menuitemcheckbox";
+        entry.dataset.column = column.id;
+        entry.ariaChecked = String(!this.hidden.has(index));
+        entry.textContent = column.title() || (column.id as string);
+        // La dernière colonne visible : elle dit qu'elle existe, et qu'on ne
+        // peut pas la retirer tant qu'elle est seule.
+        entry.disabled = this.lastOneShown(index);
+        entry.addEventListener("click", () => {
+          this.toggleColumn(index);
+          fill();
+        });
+        checks.append(entry);
+      }
+    };
+    fill();
+
+    // --- Colorer la colonne cliquée.
+    const subject = clicked !== null && this.movable(clicked) ? clicked : null;
+    const title = subject === null ? "" : this.options.columns[subject].title();
+    // « Colorer la colonne : Solde » — le libellé vient entier de Fluent, deux
+    // points compris ; le nom de la colonne le suit, comme le message d'une
+    // erreur suit sa phrase. Une substitution, pas une composition.
+    const colour = nest(
+      subject === null ? t("columns-colour") : `${t("columns-colour")} ${title}`,
+      "colour",
+      subject !== null,
+    );
+    if (subject !== null) {
+      const tints = colour.querySelector(".context-menu__submenu") as HTMLElement;
+      const choice = (name: string, label: string): HTMLButtonElement => {
+        const entry = document.createElement("button");
+        entry.type = "button";
+        entry.className = "context-menu__entry context-menu__entry--check";
+        entry.role = "menuitemradio";
+        entry.dataset.colour = name;
+        entry.ariaChecked = String(this.colours[subject] === name);
+        if (name !== "") {
+          // La pastille : la teinte, telle qu'elle se posera sur la colonne.
+          const swatch = document.createElement("span");
+          swatch.className = "context-menu__swatch";
+          swatch.dataset.tint = name;
+          entry.append(swatch);
+        }
+        entry.append(label);
+        entry.addEventListener("click", () => {
+          this.closeColumnsMenu();
+          this.colourColumn(subject, name);
+        });
+        return entry;
+      };
+      const rule = document.createElement("hr");
+      rule.className = "context-menu__rule";
+      tints.append(
+        choice("", t("columns-colour-none")),
+        rule,
+        ...COLUMN_COLOURS.map((name) => choice(name, t(`columns-colour-${name}`))),
+      );
+    }
+
+    // --- Rétablir.
+    const rule = document.createElement("hr");
+    rule.className = "context-menu__rule";
+    const reset = document.createElement("button");
+    reset.type = "button";
+    reset.className = "context-menu__entry";
+    reset.dataset.column = "";
+    reset.textContent = t("columns-reset");
+    reset.addEventListener("click", () => {
+      this.closeColumnsMenu();
+      this.restoreBornLayout();
+    });
+    menu.append(shown, colour, rule, reset);
+
+    document.body.append(menu);
+    // Le menu tient dans la fenêtre, où qu'on ait cliqué, et ses sous-menus
+    // aussi : à gauche près du bord droit, vers le haut près du bas — le
+    // détail d'une statistique a ses en-têtes à mi-hauteur de la fenêtre. Et
+    // un sous-menu plus haut que la place qui reste défile au lieu de sortir.
+    const box = menu.getBoundingClientRect();
+    menu.style.left = `${Math.max(0, Math.min(x, window.innerWidth - box.width - 4))}px`;
+    menu.style.top = `${Math.max(0, Math.min(y, window.innerHeight - box.height - 4))}px`;
+    const placed = menu.getBoundingClientRect();
+    if (placed.right + 230 > window.innerWidth) {
+      menu.classList.add("context-menu--near-the-edge");
+    }
+    const tallest = Math.max(checks.childElementCount, COLUMN_COLOURS.length + 2) * 28 + 12;
+    const upwards = placed.top + tallest > window.innerHeight && placed.bottom > window.innerHeight / 2;
+    if (upwards) {
+      menu.classList.add("context-menu--near-the-bottom");
+    }
+    const room = upwards ? placed.bottom - 4 : window.innerHeight - placed.top - 4;
+    for (const nested of menu.querySelectorAll<HTMLElement>(".context-menu__submenu")) {
+      nested.style.maxHeight = `${Math.max(120, room)}px`;
+      nested.style.overflowY = "auto";
+    }
+
+    const closeIfOutside = (event: MouseEvent): void => {
+      if (this.columnsMenu !== menu) {
+        document.removeEventListener("mousedown", closeIfOutside);
+        return;
+      }
+      if (!menu.contains(event.target as Node)) {
+        this.closeColumnsMenu();
+        document.removeEventListener("mousedown", closeIfOutside);
+      }
+    };
+    document.addEventListener("mousedown", closeIfOutside);
+  }
+
+  /// Aligne l'en-tête et la ligne des filtres sur le défilement horizontal des
+  /// lignes. Un titre décalé d'une colonne serait pire qu'un tableau tronqué.
+  private followSideways(): void {
+    const shift = `translateX(${-this.options.container.scrollLeft}px)`;
+    if (this.header) {
+      this.header.style.transform = shift;
+    }
+    if (this.filterRow) {
+      this.filterRow.style.transform = shift;
+    }
+  }
+
+  /// La largeur en dessous de laquelle le tableau déborde plutôt que de se
+  /// serrer : la somme des minimums de ses colonnes. Zéro quand la fenêtre
+  /// n'a pas demandé d'ascenseur — le tableau se partage alors la place comme
+  /// il l'a toujours fait.
+  ///
+  /// **C'est une largeur plancher, et non un minimum par piste.** Une piste
+  /// `minmax(150px, 1fr)` a été essayée d'abord : elle ne fait rien de ce
+  /// qu'on croit. Quand la place manque, une grille ne dépasse pas — elle
+  /// ramène chaque piste à son minimum et s'arrête là, si bien que tirer une
+  /// poignée ne pouvait plus élargir quoi que ce soit (attrapé par la
+  /// vérification « tirer la poignée élargit la colonne »). Le plancher, lui,
+  /// donne au tableau une largeur qu'il garde quoi qu'il arrive : les
+  /// proportions restent celles d'une fenêtre de cette largeur-là, et ce qui
+  /// dépasse se rattrape à l'ascenseur.
+  private smallestWidth(): number {
+    if (!this.options.horizontalScroll) {
+      return 0;
+    }
+    return this.shown().reduce(
+      (total, index) => total + (this.options.columns[index].minWidth ?? 0),
+      0,
+    );
+  }
+
+  /// Pose cette largeur minimale sur une bande du tableau — en-tête, filtres
+  /// ou ligne. Les trois portent la même, sans quoi elles ne défileraient pas
+  /// du même pas.
+  private holdTheWidth(band: HTMLElement): void {
+    const smallest = this.smallestWidth();
+    // Posée même à zéro : une colonne masquée abaisse le plancher, et une
+    // bande rebâtie ne doit pas garder l'ancien.
+    band.style.minWidth = smallest > 0 ? `${smallest}px` : "";
   }
 
   /// Builds the header — one cell, one sort marker and one funnel per column.
@@ -195,6 +992,17 @@ export class Table<Row> {
     this.headerCells = [];
     this.markers = [];
     this.filterInputs = [];
+    this.funnels = [];
+    if (this.options.layoutName !== undefined && !this.menuArmed.has(header)) {
+      this.menuArmed.add(header);
+      header.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+        // L'en-tête sous le pointeur : c'est sa colonne que « Colorer » teinte.
+        const cell = (event.target as Element).closest<HTMLElement>(".list__title");
+        const clicked = cell === null ? -1 : this.headerCells.indexOf(cell);
+        this.openColumnsMenu(event.clientX, event.clientY, clicked < 0 ? null : clicked);
+      });
+    }
     // Les entonnoirs repartent fermés et vides : leurs champs viennent d'être
     // remplacés par des neufs. Garder les mots cherchés laisserait un filtre
     // agir sans que rien à l'écran ne dise plus lequel — des lignes cachées
@@ -204,10 +1012,19 @@ export class Table<Row> {
     filterRow.classList.remove("list__filter--open");
     header.style.gridTemplateColumns = this.trackList();
     filterRow.style.gridTemplateColumns = this.trackList();
+    this.holdTheWidth(header);
+    this.holdTheWidth(filterRow);
+    // L'en-tête vient d'être rebâti : il est revenu à sa position de départ
+    // alors que les lignes, elles, n'ont pas bougé.
+    this.followSideways();
 
-    this.options.columns.forEach((column, index) => {
+    this.shown().forEach((index, place) => {
+      const column = this.options.columns[index];
       const cell = document.createElement("span");
       cell.className = "list__title";
+      if (column.id !== undefined) {
+        cell.dataset.column = column.id;
+      }
       cell.role = "button";
       cell.tabIndex = 0;
       if (column.numeric) {
@@ -220,7 +1037,21 @@ export class Table<Row> {
       const marker = document.createElement("span");
       marker.className = "list__sort-marker";
       cell.append(title, marker);
-      cell.addEventListener("click", () => this.sortBy(index));
+      cell.addEventListener("click", () => {
+        if (!this.justMoved) {
+          this.sortBy(index);
+        }
+      });
+      if (this.movable(index)) {
+        cell.addEventListener("pointerdown", (event) => {
+          // Le bouton principal seulement. La poignée de largeur, elle,
+          // arrête déjà l'événement avant qu'il n'arrive ici.
+          if (event.button !== 0) {
+            return;
+          }
+          this.startMoving(index, cell, event);
+        });
+      }
 
       const funnel = document.createElement("button");
       funnel.type = "button";
@@ -229,6 +1060,11 @@ export class Table<Row> {
       funnel.ariaPressed = "false";
       funnel.addEventListener("click", (event) => {
         event.stopPropagation();
+        // Une colonne étroite est à moitié faite de sa loupe : on doit pouvoir
+        // l'attraper par là aussi, et la lâcher n'ouvre pas la recherche.
+        if (this.justMoved) {
+          return;
+        }
         this.toggleFilter(index, funnel);
       });
       cell.append(funnel);
@@ -246,8 +1082,9 @@ export class Table<Row> {
       });
       handle.addEventListener("dblclick", (event) => {
         event.stopPropagation();
-        this.widths[index] = this.options.columns[index].width ?? "1fr";
+        this.widths[index] = this.bornWidth(index);
         this.applyTracks();
+        this.remember();
       });
       cell.append(handle);
 
@@ -259,7 +1096,7 @@ export class Table<Row> {
       // one search field on screen slid back into the first column whatever
       // funnel had been opened — one searched the labels and it looked like
       // one was searching the dates (reported by Fabrice, 25/07/2026).
-      input.style.gridColumn = String(index + 1);
+      input.style.gridColumn = String(place + 1);
       input.addEventListener("input", () => {
         this.filters[index] = input.value;
         this.drawnSlice = null;
@@ -268,16 +1105,39 @@ export class Table<Row> {
 
       header.append(cell);
       filterRow.append(input);
-      this.headerCells.push(cell);
-      this.markers.push(marker);
-      this.filterInputs.push(input);
+      this.headerCells[index] = cell;
+      this.markers[index] = marker;
+      this.filterInputs[index] = input;
+      this.funnels[index] = funnel;
     });
 
     this.showSortMarkers();
   }
 
   private trackList(): string {
-    return this.widths.join(" ");
+    const shown = this.shown();
+    // **Dès qu'une largeur a été tirée à la main, une colonne restée en `fr`
+    // reçoit un plancher.** Tirer une poignée fige en pixels toutes les
+    // colonnes visibles ; une colonne qui revient ensuite avec sa part `1fr` —
+    // réaffichée, ou rendue à sa largeur de naissance par un double-clic —
+    // reçoit ce qui reste, c'est-à-dire rien dès que le tableau déborde : elle
+    // serait là sans qu'on la voie. Et depuis que la disposition est retenue,
+    // elle le resterait d'une ouverture à l'autre.
+    //
+    // Le plancher n'est posé que dans ce cas. Un tableau où rien n'a été tiré
+    // garde ses pistes telles quelles : `minmax` partout l'empêcherait de se
+    // partager la place comme il l'a toujours fait (voir `smallestWidth`).
+    const pulled = shown.some((index) => this.widths[index] !== this.bornWidth(index));
+    return shown
+      .map((index) => {
+        const width = this.widths[index];
+        if (!pulled || !width.endsWith("fr")) {
+          return width;
+        }
+        const least = this.options.columns[index].minWidth ?? LEAST_SHARE;
+        return `minmax(${least}px, ${width})`;
+      })
+      .join(" ");
   }
 
   /// Lays the same track list on the header, the filters and every row on
@@ -302,13 +1162,26 @@ export class Table<Row> {
   /// would move when only one column was pulled.
   private startResizing(index: number, cell: HTMLElement, event: PointerEvent): void {
     const startX = event.clientX;
-    const startWidths = this.headerCells.map((header) => header.offsetWidth);
+    // Par rang de naissance, comme `widths` : les colonnes masquées n'ont pas
+    // d'en-tête à mesurer et gardent ce qu'elles avaient.
+    const startWidths: number[] = [];
+    for (const shown of this.shown()) {
+      startWidths[shown] = this.headerCells[shown].offsetWidth;
+    }
     const smallest = 34;
-
-    this.widths = startWidths.map((width) => `${width}px`);
-    this.applyTracks();
+    // **Rien n'est figé tant que la poignée n'a pas bougé.** Un simple clic
+    // dessus — ou les deux d'un double-clic — figeait toutes les colonnes en
+    // pixels sans que l'utilisateur ait rien tiré ; cela ne se voyait pas,
+    // mais depuis que la disposition est retenue, cela s'enregistrerait.
+    let pulled = false;
 
     const move = (moved: PointerEvent): void => {
+      if (!pulled) {
+        pulled = true;
+        for (const shown of this.shown()) {
+          this.widths[shown] = `${startWidths[shown]}px`;
+        }
+      }
       const width = Math.max(smallest, startWidths[index] + (moved.clientX - startX));
       this.widths[index] = `${width}px`;
       this.applyTracks();
@@ -317,6 +1190,9 @@ export class Table<Row> {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
       document.body.classList.remove("resizing-column");
+      if (pulled) {
+        this.remember();
+      }
     };
 
     void cell;
@@ -477,6 +1353,7 @@ export class Table<Row> {
       const line = document.createElement("div");
       line.className = "list__row";
       line.style.gridTemplateColumns = this.trackList();
+      this.holdTheWidth(line);
       line.role = "option";
       line.dataset.id = String(id);
       line.ariaSelected = String(this.selection.includes(id));
@@ -488,9 +1365,14 @@ export class Table<Row> {
         line.classList.add(...extra.split(" ").filter(Boolean));
       }
 
-      for (const column of this.options.columns) {
+      for (const index of this.shown()) {
+        const column = this.options.columns[index];
         const cell = document.createElement("span");
         cell.className = column.numeric ? "list__cell list__cell--numeric" : "list__cell";
+        // Le calque de couleur de la colonne, s'il y en a un.
+        if (this.colours[index] !== "") {
+          cell.dataset.tint = this.colours[index];
+        }
         if (column.editor && this.selection.includes(id) && (column.editor.editable?.(row) ?? true)) {
           const combo = document.createElement("select");
           combo.className = "list__combo";
@@ -501,6 +1383,7 @@ export class Table<Row> {
             combo.append(entry);
           }
           combo.value = String(column.editor.value(row));
+          column.editor.decorate?.(row, combo);
           // The click that opens the list is not a click on the row: it must
           // not move the selection under the user's hand.
           combo.addEventListener("click", (event) => event.stopPropagation());
@@ -557,7 +1440,9 @@ export class Table<Row> {
   /// à cocher — sort telle qu'elle se lit à l'écran, c'est-à-dire vide : rien
   /// n'est inventé pour la remplir.
   async sheet(): Promise<Sheet> {
-    const columns = this.options.columns;
+    // Les colonnes qu'on voit, dans l'ordre où on les voit : un tableau
+    // exporte ce qu'on lit, et l'utilisateur vient de choisir ce qu'il lit.
+    const columns = this.shown().map((index) => this.options.columns[index]);
     const heading = columns.map((column) => exportText(column.title(), true));
     const lines = this.visible().map((row) =>
       columns.map((column) => {
@@ -577,6 +1462,103 @@ export class Table<Row> {
     };
   }
 
+  // --- Copier ---------------------------------------------------------------
+
+  /// Ce qu'une cellule vaut dans le presse-papiers : le texte qu'on lit, et
+  /// **un nombre pur pour un montant** — sans signe monétaire ni groupement,
+  /// le séparateur décimal de la langue (Fabrice, 07/10/2026 : « en nombre
+  /// pur »). Seules les colonnes de nombres y passent : un libellé reste ce
+  /// qu'il est.
+  private copied(row: Row, index: number): string {
+    const column = this.options.columns[index];
+    const text = oneCell(column.cell(row));
+    return column.numeric || column.money !== undefined ? pureNumber(text) : text;
+  }
+
+  /// **Les lignes choisies, telles qu'on les voit** : dans l'ordre de l'écran,
+  /// avec les colonnes affichées, dans leur ordre. Une tabulation entre deux
+  /// cellules, un saut de ligne entre deux lignes — ce qu'un tableur colle une
+  /// cellule par colonne. **Sans titres** (tranché par Fabrice).
+  private selectedAsText(): string {
+    const chosen = new Set(this.selection);
+    const shown = this.shown();
+    return this.visible()
+      .filter((row) => chosen.has(this.options.identity(row)))
+      .map((row) => shown.map((index) => this.copied(row, index)).join("\t"))
+      .join("\n");
+  }
+
+  private async toTheClipboard(text: string): Promise<void> {
+    if (!(await copyText(text))) {
+      this.said?.(t("copy-failed"), true);
+    }
+  }
+
+  /// La touche de copie. Elle n'agit que si ce tableau a des lignes choisies,
+  /// qu'il est à l'écran, et que l'utilisateur n'est pas en train de copier
+  /// autre chose : dans une loupe de recherche, une liste déroulante ou un
+  /// champ, ⌘C reste ce qu'il a toujours été — comme partout où un texte est
+  /// surligné.
+  private copyOnTheKey(event: KeyboardEvent): void {
+    if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) {
+      return;
+    }
+    if (event.key.toLowerCase() !== "c" || this.selection.length === 0) {
+      return;
+    }
+    const container = this.options.container;
+    if (!container.isConnected || container.offsetParent === null) {
+      return;
+    }
+    const focused = document.activeElement;
+    if (
+      focused instanceof HTMLInputElement ||
+      focused instanceof HTMLTextAreaElement ||
+      focused instanceof HTMLSelectElement ||
+      (focused instanceof HTMLElement && focused.isContentEditable)
+    ) {
+      return;
+    }
+    if ((window.getSelection()?.toString() ?? "") !== "") {
+      return;
+    }
+    event.preventDefault();
+    void this.toTheClipboard(this.selectedAsText());
+  }
+
+  /// **Les deux entrées de copie du menu du clic droit** : la cellule sous le
+  /// pointeur, et les lignes choisies. La première est grisée sur une cellule
+  /// vide — une coche, le « + » — ou hors de toute ligne ; la seconde, sans
+  /// sélection.
+  private copyEntries(event: MouseEvent): MenuHeadEntry[] {
+    let cell: string | null = null;
+    const under = (event.target as Element).closest<HTMLElement>(".list__cell");
+    const line = under?.parentElement ?? null;
+    if (under !== null && line !== null && line.dataset.id !== undefined) {
+      const id = Number(line.dataset.id);
+      const row = this.rows.find((one) => this.options.identity(one) === id);
+      const index = this.shown()[[...line.children].indexOf(under)];
+      if (row !== undefined && index !== undefined) {
+        const text = this.copied(row, index);
+        cell = text === "" ? null : text;
+      }
+    }
+    return [
+      {
+        name: "copy-cell",
+        label: t("copy-cell"),
+        enabled: cell !== null,
+        run: () => void this.toTheClipboard(cell ?? ""),
+      },
+      {
+        name: "copy-rows",
+        label: t("copy-rows"),
+        enabled: this.selection.length > 0,
+        run: () => void this.toTheClipboard(this.selectedAsText()),
+      },
+    ];
+  }
+
   /// Branche le clic droit du tableau sur l'export. Appelé par la fenêtre une
   /// fois qu'elle a ses mots.
   ///
@@ -584,12 +1566,24 @@ export class Table<Row> {
   /// chaque fois qu'elle se rhabille ; deux branchements ouvriraient deux
   /// menus l'un sur l'autre au premier clic droit. Le menu, lui, se construit
   /// au moment du clic : ses entrées suivent la langue sans rien rebrancher.
-  exportOnRightClick(said: (message: string, alert?: boolean) => void): void {
+  exportOnRightClick(
+    said: (message: string, alert?: boolean) => void,
+    additions?: () => MenuAddition[],
+    exportsUnder?: () => string,
+  ): void {
     if (this.rightClickArmed) {
       return;
     }
     this.rightClickArmed = true;
-    onRightClick(this.options.container, () => this.sheet(), said);
+    this.said = said;
+    onRightClick(
+      this.options.container,
+      () => this.sheet(),
+      said,
+      additions,
+      exportsUnder,
+      (event) => this.copyEntries(event),
+    );
   }
 
   private onRowClick(event: MouseEvent, id: number): void {

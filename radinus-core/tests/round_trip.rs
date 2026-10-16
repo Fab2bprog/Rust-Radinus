@@ -141,9 +141,21 @@ fn the_authors_archive_survives_a_full_round_trip() {
             } else {
                 // `operations` : seul l'ordre de quelques lignes ex-aequo
                 // differe, la taille le dit.
+                //
+                // **Et `IDVerification`, depuis la base 11** (Fabrice,
+                // 03/10/2026). L'archive de 1.9.3 ne le porte pas ; celle que
+                // l'on reecrit le pose en dernier sur chaque operation, a
+                // « Verifiee ». On le retire avant de comparer : ce qui reste
+                // doit avoir la taille d'origine, au caractere pres.
+                let rewritten = String::from_utf8_lossy(&after[name])
+                    .replace(", \"IDVerification\":2", "");
+                assert!(
+                    !rewritten.contains("IDVerification"),
+                    "{name} : une operation restauree d'une archive 1.9.3 n'est pas « Verifiee »"
+                );
                 assert_eq!(
                     original.len(),
-                    after[name].len(),
+                    rewritten.len(),
                     "{name} a change de taille : ce n'est plus la difference connue"
                 );
             }

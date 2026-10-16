@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Bilan croisé</title>
+    <script type="module" src="/ui/windows/crossed-balance.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F39 — « Bilan croisé » (demande de Fabrice, 25/08/2026).
+
+         Le gabarit des six statistiques, aux deux différences qu'il a
+         demandées : les colonnes ne sont plus les douze mois mais les
+         affectations, et la période n'est plus l'année mais **un mois**, que
+         l'on parcourt de proche en proche.
+
+         Le bandeau bleu porte donc « 09/2026 » : deux zones cliquables, le
+         mois et l'année, séparées par une barre. -->
+    <div class="window window--statistics window--crossed-balance">
+      <nav class="window-menu" id="window-menu"></nav>
+      <nav class="switches" id="switches"></nav>
+
+      <main class="window__content window__content--split">
+        <section class="matrix" id="matrix-zone">
+          <div class="matrix__grid" id="matrix" role="grid"></div>
+        </section>
+
+        <div class="splitter" id="splitter" role="separator" aria-orientation="horizontal"></div>
+
+        <section class="list list--detail">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox"></div>
+        </section>
+      </main>
+
+      <aside class="panel panel--statistics">
+        <!-- Le mois et l'année, sur une seule ligne. Deux boutons : cliquer le
+             mois demande un nombre entre 1 et 12, cliquer l'année demande un
+             millésime — la saisie de l'année ne change pas. -->
+        <div class="panel__period">
+          <button class="panel__period-part" id="month" type="button"></button>
+          <span class="panel__period-slash">/</span>
+          <button class="panel__period-part" id="year" type="button"></button>
+        </div>
+        <button class="panel__button" id="next-period" type="button">
+          <img src="/ui/assets/icons/Temps_Plus.png" alt="" />
+        </button>
+        <button class="panel__button" id="previous-period" type="button">
+          <img src="/ui/assets/icons/Temps_Moins.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar info-bar--split" id="info-bar">
+        <span id="info-message"></span>
+        <span id="accounts-line"></span>
+      </footer>
+    </div>
+  </body>
+</html>

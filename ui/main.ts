@@ -16,6 +16,15 @@
 // C'est une lecture plus fine de ce qui est déjà à l'écran, et l'accueil
 // répond toujours sans qu'on lui ait rien demandé.
 //
+// **Révisée le 07/10/2026, par Fabrice lui-même** : chaque tuile de compte
+// porte une case — « le but sera de faire comptabiliser ou non les soldes dans
+// les 3 zones carrées du dessus » — et les tuiles se rangent à la souris.
+// « Évidemment cela sera mémorisable dans les préférences. » L'accueil garde
+// donc désormais deux choses d'une ouverture à l'autre : l'ordre de ses tuiles
+// et les comptes qu'il ne compte pas. Il reste la vue sans un clic — on n'a
+// toujours rien à lui régler pour qu'il réponde — mais il n'est plus vrai que
+// rien ne s'y mémorise, et tout ce qui s'y ajoutera se jugera à cette aune.
+//
 // C'est ce qui fait que les mêmes chiffres qu'en F07 et F19 n'y sont pas une
 // redite : F07 est un tableau qu'on ouvre exprès, F19 demande les comptes, la
 // période et trois interrupteurs. L'accueil ne demande rien et a déjà répondu
@@ -46,6 +55,8 @@ interface WelcomeAccount {
   balance_bank_value: number;
   balance_real_value: number;
   balance_final_value: number;
+  /// La case de la tuile : ce compte entre-t-il dans les totaux et les anneaux ?
+  included: boolean;
 }
 
 interface Welcome {
@@ -137,10 +148,143 @@ function paint(node: HTMLElement, value: number, negativeClass: string): void {
   node.classList.toggle(negativeClass, value < 0);
 }
 
+/// De combien de points le pointeur doit avoir bougé pour que ce soit un
+/// déplacement et non un clic. Le même seuil que pour les colonnes des tableaux.
+const TILE_MOVE_THRESHOLD = 6;
+
+/// Vrai tant qu'une tuile est en main. **L'accueil ne se redessine pas sous la
+/// main de l'utilisateur** : il se relit dès qu'il reprend le focus ou qu'une
+/// donnée change, et une tuile qui disparaîtrait au milieu du geste laisserait
+/// un trait orphelin à l'écran.
+let tileInHand = false;
+
+/// Le navigateur envoie un clic après le relâchement d'un déplacement : ce
+/// n'est pas une demande d'ouvrir le compte.
+let tileJustMoved = false;
+
+/// Les comptes tels que les tuiles les montrent : dans l'ordre, et cochés ou
+/// non. C'est l'écran qu'on enregistre, pas un état tenu à côté de lui.
+function shownTiles(): HTMLElement[] {
+  return [...element<HTMLElement>("tiles").querySelectorAll<HTMLElement>(".tile")];
+}
+
+/// **Enregistre l'ordre et les cases, puis relit tout.** Les trois totaux et
+/// les deux anneaux dépendent des cases (Fabrice, 07/10/2026 : « oui ils
+/// doivent suivre les cases à cocher ») : c'est le noyau qui les recompte, la
+/// fenêtre ne soustrait rien elle-même.
+async function saveTiles(): Promise<void> {
+  const tiles = shownTiles();
+  const order = tiles.map((tile) => Number(tile.dataset.account));
+  const excluded = tiles
+    .filter((tile) => tile.classList.contains("tile--excluded"))
+    .map((tile) => Number(tile.dataset.account));
+  try {
+    await invoke("save_welcome_accounts", { order, excluded });
+  } catch (error) {
+    say(tError("ui-save-failed", error), true);
+  }
+  await reload();
+}
+
+/// **Une tuile se prend et se pose ailleurs dans la rangée.**
+///
+/// Des événements de pointeur et non le glisser-déposer du navigateur : celui-ci
+/// ne se comporte pas de la même façon dans les trois vues web que Radinus
+/// habite (macOS, Windows, Linux), et les colonnes des tableaux se déplacent
+/// déjà ainsi. Un seul geste à apprendre pour tout le logiciel.
+///
+/// Tant que le pointeur n'a pas bougé du seuil, rien ne se passe : c'est un
+/// clic, et le clic ouvre le compte.
+function startMovingTile(tile: HTMLElement, event: PointerEvent): void {
+  const holder = element<HTMLElement>("tiles");
+  const startX = event.clientX;
+  let mark: HTMLElement | null = null;
+  let before: HTMLElement | null = tile;
+
+  const move = (moved: PointerEvent): void => {
+    if (mark === null) {
+      if (Math.abs(moved.clientX - startX) < TILE_MOVE_THRESHOLD) {
+        return;
+      }
+      mark = document.createElement("div");
+      mark.className = "tile-drop-mark";
+      document.body.append(mark);
+      document.body.classList.add("moving-tile");
+      tile.classList.add("tile--moving");
+      tileInHand = true;
+    }
+    // Au bord de la rangée, elle défile : une tuile doit pouvoir aller plus
+    // loin que ce qu'on voit.
+    const frame = holder.getBoundingClientRect();
+    if (moved.clientX > frame.right - 24) {
+      holder.scrollLeft += 18;
+    } else if (moved.clientX < frame.left + 24) {
+      holder.scrollLeft -= 18;
+    }
+    // Le trait se pose sur la frontière la plus proche du pointeur.
+    let x = 0;
+    before = null;
+    for (const other of shownTiles()) {
+      const box = other.getBoundingClientRect();
+      if (moved.clientX < box.left + box.width / 2) {
+        before = other;
+        x = box.left - 5;
+        break;
+      }
+      x = box.right + 4;
+    }
+    // Il ne sort pas de la rangée, même quand la frontière visée a défilé
+    // hors de vue.
+    x = Math.min(Math.max(x, frame.left), frame.right - 3);
+    const box = tile.getBoundingClientRect();
+    mark.style.left = `${Math.round(x)}px`;
+    mark.style.top = `${box.top}px`;
+    mark.style.height = `${box.height}px`;
+  };
+  const stop = (ended: Event): void => {
+    window.removeEventListener("pointermove", move);
+    window.removeEventListener("pointerup", stop);
+    window.removeEventListener("pointercancel", stop);
+    if (mark === null) {
+      return;
+    }
+    mark.remove();
+    document.body.classList.remove("moving-tile");
+    tile.classList.remove("tile--moving");
+    tileInHand = false;
+    tileJustMoved = true;
+    window.setTimeout(() => {
+      tileJustMoved = false;
+    }, 0);
+    // Un geste que le système interrompt n'a rien demandé. Et une tuile
+    // reposée à sa place non plus : inutile d'écrire dans la base.
+    const samePlace = before === tile || before === tile.nextElementSibling;
+    if (ended.type === "pointercancel" || samePlace) {
+      void reload();
+      return;
+    }
+    holder.insertBefore(tile, before);
+    void saveTiles();
+  };
+  window.addEventListener("pointermove", move);
+  window.addEventListener("pointerup", stop);
+  window.addEventListener("pointercancel", stop);
+}
+
 /// Les tuiles de comptes. **Chacune ouvre F02 sur son compte** : l'accueil
 /// n'est pas qu'un tableau, c'est aussi une porte d'entrée.
 function drawTiles(accounts: WelcomeAccount[]): void {
   const holder = element<HTMLElement>("tiles");
+  // Redessiner ne doit pas ramener la rangée à son début : celui qui a fait
+  // défiler jusqu'à son neuvième compte pour le décocher le garde sous les yeux.
+  const scrolled = holder.scrollLeft;
+  // Ni faire perdre sa place à celui qui coche au clavier : la case qu'il
+  // vient de changer reprend le focus sur la tuile redessinée.
+  const focused = document.activeElement;
+  const focusedCheck =
+    focused instanceof HTMLElement && focused.classList.contains("tile__check")
+      ? (focused.closest<HTMLElement>(".tile")?.dataset.account ?? null)
+      : null;
   holder.replaceChildren();
 
   // **Rien à faire, et une porte pour en sortir** (Fabrice, 04/08/2026). La
@@ -176,18 +320,40 @@ function drawTiles(accounts: WelcomeAccount[]): void {
   }
 
   for (const account of accounts) {
-    const tile = document.createElement("button");
-    tile.type = "button";
-    tile.className = "tile";
+    // **Plus un bouton, mais elle se comporte comme tel.** Une case à cocher
+    // ne peut pas vivre dans un `<button>` — le HTML l'interdit, et les trois
+    // vues web ne s'accordent pas sur ce que fait alors un clic sur la case.
+    // La tuile garde donc son rôle, sa place dans l'ordre de tabulation et ses
+    // deux touches.
+    const tile = document.createElement("div");
+    tile.className = account.included ? "tile" : "tile tile--excluded";
+    tile.setAttribute("role", "button");
+    tile.tabIndex = 0;
     tile.title = t("welcome-open-account");
+    tile.dataset.account = String(account.id);
 
+    // La case **avant** le nom (Fabrice, 07/10/2026 : « avant chaque nom de
+    // compte […] je veux une boîte à cocher »).
+    const head = document.createElement("span");
+    head.className = "tile__head";
+    const check = document.createElement("input");
+    check.type = "checkbox";
+    check.className = "tile__check";
+    check.checked = account.included;
+    check.title = t("welcome-tile-counted");
+    check.setAttribute("aria-label", t("welcome-tile-counted"));
+    check.addEventListener("change", () => {
+      tile.classList.toggle("tile--excluded", !check.checked);
+      void saveTiles();
+    });
     const name = document.createElement("span");
     name.className = "tile__name";
     name.textContent = account.label;
+    head.append(check, name);
     const bank = document.createElement("span");
     bank.className = "tile__bank";
     bank.textContent = account.bank;
-    tile.append(name, bank);
+    tile.append(head, bank);
 
     for (const [key, text, value, strong] of [
       ["welcome-tile-bank", account.balance_bank, account.balance_bank_value, true],
@@ -205,13 +371,39 @@ function drawTiles(accounts: WelcomeAccount[]): void {
       tile.append(row);
     }
 
-    tile.addEventListener("click", () => {
+    const open = (): void => {
       void invoke("open_operations_list", { accountId: account.id }).catch((error) => {
         say(tError("ui-open-failed", error), true);
       });
+    };
+    // **Cocher n'est pas ouvrir.** Tout ce qui touche la case s'arrête à elle :
+    // le clic, la touche, et le début d'un déplacement.
+    const onTheCheck = (event: Event): boolean => event.target === check;
+    tile.addEventListener("click", (event) => {
+      if (onTheCheck(event) || tileJustMoved) {
+        return;
+      }
+      open();
+    });
+    tile.addEventListener("keydown", (event) => {
+      if (onTheCheck(event) || (event.key !== "Enter" && event.key !== " ")) {
+        return;
+      }
+      event.preventDefault();
+      open();
+    });
+    tile.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || onTheCheck(event)) {
+        return;
+      }
+      startMovingTile(tile, event);
     });
     holder.append(tile);
+    if (focusedCheck === tile.dataset.account) {
+      check.focus({ preventScroll: true });
+    }
   }
+  holder.scrollLeft = scrolled;
 }
 
 /// **Un clic sur un secteur ou sur une ligne de légende fait descendre.**
@@ -339,7 +531,9 @@ async function reload(): Promise<void> {
     element<HTMLElement>("spending-title").textContent = shown.spending_title;
     element<HTMLElement>("earning-title").textContent = shown.earning_title;
 
-    drawTiles(shown.accounts);
+    if (!tileInHand) {
+      drawTiles(shown.accounts);
+    }
 
     for (const side of SIDES) {
       const holder = element<HTMLElement>(side);
@@ -459,7 +653,13 @@ element<HTMLButtonElement>("refresh").addEventListener("click", () => void reloa
 // avertissement qui n'arrive pas est pire que pas d'avertissement du tout,
 // puisqu'on croit avoir prévenu. Relire est une lecture, elle ne coûte rien
 // et ne peut rien casser.
-for (const event of ["data-changed:operations", "data-changed:accounts-list"]) {
+// Et le bouton « Réinitialiser les réglages de confort » des préférences rend
+// aux tuiles leur ordre et leurs cases : l'accueil le montre aussitôt.
+for (const event of [
+  "data-changed:operations",
+  "data-changed:accounts-list",
+  "welcome-accounts-changed",
+]) {
   void listen(event, () => void reload());
 }
 window.addEventListener("focus", () => void reload());

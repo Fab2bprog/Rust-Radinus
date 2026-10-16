@@ -109,6 +109,17 @@ pub fn run(conn: &mut Connection, language: Language) -> Result<Report> {
             );
             anomalies += 1;
         }
+        if count(&transaction, "Verification")? == 0 {
+            crate::database::seed::seed_verifications(&transaction)?;
+            journal.add(
+                "journal-step-refill",
+                "Verification",
+                Status::Repaired,
+                "",
+                "",
+            );
+            anomalies += 1;
+        }
         if count(&transaction, "StatutCheque")? == 0 {
             crate::database::seed::seed_statuts_cheque(&transaction)?;
             journal.add(

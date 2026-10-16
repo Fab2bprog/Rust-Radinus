@@ -21,6 +21,17 @@
 //! répond toujours sans qu'on lui ait rien demandé. La distinction tient à
 //! ceci : ce que l'accueil montre à l'ouverture n'a pas changé d'un pixel.
 //!
+//! **La règle a été révisée le 07/10/2026**, par Fabrice lui-même, et il faut
+//! l'écrire pour qu'on ne prenne pas ce qui suit pour une entorse. La zone
+//! « Vos comptes » porte désormais deux réglages, et ils sont mémorisés :
+//! l'**ordre des tuiles**, qu'on glisse, et une **case à cocher** par compte,
+//! qui dit s'il entre dans les trois totaux et dans les deux anneaux. Ce qui
+//! tient toujours : l'accueil répond **à l'ouverture, sans qu'on lui ait rien
+//! demandé** — il s'ouvre sur ce qu'on avait réglé la dernière fois, et tant
+//! qu'on n'a rien réglé, sur ce qu'il a toujours montré. La préférence est lue
+//! ici (`preferences::welcome_accounts`), et cette fonction n'a toujours ni
+//! interrupteur ni liste de comptes en argument.
+//!
 //! **Rien ne se calcule ici.** Les totaux sortent de `accounts::list`, les deux
 //! anneaux de `dashboard::dashboard`. Ce module ne fait que les appeler avec
 //! des paramètres fixes. Ce n'est pas de la paresse, c'est la seule façon
@@ -64,7 +75,15 @@ pub struct Welcome {
     /// dehors, comme ils sont dehors de F07 : ils ne portent plus rien sur
     /// quoi agir, et les compter dirait que le foyer possède un argent qu'il a
     /// fermé il y a des années.
+    ///
+    /// **Dans l'ordre que l'utilisateur leur a donné** depuis le 07/10/2026 :
+    /// ceux qu'il a rangés d'abord, dans son ordre, puis les autres — un compte
+    /// né depuis — dans celui des listes.
     pub accounts: Vec<AccountRow>,
+    /// **Les comptes laissés hors des totaux** : leur case est décochée. Ils
+    /// sont dans `accounts` — on les montre —, mais ni les trois totaux ni les
+    /// deux anneaux ne les comptent.
+    pub excluded: Vec<i64>,
     pub total_bank: i64,
     pub total_real: i64,
     pub total_final: i64,
@@ -164,17 +183,42 @@ pub fn welcome(
     spending_drill: Drill,
     earning_drill: Drill,
 ) -> Result<Welcome> {
-    let accounts: Vec<AccountRow> = crate::accounts::list(conn)?
+    let open: Vec<AccountRow> = crate::accounts::list(conn)?
         .into_iter()
         .filter(|account| !account.is_closed)
         .collect();
 
-    let total_bank = accounts.iter().map(|account| account.balance_bank).sum();
-    let total_real = accounts.iter().map(|account| account.balance_real).sum();
-    let total_final = accounts.iter().map(|account| account.balance_final).sum();
+    // **Ce que l'utilisateur a réglé dans « Vos comptes »** : un ordre, et des
+    // comptes laissés hors des totaux. Un souhait, pas une liste — un compte
+    // qu'il ne cite pas vient après les autres et compte ; un compte qu'il
+    // cite et qui n'existe plus, ou qui a été clôturé, est ignoré.
+    let wished = crate::preferences::welcome_accounts(conn)?;
+    let rank = |account: &AccountRow| {
+        wished
+            .order
+            .iter()
+            .position(|id| *id == account.id)
+            .unwrap_or(usize::MAX)
+    };
+    let mut accounts = open;
+    // Tri stable : à rang égal — tous ceux qu'il n'a pas rangés —, l'ordre des
+    // listes est gardé.
+    accounts.sort_by_key(rank);
+    let excluded: Vec<i64> = accounts
+        .iter()
+        .map(|account| account.id)
+        .filter(|id| wished.excluded.contains(id))
+        .collect();
+    let counted = || accounts.iter().filter(|account| !excluded.contains(&account.id));
+
+    let total_bank = counted().map(|account| account.balance_bank).sum();
+    let total_real = counted().map(|account| account.balance_real).sum();
+    let total_final = counted().map(|account| account.balance_final).sum();
 
     let (from, to) = month_of(day);
-    let ids: Vec<i64> = accounts.iter().map(|account| account.id).collect();
+    // Les anneaux portent sur les mêmes comptes que les totaux : « toute la
+    // fenêtre parle des mêmes comptes » (tranché par Fabrice).
+    let ids: Vec<i64> = counted().map(|account| account.id).collect();
 
     // Les trois statuts, les deux sens : l'accueil ne porte aucun
     // interrupteur, donc rien n'est retiré. `Switches::default()` est
@@ -250,6 +294,7 @@ pub fn welcome(
 
     Ok(Welcome {
         accounts,
+        excluded,
         total_bank,
         total_real,
         total_final,
@@ -315,6 +360,90 @@ mod tests {
             rusqlite::params![id, day, amount, account_id],
         )
         .expect("opération");
+    }
+
+    /// **La case à cocher d'un compte, et l'ordre des tuiles** (Fabrice,
+    /// 07/10/2026) : « le but sera de faire comptabiliser ou non les soldes
+    /// dans les trois zones carrées du dessus. Les carrés dans Vos comptes
+    /// pourront aussi être déplacés par drag and drop et réordonnés. » — et
+    /// les anneaux « doivent suivre les cases à cocher ».
+    #[test]
+    fn les_comptes_decoches_sortent_des_totaux_et_des_anneaux_mais_restent_montres() {
+        let conn = database();
+        account(&conn, 1, "CCP", false, 100 * EURO, 110 * EURO, 120 * EURO);
+        account(&conn, 2, "Livret", false, 1000 * EURO, 1000 * EURO, 1000 * EURO);
+        account(&conn, 3, "Epargne", false, 5 * EURO, 6 * EURO, 7 * EURO);
+        account(&conn, 4, "Ancien", true, 9999 * EURO, 9999 * EURO, 9999 * EURO);
+        operation(&conn, 1, 1, "2026-03-05", -30 * EURO);
+        operation(&conn, 2, 2, "2026-03-06", -400 * EURO);
+        operation(&conn, 3, 3, "2026-03-07", 50 * EURO);
+        let read = || {
+            welcome(&conn, date(2026, 3, 15), "Sans", Drill::default(), Drill::default()).unwrap()
+        };
+        let labels = |shown: &Welcome| -> Vec<String> {
+            shown.accounts.iter().map(|one| one.label.clone()).collect()
+        };
+        let spent = |shown: &Welcome| -> i64 { shown.spending.iter().map(|part| part.amount).sum() };
+        let earned = |shown: &Welcome| -> i64 { shown.earning.iter().map(|part| part.amount).sum() };
+
+        // Rien de réglé : l'accueil de toujours.
+        let born = read();
+        assert_eq!(labels(&born).len(), 3);
+        assert!(born.excluded.is_empty());
+        assert_eq!(born.total_bank, 1105 * EURO);
+        let (all_spent, all_earned) = (spent(&born), earned(&born));
+        assert_ne!(all_spent, 0);
+        assert_ne!(all_earned, 0);
+
+        // Le Livret décoché, et l'épargne glissée en tête. Le compte clôturé et
+        // un compte disparu sont cités : ils ne comptent pour rien.
+        let order: Vec<i64> = vec![3, 99, 4, 1];
+        crate::preferences::set_welcome_accounts(
+            &conn,
+            &crate::preferences::WelcomeAccounts { order, excluded: vec![2, 4, 99] },
+        )
+        .unwrap();
+        let shown = read();
+        // L'ordre voulu d'abord ; le Livret, qu'on n'a pas rangé, vient après.
+        assert_eq!(labels(&shown), vec!["Epargne", "CCP", "Livret"]);
+        // Il est toujours montré, et dit décoché.
+        assert_eq!(shown.excluded, vec![2]);
+        assert_eq!(shown.total_bank, 105 * EURO);
+        assert_eq!(shown.total_real, 116 * EURO);
+        assert_eq!(shown.total_final, 127 * EURO);
+        // Les anneaux ont perdu ses 400 de dépenses, et rien d'autre.
+        assert_eq!((spent(&shown) - all_spent).abs(), 400 * EURO);
+        assert_eq!(earned(&shown), all_earned);
+
+        // Tout décoché : des zéros, des anneaux vides, et rien ne casse.
+        crate::preferences::set_welcome_accounts(
+            &conn,
+            &crate::preferences::WelcomeAccounts { order: vec![], excluded: vec![1, 2, 3] },
+        )
+        .unwrap();
+        let nothing = read();
+        assert_eq!(labels(&nothing).len(), 3);
+        // Dans l'ordre où ils sont montrés — celui des listes, faute de mieux.
+        assert_eq!(nothing.excluded.len(), 3);
+        assert_eq!((nothing.total_bank, nothing.total_real, nothing.total_final), (0, 0, 0));
+        assert!(nothing.spending.is_empty() && nothing.earning.is_empty());
+
+        // Un compte né depuis vient en dernier, et il compte.
+        crate::preferences::set_welcome_accounts(
+            &conn,
+            &crate::preferences::WelcomeAccounts { order: vec![3, 2, 1], excluded: vec![1] },
+        )
+        .unwrap();
+        account(&conn, 5, "Nouveau", false, EURO, EURO, EURO);
+        let later = read();
+        assert_eq!(labels(&later), vec!["Epargne", "Livret", "CCP", "Nouveau"]);
+        assert_eq!(later.total_bank, 1006 * EURO);
+
+        // Et la remise à zéro du confort rend l'accueil de naissance.
+        crate::preferences::reset_comfort(&conn).unwrap();
+        let again = read();
+        assert!(again.excluded.is_empty());
+        assert_eq!(again.total_bank, 1106 * EURO);
     }
 
     /// **L'anneau creusé montre les catégories du poste, et rien d'autre.**

@@ -72,6 +72,12 @@ pub mod operations;
 /// Dossier reference: 02_BASE_DE_DONNEES.md §9.
 pub mod sheets;
 pub mod statistics;
+
+/// **Le bilan croisé** (F39, demandé par Fabrice le 25/08/2026) : les
+/// catégories en lignes, les affectations en colonnes, sur un mois. Les six
+/// statistiques croisent une nomenclature avec le temps ; celle-ci croise deux
+/// nomenclatures entre elles et fixe le temps.
+pub mod crossed_balance;
 pub mod sub_operations;
 
 /// Le transfert d'un montant entre deux comptes (phase 12) : **deux écritures
@@ -93,10 +99,10 @@ pub mod preferences;
 pub mod welcome;
 
 /// Le budget (phase 11) : la saisie par poste budgétaire (F26) et le contrôle
-/// du budget contre le réalisé (F27). **Deux portes, deux questions** — et la
+/// du budget contre le réalisé (F39). **Deux portes, deux questions** — et la
 /// convention de signe des opérations, qui rend le prévu et le réalisé
 /// directement comparables. Référence : 02_BASE_DE_DONNEES.md §3.9,
-/// 04_SPECIFICATIONS_FENETRES.md F26 et F27.
+/// 04_SPECIFICATIONS_FENETRES.md F26 et F39.
 pub mod budget;
 
 /// Les modèles d'opération (phase 10) : une saisie toute faite, que l'on
@@ -145,6 +151,11 @@ pub mod ofx_import;
 /// données de la phase 13.
 pub mod csv_statement;
 
+/// Le relevé bancaire au format QIF (15/10/2026) : la même fenêtre, les mêmes
+/// boutons que l'OFX (demande de Fabrice), et un module à part pour que la
+/// lecture OFX ne bouge pas d'une ligne. Rend le même `ofx_import::Statement`.
+pub mod qif_import;
+
 /// CSV and Excel import (Phase 13). Uses the author's `office-toolkit` crate
 /// for the Excel side once this module is implemented (see dependency
 /// registry, 08_ARCHITECTURE.md). Dossier reference:
@@ -184,6 +195,38 @@ pub mod printing;
 /// opération seulement** — phase 17. Dossier reference:
 /// 06_FORMATS_SAUVEGARDE_IMPORT_EXPORT.md §5.
 pub mod journal;
+
+/// La simulation de crédit — F41 (Fabrice, 08/10/2026) : le calcul du prêt à
+/// taux fixe, et ce que l'historique de la base dit de la capacité à le
+/// rembourser. Ses graphiques et son rapport à côté.
+pub mod loan;
+pub mod loan_charts;
+pub mod loan_report;
+
+/// Ce que coûte un appareil électrique — F42 (Fabrice, 09/10/2026) : allumé et
+/// en veille, en heures pleines et en heures creuses.
+pub mod appliance;
+
+/// Mon matelas de sécurité — F43 (Fabrice, 09/10/2026) : combien de mois
+/// l'épargne tiendrait si les revenus s'arrêtaient.
+pub mod cushion;
+
+/// Objectif Épargne — F44 (Fabrice, 10/10/2026) : quand aurai-je ce montant,
+/// combien aurai-je à cette date, combien épargner par mois.
+pub mod savings_goal;
+
+/// Et si je réduisais… ? — F45 (Fabrice, 10/10/2026) : réduire des postes de
+/// dépense, et voir ce que ça change dans le temps.
+pub mod cutback;
+
+/// Préparer mes vacances — F46 (Fabrice, 10/10/2026) : ce que coûtera le
+/// prochain voyage, séjour ou croisière.
+pub mod holiday;
+pub mod car;
+
+/// Partager une dépense — F48 (Fabrice, 11/10/2026, P-71) : qui paie quoi,
+/// avec des contraintes, et où en sont les règlements.
+pub mod sharing;
 
 #[cfg(test)]
 mod tests {

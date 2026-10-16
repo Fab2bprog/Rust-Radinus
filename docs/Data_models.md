@@ -42,7 +42,7 @@ parent".
 
 **6 · The schema has its own version line.** `Parametres.VerDataBase` mirrors
 `PRAGMA user_version` and continues the numbering Radinus 1.x walked from 0
-to 9. It is **10** today. Opening a database migrates it forward; nothing
+to 9. It is **11** today. Opening a database migrates it forward; nothing
 migrates backward.
 
 ---
@@ -58,6 +58,7 @@ erDiagram
     Operation   ||--o{ PiecesJointes : "IDOperation, cascade"
     Operation   ||--o{ Operation  : "IDOperationParent, mother-daughter"
     Operation   }o--|| StatutOperation : "closed list of 3"
+    Operation   }o--o| Verification : "closed list of 4, soft"
     Operation   }o--o| Categorie  : soft
     Operation   }o--o| Affectation : soft
     Operation   }o--o| ModeOperation : soft
@@ -113,6 +114,7 @@ The largest table, and the one whose shape holds the traps.
 | `Montant` | INTEGER | Micro-units. **Negative is a debit, positive a credit.** One column, one sign, never two columns. |
 | `IDCompte` | INTEGER | `REFERENCES Compte ON DELETE CASCADE` — deleting an account takes its operations with it. |
 | `IDStatutOperation` | INTEGER | `REFERENCES StatutOperation`. **1 pointed, 2 committed, 3 planned**, and the list is closed. |
+| `IDVerification` | INTEGER, default 2 | **Schema 11.** What the *user* thinks of the entry, next to the status, which says what the *bank* did: **1 to verify, 2 verified, 3 doubtful, 4 disputed**. A soft link to `Verification` — a default is what lets the column reach an existing database. A daughter carries her mother's. |
 | `IDOperationParent` | INTEGER | `0` for a mother; the mother's id for a daughter. |
 | `EstParent` | INTEGER | `1` when this operation has daughters. |
 | `EstComplement` | INTEGER | `1` for the complement of a split. **A dedicated marker, never the label** — a label cannot survive three languages. |
@@ -169,6 +171,9 @@ Two more tables look the same and are not, because the user cannot touch them:
 - **`StatutOperation`** — exactly 1 = Pointé, 2 = Engagé, 3 = Prévu, recreated
   identically by the seed. **Closed for ever**: the three ids are relied upon
   throughout the core.
+- **`Verification`** (schema 11) — exactly 1 = À vérifier, 2 = Vérifiée,
+  3 = Douteuse, 4 = Contestée. Closed like the statuses, and like them the
+  label is only a fallback: the interface translates by the key.
 - **`TypeCompte`** and **`StatutCheque`** — prefilled reference lists.
 
 ---
@@ -238,7 +243,7 @@ category's budget line and the past moves with it.
 | Column | What it holds |
 |---|---|
 | `VerSoftMajeur` / `VerSoftMineur` / `VerSoftDebug` | The **software** version: 2 / 0 / 0. |
-| `VerDataBase` | The **schema** version — a different number line, at 10. |
+| `VerDataBase` | The **schema** version — a different number line, at 11. |
 | `UtiliseLangue` | **The WinDev nation number**: 5 French, 3 English, 7 Spanish. |
 | `RunOnce`, `InitValDefaut` | Inherited flags from the original. |
 
@@ -255,7 +260,50 @@ category's budget line and the past moves with it.
 ### `Preferences`
 
 A key and a JSON value. The place for anything that would otherwise need a new
-column.
+column. **Nothing enters it that Fabrice has not asked for, key by key**
+(03/08/2026). The keys that exist:
+
+| Key | Value | Since |
+|---|---|---|
+| `devise` | `{"choix": …, "signe": …}` | 2.0 |
+| `verification_import` | `1` or `2` | 3.0.0 |
+| `tableau.<name>` | the layout of a table: `{"order": […], "hidden": […], "widths": {…}, "colors": {…}}` | 3.0.0 |
+| `accueil.comptes` | the account tiles of the welcome window: `{"order": [ids…], "excluded": [ids…]}` | 3.0.0 |
+| `tarif.electricite` | the electricity tariff of F42: `{"off_peak_option": bool, "base": µ, "peak": µ, "off_peak": µ, "off_peak_hours": 0–24}`, prices per kWh in micro-units | 3.0.0 |
+
+`tarif.electricite` is the contract F42 starts from, set in Préférences ›
+Outils › Tarif d'électricité (P-62). Absent, or unreadable (then removed), it
+is EDF's Tarif Bleu on 1 August 2026 (`appliance::BLUE_TARIFF`). It is not a
+comfort setting: « Réinitialiser les réglages de confort » leaves it alone.
+
+`accueil.comptes` holds the order in which the welcome window shows its
+account tiles and the accounts whose tick box is off — those stay shown but
+leave the three totals and the two rings (P-57). An account it does not name is
+shown last and counted; an id that no longer matches an open account is
+ignored; a value that cannot be read is removed and the born state returns.
+
+`tableau.<name>` exists for the tables listed in
+`preferences::TABLES_WITH_A_LAYOUT`: `operations-list`, the detail of each of
+the seven statistics (`statistics-category`, `statistics-assignment`,
+`statistics-budget-line`, `statistics-payment-mode`, `statistics-payee`,
+`statistics-project`, `statistics-verification`) and that of the crossed
+balance (`crossed-balance`), the table of « Analyse Évolution du solde »
+(`balance-analysis`), and the repayment schedule of « Simulation de crédit »
+(`loan-simulation`). The simulation itself stores nothing (P-58). A table belongs to a window — the part of its
+name before a `.`, the whole name when there is none — and the preferences
+reset the tables of a window together (P-51). Columns
+are named, never numbered: a rank does not survive the column a later version
+slips in the middle. `order` holds every movable column, hidden ones included,
+so that a column shown again comes back where it was; `widths` holds only the
+widths pulled by hand, in pixels; `colors` holds, for a tinted column, the
+*name* of its tint — one of the nine of `preferences::COLUMN_COLOURS`, never a
+colour code: what a tint looks like is the stylesheet's business, and can be
+adjusted without touching a database. `colors` may be absent (a layout stored
+before it existed). A value that does not parse or does not hold
+(a name twice, everything hidden, an absurd width) is **deleted on read** and
+the table opens as it was born.
+
+The whole table travels in a backup, so a layout survives backup and restore.
 
 ### `ParamSecurite`
 

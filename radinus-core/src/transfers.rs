@@ -85,8 +85,17 @@ pub fn refusal(conn: &Connection, transfer: &Transfer) -> Result<Option<&'static
     if transfer.amount <= 0 {
         return Ok(Some("transfer-refusal-amount"));
     }
+    // **Pointée veut dire que la banque l'a passée, un jour donné** (Fabrice,
+    // 21/08/2026). Le virement écrit deux opérations : ni l'une ni l'autre ne
+    // doit entrer pointée sans sa date.
+    if transfer.status_id == POINTED && transfer.clearing_date.is_none() {
+        return Ok(Some("operation-clearing-date-required"));
+    }
     Ok(None)
 }
+
+/// Le statut « pointée ».
+const POINTED: i64 = 1;
 
 fn one_side(transfer: &Transfer, direction: Direction) -> crate::operations::OperationInput {
     crate::operations::OperationInput {
@@ -102,6 +111,7 @@ fn one_side(transfer: &Transfer, direction: Direction) -> crate::operations::Ope
         payment_mode_id: transfer.payment_mode_id,
         payee_id: transfer.payee_id,
         project_id: transfer.project_id,
+        verification_id: None,
         comment: None,
     }
 }

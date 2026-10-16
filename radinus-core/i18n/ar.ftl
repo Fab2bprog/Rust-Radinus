@@ -273,13 +273,16 @@ menu-accounts-checkbooks = إدارة دفاتر الشيكات
 
 menu-statistics = الإحصائيات
 menu-statistics-balance-chart = الرسم البياني لتطور الرصيد
+menu-statistics-balance-analysis = تحليل تطور الرصيد
 menu-statistics-by-category = إحصائيات حسب الفئات
 menu-statistics-by-assignment = إحصائيات حسب التخصيصات
 menu-statistics-by-budget-line = إحصائيات حسب بنود الميزانية
 menu-statistics-by-payment-mode = إحصائيات حسب طرق الدفع
 menu-statistics-by-payee = إحصائيات حسب الأطراف المقابلة والتجار
 menu-statistics-by-project = إحصائيات حسب المشاريع
+menu-statistics-by-verification = إحصائيات حسب التحقق
 menu-statistics-dashboard = لوحة معلومات العمليات
+menu-statistics-crossed-balance = الميزان المتقاطع
 
 menu-budget = الميزانية
 menu-budget-entry = إدخال الميزانية
@@ -297,6 +300,8 @@ menu-nomenclature = { $kind ->
 }
 menu-nomenclatures-templates = قوالب العمليات
 
+# Le menu Outils (Fabrice, 09/10/2026), entre Nomenclatures et Paramètres.
+menu-tools = أدوات
 menu-settings = الإعدادات
 menu-settings-about-author = حول المؤلف
 menu-settings-about-radinus = حول Radinus
@@ -465,6 +470,15 @@ operations-selection-total = المبلغ الإجمالي للعمليات ال
 
 operations-column-date = التاريخ
 operations-column-clearing-date = تاريخ المطابقة
+operations-column-status = حالة العملية
+operation-status-pointed = مطابقة
+operation-status-committed = محجوزة
+operation-status-planned = مخططة
+operations-column-verification = التحقق
+operation-verification-to-verify = للتحقق
+operation-verification-verified = تم التحقق
+operation-verification-doubtful = مشكوك فيها
+operation-verification-disputed = معترض عليها
 operations-column-label = الوصف
 operations-column-category = الفئة
 operations-column-assignment = التخصيص
@@ -540,6 +554,9 @@ filter-all = جميع العمليات
 filter-pointed = العمليات المطابقة فقط
 filter-committed = العمليات المحجوزة فقط
 filter-planned = العمليات المخططة فقط
+filter-by-status = تصفية حسب الحالة
+filter-by-verification = تصفية حسب التحقق
+filter-show-all = عرض الكل
 
 # --- بطاقة العملية (F03) -------------------------------------------
 # العناوين هي عناوين لقطة الشاشة "Fiche operation transaction.png"، مع تصحيح
@@ -572,6 +589,7 @@ operation-field-direction = نوع العملية:
 operation-field-amount = المبلغ
 operation-field-status = حالة العملية
 operation-field-clearing-date = تاريخ المطابقة
+operation-field-verification = التحقق
 operation-field-category = الفئة
 operation-field-assignment = التخصيص
 operation-field-payment-mode = الطريقة
@@ -594,6 +612,10 @@ operation-nothing-to-show = لا توجد عملية للعرض.
 operation-label-required = وصف العملية إلزامي.
 operation-date-required = تاريخ العملية إلزامي.
 operation-clearing-date-invalid = تاريخ المطابقة ليس تاريخًا صالحًا.
+operation-clearing-date-required = يجب أن تحمل العملية المؤشَّرة تاريخ تأشير إلزاميًا.
+operation-clearing-date-question =
+    يجب أن تحمل العملية المؤشَّرة تاريخ تأشير إلزاميًا.
+    هل تريد الحفظ بتاريخ العملية، { $date }؟
 operation-is-a-sub = هذا الصف عملية فرعية: يتم تعديله من بطاقته الخاصة.
 operation-delete-form-open = بطاقة "{ $label }" مفتوحة. يجب إغلاقها قبل الحذف.
 
@@ -634,6 +656,7 @@ sub-operation-is-the-complement = هذا هو المكمل: ما تبقى لتو
 sub-operation-of = توزيع "{ $label }" ({ $amount })
 
 operations-pointed = { $count ->
+    [0] لا توجد عملية للمطابقة: التحديد مطابق بالفعل.
     [zero] لم تتم مطابقة أي عملية.
     [one] تمت مطابقة عملية واحدة.
     [two] تمت مطابقة عمليتين.
@@ -651,6 +674,7 @@ operations-select-one = يرجى اختيار عملية واحدة فقط.
 operation-copy = نسخة بانتظار الحفظ: لم يتم إنشاء أي شيء بعد.
 operations-show-children = إظهار جميع العمليات الفرعية
 operations-hide-children = إخفاء جميع العمليات الفرعية
+operations-recurring-from = إنشاء عملية دورية انطلاقًا من هذه العملية
 
 # --- تأكيد ثانٍ لحذف خطير ---------------------
 # حذف حساب مصرفي يحذف معه كل سجله: زر نعم/لا يُنقر دون قراءة، لذلك نطلب كتابة
@@ -670,6 +694,7 @@ window-statistics-title = { $kind ->
     [payment-mode] إحصائيات حسب طريقة الدفع
     [payee] إحصائيات حسب الطرف المقابل والتاجر
     [project] إحصائيات حسب المشروع
+    [verification] إحصائيات حسب التحقق
    *[category] إحصائيات حسب الفئة
 }
 
@@ -679,6 +704,7 @@ statistics-axis-column = { $kind ->
     [payment-mode] طريقة الدفع
     [payee] الطرف المقابل
     [project] المشاريع
+    [verification] التحقق
    *[category] اسم الفئة
 }
 
@@ -688,6 +714,7 @@ statistics-unclassified = { $kind ->
     [payment-mode] بدون طريقة دفع
     [payee] بدون طرف مقابل
     [project] بدون مشروع
+    [verification] للتحقق
    *[category] بدون فئة
 }
 statistics-total = الإجمالي
@@ -732,6 +759,19 @@ accounts-stats-multiselect-help = معلومة: استخدم نقر الفأرة
 statistics-year-question = على أي سنة تريد العمل؟ Radinus يمتد من { $first } إلى { $last }.
 statistics-year-choose = اختيار السنة
 
+# --- F27, le bilan croisé (Fabrice, 25/08/2026) ---------------------
+# Les catégories en lignes, les affectations en colonnes, sur un mois.
+# Tout le reste de son vocabulaire est celui des statistiques : Total,
+# Somme, les interrupteurs, « Sans … », les colonnes du détail.
+window-crossed-balance-title = الميزان المتقاطع
+crossed-balance-window-name = الميزان المتقاطع
+crossed-balance-column = الفئة
+crossed-balance-no-data = لا توجد عملية في هذا الشهر للحسابات المختارة.
+crossed-balance-month-question = على أي شهر تريد العمل؟ رقم بين { $first } و{ $last }.
+crossed-balance-month-choose = اختيار الشهر
+crossed-balance-next = الشهر التالي
+crossed-balance-previous = الشهر السابق
+
 # --- تصدير الجداول (النقر الأيمن) ---------------------------------
 # وظيفة تخص الجدول، لا النافذة: كل القوائم تملكها.
 
@@ -749,8 +789,16 @@ export-to-xml = تصدير إلى XML (.xml)
 # قائمة التصدير في نافذة الإحصائيات: علامة تبويب لكل سنة، باسم AN_2026.
 # السنوات الفارغة — بحسب المفاتيح الموضوعة — ليست فيها.
 export-menu = تصدير
+export-to = تصدير إلى
+# Copying from a table (Fabrice, 07/10/2026): the two entries at the head of
+# the right-click menu, and what is said when the clipboard refuses.
+copy-cell = نسخ الخانة
+copy-rows = نسخ الصفوف المحددة
+copy-failed = تعذّر النسخ إلى الحافظة.
 export-all-years-excel = تصدير جميع السنوات إلى Excel
 export-all-years-ods = تصدير جميع السنوات إلى LibreOffice Calc
+export-all-months-excel = تصدير كل أشهر السنة المعروضة إلى Excel
+export-all-months-ods = تصدير كل أشهر السنة المعروضة إلى LibreOffice Calc
 export-no-year = لا توجد سنة تحمل عمليات: لا شيء للتصدير.
 export-years-done = تم تصدير { $years } سنوات إلى "{ $file }".
 export-to-json = تصدير إلى JSON (.json)
@@ -764,6 +812,7 @@ statistics-window-name = { $kind ->
     [payment-mode] إحصائيات حسب طريقة الدفع
     [payee] إحصائيات حسب الطرف المقابل والتاجر
     [project] إحصائيات حسب المشروع
+    [verification] إحصائيات حسب التحقق
    *[category] إحصائيات حسب الفئة
 }
 statistics-detail-name = تفاصيل الإحصائيات
@@ -805,6 +854,19 @@ curve-axis-balance = رصيد
 curve-nothing = لم يتم اختيار أي حساب: لا يوجد رسم بياني لرسمه.
 curve-empty = لا توجد عمليات في هذه الفترة.
 
+# F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026): the chart of F25,
+# on which one drags a zone, and under it the operations of that zone. The
+# chart's own words are F25's (curve-*); these are the summary of the zone.
+window-analysis-title = تحليل تطور الرصيد
+analysis-heading = تحليل تطور الرصيد
+analysis-hint = اسحب على الرسم البياني مع الضغط على زر الفأرة لعرض عمليات تلك الفترة.
+analysis-zone = المنطقة:
+analysis-opening = الرصيد في البداية:
+analysis-closing = الرصيد في النهاية:
+analysis-variation = التغيّر:
+analysis-detail-name = تحليل الرصيد
+analysis-detail-none = لا توجد عملية في هذه المنطقة.
+
 # --- F05 — التصنيف السريع للعمليات ------------------------
 # النافذة التي يتم فيها التصنيف **بالجملة**: يتم تحديد صفوف، والإشارة
 # إلى الخصائص المراد تغييرها، ثم تطبيقها دفعة واحدة — في الذاكرة.
@@ -823,6 +885,7 @@ quick-check-payment-mode = الطريقة
 quick-check-payee = الطرف المقابل
 quick-check-project = المشروع
 quick-check-status = الحالة
+quick-check-verification = التحقق
 quick-column-date = التاريخ
 quick-column-label = الوصف
 quick-column-amount = المبلغ
@@ -832,6 +895,7 @@ quick-column-payment-mode = طريقة الدفع
 quick-column-payee = الطرف المقابل
 quick-column-project = المشاريع
 quick-column-status = الحالة
+quick-column-verification = التحقق
 # على جهاز Mac، مفتاح Ctrl + النقر هو نقر أيمن: المفتاح الذي يضيف إلى
 # التحديد هناك هو ⌘، وعلى المساعدة أن تذكر المفتاح الذي يعمل فعلا.
 quick-multiselect-help = معلومة: استخدم نقرة الفأرة + مفتاح [{ $modifier }] على الجدول لتحديد عدة عناصر
@@ -905,7 +969,7 @@ statement-no-match = لا يوجد صف يطابق التصفية.
 statement-help = معلومة: استخدم نقرة الفأرة + مفتاح [{ $modifier }] على الجدول لتحديد عدة صفوف
 statement-choose-account = يحتوي هذا الملف على عدة حسابات. أيها تريد استيراده؟
 statement-select-line = حدد صفا واحدا على الأقل من كشف الحساب.
-statement-title-open = فتح ملف كشف حساب (.ofx)
+statement-title-open = فتح ملف كشف حساب (OFX، QIF، CSV)
 statement-title-info = معلومات عن الملف المفتوح
 statement-title-integrate = دمج التحديد في الحساب
 statement-title-validate = دمج هذه العملية في الحساب
@@ -918,6 +982,21 @@ statement-loaded = { $count ->
     [few] تمت قراءة { $count } صفوف. عدد الصفوف الموجودة في حسابك من قبل: { $known }.
     [many] تمت قراءة { $count } صفا. عدد الصفوف الموجودة في حسابك من قبل: { $known }.
    *[other] تمت قراءة { $count } صف. عدد الصفوف الموجودة في حسابك من قبل: { $known }.
+}
+statement-loaded-unidentified = { $alike ->
+    [0] عدد الصفوف التي تمت قراءتها: { $count }. لا يشبه أيٌّ منها عملية موجودة في حسابك من قبل.
+    [one] عدد الصفوف التي تمت قراءتها: { $count }. منها صف واحد يشبه عملية موجودة في حسابك من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
+    [two] عدد الصفوف التي تمت قراءتها: { $count }. منها صفان يشبهان عمليتين موجودتين في حسابك من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
+    [few] عدد الصفوف التي تمت قراءتها: { $count }. منها { $alike } صفوف تشبه عمليات موجودة في حسابك من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
+    [many] عدد الصفوف التي تمت قراءتها: { $count }. منها { $alike } صفا تشبه عمليات موجودة في حسابك من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
+   *[other] عدد الصفوف التي تمت قراءتها: { $count }. منها { $alike } صف تشبه عمليات موجودة في حسابك من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
+}
+statement-loaded-also-alike = { $alike ->
+    [one] صف آخر يشبه عملية موجودة من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
+    [two] صفان آخران يشبهان عمليتين موجودتين من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
+    [few] { $alike } صفوف أخرى تشبه عمليات موجودة من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
+    [many] يشبه { $alike } صفا آخر عمليات موجودة من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
+   *[other] يشبه { $alike } صف آخر عمليات موجودة من قبل (التاريخ نفسه، الوصف نفسه، المبلغ نفسه).
 }
 statement-integrated = { $count ->
     [0] لم يدخل شيء: هذه الصفوف موجودة في حسابك من قبل.
@@ -956,7 +1035,27 @@ statement-file-info =
     حساب الملف: { $account }
     الفترة: من { $from } إلى { $to }
     الرصيد المعلن من البنك: { $balance }
-    { $count } عملية، منها { $known } موجودة في حسابك من قبل.
+statement-qif-question = لا شيء في هذا الملف يبيّن ما إذا كان التاريخ "{ $date }" مكتوبًا يوم/شهر أم شهر/يوم. معناه:
+statement-qif-day-month = اليوم { $day }، الشهر { $month } (يوم/شهر)
+statement-qif-month-day = اليوم { $day }، الشهر { $month } (شهر/يوم)
+statement-qif-dates-mixed = يكتب هذا الملف تواريخه بطريقتين: "{ $first }" تُقرأ يوم/شهر، و"{ $second }" شهر/يوم. لم يتم استيراده، حتى لا يكون أي تاريخ خاطئًا.
+statement-qif-amounts-mixed = يكتب هذا الملف مبالغه بطريقتين: "{ $first }" بنقطة، و"{ $second }" بفاصلة. لم يتم استيراده، حتى لا يكون أي مبلغ خاطئًا.
+statement-qif-opening = رصيد افتتاحي قدره { $amount } بتاريخ { $date }: ليس عملية، ولم يتم استيراده.
+statement-qif-opening-undated = رصيد افتتاحي قدره { $amount }: ليس عملية، ولم يتم استيراده.
+statement-qif-suspect = الصف { $rank }، "{ $label }" ({ $amount })، يشبه رصيدًا افتتاحيًا: تحقق منه قبل دمجه.
+statement-qif-rejected = { $count ->
+    [zero] لم يتم استيراد { $count } صف غير مقروء: { $lines }.
+    [one] صف واحد غير مقروء لم يتم استيراده: { $lines }.
+    [two] صفان غير مقروءين لم يتم استيرادهما: { $lines }.
+    [few] { $count } صفوف غير مقروءة لم يتم استيرادها: { $lines }.
+    [many] { $count } صفا غير مقروء لم يتم استيرادها: { $lines }.
+   *[other] { $count } صف غير مقروء لم يتم استيرادها: { $lines }.
+}
+statement-qif-reason-date = تاريخ
+statement-qif-reason-amount = مبلغ
+statement-qif-reason-differ = مبالغ متناقضة
+statement-qif-no-account = لم يعد هذا الحساب موجودًا في الملف: أعد فتح الملف.
+statement-balance-unknown = غير مذكور في الملف
 statement-group-identification = تعريف العملية
 statement-group-amount = مبلغ العملية
 statement-group-classification = تصنيف العملية لحساب الإحصائيات
@@ -1615,6 +1714,9 @@ password-show = إظهار كلمة المرور
 password-remove-question = إزالة الحماية عن قاعدة البيانات هذه؟
 password-mismatch = الإدخالان لكلمة المرور الجديدة مختلفان
 password-wrong = كلمة المرور غير صحيحة
+database-too-recent = حُفظت هذه القاعدة بإصدار أحدث من Radinus (إصدار القاعدة { $found }؛ هذا الإصدار يقرأ حتى الإصدار { $supported }). حدِّث Radinus لفتحها.
+database-not-radinus = هذا الملف ليس قاعدة بيانات Radinus.
+database-unreadable = تعذّرت قراءة القاعدة: { $reason }
 password-close-first = أغلق قاعدة البيانات هذه قبل تغيير كلمة المرور
 password-now-protected = قاعدة البيانات محمية بكلمة مرور
 password-now-clear = قاعدة البيانات لم تعد محمية
@@ -1850,6 +1952,11 @@ welcome-total-final = الرصيد النهائي
 welcome-total-real-detail = مطابق + محجوز
 welcome-total-final-detail = مطابق + محجوز + مخطط
 welcome-accounts = حساباتك
+# The tick box of an account on the home window (Fabrice, 07/10/2026), and the
+# line that says so when not every account is counted. No plural on purpose:
+# « counted: 3 of 5 » reads the same whatever the numbers.
+welcome-accounts-counted = الحسابات المحتسبة في المجاميع: { $count } من { $total }
+welcome-tile-counted = احتساب هذا الحساب في المجاميع
 welcome-tile-bank = في البنك
 welcome-tile-real = الفعلي
 welcome-tile-final = النهائي
@@ -1903,6 +2010,58 @@ preferences-leaf-zoom = حجم العرض
 preferences-field-zoom = التكبير:
 preferences-zoom-reset = القيمة الافتراضية
 preferences-zoom-hint = كل شيء يكبر معًا: النص والأيقونات والأعمدة. دون 100 %، يتسع على الشاشة أكثر. أما شريط قوائم النظام وصناديق حواره فتتبع إعدادات حاسوبك لا هذه الإعدادات.
+preferences-branch-import = الاستيراد
+preferences-leaf-verification = التحقق
+preferences-field-verification = العمليات المستوردة:
+preferences-verification-hint = «تم التحقق»: أنت تثق في مصرفك، وتُعدّ العملية المستوردة صحيحة. «للتحقق»: كل عملية مستوردة تنتظر مراجعتك؛ ثم تغيّرها بنفسك إلى «تم التحقق» في قائمة العمليات. هذا الإعداد يسري على عمليات الاستيراد القادمة فقط.
+preferences-leaf-qif = كشوف حساب QIF
+preferences-field-qif-order = ترتيب اليوم والشهر:
+preferences-qif-order-ask = اسألني في كل مرة
+preferences-qif-order-day-month = دائمًا يوم/شهر (05/03 = 5 مارس)
+preferences-qif-order-month-day = دائمًا شهر/يوم (05/03 = 3 مايو)
+preferences-qif-order-help = لا يُستخدم إلا إذا لم يكن في الملف أي تاريخ يحسم الأمر. فبمجرد أن يُثبت تاريخ مثل 24/11 الترتيب، يكون الملف هو الذي يقرر، أيًا كان هذا الإعداد.
+preferences-field-qif-label = وصف العملية:
+preferences-qif-label-both = الطرف المقابل + المذكرة
+preferences-qif-label-payee = الطرف المقابل فقط
+preferences-qif-label-memo = المذكرة فقط
+preferences-qif-label-help = عندما تحمل العملية طرفًا مقابلًا ومذكرة معًا. وإذا لم تحمل إلا أحدهما، فهو الذي يُستخدم، أيًا كان هذا الإعداد.
+preferences-qif-hint = تسري هذه الإعدادات على كل كشوف حساب QIF، أيًا كانت قاعدة البيانات المفتوحة. «اسألني في كل مرة» هو الخيار الأكثر أمانًا: فالملف الذي تكون تواريخه ملتبسة لا يُقرأ أبدًا عشوائيًا.
+
+# The columns of a table (Fabrice, 04/10/2026): each user has his own. The
+# first is the last entry of the right-click menu on a table's header; the
+# others are the « Table columns » leaf of the preferences, one line per
+# table whose columns can be arranged, a « Reset » button facing it.
+columns-reset = استعادة الأعمدة الافتراضية
+# The header menu's two sub-menus (Fabrice, 05/10/2026). « columns-colour » is
+# followed by the column's own title, hence its colon. Then the nine tints a
+# column can take, and the entry that takes it off.
+columns-show-hide = إظهار/إخفاء
+columns-colour = تلوين العمود:
+columns-colour-none = بلا لون
+columns-colour-red = أحمر
+columns-colour-orange = برتقالي
+columns-colour-pink = وردي
+columns-colour-pastel-green = أخضر فاتح
+columns-colour-green = أخضر
+columns-colour-pastel-blue = أزرق فاتح
+columns-colour-blue = أزرق
+columns-colour-pastel-yellow = أصفر فاتح
+columns-colour-yellow = أصفر
+preferences-leaf-columns = أعمدة الجداول
+preferences-table-operations-list = قائمة العمليات
+preferences-columns-reset = إعادة التعيين
+preferences-columns-reset-all = إعادة تعيين الكل
+preferences-columns-done = عادت الأعمدة إلى ترتيبها الأصلي.
+preferences-columns-hint = يحتفظ كل جدول بترتيب أعمدته وبالأعمدة التي تخفيها وبعرضها. «إعادة التعيين» تعيد إليه ترتيبه الأصلي فورًا.
+
+# The reset of the comfort settings (Fabrice, 07/10/2026): columns, home
+# window, display size — and nothing else.
+preferences-branch-reset = إعادة التعيين
+preferences-leaf-comfort = إعدادات الراحة
+preferences-comfort-reset = إعادة تعيين إعدادات الراحة
+preferences-comfort-hint = يعيد إلى الحالة الأصلية أعمدة جميع الجداول، وترتيب الحسابات وخانات اختيارها في نافذة البداية، وحجم العرض. لا تتغير اللغة ولا العملة ولا التحقق من العمليات المستوردة.
+preferences-comfort-question = هل تريد إعادة تعيين إعدادات الراحة؟ ستعود أعمدة الجداول ونافذة البداية وحجم العرض إلى حالتها الأصلية.
+preferences-comfort-done = تمت إعادة تعيين إعدادات الراحة.
 
 # --- شريط الاستقبال ---------------------------------------------
 #
@@ -1966,3 +2125,1036 @@ licence-copyright = Copyright © 2026 Fabrice Garcia
 licence-no-warranty = يُقدَّم هذا البرنامج دون أي ضمان، بالقدر الذي يسمح به القانون.
 licence-info = يُفتح النص الرسمي في متصفحك، على gnu.org.
 
+# --- F41 — Simulation de crédit (Fabrice, 08/10/2026) ------------------------
+# Le calcul d'un prêt à taux fixe, et ce que l'historique de la base dit de la
+# capacité à le rembourser. Les phrases sont écrites par le noyau ; la fenêtre
+# n'en compose aucune.
+menu-tools-loan-simulation = محاكاة قرض
+window-loan-title = محاكاة قرض
+loan-tab-credit = القرض
+loan-tab-afford = هل أستطيع سداده؟
+loan-field-kind = نوع القرض
+loan-kind-consumer = قرض استهلاكي
+loan-kind-mortgage = قرض عقاري
+loan-field-amount = مبلغ القرض
+loan-field-payment = القسط الشهري
+loan-field-months = المدة
+loan-field-rate = سعر فائدة ثابت
+loan-field-fees = رسوم الملف
+loan-field-insurance = التأمين شهريًا
+loan-unit-months = أشهر
+loan-unit-percent = %
+loan-invalid-field = هذه القيمة ليست رقمًا: صحّحها لإعادة الحساب.
+loan-report-button = تقرير PDF
+loan-monthly-table = جدول شهرًا بشهر
+loan-months-count = { $count ->
+        [zero] { $count } شهر
+        [one] شهر واحد
+        [two] شهران
+        [few] { $count } أشهر
+        [many] { $count } شهرًا
+       *[other] { $count } شهر
+    }
+loan-percent = { $value }٪
+loan-notice-payment-too-low = هذا القسط لا يغطي الفوائد: لن يُسدَّد القرض أبدًا. تبقى المدة 600 شهر.
+loan-notice-too-long = هذا القسط يتطلب أكثر من 600 شهر: تبقى المدة 600 شهر.
+loan-figure-payment = القسط الشهري
+loan-figure-payment-insured = القسط مع التأمين
+loan-figure-taeg = معدل التكلفة السنوي
+loan-figure-interest = تكلفة الفوائد
+loan-figure-insurance = تكلفة التأمين
+loan-figure-cost = التكلفة الإجمالية للقرض
+loan-figure-total-due = المبلغ الإجمالي المستحق
+loan-figure-all-in = إجمالي المسدَّد مع التأمين
+loan-part-capital = مبلغ القرض
+loan-part-interest = الفوائد
+loan-part-fees = رسوم الملف
+loan-part-insurance = التأمين
+loan-donut-cost-caption = إجمالًا
+loan-chart-cost = كم يكلّف هذا القرض
+loan-chart-capital = الرصيد المتبقي من الأصل
+loan-schedule-title = جدول السداد
+loan-schedule-yearly = جدول السداد، سنة بسنة
+loan-column-number = رقم
+loan-column-year = السنة
+loan-column-date = الاستحقاق
+loan-column-payment = القسط
+loan-column-payments = الأقساط
+loan-column-interest = الفوائد
+loan-column-capital = الأصل
+loan-column-insurance = التأمين
+loan-column-remaining = الرصيد المتبقي من الأصل
+loan-history-label = الفترة المدروسة
+loan-period-last-12 = آخر 12 شهرًا
+loan-accounts-title = الحسابات المدروسة
+loan-period-title = الفترة
+loan-column-account = الحساب
+loan-column-bank = البنك
+loan-column-balance = الرصيد الفعلي
+loan-unavailable-no-account = حدّد حسابًا واحدًا على الأقل لدراسة سجلك.
+loan-unavailable-no-month = لا تتضمن هذه الفترة أي شهر كامل بعد: اختر فترة أخرى.
+loan-verdict-title = باختصار
+loan-verdict-green = ممكن
+loan-verdict-orange = على الحافة
+loan-verdict-red = محفوف بالمخاطر
+loan-verdict-no-income = لا دخل في هذه الفترة: لا يمكن حساب نسبة المديونية.
+loan-check-debt-green = نسبة المديونية { $ratio }: أقل من عتبة هذه الطريقة ({ $green }).
+loan-check-debt-orange = نسبة المديونية { $ratio }: بين { $green } و{ $red }، على الحد.
+loan-check-debt-red = نسبة المديونية { $ratio }: أعلى من { $red }.
+loan-check-effort = يستهلك القسط البالغ { $payment } نسبة { $share } مما تدّخره { $kind ->
+        [good] في شهر جيد
+        [hard] في شهر صعب
+       *[usual] في شهر عادي
+    } ({ $margin }).
+loan-check-effort-none = { $kind ->
+        [good] الشهر الجيد
+        [hard] الشهر الصعب
+       *[usual] الشهر العادي
+    } لا يترك لك شيئًا جانبًا: سيُقتطع القسط البالغ { $payment } من احتياطيك.
+loan-check-reserve-green = يبقى رصيدك موجبًا حتى نهاية القرض.
+loan-check-reserve-red = سينزل رصيدك تحت الصفر في { $month } بسبب هذا القرض.
+loan-check-reserve-sooner = سينزل رصيدك تحت الصفر في { $month }، أي قبل { $count ->
+        [one] شهر واحد
+        [two] شهرين
+        [few] { $count } أشهر
+       *[other] { $count } شهرًا
+    } مما لو لم يكن هذا القرض.
+loan-check-reserve-anyway = سينزل رصيدك تحت الصفر نحو { $month } حتى من دون هذا القرض، الذي لا يغيّر شيئًا يُذكر.
+loan-check-reserve-floor-green = يبقى رصيدك فوق احتياطي الأمان ({ $floor }) حتى نهاية القرض.
+loan-check-reserve-floor-red = سينزل رصيدك تحت احتياطي الأمان ({ $floor }) في { $month } بسبب هذا القرض.
+loan-check-reserve-floor-sooner = سينزل رصيدك تحت احتياطي الأمان ({ $floor }) في { $month }، أي قبل { $count ->
+        [one] شهر واحد
+        [two] شهرين
+        [few] { $count } أشهر
+       *[other] { $count } شهرًا
+    } مما لو لم يكن هذا القرض.
+loan-check-reserve-floor-anyway = سينزل رصيدك تحت احتياطي الأمان ({ $floor }) نحو { $month } حتى من دون هذا القرض، الذي لا يغيّر شيئًا يُذكر.
+loan-warning-deficit = تنبيه: في هذه الفترة، تتجاوز نفقاتك دخلك بالفعل بمقدار { $amount } شهريًا في المتوسط، قبل أي قرض.
+loan-figure-reference = الادخار { $kind ->
+        [good] في شهر جيد
+        [hard] في شهر صعب
+       *[usual] في شهر عادي
+    }
+loan-figure-tipped = الأشهر التي سيوقعها القرض في العجز
+loan-gauge-caption = نسبة المديونية
+loan-figure-income = متوسط الدخل الشهري
+loan-figure-spending = متوسط الإنفاق الشهري
+loan-figure-saving = متوسط الادخار الشهري
+loan-figure-running = القروض الجارية شهريًا
+loan-figure-new = القسط الجديد مع التأمين
+loan-figure-rest = المتبقي للمعيشة شهريًا
+loan-figure-debt = نسبة المديونية
+loan-red-months-value = { $count } من { $total }
+loan-figure-balance-now = الرصيد الفعلي اليوم
+loan-figure-balance-end = الرصيد المتوقع في نهاية القرض
+loan-chart-income = أين يذهب متوسط دخلك
+loan-donut-income-caption = متوسط الدخل
+loan-part-spending = النفقات الجارية
+loan-part-running = القروض الجارية
+loan-part-new = القرض الجديد
+loan-part-rest = المتبقي
+loan-part-missing = العجز
+loan-chart-history = سجلك مع هذا القرض
+loan-chart-history-hint = ما كان سيتبقى كل شهر بعد دفع القسط. بالأحمر الفاقع: الأشهر التي سيوقعها القرض في العجز؛ بالأحمر الباهت: تلك التي كانت في العجز من دونه.
+loan-chart-projection = رصيدك المتوقع
+loan-mark-loan-end = النهاية: { $label }
+loan-mark-negative = في العجز
+loan-mark-floor = تحت الاحتياطي
+loan-mark-floor-line = احتياطي الأمان
+loan-running-title = القروض الجارية المحتسبة
+loan-running-column-label = عملية دورية
+loan-running-column-monthly = شهريًا
+loan-running-column-end = آخر قسط
+loan-no-running = لم يُتعرَّف على أي قرض جارٍ ضمن عملياتك الدورية.
+loan-period-caption = من { $from } إلى { $to } ({ $count ->
+        [one] شهر واحد
+        [two] شهران
+        [few] { $count } أشهر
+        [many] { $count } شهرًا
+       *[other] { $count } شهر
+    })
+loan-transfers = { $count ->
+        [0] لم يُتعرَّف على أي تحويل بين حساباتك المحددة.
+        [one] تُعرِّف على تحويل واحد بين حساباتك المحددة واستُبعد.
+        [two] تُعرِّف على تحويلين بين حساباتك المحددة واستُبعدا.
+       *[other] تُعرِّف على { $count } تحويلات بين حساباتك المحددة واستُبعدت.
+    }
+loan-method = متوسطات على الأشهر الكاملة من الفترة، عمليات مطابَقة وملتزَم بها، دون التحويلات بين حساباتك المحددة.
+loan-report-title = محاكاة قرض
+loan-report-made-on = محاكاة بتاريخ { $date }
+loan-disclaimer = محاكاة إرشادية بلا قيمة تعاقدية. العرض الصادر عن البنك وحده هو الملزم.
+loan-tab-rules = إعدادات الحكم
+loan-method-optimistic = متفائلة
+loan-method-neutral = محايدة
+loan-method-severe = صارمة
+loan-method-line = طريقة الحكم: { $method }
+loan-method-verdict = { $method }: { $verdict }
+loan-rules-intro = يجيب الحكم عن ثلاثة أسئلة، ولكل طريقة متطلباتها الخاصة. اختر الطريقة التي تشبهك: يتبعها الحكم في تبويب «هل أستطيع سداده؟». يفترض السطر الأخير أن نفقاتك ترتفع كل سنة بالنسبة المذكورة؛ أما القسط فلا يتغيّر.
+loan-rule-row-debt = المديونية المقبولة
+loan-rule-row-reference = الادخار المرجعي
+loan-rule-row-share = الجزء من هذا الادخار الذي يمكن للقسط أن يأخذه
+loan-rule-row-floor = الحد الذي يجب ألا ينزل الرصيد تحته
+loan-rule-row-sooner = إذا نزل الرصيد تحته حتى من دون القرض
+loan-rule-row-growth = ارتفاع نفقاتك سنويًا
+loan-rule-limits = أخضر حتى { $green }، برتقالي حتى { $red }
+loan-rule-reference = { $kind ->
+        [good] شهر جيد
+        [hard] شهر صعب
+       *[usual] شهر عادي
+    }: { $amount }
+loan-rule-floor-zero = صفر
+loan-rule-floor-cushion = نفقات شهر واحد: { $amount }
+loan-rule-sooner = برتقالي إذا قدّمه القرض بمقدار { $orange }، أحمر بمقدار { $red }
+loan-unit-percent-year = ٪ سنويًا
+loan-method-optimistic-explain = تفترض الطريقة المتفائلة شهرًا جيدًا، وتقبل مديونية حتى 40٪ ولا تحتفظ بأي احتياطي: تبيّن ما هو ممكن إذا سارت الأمور على ما يرام.
+loan-method-neutral-explain = تفترض الطريقة المحايدة شهرًا عاديًا وتتبع قاعدة البنوك، مديونية بين 33 و35٪: إنها الحكم المرجعي.
+loan-method-severe-explain = تفترض الطريقة الصارمة شهرًا صعبًا وتحتفظ بنفقات شهر احتياطيًا للطوارئ: تبيّن ما يصمد حتى لو ساءت الأمور.
+
+# --- F42 — Consommation d'un appareil électrique (Fabrice, 09/10/2026) -------
+# Ce que coûte un appareil, allumé et en veille, en heures pleines et en
+# heures creuses. Le tarif est une préférence de la base (« tarif.electricite »).
+menu-tools-appliance-cost = استهلاك جهاز كهربائي
+window-appliance-title = استهلاك جهاز كهربائي
+appliance-device-title = الجهاز
+appliance-on-title = قيد التشغيل
+appliance-standby-title = في وضع الاستعداد
+appliance-field-on-watts = القدرة أثناء التشغيل
+appliance-field-on-hours = مدة التشغيل في اليوم
+appliance-field-days = أيام الاستخدام في الأسبوع
+appliance-field-share = نسبة التشغيل في ساعات خارج الذروة
+appliance-field-standby-watts = القدرة في وضع الاستعداد
+appliance-field-standby-hours = مدة الاستعداد في كل يوم استخدام
+appliance-unit-watts = W
+appliance-unit-hours = h
+appliance-unit-days = من 7
+appliance-unit-percent = %
+appliance-unit-price = { $sign }/kWh
+appliance-standby-hint = إذا تُرك الحقل فارغًا، يستمر وضع الاستعداد بقية اليوم. في أيام عدم الاستخدام يبقى الجهاز موصولًا بالكهرباء: يُحتسب كل هذا الوقت استعدادًا. وإذا فُصل عن المقبس، فقدرة الاستعداد 0 W.
+appliance-contract-title = عقدك
+appliance-field-option = خيار التعرفة
+appliance-option-base = أساسي (سعر واحد)
+appliance-option-off-peak = ساعات الذروة / ساعات خارج الذروة
+appliance-field-base = سعر kWh
+appliance-field-peak = سعر kWh في ساعات الذروة
+appliance-field-off-peak = سعر kWh في ساعات خارج الذروة
+appliance-field-off-peak-hours = ساعات خارج الذروة في اليوم
+appliance-contract-hint = هذه الأسعار خاصة بهذا الحساب فقط. تُضبط التعرفة المحفوظة من الإعدادات › التفضيلات › الأدوات.
+appliance-contract-reset = استخدام التعرفة المحفوظة مجددًا
+appliance-period-day = في اليوم
+appliance-period-month = في الشهر
+appliance-period-year = في السنة
+appliance-energy = { $value } kWh
+appliance-less-than = أقل من { $amount }
+appliance-detail-title = التفاصيل على مدى سنة
+appliance-column-part = البند
+appliance-column-energy = الطاقة
+appliance-column-cost = التكلفة
+appliance-column-share = النسبة
+appliance-line-on = قيد التشغيل
+appliance-line-standby = في وضع الاستعداد
+appliance-line-on-peak = قيد التشغيل، ساعات الذروة
+appliance-line-on-off-peak = قيد التشغيل، ساعات خارج الذروة
+appliance-line-standby-peak = في وضع الاستعداد، ساعات الذروة
+appliance-line-standby-off-peak = في وضع الاستعداد، ساعات خارج الذروة
+appliance-line-total = الإجمالي
+appliance-chart-title = أين يذهب المال
+appliance-chart-caption = في السنة
+appliance-standby-sentence = وضع الاستعداد وحده يكلّف { $amount } في السنة: { $share } من تكلفة الجهاز.
+appliance-note-plate = القدرة المدوّنة على الجهاز أو في دليله هي حدّ أقصى: أثناء التشغيل تستهلك معظم الأجهزة أقل من ذلك. للحصول على رقم حقيقي، قِسها بمقبس لقياس الاستهلاك وأدخل ما يعرضه.
+appliance-note-subscription = لا يُحتسب الاشتراك الثابت: تدفعه سواء كان الجهاز موصولًا أم لا.
+appliance-invalid-watts = يُرجى إدخال قدرة من 0 إلى 100,000 W.
+appliance-invalid-hours = يُرجى إدخال مدة من 0 إلى 24 ساعة في اليوم.
+appliance-invalid-days = يُرجى إدخال عدد صحيح من الأيام، من 0 إلى 7.
+appliance-invalid-share = يُرجى إدخال نسبة من 0 إلى 100%.
+appliance-invalid-day-overflow = مجموع التشغيل والاستعداد يتجاوز 24 ساعة في اليوم.
+appliance-invalid-price = يُرجى إدخال سعر kWh من 0 إلى 100.
+appliance-invalid-off-peak-hours = يُرجى إدخال عدد صحيح من ساعات خارج الذروة، من 0 إلى 24.
+preferences-branch-tools = أدوات
+preferences-leaf-electricity = تعرفة الكهرباء
+preferences-electricity-blue = العودة إلى Tarif Bleu من EDF
+preferences-electricity-hint = تعرفة عقدك، التي تستخدمها أداة «استهلاك جهاز كهربائي». افتراضيًا: Tarif Bleu من EDF (فرنسا) بتاريخ 1 أغسطس 2026، الأسعار شاملة الضرائب، عداد من 3 إلى 6 kVA. تتغير هذه الأسعار غالبًا في فبراير وأغسطس: انسخ الأسعار الواردة في فاتورتك.
+
+# --- F43 — Mon matelas de sécurité (Fabrice, 09/10/2026) -------------------------
+# Combien de mois l'épargne tiendrait si les revenus s'arrêtaient. Les
+# phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-safety-cushion = احتياطي الأمان الخاص بي
+window-cushion-title = احتياطي الأمان الخاص بي
+cushion-question = لو توقف دخلك غدًا، كم شهرًا ستصمد بمدخراتك؟
+cushion-accounts-title = حساباتك
+cushion-column-account = الحساب
+cushion-column-balance = الرصيد الفعلي
+cushion-column-savings = الادخار
+cushion-column-spending = النفقات
+cushion-accounts-hint = «الادخار»: المال الذي تعتمد عليه عند الأزمات. «النفقات»: الحسابات التي تُدفع منها نفقاتك اليومية.
+cushion-history-label = الفترة المدروسة
+cushion-backup-label = الدخل البديل شهريًا
+cushion-backup-hint = ما سيستمر في الوصول إليك: إعانة البطالة، راتب الزوج أو الزوجة… فارغ: لا دخل.
+cushion-categories-title = النفقات المحتسبة
+cushion-categories-hint = ألغِ تحديد ما ستستغني عنه عند الأزمة.
+cushion-categories-empty = لا نفقات في هذه الفترة.
+cushion-verdict-title = احتياطيك
+cushion-targets-title = عتبات الحيطة
+cushion-projection-title = مدخراتك عند الأزمة
+cushion-projection-hint = ما سيتبقى كل شهر لو توقف دخلك اليوم.
+cushion-note = تقدير مستخلص من سجلك: قد تختلف نفقات شهر صعب عن المتوسط.
+cushion-invalid-backup = هذا المبلغ غير مقروء: صحّحه لإعادة الحساب.
+cushion-no-spending-account = حدّد حسابًا واحدًا على الأقل في «النفقات».
+cushion-no-month = لا تتضمن هذه الفترة أي شهر كامل بعد.
+cushion-months = { $value } شهر
+cushion-per-month = { $amount } شهريًا
+cushion-figure-holds = بلا حد
+cushion-gauge-caption = من النفقات المغطاة
+cushion-verdict-short = أقل من ثلاثة أشهر: أي أزمة ستضعك سريعًا في ضائقة.
+cushion-verdict-fair = بين ثلاثة وستة أشهر: احتياطي مقبول، يُستحسن تعزيزه إن أمكنك.
+cushion-verdict-solid = ستة أشهر أو أكثر: احتياطيك متين.
+cushion-verdict-holds = دخلك البديل يغطي نفقاتك: لن تتآكل مدخراتك.
+cushion-verdict-nothing = لا نفقات محتسبة خلال الفترة: لا يوجد ما يجب تغطيته.
+cushion-tile-savings = المدخرات المتاحة
+cushion-tile-spending = النفقات المحتسبة
+cushion-tile-backup = الدخل البديل
+cushion-tile-burn = ستتآكل المدخرات بمقدار
+cushion-tile-rhythm = وتيرة الادخار
+cushion-burn-none = لا شيء
+cushion-target-title = نفقات { $months } أشهر: { $amount }
+cushion-target-reached = تم بلوغه.
+cushion-target-date = ينقصك { $missing }. بوتيرة ادخارك الحالية، ستبلغه نحو: { $month }.
+cushion-target-never = ينقصك { $missing }. لم تنمُ مدخراتك خلال الفترة: بهذه الوتيرة، لن تبلغ هذه العتبة.
+cushion-mark-empty = نفاد المدخرات: { $month }
+cushion-period = متوسط { $count ->
+        [zero] { $count } شهر كامل
+        [one] شهر كامل واحد
+        [two] شهرين كاملين
+        [few] { $count } أشهر كاملة
+        [many] { $count } شهرًا كاملًا
+       *[other] { $count } شهر كامل
+    }، من { $from } إلى { $to }. { $transfers ->
+        [0] لا توجد تحويلات بين حساباتك.
+        [one] تحويل واحد بين حساباتك، تم استبعاده.
+        [two] تحويلان بين حساباتك، تم استبعادهما.
+        [few] { $transfers } تحويلات بين حساباتك، تم استبعادها.
+        [many] { $transfers } تحويلًا بين حساباتك، تم استبعادها.
+       *[other] { $transfers } تحويل بين حساباتك، تم استبعادها.
+    }
+
+# --- F44 — Objectif Épargne (Fabrice, 10/10/2026) --------------------------------
+# Quand aurai-je ce montant, combien aurai-je à cette date, combien épargner.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-savings-goal = هدف الادخار
+window-goal-title = هدف الادخار
+goal-accounts-title = الحسابات المتابَعة
+goal-column-account = الحساب
+goal-column-balance = الرصيد الفعلي
+goal-accounts-hint = التحويل بين حسابين متابَعين يُلغي بعضه بعضًا؛ أما التحويل إلى حساب غير متابَع فيُحتسب خروجًا للمال.
+goal-period-label = الفترة المرجعية
+goal-period-range = نطاق سنوات…
+goal-range-from = من
+goal-range-to = إلى
+goal-question-title = سؤالك
+goal-question-when = متى سأملك هذا المبلغ؟
+goal-question-amount = كم سأملك في هذا التاريخ؟
+goal-question-effort = كم يجب أن أدّخر لأملك هذا المبلغ في هذا التاريخ؟
+goal-field-target = المبلغ المستهدف
+goal-field-date = التاريخ المستهدف
+goal-field-rate = معدل الفائدة السنوي على المدخرات
+goal-field-extra = ولو ادّخرت مبلغًا إضافيًا، شهريًا
+goal-options-hint = فارغة: لا فوائد، ولا شيء إضافي.
+goal-answer-title = الإجابة
+goal-chart-title = رصيدك، أمس وغدًا
+goal-chart-hint = الخط المتصل: الرصيد الفعلي للأشهر الاثني عشر الأخيرة؛ الخط المنقّط: الإسقاط؛ المنطقة الفاتحة: النطاق حسب الأشهر.
+goal-disclaimer = إسقاط مستخلص من سجلك، لا وعد: أي طارئ قد يغيّر كل شيء.
+goal-no-account = حدّد حسابًا واحدًا على الأقل لمتابعته.
+goal-no-month = لا تتضمن هذه الفترة أي شهر كامل بعد.
+goal-invalid-target = أدخل مبلغًا تريد بلوغه، من فضلك.
+goal-invalid-date = أدخل تاريخًا مستقبليًا خلال الخمسين سنة القادمة، من فضلك.
+goal-invalid-rate = أدخل معدلًا من 0 إلى 100 %، من فضلك.
+goal-invalid-extra = هذا المبلغ غير مقروء: صحّحه لإعادة الحساب.
+goal-per-month = { $amount } شهريًا
+goal-tile-balance = الرصيد اليوم
+goal-tile-rhythm = متوسط وتيرة الادخار
+goal-tile-target = الهدف
+goal-tile-reached = يتحقق نحو
+goal-tile-date = التاريخ المستهدف
+goal-tile-projected = الرصيد المتوقع
+goal-tile-saved = المُدّخر حتى ذلك الحين
+goal-tile-interest = منها فوائد
+goal-tile-needed = المطلوب ادخاره
+goal-when-already = لديك بالفعل { $amount }: مجموع حساباتك المتابَعة { $balance }.
+goal-when-reached = ستملك { $amount } خلال { $months ->
+        [zero] { $months } شهر
+        [one] شهر واحد
+        [two] شهرين
+        [few] { $months } أشهر
+        [many] { $months } شهرًا
+       *[other] { $months } شهر
+    }، نحو: { $month }.
+goal-when-range = حسب الأشهر، بين { $early } و{ $late }.
+goal-when-range-open = في أقرب تقدير نحو: { $early }؛ ومع أشهر ضعيفة، لن يتحقق الهدف.
+goal-when-never = بهذه الوتيرة، لن تبلغ { $amount }.
+goal-zero = سينخفض رصيدك إلى الصفر نحو: { $month }.
+goal-amount = في { $month }، سيكون لديك نحو { $amount }.
+goal-amount-range = حسب الأشهر، بين { $low } و{ $high }.
+goal-effort-more = لتملك { $amount } في { $month }، عليك أن تدّخر في المتوسط { $monthly } شهريًا، أي { $gap } أكثر مما تدّخره اليوم.
+goal-effort-less = لتملك { $amount } في { $month }، يكفي ادخار { $monthly } شهريًا، أي { $gap } أقل مما تدّخره اليوم: أنت متقدّم على هدفك.
+goal-effort-range = حسب الأشهر، سيتراوح الفارق مع وتيرتك بين { $low } و{ $high } شهريًا.
+goal-chart-target = الهدف: { $amount }
+goal-chart-today = اليوم
+goal-note-seasons = يتبع الإسقاط المواسم: كل شهر قادم يأخذ متوسط الأشهر نفسها في الفترة.
+goal-note-range = يأتي النطاق من الأشهر الضعيفة والأشهر القوية في الفترة: الربع الأدنى والربع الأعلى.
+goal-note-loan = ينتهي القرض «{ $label }» في { $month }: { $amount } إضافية شهريًا بعد ذلك.
+goal-note-interest = تُحتسب الفوائد كل شهر بمعدل { $rate } % سنويًا: تقريب لقاعدة احتساب الفوائد كل نصف شهر في دفاتر التوفير.
+goal-period = وتيرة محسوبة على مدى { $count ->
+        [zero] { $count } شهر كامل
+        [one] شهر كامل واحد
+        [two] شهرين كاملين
+        [few] { $count } أشهر كاملة
+        [many] { $count } شهرًا كاملًا
+       *[other] { $count } شهر كامل
+    }، من { $from } إلى { $to }. { $transfers ->
+        [0] لا توجد تحويلات بين حساباتك المتابَعة.
+        [one] تحويل واحد بين حساباتك المتابَعة، تم تحييده.
+        [two] تحويلان بين حساباتك المتابَعة، تم تحييدهما.
+        [few] { $transfers } تحويلات بين حساباتك المتابَعة، تم تحييدها.
+        [many] { $transfers } تحويلًا بين حساباتك المتابَعة، تم تحييدها.
+       *[other] { $transfers } تحويل بين حساباتك المتابَعة، تم تحييدها.
+    }
+
+# --- F45 — Et si je réduisais… ? (Fabrice, 10/10/2026) ----------------------------
+# Réduire des postes de dépense, et voir ce que ça change dans le temps.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-spending-cut = ماذا لو خفّضت…؟
+window-cut-title = ماذا لو خفّضت…؟
+cut-axis-label = التصنيف حسب
+cut-axis-category = الفئات
+cut-axis-payee = الأطراف المقابلة
+cut-axis-budget-line = بنود الميزانية
+cut-table-title = نفقاتك، بندًا بندًا
+cut-table-hint = أدخل تخفيضًا بالنسبة المئوية (%) أو باليورو ({ $sign }) شهريًا على البنود التي تودّ تقليصها. لا يمكن أن يتجاوز التخفيض قيمة النفقة نفسها.
+cut-column-monthly = شهريًا
+cut-column-cut = التخفيض
+cut-column-after = بعد التخفيض
+cut-column-yearly = التوفير سنويًا
+cut-total = المجموع
+cut-horizon-label = الأفق الزمني
+cut-settings-title = الإعدادات
+cut-options-hint = المعدل والمبلغ المستهدف اختياريان.
+cut-report-button = تقرير PDF
+cut-chart-title = رصيدك، بدون التخفيضات ومعها
+cut-chart-hint = الخط المتصل: الرصيد الفعلي للأشهر الاثني عشر الأخيرة؛ الخط الرمادي المنقّط: الإسقاط بدون تخفيض؛ الأزرق: مع التخفيضات؛ الأخضر: المال المُوفَّر.
+cut-donut-title = نفقاتك الشهرية بعد التخفيض
+cut-donut-caption = شهريًا بعد التخفيض
+cut-donut-others = بنود أخرى
+cut-donut-saved = المُوفَّر
+cut-legend-with = مع التخفيضات
+cut-legend-without = بدون تخفيض
+cut-years = { $years ->
+        [zero] { $years } سنة
+        [one] سنة واحدة
+        [two] سنتان
+        [few] { $years } سنوات
+        [many] { $years } سنة
+       *[other] { $years } سنة
+    }
+cut-headline-none = أدخل تخفيضًا في الجدول لترى أثره.
+cut-headline = بتخفيض { $count ->
+        [zero] { $count } بند
+        [one] هذا البند
+        [two] هذين البندين
+        [few] هذه البنود الـ{ $count }
+        [many] هذه البنود الـ{ $count }
+       *[other] هذه البنود الـ{ $count }
+    }، ستدّخر { $monthly } إضافية شهريًا، أي { $yearly } سنويًا.
+cut-tile-monthly = التوفير شهريًا
+cut-tile-yearly = التوفير سنويًا
+cut-tile-horizon = التوفير على مدى { $years ->
+        [zero] { $years } سنة
+        [one] سنة واحدة
+        [two] سنتين
+        [few] { $years } سنوات
+        [many] { $years } سنة
+       *[other] { $years } سنة
+    }
+cut-tile-spending = النفقات شهريًا
+cut-target-already = لديك بالفعل { $amount }.
+cut-target-sooner = ستبلغ { $amount } نحو: { $with } بدلًا من: { $without }، { $months ->
+        [0] أي ليس أبكر
+        [one] أي أبكر بشهر واحد
+        [two] أي أبكر بشهرين
+        [few] أي أبكر بـ{ $months } أشهر
+        [many] أي أبكر بـ{ $months } شهرًا
+       *[other] أي أبكر بـ{ $months } شهر
+    }.
+cut-target-only-with = بهذه التخفيضات، ستبلغ { $amount } نحو: { $with }؛ ومن دونها، بوتيرتك الحالية، لن تبلغه أبدًا.
+cut-target-never = حتى بهذه التخفيضات، لن تبلغ { $amount } بوتيرتك الحالية.
+cut-note-seasons = يتبع كل تخفيض مواسم بنده: البند الذي تتركّز نفقاته في الصيف يتركّز توفيره في الصيف.
+cut-note-capped = تجاوز أحد التخفيضات المُدخلة قيمة النفقة: فخُفِّض إلى قيمة النفقة نفسها.
+cut-invalid-cut = هذا التخفيض غير مقروء: أدخل نسبة من 0 إلى 100، أو مبلغًا شهريًا.
+cut-report-settings = الإعدادات
+cut-report-result = النتيجة
+cut-report-accounts = الحسابات المتابَعة
+
+# --- F46 — Préparer mes vacances (Fabrice, 10/10/2026) -----------------------------
+# Ce que coûtera le prochain voyage, séjour ou croisière.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-holiday = تحضير عطلتي
+window-holiday-title = تحضير عطلتي
+holiday-trip-title = الرحلة
+holiday-field-trip = نوع الرحلة
+holiday-trip-stay = إقامة
+holiday-trip-cruise = رحلة بحرية
+holiday-field-adults = البالغون
+holiday-field-children = الأطفال
+holiday-field-nights = مدة الإقامة بالليالي
+holiday-field-days = الأيام
+holiday-field-months = الأشهر المتبقية قبل المغادرة
+holiday-field-stops = عدد محطات التوقف
+holiday-saved-title = المُدّخر مسبقًا
+holiday-saved-hint = حدّد الحسابات التي وُضع فيها مال العطلة جانبًا بالفعل: يُحتسب رصيدها الفعلي مُدّخرًا مسبقًا.
+holiday-budget-title = الميزانية
+holiday-budget-hint = لكل بند: مبلغ، ولمن يسري، ولأي مدة. البند الفارغ لا يُحتسب.
+holiday-optional-title = بنود اختيارية
+holiday-result-title = النتيجة
+holiday-donut-title = أين يذهب مال الرحلة
+holiday-donut-caption = للرحلة
+holiday-child-label = سعر الطفل
+holiday-count-label = المقصورات
+holiday-open = فتح مشروع…
+holiday-save = حفظ المشروع…
+holiday-pdf = تقرير PDF
+holiday-excel = تصدير إلى Excel
+holiday-file-filter = مشروع عطلة
+holiday-replace-question = سيؤدي فتح هذا المشروع إلى استبدال ما أُدخل في النافذة. هل تريد المتابعة؟
+holiday-file-saved = تم حفظ المشروع: { $file }
+holiday-file-opened = تم فتح المشروع: { $file }
+holiday-file-not-project = هذا الملف ليس مشروع عطلة من Radinus.
+holiday-file-too-recent = هذا المشروع صادر عن إصدار أحدث من Radinus: حدّث Radinus لفتحه.
+holiday-file-failed = تعذّرت قراءة الملف أو كتابته: { $reason }
+holiday-line-transport = النقل ذهابًا وإيابًا
+holiday-line-lodging = السكن
+holiday-line-meals = الوجبات والنفقات اليومية
+holiday-line-visits = الزيارات والترفيه
+holiday-line-port = الوصول إلى الميناء
+holiday-line-cabins = المقصورات
+holiday-line-service = رسوم الخدمة (البقشيش)
+holiday-line-drinks = باقة المشروبات
+holiday-line-excursions = الجولات في محطات التوقف
+holiday-line-port-taxes = رسوم الموانئ
+holiday-line-wifi = الواي فاي على متن السفينة
+holiday-line-onboard = النفقات على متن السفينة وفي محطات التوقف
+holiday-line-other = نفقات أخرى وطوارئ
+holiday-line-insurance = تأمين الإلغاء
+holiday-line-stay-tax = ضريبة الإقامة السياحية
+holiday-line-car = سيارة في الوجهة، والوقود ورسوم الطرق
+holiday-line-parking = موقف السيارات في المطار أو المحطة
+holiday-line-bank = الرسوم المصرفية في الخارج
+holiday-line-formalities = الإجراءات الرسمية (جواز السفر، التأشيرة، اللقاحات)
+holiday-line-pets = رعاية الحيوانات الأليفة
+holiday-span-trip = للإقامة كلها
+holiday-span-night = لكل ليلة
+holiday-span-day = لكل يوم
+holiday-span-stop = لكل محطة توقف
+holiday-who-all = للجميع
+holiday-who-person = لكل شخص
+holiday-who-adults = لكل بالغ
+holiday-cabins-count = { $count ->
+        [zero] { $count } مقصورة
+        [one] مقصورة واحدة
+        [two] مقصورتان
+        [few] { $count } مقصورات
+        [many] { $count } مقصورةً
+       *[other] { $count } مقصورة
+    }
+holiday-days = { $days ->
+        [zero] { $days } يوم
+        [one] يوم واحد
+        [two] يومان
+        [few] { $days } أيام
+        [many] { $days } يومًا
+       *[other] { $days } يوم
+    }
+holiday-invalid-count = أدخل عددًا صحيحًا، من فضلك.
+holiday-invalid-amount = هذا المبلغ غير مقروء: أدخل عددًا موجبًا، أو نسبة من 0 إلى 100.
+holiday-headline-empty = أدخل مبالغ الميزانية لترى كم ستكلّف الرحلة.
+holiday-headline-stay = ستكلّف هذه الإقامة { $total } { $people ->
+        [zero] لـ{ $people } شخص
+        [one] لشخص واحد
+        [two] لشخصين
+        [few] لـ{ $people } أشخاص
+        [many] لـ{ $people } شخصًا
+       *[other] لـ{ $people } شخص
+    }، { $nights ->
+        [0] دون أي ليلة
+        [one] لليلة واحدة
+        [two] لليلتين
+        [few] لـ{ $nights } ليالٍ
+        [many] لـ{ $nights } ليلةً
+       *[other] لـ{ $nights } ليلة
+    }.
+holiday-headline-cruise = ستكلّف هذه الرحلة البحرية { $total } { $people ->
+        [zero] لـ{ $people } شخص
+        [one] لشخص واحد
+        [two] لشخصين
+        [few] لـ{ $people } أشخاص
+        [many] لـ{ $people } شخصًا
+       *[other] لـ{ $people } شخص
+    }، { $nights ->
+        [0] دون أي ليلة
+        [one] لليلة واحدة
+        [two] لليلتين
+        [few] لـ{ $nights } ليالٍ
+        [many] لـ{ $nights } ليلةً
+       *[other] لـ{ $nights } ليلة
+    }.
+holiday-tile-total = التكلفة الإجمالية
+holiday-tile-person = للشخص الواحد
+holiday-tile-person-day = للشخص الواحد يوميًا
+holiday-tile-saved = المُدّخر مسبقًا
+holiday-tile-remaining = المتبقي للتمويل
+holiday-tile-monthly = الادخار اللازم
+holiday-remaining-none = لا شيء: المبلغ مغطّى
+holiday-monthly-none = لا شيء لادّخاره
+holiday-monthly-now = المغادرة هذا الشهر
+holiday-note-days = عدد الأيام هو عدد الليالي زائد واحد: سبع ليالٍ تعني ثمانية أيام.
+holiday-note-child = للشخص الواحد، يدفع الطفل سعر الطفل إن كان محدّدًا؛ وإن تُرك فارغًا، يدفع مثل البالغ.
+holiday-note-percent = تُطبَّق نسبة التأمين على البنود الرئيسية للرحلة؛ ونسبة الرسوم المصرفية على النفقات في الوجهة.
+holiday-sheet-budget = الميزانية
+holiday-sheet-result = النتيجة
+holiday-column-line = البند
+holiday-column-amount = المبلغ
+holiday-column-child = سعر الطفل
+holiday-column-who = لمن
+holiday-column-span = لأي مدة
+holiday-column-cost = التكلفة
+holiday-disclaimer = تقدير مستخلص من مبالغك أنت: قد تختلف الأسعار الفعلية.
+
+# --- F45 (suite) — le projet de réduction en fichier (Fabrice, 10/10/2026) --------
+# « Rajoute enregistrement et chargement JSON et aussi export Excel. »
+cut-file-filter = مشروع تخفيض
+cut-file-not-project = هذا الملف ليس مشروع تخفيض من Radinus.
+cut-file-too-recent = هذا المشروع صادر عن إصدار أحدث من Radinus: حدّث Radinus لفتحه.
+cut-sheet-items = البنود
+
+# --- F47 — Carnet de ma voiture (Fabrice, 10/10/2026) --------------------------------
+# L'historique de la voiture : énergie, entretien, pièces, pneus, pannes, assurance, contrôle.
+# Les phrases sont écrites par le noyau ; la fenêtre n'en compose aucune.
+menu-tools-car = دفتر سيارتي
+window-car-title = دفتر سيارتي
+car-unnamed = سيارتي
+car-sheet-title = السيارة
+car-field-plate = رقم التسجيل
+car-field-make = العلامة التجارية
+car-field-model = الطراز
+car-field-engine = نوع المحرك
+car-field-first-hand = المالك الأول
+car-field-registered = تاريخ أول تسجيل
+car-field-acquired = تاريخ الاقتناء
+car-field-acquired-km = عدد الكيلومترات عند الاقتناء
+car-field-service = الصيانة الدورية كل
+car-field-service-or = أو كل
+car-unit-months-short = أشهر
+car-unit-km = km
+car-tariff-title = تعرفة الشحن في المنزل
+car-tariff-hint = تُحفَظ هذه التعرفة في دفتر السيارة: ولا تغيّر التعرفة المحددة في التفضيلات.
+car-tariff-reset = استعادة التعرفة من التفضيلات
+car-engine-petrol = بنزين
+car-engine-diesel = ديزل
+car-engine-lpg = غاز البترول المسال (LPG)
+car-engine-e85 = E85 (إيثانول حيوي)
+car-engine-hybrid = هجين
+car-engine-plug-in = هجين قابل للشحن
+car-engine-electric = كهربائي
+car-engine-hydrogen = هيدروجين
+car-energy-petrol = بنزين
+car-energy-diesel = ديزل
+car-energy-lpg = غاز البترول المسال
+car-energy-e85 = E85
+car-energy-electricity = كهرباء
+car-energy-hydrogen = هيدروجين
+car-unit-litre = L
+car-unit-kwh = kWh
+car-unit-kg = kg
+car-rubric-energy = الطاقة
+car-rubric-upkeep = العناية الاعتيادية
+car-rubric-service = الصيانة الدورية
+car-rubric-wear = قطع الاستهلاك
+car-rubric-tyres = الإطارات
+car-rubric-breakdown = الأعطال
+car-rubric-insurance = التأمين
+car-rubric-inspection = الفحص الفني
+car-part-brake-pads = وسادات الفرامل
+car-part-brake-discs = أقراص الفرامل
+car-part-timing-belt = سير التوقيت
+car-part-clutch = القابض (الدبرياج)
+car-part-battery-12v = بطارية 12 فولت
+car-part-shock-absorbers = ممتصات الصدمات
+car-part-wipers = ماسحات الزجاج
+car-part-spark-plugs = شمعات الإشعال
+car-part-glow-plugs = شمعات التسخين
+car-part-particulate-filter = مرشح الجسيمات
+car-part-catalytic-converter = المحوّل الحفّاز
+car-part-fuel-cell-filter = مرشح خلية الوقود
+car-part-exhaust = العادم
+car-part-other = قطعة أخرى…
+car-axle-all = الإطارات الأربعة
+car-axle-front = الإطارات الأمامية
+car-axle-rear = الإطارات الخلفية
+car-verdict-pass = مقبول
+car-verdict-counter = إعادة الفحص
+car-charge-station = في محطة شحن
+car-charge-home = في المنزل
+car-slot-peak = ساعات الذروة
+car-slot-off-peak = ساعات خارج الذروة
+car-entry-new = سطر جديد
+car-entry-edit = تعديل السطر
+car-field-date = التاريخ
+car-field-km = العدّاد
+car-field-rubric = البند
+car-field-amount = المبلغ
+car-field-garage = الورشة أو المحطة
+car-field-note = ملاحظة
+car-field-energy = الطاقة
+car-field-quantity = الكمية
+car-field-charge = الشحن
+car-field-slot = وقت الشحن
+car-field-part = القطعة
+car-field-part-name = اسم القطعة
+car-field-axle = الإطارات المستبدلة
+car-field-verdict = النتيجة
+car-field-months = الأشهر المشمولة
+car-field-battery = حالة البطارية
+car-home-amount-hint = يُحسَب مبلغ الشحن في المنزل وفق تعرفة السيارة.
+car-entry-add = إضافة إلى الدفتر
+car-entry-update = حفظ السطر
+car-entry-cancel = إلغاء
+car-entry-delete = حذف السطر
+car-delete-question = هل تريد حذف هذا السطر من الدفتر؟
+car-from-operation = أخذ عملية…
+car-pick-account = من أي حساب جاءت النفقة؟
+car-pick-operation = أي عملية؟
+car-pick-take = أخذ
+car-pick-none = لا توجد أي نفقة في هذا الحساب.
+car-pick-taken = تم أخذ العملية: أكمل العدّاد والبند، ثم أضف السطر.
+car-history-title = السجل
+car-filter-all = كل البنود
+car-history-empty = لا توجد أسطر حتى الآن.
+car-history-hint = انقر على سطر لتعديله.
+car-column-date = التاريخ
+car-column-km = كم
+car-column-rubric = البند
+car-column-detail = التفاصيل
+car-column-amount = المبلغ
+car-column-garage = الورشة
+car-column-note = ملاحظة
+car-column-share = الحصة
+car-column-per-km = لكل كم
+car-column-energy = الطاقة
+car-column-quantity = الكمية
+car-column-price = متوسط السعر
+car-column-consumption = الاستهلاك
+car-column-part = القطعة
+car-column-changes = مرات الاستبدال
+car-column-last = آخر استبدال
+car-column-life = العمر الافتراضي
+car-column-next = الاستبدال التالي
+car-total = المجموع
+car-summary-title = كم تكلّف السيارة
+car-headline-empty = املأ بطاقة السيارة، ثم أضف سطرًا أول: تعبئة وقود، أو صيانة دورية، أو فاتورة ورشة…
+car-headline = منذ { $since }، كلّفتك سيارتك { $total }.
+car-headline-km = منذ { $since }، كلّفتك سيارتك { $total } مقابل { $km } مقطوعة: أي { $cost } لكل كيلومتر.
+car-tile-total = التكلفة الإجمالية
+car-tile-month = شهريًا
+car-tile-km = لكل كيلومتر
+car-tile-driven = الكيلومترات المقطوعة
+car-tile-consumption = الاستهلاك
+car-tile-energy-km = الطاقة لكل كيلومتر
+car-km = { $value } km
+car-quantity = { $value } { $unit }
+car-per-100 = { $value } { $unit } / 100 km
+car-per-unit = { $price } / { $unit }
+car-months = { $months ->
+        [zero] { $months } شهر
+        [one] شهر واحد
+        [two] شهران
+        [few] { $months } أشهر
+        [many] { $months } شهرًا
+       *[other] { $months } شهر
+    }
+car-detail-battery = البطارية: { $value } %
+car-battery-line = { $when }: { $value } %
+car-rubrics-title = حسب البند
+car-energy-title = الطاقة
+car-parts-title = قطع الاستهلاك
+car-tyres-title = الإطارات
+car-battery-title = حالة البطارية
+car-years-title = كم كلّفت السيارة كل سنة
+car-donut-title = أين يذهب المال
+car-donut-caption = إجمالًا
+car-deadlines-title = المواعيد القادمة
+car-deadlines-empty = لا توجد مواعيد حتى الآن: سجّل صيانة دورية، أو فحصًا فنيًا، أو تأمينًا، أو استبدالين للقطعة نفسها.
+car-deadline-service = الصيانة الدورية
+car-deadline-inspection = الفحص الفني
+car-deadline-counter = إعادة الفحص الفني
+car-deadline-insurance = انتهاء التأمين
+car-when-date = في { $date }
+car-when-km = عند { $km }
+car-when-km-reached = عند { $km }، أي بوتيرتك نحو: { $month }
+car-when-date-km = في { $date } أو عند { $km }، أيهما أسبق
+car-when-inspection-unknown = سجّل آخر فحص فني لمعرفة موعد الفحص التالي.
+car-tone-late = متأخر
+car-tone-soon = قريبًا
+car-note-since = يُحتسب كل شيء منذ الاقتناء: التاريخ وقراءة العدّاد المسجّلان في بطاقة السيارة.
+car-note-consumption = يُقاس الاستهلاك من تعبئة كاملة إلى أخرى: املأ الخزان بالكامل وسجّل قراءة العدّاد في كل مرة.
+car-note-e85 = سيارة E85 تستهلك ما يُعطى لها: الكيلومترات التي تلي تعبئة الوقود تُحتسب للوقود الذي عُبّئ.
+car-note-home = يُسعَّر الشحن في المنزل بتعرفة السيارة في يوم تسجيله، ويحتفظ بهذه التكلفة.
+car-note-inspection = يتبع الفحص الفني القاعدة الفرنسية: الفحص الأول خلال السنوات الأربع التي تلي أول تسجيل، ثم كل سنتين؛ وإعادة الفحص خلال شهرين.
+car-disclaimer = المواعيد والأعمار الافتراضية تقديرات مستخلصة من الدفتر: ولا يُعتمد إلا على دفتر الصيانة الصادر عن الشركة المصنّعة.
+car-invalid-date = يُرجى إدخال تاريخ صالح لا يقع في المستقبل.
+car-invalid-acquired = لا يمكن أن يسبق تاريخ الاقتناء تاريخ أول تسجيل.
+car-invalid-km = يُرجى إدخال قراءة العدّاد بكيلومترات صحيحة.
+car-invalid-amount = هذا المبلغ غير مقروء.
+car-invalid-quantity = أدخل الكمية: باللتر، أو بالكيلوواط ساعة (kWh)، أو بالكيلوغرام.
+car-invalid-part = اختر القطعة المستبدلة، أو اكتب اسمها.
+car-invalid-rubric = اختر بندًا.
+car-invalid-months = يُرجى إدخال عدد صحيح من الأشهر.
+car-invalid-battery = يُرجى إدخال حالة بطارية من 0 إلى 100 %.
+car-open = فتح دفتر…
+car-save = حفظ الدفتر…
+car-report-button = ملف PDF
+car-file-filter = دفتر سيارة
+car-file-saved = تم حفظ الدفتر: { $file }
+car-file-opened = تم فتح الدفتر: { $file }
+car-file-not-logbook = هذا الملف ليس دفتر سيارة من Radinus.
+car-file-too-recent = هذا الدفتر صادر عن إصدار أحدث من Radinus: حدّث Radinus لفتحه.
+car-replace-question = فتح هذا الدفتر سيستبدل الدفتر المعروض في النافذة. هل تريد المتابعة؟
+car-sheet-history = الدفتر
+car-sheet-summary = الملخص
+
+analysis-history-hint = كلما طال سجلّك، كان هذا التحليل أفضل: الأمثل أن يكون لديك عام على الأقل من العمليات.
+
+# --- F48 — تقسيم مصروف (Fabrice, 11/10/2026, P-71) ---
+menu-tools-sharing = تقسيم مصروف
+window-sharing-title = تقسيم مصروف
+sharing-question = من يدفع ماذا؟
+sharing-setup-title = التقسيم
+sharing-field-label = التسمية
+sharing-label-hint = مثلًا "مطعم 12/10" أو "رحلة بريتاني 2027": يُستخدم لتسمية الملفات والتقارير.
+sharing-field-total = الإجمالي
+sharing-total-hint = إذا تُرك فارغًا، فإن الإجمالي هو مجموع البنود والإضافات الخاصة بكل شخص.
+sharing-field-rule = القاعدة
+sharing-field-rounding = التقريب
+sharing-field-people = الأشخاص
+sharing-mode-whole = قاعدة واحدة للمصروف كله
+sharing-mode-item = قاعدة لكل بند
+sharing-rule-equal = حصص متساوية
+sharing-rule-parts = بحسب الأجزاء
+sharing-rule-percent = بالنسب المئوية
+sharing-rule-income = بما يتناسب مع الدخل
+sharing-rounding-cent = إلى أقرب سنت
+sharing-rounding-euro = إلى وحدة كاملة
+sharing-round-euro = تقريب إلى وحدات كاملة
+sharing-hide-incomes = إخفاء الدخل في التقارير والتصدير
+sharing-people-title = الأشخاص
+sharing-people-hint = صف لكل شخص وعمود لكل بند: حدّد من يشارك في ماذا. كل ما عدا ذلك اختياري. من ينسحب ويترك عربونه: مبلغ دقيق يساوي ما دفعه، دون تحديد أي خانة.
+sharing-add-person = إضافة شخص
+sharing-person-default = الشخص { $number }
+sharing-items-title = البنود
+sharing-items-hint = فقط ما لا يخص الجميع، مثل النبيذ. يذهب باقي الإجمالي إلى البند المشترك.
+sharing-add-item = إضافة بند
+sharing-common = مشترك
+sharing-payments-title = المدفوعات
+sharing-payments-hint = من دفع، وكم، ومتى. الصف الذي بلا مبلغ لا يُحتسب بعد.
+sharing-payments-none = لا توجد مدفوعات حتى الآن.
+sharing-add-payment = إضافة دفعة
+sharing-result-title = النتيجة
+sharing-balances-title = وضع المدفوعات
+sharing-transfers-title = التحويلات المقترحة
+sharing-delete = حذف
+sharing-delete-person-question = لهذا الشخص مدفوعات: هل تريد حذفها معه؟
+sharing-disclaimer = يقترح Radinus تقسيمًا: بين الأصدقاء، يبقى لكل واحد حرية الاتفاق على غير ذلك.
+sharing-column-person = الشخص
+sharing-column-household = الأسرة
+sharing-column-income = الدخل
+sharing-column-parts = الأجزاء
+sharing-column-percent = %
+sharing-column-floor = على الأقل
+sharing-column-cap = على الأكثر
+sharing-column-fixed = مبلغ دقيق
+sharing-column-alone = إضافات خاصة
+sharing-column-gift = فائض مُهدى
+sharing-column-share = الحصة
+sharing-column-typed = % المُدخلة
+sharing-column-constraint = ما طُبّق
+sharing-column-due = المطلوب دفعه
+sharing-column-item = البند
+sharing-column-amount = المبلغ
+sharing-column-rule = القاعدة
+sharing-column-participants = المشاركون
+sharing-column-unit = أسرة أو شخص
+sharing-column-members = الأعضاء
+sharing-column-paid = المدفوع
+sharing-column-balance = الرصيد
+sharing-column-date = التاريخ
+sharing-column-who = من
+sharing-column-label = التسمية
+sharing-help-household = يسدّد أفراد الأسرة الواحدة معًا: تُجمع مدفوعاتهم وما عليهم، ويحصلون على كشف واحد. مثلًا: "أسرة مارتن" للوالدين والأطفال.
+sharing-help-income = يُستخدم فقط مع قاعدة "بما يتناسب مع الدخل": كلما ارتفع الدخل زادت الحصة. أدخل الدخل الشهري.
+sharing-help-parts = الشخص ذو الجزأين يدفع ضعف ما يدفعه الشخص ذو الجزء الواحد. مثلًا: بالغ 1، طفل 0.5.
+sharing-help-percent = حصة المصروف التي يدفعها الشخص. يجب أن يكون مجموع النسب المئوية 100 %.
+sharing-help-floor = سيدفع الشخص هذا المبلغ على الأقل، حتى لو كانت حصته المحسوبة أصغر. يخفّف الفرق العبء عن الآخرين.
+sharing-help-cap = لن يدفع الشخص أكثر من هذا المبلغ أبدًا. ما لا يدفعه يقع على باقي المشاركين في بنوده.
+sharing-help-fixed = يدفع الشخص هذا المبلغ الدقيق مهما حدث، ويُقسَّم الباقي بين الآخرين. مثلًا: من ينسحب ويترك عربونه.
+sharing-help-alone = ما أخذه الشخص لنفسه وحده، مثل حلوى أو قهوة. يدفعه كاملًا، إضافة إلى حصته.
+sharing-help-gift = إذا دفع الشخص أكثر من حصته: عند التحديد يكون الفائض هدية للمجموعة، وعند عدم التحديد يُردّ إليه.
+sharing-help-items = حدّد الأشخاص المشاركين في هذا البند. البند المشترك هو ما يتبقى من الإجمالي بعد استبعاد البنود الأخرى.
+sharing-help-due = ما على الشخص دفعه في المجموع: حصته من البنود وإضافاته الخاصة والتقريب.
+sharing-help-share = ما تمثّله حصته، كنسبة مئوية من المبلغ المقسَّم.
+sharing-help-typed = النسبة المئوية التي أدخلتها. قد تختلف عن الحصة الفعلية عندما ينطبق حد أدنى أو حد أقصى أو مبلغ دقيق.
+sharing-help-constraint = يبيّن ما إذا كانت حصة الشخص قد تغيّرت بسبب حد أدنى أو حد أقصى أو مبلغ دقيق أو فائض مُهدى.
+sharing-help-item = فقط ما لا يخص الجميع، مثل النبيذ. يذهب باقي الإجمالي إلى البند المشترك، ويُقسَّم بين من حُدّدوا فيه.
+sharing-help-rule = كيف يُقسَّم هذا البند: بحصص متساوية أو بحسب الأجزاء أو بالنسب المئوية أو بما يتناسب مع الدخل.
+sharing-help-paid = ما دفعته الأسرة أو الشخص بالفعل، بحسب المدفوعات المُدخلة.
+sharing-help-balance = ما بقي للدفع، أو ما دُفع زيادة على الحصة. مثلًا: "المتبقي للدفع: 61.54 €".
+sharing-advice-equal = { $count ->
+        [zero] { $total } ÷ { $count } شخص = { $amount } لكل واحد.
+        [one] { $total } لشخص واحد فقط.
+        [two] { $total } ÷ شخصين = { $amount } لكل واحد.
+        [few] { $total } ÷ { $count } أشخاص = { $amount } لكل واحد.
+        [many] { $total } ÷ { $count } شخصًا = { $amount } لكل واحد.
+       *[other] { $total } ÷ { $count } شخص = { $amount } لكل واحد.
+    }
+sharing-advice-equal-varied = بحصص متساوية بين المشاركين، مع مراعاة الحدود والاستثناءات.
+sharing-advice-parts = مجموع الأجزاء { $parts }: قيمة الجزء الواحد { $amount }.
+sharing-advice-parts-varied = يدفع كل واحد بحسب أجزائه، مع مراعاة الحدود والاستثناءات. الخانة الفارغة تُحسب جزءًا واحدًا.
+sharing-advice-percent-rest = ينقص { $rest } % للوصول إلى 100 %.
+sharing-advice-percent-over = النسب المئوية تتجاوز 100 % بمقدار { $over } %.
+sharing-advice-percent-ok = مجموع النسب المئوية 100 % تمامًا.
+sharing-advice-percent-nobody = مجموع النسب المئوية 100 % بالفعل: { $count ->
+        [zero] { $names } لن يدفعوا شيئًا.
+        [one] { $names } لن يدفع شيئًا.
+        [two] { $names } لن يدفعا شيئًا.
+        [few] { $names } لن يدفعوا شيئًا.
+        [many] { $names } لن يدفعوا شيئًا.
+       *[other] { $names } لن يدفعوا شيئًا.
+    }
+sharing-advice-income = يدفع كل واحد { $rate } % من دخله.
+sharing-advice-income-missing = أدخل دخل كل شخص للتقسيم بما يتناسب مع الدخل.
+sharing-advice-income-varied = يدفع كل واحد النسبة نفسها من دخله، مع مراعاة الحدود والاستثناءات.
+sharing-advice-empty = أدخل المبلغ المراد تقسيمه.
+sharing-apply-advice = استخدام القيم المقترحة
+sharing-help-apply-advice = يملأ الخانات الفارغة بالقيم الرمادية. لا تتغير الخانات المملوءة من قبل.
+sharing-from-incomes = النسب المئوية بحسب الدخل
+sharing-help-from-incomes = يستبدل بالنسب المئوية حصة كل دخل من مجموع الدخل. يكون مجموعها 100 %.
+sharing-reset-percents = إعادة توزيع الكل
+sharing-help-reset-percents = يمحو النسب المئوية ويوزّعها بالتساوي على الجميع. مفيد بعد إضافة شخص.
+sharing-reset-percents-question = هل تريد محو كل النسب المئوية وتوزيعها بالتساوي؟
+sharing-open = فتح مشروع…
+sharing-save = حفظ المشروع…
+sharing-pdf-distribution = التقسيم (PDF)
+sharing-pdf-payments = وضع المدفوعات (PDF)
+sharing-pdf-statements = كشوف فردية (PDF)…
+sharing-statements-everyone = الجميع
+sharing-excel = تصدير إلى Excel
+sharing-file-filter = مشروع تقسيم
+sharing-replace-question = سيؤدي فتح هذا المشروع إلى استبدال ما أُدخل في النافذة. هل تريد المتابعة؟
+sharing-file-saved = تم حفظ المشروع: { $file }
+sharing-file-opened = تم فتح المشروع: { $file }
+sharing-file-not-project = هذا الملف ليس مشروع تقسيم من Radinus.
+sharing-file-too-recent = هذا المشروع صادر عن إصدار أحدث من Radinus: حدّث Radinus لفتحه.
+sharing-file-failed = تعذّرت قراءة الملف أو كتابته: { $reason }
+sharing-statements-replace-question = { $count ->
+        [zero] يوجد { $count } كشف في هذا المجلد بالفعل. هل تريد استبدالها؟
+        [one] يوجد كشف واحد في هذا المجلد بالفعل. هل تريد استبداله؟
+        [two] يوجد كشفان في هذا المجلد بالفعل. هل تريد استبدالهما؟
+        [few] يوجد { $count } كشوف في هذا المجلد بالفعل. هل تريد استبدالها؟
+        [many] يوجد { $count } كشفًا في هذا المجلد بالفعل. هل تريد استبدالها؟
+       *[other] يوجد { $count } كشف في هذا المجلد بالفعل. هل تريد استبدالها؟
+    }
+sharing-statements-written = { $count ->
+        [zero] كُتب { $count } كشف في "{ $folder }".
+        [one] كُتب كشف واحد في "{ $folder }".
+        [two] كُتب كشفان في "{ $folder }".
+        [few] كُتبت { $count } كشوف في "{ $folder }".
+        [many] كُتب { $count } كشفًا في "{ $folder }".
+       *[other] كُتب { $count } كشف في "{ $folder }".
+    }
+sharing-too-many-people = يضم التقسيم 40 شخصًا على الأكثر.
+sharing-too-many-items = يضم التقسيم 20 بندًا على الأكثر.
+sharing-too-many-payments = يضم التقسيم 400 دفعة على الأكثر.
+sharing-invalid-amount = هذا المبلغ غير مقروء: أدخل عددًا موجبًا.
+sharing-invalid-number = هذا العدد غير مقروء: أدخل عددًا موجبًا.
+sharing-invalid-percent = النسبة المئوية تتراوح من 0 إلى 100.
+sharing-invalid-date = هذا التاريخ غير مقروء.
+sharing-name-missing = يجب أن يكون لكل شخص اسم.
+sharing-name-duplicate = يوجد بالفعل "{ $name }": ميّز بينهما، مثلًا بحرف أول.
+sharing-floor-above-cap = الحد الأدنى يتجاوز الحد الأقصى.
+sharing-item-label-missing = هذا البند بلا اسم.
+sharing-items-above-total = البنود والإضافات الخاصة بكل شخص تتجاوز الإجمالي بمقدار { $amount }.
+sharing-payment-person = اختر من دفع.
+sharing-percent-total = مجموع النسب المئوية { $sum } %: يجب أن يكون 100 %.
+sharing-percent-total-item = "{ $item }": مجموع النسب المئوية { $sum } %: يجب أن يكون 100 %.
+sharing-item-nobody = لا أحد يشارك في "{ $item }".
+sharing-item-no-weight = لا أحد له وزن في "{ $item }": كل المشاركين فيه عند الصفر.
+sharing-income-missing = دخل { $name } مفقود.
+sharing-fixed-above = المبالغ الدقيقة تتجاوز المبلغ المراد تقسيمه بمقدار { $amount }.
+sharing-floors-above = الحدود الدنيا تتجاوز المبلغ المراد تقسيمه بمقدار { $amount }.
+sharing-cap-alone = { $name } هو الوحيد المشارك في "{ $item }": لا يمكن احترام حدّه الأقصى.
+sharing-caps-short = الحدود القصوى لا تكفي لتغطية المبلغ: ينقص { $amount }.
+sharing-impossible = لا يمكن احترام كل هذه الشروط: خفّف حدًّا أدنى أو أقصى.
+sharing-constraint-floor = بلوغ الحد الأدنى
+sharing-constraint-cap = بلوغ الحد الأقصى
+sharing-constraint-fixed = مبلغ دقيق
+sharing-constraint-gift = فائض مُهدى
+sharing-and = { $first } و{ $last }
+sharing-outside = خارج بنوده
+sharing-alone = إضافات خاصة
+sharing-rounding = التقريب
+sharing-headline-empty = أضف الأشخاص الذين يتقاسمون المصروف.
+sharing-headline-no-amount = اكتب الإجمالي، أو البنود المراد تقسيمها.
+sharing-headline-equal = { $total } للتقسيم: يدفع كل واحد { $amount }.
+sharing-headline-range = { $total } للتقسيم: من { $min } إلى { $max } بحسب كل شخص.
+sharing-participants = { $count ->
+        [0] لا مشارك
+        [one] مشارك واحد
+        [two] مشاركان
+        [few] { $count } مشاركين
+        [many] { $count } مشاركًا
+       *[other] { $count } مشارك
+    }
+sharing-balance-due = المتبقي للدفع: { $amount }
+sharing-balance-over = دُفع { $amount } زيادة على الحصة
+sharing-balance-even = مُسدَّد
+sharing-summary-collected = تم دفع { $collected } من أصل { $total }.
+sharing-summary-owing = { $count ->
+        [0] الجميع مسدِّدون.
+        [one] شخص واحد فقط ما زال مدينًا بمبلغ { $amount }.
+        [two] شخصان ما زالا مدينين بمبلغ { $amount } في المجموع.
+        [few] { $count } أشخاص ما زالوا مدينين بمبلغ { $amount } في المجموع.
+        [many] { $count } شخصًا ما زالوا مدينين بمبلغ { $amount } في المجموع.
+       *[other] { $count } شخص ما زالوا مدينين بمبلغ { $amount } في المجموع.
+    }
+sharing-remaining-outside = المتبقي للدفع من المصروف: { $amount }
+sharing-remaining-reimburse = للرد إلى { $name }: { $amount }
+sharing-all-settled = تمت تسوية كل شيء: لا أحد مدين لأحد بشيء.
+sharing-transfer = { $from } مدين بمبلغ { $amount } إلى { $to }
+sharing-warning-over-paid = المدفوعات تتجاوز المصروف بمقدار { $amount }: تحقق من المبالغ.
+sharing-note-income-zero = { $name } لا يدفع شيئًا عن { $items }: دخله 0.
+sharing-note-excluded = { $name } لا يشارك في "{ $item }": توزَّع حصته على الآخرين.
+sharing-note-gift = الفائض الذي أهداه { $giver } يخفّض حصة الآخرين: دفع { $name } الآن أكثر من حصته.
+sharing-note-outside = يدفع { $name } مبلغ { $amount } خارج بنوده: يُخصم المبلغ مما يتقاسمه الآخرون.
+sharing-note-keeper = تقريب إلى وحدات كاملة: يحتفظ { $name } بالسنتات، لكي يأتي الإجمالي دقيقًا.
+sharing-report-distribution = التقسيم
+sharing-report-sharing = التقسيم
+sharing-report-who-pays = من يدفع ماذا
+sharing-report-items = التفصيل بحسب البند
+sharing-report-payments = وضع المدفوعات
+sharing-report-as-of = الوضع في { $date }
+sharing-report-balances = الحصة، المدفوع، الرصيد
+sharing-report-statement = كشف — { $name }
+sharing-report-your-share = حصتك
+sharing-statement-total = الإجمالي للأسرة: { $amount }
+sharing-statement-pay = المطلوب دفعه إلى { $name }: { $amount }
+sharing-statement-receive = المطلوب استلامه من { $name }: { $amount }
+sharing-sheet-people = الأشخاص
+sharing-sheet-items = البنود
+sharing-sheet-result = النتيجة
+sharing-sheet-payments = المدفوعات
+sharing-sheet-balances = المبالغ المستردة

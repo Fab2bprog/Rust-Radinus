@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Analyse de l'évolution du solde</title>
+    <script type="module" src="/ui/windows/balance-analysis.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- F40 — « Analyse Évolution du solde » (Fabrice, 05/10/2026).
+
+         Le graphique de F25, et dessous le tableau des opérations — celui du
+         détail des statistiques. Entre les deux, le geste qui les relie : on
+         appuie sur le graphique, on glisse, et la zone qu'on vient de tracer
+         se détaille en bas. La courbe dit que le solde a chuté ; cette
+         fenêtre dit pourquoi.
+
+         **Une fenêtre à elle, et F25 n'est pas touchée** : « Graphique, on se
+         concentre sur le solde ; Analyse, c'est une vision plus approfondie ».
+         Le dessin du graphique est donc **recopié** ici, et non partagé — sa
+         décision, pour que les deux fenêtres restent indépendantes. -->
+    <div class="window window--curves window--analysis">
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <main class="window__content window__content--split">
+        <section class="analysis__chart" id="chart-zone">
+          <h1 class="chart__heading" id="heading"></h1>
+          <div class="chart__legend" id="legend"></div>
+          <div class="chart__period">
+            <span id="from-label"></span>
+            <strong id="from"></strong>
+            <span id="to-label"></span>
+            <strong id="to"></strong>
+          </div>
+          <div class="chart__plot chart__plot--zonable" id="plot"></div>
+
+          <!-- Le résumé de la zone : ce qu'on avait avant, ce qu'on a après,
+               et de combien cela a bougé. Tant qu'aucune zone n'est tracée,
+               la phrase qui dit comment en tracer une. -->
+          <div class="analysis__summary" id="summary" data-state="none">
+            <p class="analysis__hint" id="summary-hint"></p>
+            <span class="analysis__figure">
+              <span id="zone-label"></span>
+              <strong id="zone-dates"></strong>
+            </span>
+            <span class="analysis__figure analysis__figure--result">
+              <span id="opening-label"></span>
+              <strong id="opening"></strong>
+            </span>
+            <span class="analysis__figure analysis__figure--result">
+              <span id="closing-label"></span>
+              <strong id="closing"></strong>
+            </span>
+            <span class="analysis__figure analysis__figure--result">
+              <span id="variation-label"></span>
+              <strong id="variation"></strong>
+            </span>
+            <span class="analysis__figure analysis__figure--result">
+              <span id="debit-label"></span>
+              <strong id="debit" class="analysis__debit"></strong>
+            </span>
+            <span class="analysis__figure analysis__figure--result">
+              <span id="credit-label"></span>
+              <strong id="credit"></strong>
+            </span>
+          </div>
+        </section>
+
+        <!-- Le splitter : le graphique et le tableau se partagent la hauteur,
+             et l'utilisateur déplace la frontière, comme dans les
+             statistiques. -->
+        <div class="splitter" id="splitter" role="separator" aria-orientation="horizontal"></div>
+
+        <section class="list list--detail">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox"></div>
+        </section>
+      </main>
+
+      <aside class="panel panel--curves">
+        <button class="panel__year" id="year" type="button"></button>
+        <button class="panel__button" id="next-year" type="button">
+          <img src="/ui/assets/icons/Temps_Plus.png" alt="" />
+        </button>
+        <button class="panel__button" id="previous-year" type="button">
+          <img src="/ui/assets/icons/Temps_Moins.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

@@ -24,6 +24,12 @@
 //!      décrivent à quoi l'argent a servi, et c'est précisément ce qu'une
 //!      ventilation sert à éclater.
 //!
+//!   6. **La vérification est la septième caractéristique** (Fabrice,
+//!      03/10/2026) : ce que l'utilisateur pense de l'écriture. Elle suit les
+//!      règles du statut — elle descend aux filles, et elle ne s'efface pas —
+//!      et elle n'en touche aucune autre : ni le statut, ni la date de
+//!      pointage. Comme tout le reste ici, elle attend l'enregistrement.
+//!
 //! **Le tableau ne montre que les lignes mères** (décision de Fabrice, même
 //! jour) : les gens qui se servent de cette fenêtre viennent d'importer un gros
 //! OFX et n'ont pas encore de filles. Les filles sont chargées quand même,
@@ -43,9 +49,10 @@ pub struct Classification {
     pub payee_id: i64,
     pub project_id: i64,
     pub status_id: i64,
+    pub verification_id: i64,
 }
 
-/// L'une des six caractéristiques du bandeau « Changer caractéristiques
+/// L'une des sept caractéristiques du bandeau « Changer caractéristiques
 /// sélection en : ». Cinq nomenclatures et un statut — Fabrice a demandé qu'on
 /// les distingue, et il a raison : les cinq premières **nomment** l'opération,
 /// le statut dit **où elle en est**, et c'est le trio qui pilote les
@@ -58,18 +65,22 @@ pub enum Characteristic {
     Payee,
     Project,
     Status,
+    /// À vérifier, vérifiée, douteuse, contestée (base 11).
+    Verification,
 }
 
-/// Les six, dans l'ordre du bandeau de la capture : la colonne de gauche
-/// d'abord (catégorie, affectation, mode), puis celle de droite (tiers,
-/// projet, statut).
-pub const CHARACTERISTICS: [Characteristic; 6] = [
+/// Les sept, dans l'ordre du bandeau : la colonne de gauche d'abord
+/// (catégorie, affectation, mode), puis celle de droite (tiers, projet,
+/// statut) — et la vérification sous le statut, où Fabrice l'a placée le
+/// 03/10/2026.
+pub const CHARACTERISTICS: [Characteristic; 7] = [
     Characteristic::Category,
     Characteristic::Assignment,
     Characteristic::PaymentMode,
     Characteristic::Payee,
     Characteristic::Project,
     Characteristic::Status,
+    Characteristic::Verification,
 ];
 
 impl Characteristic {
@@ -84,6 +95,7 @@ impl Characteristic {
             Self::Payee => "payee",
             Self::Project => "project",
             Self::Status => "status",
+            Self::Verification => "verification",
         }
     }
 
@@ -101,6 +113,7 @@ impl Characteristic {
             Self::Payee => "IDTiers",
             Self::Project => "IDProjets",
             Self::Status => "IDStatutOperation",
+            Self::Verification => "IDVerification",
         }
     }
 
@@ -109,8 +122,12 @@ impl Characteristic {
     /// que Fabrice a redonnée de tête le 27/07/2026 : « si tu modifies le
     /// moyen de paiement d'une ligne mère il doit être modifié dans les
     /// filles ».
+    ///
+    /// **Et la vérification** (03/10/2026) : c'est l'écriture de la banque
+    /// que l'on juge, et une ventilation n'en est pas une — une fille porte
+    /// celle de sa mère, comme partout ailleurs dans Radinus.
     pub fn descends_to_children(self) -> bool {
-        matches!(self, Self::PaymentMode | Self::Status)
+        matches!(self, Self::PaymentMode | Self::Status | Self::Verification)
     }
 
     /// **Peut-elle être effacée ?** Une nomenclature revient à « Non précisé »
@@ -118,8 +135,22 @@ impl Characteristic {
     /// lot d'opérations. Le statut, non : `StatutOperation` ne contient que
     /// trois lignes — pointé, engagé, prévu — et aucune ne vaut « rien ». Une
     /// opération est toujours dans l'un des trois états.
+    ///
+    /// La vérification non plus : quatre lignes, et aucune ne vaut « rien ».
     pub fn can_be_cleared(self) -> bool {
-        !matches!(self, Self::Status)
+        !matches!(self, Self::Status | Self::Verification)
+    }
+
+    /// **Cette valeur est-elle recevable ?** Une vérification n'a que quatre
+    /// valeurs, de 1 à 4, et le brouillon refuse d'en porter une autre : elle
+    /// partirait dans la base à l'enregistrement, où plus rien ne la
+    /// retiendrait. Les six autres caractéristiques gardent la règle qu'elles
+    /// avaient — elles reçoivent ce que leur menu propose.
+    pub fn accepts(self, value: i64) -> bool {
+        match self {
+            Self::Verification => (1..=4).contains(&value),
+            _ => true,
+        }
     }
 
     /// Ce que cette caractéristique vaut dans un classement.
@@ -131,6 +162,7 @@ impl Characteristic {
             Self::Payee => of.payee_id,
             Self::Project => of.project_id,
             Self::Status => of.status_id,
+            Self::Verification => of.verification_id,
         }
     }
 
@@ -142,6 +174,7 @@ impl Characteristic {
             Self::Payee => into.payee_id = value,
             Self::Project => into.project_id = value,
             Self::Status => into.status_id = value,
+            Self::Verification => into.verification_id = value,
         }
     }
 }
@@ -199,6 +232,7 @@ pub struct Change {
     pub payee: Option<i64>,
     pub project: Option<i64>,
     pub status: Option<i64>,
+    pub verification: Option<i64>,
 }
 
 impl Change {
@@ -211,7 +245,11 @@ impl Change {
             Characteristic::Payee => self.payee,
             Characteristic::Project => self.project,
             Characteristic::Status => self.status,
+            Characteristic::Verification => self.verification,
         }
+        // Une valeur que la caractéristique ne peut pas recevoir vaut une case
+        // décochée : on n'y touche pas.
+        .filter(|value| which.accepts(*value))
     }
 
     /// Aucune case cochée : il n'y a rien à appliquer, et les engrenages
@@ -256,7 +294,7 @@ pub fn load(conn: &Connection, account_id: i64) -> Result<Workbench> {
     let mut statement = conn.prepare(
         "SELECT IDOperation, Date, Libelle, Montant, IDOperationParent,
                 IDCategorie, IDAffectation, IDModeOperation, IDTiers,
-                IDProjets, IDStatutOperation
+                IDProjets, IDStatutOperation, IDVerification
            FROM Operation
           WHERE IDCompte = ?1
           ORDER BY Date, IDOperation",
@@ -270,6 +308,7 @@ pub fn load(conn: &Connection, account_id: i64) -> Result<Workbench> {
                 payee_id: row.get(8)?,
                 project_id: row.get(9)?,
                 status_id: row.get(10)?,
+                verification_id: row.get(11)?,
             };
             Ok(Line {
                 id: row.get(0)?,
@@ -379,6 +418,9 @@ impl Workbench {
         let Some(index) = self.at.get(&id).copied() else {
             return false;
         };
+        if !which.accepts(value) {
+            return false;
+        }
         which.write(&mut self.lines[index].current, value);
         let mut change = Change::default();
         match which {
@@ -388,6 +430,7 @@ impl Workbench {
             Characteristic::Payee => change.payee = Some(value),
             Characteristic::Project => change.project = Some(value),
             Characteristic::Status => change.status = Some(value),
+            Characteristic::Verification => change.verification = Some(value),
         }
         self.push_down(index, &change);
         true
@@ -455,9 +498,23 @@ impl Workbench {
         let transaction = conn.transaction()?;
         {
             let mut statement = transaction.prepare(
+                // **Pointer, c'est aussi dater** (Fabrice, 21/08/2026). Une
+                // opération pointée porte la date à laquelle la banque l'a
+                // passée ; personne n'est là pour la demander quand cinquante
+                // lignes basculent d'un coup, alors on pose celle de
+                // l'opération — la règle du bouton « Pointer ».
+                //
+                // Une date déjà écrite n'est jamais remplacée : elle est plus
+                // juste que celle que nous poserions.
                 "UPDATE Operation
                     SET IDCategorie = ?1, IDAffectation = ?2, IDModeOperation = ?3,
-                        IDTiers = ?4, IDProjets = ?5, IDStatutOperation = ?6
+                        IDTiers = ?4, IDProjets = ?5, IDStatutOperation = ?6,
+                        DatePointage = CASE
+                            WHEN ?6 = 1 AND (DatePointage IS NULL OR DatePointage = '')
+                            THEN Date
+                            ELSE DatePointage
+                        END,
+                        IDVerification = ?8
                   WHERE IDOperation = ?7",
             )?;
             for index in &to_write {
@@ -470,6 +527,7 @@ impl Workbench {
                     line.current.project_id,
                     line.current.status_id,
                     line.id,
+                    line.current.verification_id,
                 ])?;
             }
         }
@@ -568,7 +626,7 @@ mod tests {
     fn read_back(conn: &Connection, id: i64) -> Classification {
         conn.query_row(
             "SELECT IDCategorie, IDAffectation, IDModeOperation, IDTiers, IDProjets,
-                    IDStatutOperation
+                    IDStatutOperation, IDVerification
                FROM Operation WHERE IDOperation = ?1",
             [id],
             |row| {
@@ -579,6 +637,7 @@ mod tests {
                     payee_id: row.get(3)?,
                     project_id: row.get(4)?,
                     status_id: row.get(5)?,
+                    verification_id: row.get(6)?,
                 })
             },
         )
@@ -725,6 +784,68 @@ mod tests {
         assert_eq!(outsider.status_id, 1);
     }
 
+    /// **La vérification, septième caractéristique** (Fabrice, 03/10/2026).
+    ///
+    /// Elle tient les deux bouts : le bandeau qui l'applique à une sélection
+    /// et le menu d'une cellule, la mémoire et la base. Elle descend aux
+    /// filles comme le statut, n'écrit rien avant l'enregistrement, refuse une
+    /// valeur hors de ses quatre — et ne touche ni au statut ni à la date de
+    /// pointage, qui appartiennent à la banque.
+    #[test]
+    fn la_verification_suit_les_regles_du_statut_et_ne_touche_que_elle() {
+        let mut conn = database();
+        operation(&conn, 1, 1, "2026-03-01", -3_000_000);
+        child(&conn, 10, 1, 1, "2026-03-01", -1_000_000);
+        child(&conn, 11, 1, 1, "2026-03-01", -2_000_000);
+        operation(&conn, 2, 1, "2026-03-02", -1_000_000);
+        operation(&conn, 3, 1, "2026-03-03", -1_000_000);
+        let dates = |conn: &Connection| -> Vec<(i64, String)> {
+            conn.prepare("SELECT IDStatutOperation, DatePointage FROM Operation ORDER BY IDOperation")
+                .unwrap()
+                .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))
+                .unwrap()
+                .map(Result::unwrap)
+                .collect()
+        };
+        let untouched = dates(&conn);
+
+        let mut bench = load(&conn, 1).unwrap();
+        assert_eq!(bench.line(1).unwrap().current.verification_id, 2, "née vérifiée");
+
+        // Le bandeau, sur une sélection : la mère et ses deux filles bougent.
+        let touched = bench.apply(
+            &[1, 2],
+            &Change {
+                verification: Some(1),
+                ..Change::default()
+            },
+        );
+        assert_eq!(touched, 4, "deux mères et les deux filles de la première");
+        // Le menu d'une cellule, sur une ligne.
+        assert!(bench.set(3, Characteristic::Verification, 4));
+        // Une valeur hors de la liste est refusée, par les deux portes.
+        assert!(!bench.set(3, Characteristic::Verification, 9));
+        assert!(!bench.set(3, Characteristic::Verification, 0));
+        assert_eq!(
+            bench.apply(&[3], &Change { verification: Some(42), ..Change::default() }),
+            0
+        );
+        assert_eq!(bench.line(3).unwrap().current.verification_id, 4);
+
+        // Rien n'est écrit tant qu'on n'a pas enregistré.
+        assert_eq!(bench.pending(), 5);
+        assert!((1..=3).all(|id| read_back(&conn, id).verification_id == 2));
+
+        assert_eq!(bench.save(&mut conn).unwrap(), 5);
+        assert_eq!(read_back(&conn, 1).verification_id, 1);
+        assert_eq!(read_back(&conn, 10).verification_id, 1, "la fille suit sa mère");
+        assert_eq!(read_back(&conn, 11).verification_id, 1);
+        assert_eq!(read_back(&conn, 2).verification_id, 1);
+        assert_eq!(read_back(&conn, 3).verification_id, 4);
+        assert_eq!(dates(&conn), untouched, "ni le statut ni la date de pointage n'ont bougé");
+        assert_eq!(bench.pending(), 0);
+    }
+
     /// **Le brouillon ne fuit pas.** Tant qu'on n'a pas enregistré, la base est
     /// exactement dans l'état où on l'a trouvée — c'est ce qui autorise à
     /// classer vite et à quitter en cas de bêtise.
@@ -746,6 +867,7 @@ mod tests {
                 payee: Some(1),
                 project: Some(2),
                 status: Some(3),
+                verification: Some(4),
             },
         );
         assert_eq!(bench.pending(), 5);
@@ -949,24 +1071,28 @@ mod tests {
     /// écrire une caractéristique à la place d'une autre.
     #[test]
     fn les_six_caracteristiques_sont_bien_six() {
+        // Sept depuis le 03/10/2026 : la vérification a rejoint les six. Le
+        // nom du test est resté, ce qu'il garde aussi — des clefs et des
+        // colonnes toutes distinctes.
         let keys: std::collections::BTreeSet<&str> =
             CHARACTERISTICS.iter().map(|w| w.key()).collect();
         let columns: std::collections::BTreeSet<&str> =
             CHARACTERISTICS.iter().map(|w| w.column()).collect();
-        assert_eq!(keys.len(), 6);
-        assert_eq!(columns.len(), 6);
+        assert_eq!(keys.len(), 7);
+        assert_eq!(columns.len(), 7);
         for which in CHARACTERISTICS {
             assert_eq!(Characteristic::from_key(which.key()), Some(which));
         }
         assert_eq!(Characteristic::from_key("montant"), None);
 
-        // Deux descendent, quatre non ; cinq s'effacent, le statut non.
+        // Trois descendent, quatre non ; cinq s'effacent, le statut et la
+        // vérification non.
         let descending: Vec<&str> = CHARACTERISTICS
             .iter()
             .filter(|w| w.descends_to_children())
             .map(|w| w.key())
             .collect();
-        assert_eq!(descending, vec!["payment-mode", "status"]);
+        assert_eq!(descending, vec!["payment-mode", "status", "verification"]);
         let clearable: Vec<&str> = CHARACTERISTICS
             .iter()
             .filter(|w| w.can_be_cleared())
