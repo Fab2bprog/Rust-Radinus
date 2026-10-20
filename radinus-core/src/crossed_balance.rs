@@ -287,12 +287,14 @@ pub fn behind_the_cell(
     parameters.extend(statuses);
 
     let mut statement = conn.prepare(&query)?;
-    let found = statement
+    let mut found: Vec<(crate::operations::OperationRow, i64)> = statement
         .query_map(rusqlite::params_from_iter(parameters), |row| {
             crate::operations::read_row(row)
         })?
-        .collect();
-    found
+        .collect::<Result<_>>()?;
+    // Une ventilation montre la référence de sa mère (20/10/2026).
+    crate::operations::with_mothers_reference(conn, &mut found)?;
+    Ok(found)
 }
 
 #[cfg(test)]
@@ -520,6 +522,24 @@ mod tests {
             .expect("la seconde");
         assert_eq!(first.total, -60 * EURO, "la fille, pas la mère");
         assert_eq!(second.total, -40 * EURO);
+    }
+
+    /// **Une ventilation montre la référence paiement de sa mère** (Fabrice,
+    /// 20/10/2026), comme dans les statistiques.
+    #[test]
+    fn une_ventilation_montre_la_reference_de_sa_mere() {
+        let conn = database();
+        let categories = ids(&conn, crate::nomenclatures::Nomenclature::Category);
+        let assignments = ids(&conn, crate::nomenclatures::Nomenclature::Assignment);
+        add(&conn, 1, "2026-09-08", -120 * EURO, categories[0], assignments[0], 0);
+        add(&conn, 2, "2026-09-08", -80 * EURO, categories[0], assignments[0], 1);
+        add(&conn, 3, "2026-09-08", -40 * EURO, categories[1], assignments[1], 1);
+        conn.execute("UPDATE Operation SET ReferencePaiement = 'EDF REF/42' WHERE IDOperation = 1", [])
+            .expect("référence de la mère");
+
+        let detail = behind_the_cell(&conn, &[1], 2026, 9, Switches::default(), None, None).expect("détail");
+        assert_eq!(detail.len(), 2, "les deux filles, pas la mère");
+        assert!(detail.iter().all(|(row, _)| row.reference == "EDF REF/42"));
     }
 
     /// Le détail d'une case : les deux classements nommés. `None` veut dire

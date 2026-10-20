@@ -218,7 +218,28 @@ fn hold<'a>(
 }
 
 /// Le dossier où les sauvegardes se rangent, et le nom proposé pour celle-ci.
-fn suggested_backup<R: Runtime>(app: &AppHandle<R>) -> (std::path::PathBuf, String) {
+/// **Le nom de la base visée**, tel que la fenêtre des bases le montre
+/// (19/10/2026). Les trois opérations le disent partout — dans le nom du
+/// fichier, la question, la phrase de fin — pour qu'on ne croie jamais avoir
+/// sauvegardé, restauré ou réparé toutes les bases. Vide si la configuration
+/// ne la connaît pas : les phrases et le nom du fichier savent s'en passer.
+fn label_of<R: Runtime>(app: &AppHandle<R>, relative: &str) -> String {
+    app.try_state::<AppState>()
+        .and_then(|state| radinus_core::location::list_databases(&state.data_root).ok())
+        .and_then(|found| found.into_iter().find(|entry| entry.relative_path == relative))
+        .map(|entry| entry.info.label)
+        .filter(|label| !label.trim().is_empty())
+        // À défaut, le nom de son dossier : c'est encore elle qu'on désigne.
+        .unwrap_or_else(|| {
+            std::path::Path::new(relative)
+                .parent()
+                .and_then(|folder| folder.file_name())
+                .map(|name| name.to_string_lossy().to_string())
+                .unwrap_or_default()
+        })
+}
+
+fn suggested_backup<R: Runtime>(app: &AppHandle<R>, label: &str) -> (std::path::PathBuf, String) {
     let root = app
         .try_state::<AppState>()
         .map(|state| state.data_root.clone())
@@ -227,7 +248,7 @@ fn suggested_backup<R: Runtime>(app: &AppHandle<R>) -> (std::path::PathBuf, Stri
     // Le dossier peut ne pas exister encore : le sélecteur s'ouvrirait alors
     // n'importe où. On le crée, il est de toute façon prévu par l'arborescence.
     let _ = std::fs::create_dir_all(&directory);
-    let name = radinus_core::backup::writer::archive_file_name(std::time::SystemTime::now());
+    let name = radinus_core::backup::writer::archive_file_name_for(label);
     (directory, name)
 }
 
@@ -261,7 +282,8 @@ pub fn backup_now<R: Runtime>(app: &AppHandle<R>, relative: &str, password: Opti
         return;
     };
     let title = i18n::text(language, "menu-file-backup");
-    let (directory, name) = suggested_backup(app);
+    let label = label_of(app, relative);
+    let (directory, name) = suggested_backup(app, &label);
 
     let (answered, answer) = std::sync::mpsc::channel();
     app.dialog()
@@ -427,11 +449,10 @@ pub fn backup_now<R: Runtime>(app: &AppHandle<R>, relative: &str, password: Opti
         Ok(()) => tell(
             app,
             &title,
-            &i18n::text_with(
+            &i18n::text_with_all(
                 language,
                 "backup-done",
-                "file",
-                &path.to_string_lossy(),
+                &[("base", label.as_str()), ("file", &path.to_string_lossy())],
             ),
             false,
         ),
@@ -495,6 +516,7 @@ pub fn restore<R: Runtime>(app: AppHandle<R>, relative: String, password: Option
         let Some(target) = target_of(&app, &relative) else {
             return;
         };
+        let label = label_of(&app, &relative);
         let title = i18n::text(language, "menu-file-restore");
 
         let (answered, answer) = std::sync::mpsc::channel();
@@ -571,14 +593,21 @@ pub fn restore<R: Runtime>(app: AppHandle<R>, relative: String, password: Option
             // (Fabrice, 04/08/2026). La question dit ce qu'elle a toujours dit
             // — le contenu actuel sera effacé et remplacé — et ne promet plus
             // rien d'autre.
-            &i18n::text_with(
+            // **La question nomme la base** (19/10/2026) : c'est elle, et
+            // elle seule, qui sera remplacée.
+            &i18n::text_with_all(
                 language,
                 "restore-question",
-                "file",
-                &path
-                    .file_name()
-                    .map(|name| name.to_string_lossy().to_string())
-                    .unwrap_or_default(),
+                &[
+                    ("base", label.as_str()),
+                    (
+                        "file",
+                        &path
+                            .file_name()
+                            .map(|name| name.to_string_lossy().to_string())
+                            .unwrap_or_default(),
+                    ),
+                ],
             ),
         ) {
             return;
@@ -709,7 +738,7 @@ pub fn restore<R: Runtime>(app: AppHandle<R>, relative: String, password: Option
                 let mut said = i18n::message_of(
                     language,
                     "restore-done",
-                    &[],
+                    &[("base", label.as_str())],
                     &[
                         ("accounts", report.accounts as i64),
                         ("operations", report.operations as i64),
@@ -753,6 +782,7 @@ pub fn repair<R: Runtime>(app: AppHandle<R>, relative: String, password: Option<
         let Some(target) = target_of(&app, &relative) else {
             return;
         };
+        let label = label_of(&app, &relative);
 
         let done = match app.try_state::<AppState>() {
             Some(state) => match hold(&state, &target, language, password.as_deref()) {
@@ -777,7 +807,7 @@ pub fn repair<R: Runtime>(app: AppHandle<R>, relative: String, password: Option<
                     &i18n::message_of(
                         language,
                         "repair-done",
-                        &[],
+                        &[("base", label.as_str())],
                         &[("anomalies", anomalies), ("lines", lines)],
                     ),
                     false,

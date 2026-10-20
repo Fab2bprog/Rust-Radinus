@@ -448,6 +448,7 @@ operation-verification-verified = Geprüft
 operation-verification-doubtful = Zweifelhaft
 operation-verification-disputed = Beanstandet
 operations-column-label = Bezeichnung
+operations-column-reference = Zahlungsreferenz
 operations-column-category = Kategorie
 operations-column-assignment = Zuordnung
 operations-column-payment-mode = ZahlArt
@@ -910,12 +911,13 @@ statement-column-reconciled = Abgeglichen
 statement-column-fitid = FITID
 statement-column-date = Datum
 statement-column-label = Bezeichnung
+statement-column-reference = Zahlungsreferenz
 statement-column-debit = Soll
 statement-column-credit = Haben
 statement-account = Konto
 statement-file = Datei
 statement-difference = Differenz
-statement-none = Es ist kein Kontoauszug geöffnet: Klicken Sie auf den gelben Ordner, um eine Datei zu wählen.
+statement-none = Es ist kein Kontoauszug geöffnet: Klicken Sie auf den gelben Ordner, um eine Datei (OFX, CSV, QIF) zu wählen.
 statement-empty = Dieser Kontoauszug enthält keine Buchung.
 statement-no-match = Keine Zeile entspricht dem Filter.
 statement-help = Info: Benutzen Sie Mausklick + Taste [{ $modifier }] auf der Tabelle, um mehrere Zeilen auszuwählen
@@ -997,6 +999,7 @@ statement-group-classification = Einordnung der Buchung für die Berechnung der 
 statement-group-status = Status der Buchung
 statement-field-date = Datum
 statement-field-label = Bezeichnung
+statement-field-reference = Zahlungsreferenz
 statement-field-type = Buchungsart
 statement-field-amount = Betrag
 statement-field-mode = Zahlungsart
@@ -1581,14 +1584,14 @@ print-sent-default = Bericht an Ihren Standarddrucker gesendet.
 # --- Phase 17 — die Vorgänge an der Datenbank ---------------------------
 backup-archive = Radinus-Archiv
 backup-no-database = Es ist keine Datenbank geöffnet.
-backup-done = Datensicherung geschrieben in „{ $file }“.
+backup-done = Die Datenbank „{ $base }“ wurde in „{ $file }“ gesichert. Die anderen Datenbanken sind nicht betroffen.
 backup-failed = Datensicherung nicht möglich: { $reason }
 backup-not-started = Die Datensicherung konnte nicht gestartet werden:
 restore-unreadable = Diese Datei ist kein lesbares Radinus-Archiv: { $reason }
 # Die Frage sagt, was verloren geht, bevor es verloren geht. Das Archiv ist zu
 # diesem Zeitpunkt bereits gelesen worden: Was sie ankündigt, ist sicher.
-restore-question = „{ $file }“ wiederherstellen? Der gesamte aktuelle Inhalt Ihrer Datenbank wird gelöscht und ersetzt, und was sich darin befindet, geht verloren.
-restore-done = Wiederherstellung abgeschlossen: { $accounts } Konten und { $operations } Buchungen.
+restore-question = „{ $file }“ in die Datenbank „{ $base }“ wiederherstellen? Der gesamte aktuelle Inhalt dieser Datenbank wird gelöscht und ersetzt, und was sich darin befindet, geht verloren. Die anderen Datenbanken bleiben unberührt.
+restore-done = Die Datenbank „{ $base }“ wurde wiederhergestellt: { $accounts } Konten und { $operations } Buchungen. Die anderen Datenbanken bleiben unberührt.
 restore-failed = Wiederherstellung nicht möglich: { $reason }
 restore-empty-fields = Leere Felder als Nullwert gelesen: { $count }.
 
@@ -1656,9 +1659,9 @@ journal-help = Das Protokoll bewahrt nur den letzten technischen Vorgang: Datens
 # --- Die Reparatur ------------------------------------------------------
 menu-file-repair-running = Reparatur und Optimierung laufen…
 repair-done = { $anomalies ->
-    [0] Reparatur abgeschlossen: keine Anomalie gefunden. { $lines } Schritte protokolliert.
-    [one] Reparatur abgeschlossen: eine Anomalie repariert. { $lines } Schritte protokolliert.
-   *[other] Reparatur abgeschlossen: { $anomalies } Anomalien repariert. { $lines } Schritte protokolliert.
+    [0] Reparatur der Datenbank „{ $base }“ abgeschlossen: keine Anomalie gefunden. { $lines } Schritte protokolliert. Die anderen Datenbanken sind nicht betroffen.
+    [one] Reparatur der Datenbank „{ $base }“ abgeschlossen: eine Anomalie repariert. { $lines } Schritte protokolliert. Die anderen Datenbanken sind nicht betroffen.
+   *[other] Reparatur der Datenbank „{ $base }“ abgeschlossen: { $anomalies } Anomalien repariert. { $lines } Schritte protokolliert. Die anderen Datenbanken sind nicht betroffen.
 }
 repair-failed = Reparatur nicht möglich: { $reason }
 
@@ -1919,6 +1922,16 @@ preferences-branch-import = Import
 preferences-leaf-verification = Prüfung
 preferences-field-verification = Importierte Buchungen:
 preferences-verification-hint = „Geprüft“: Sie vertrauen Ihrer Bank, eine importierte Buchung gilt als in Ordnung. „Zu prüfen“: Jede importierte Buchung wartet auf Ihre Kontrolle; danach setzen Sie sie in der Buchungsliste selbst auf „Geprüft“. Diese Einstellung gilt nur für künftige Importe.
+preferences-leaf-ofx = OFX-Kontoauszüge
+preferences-field-ofx-label = Bezeichnung der Buchung:
+preferences-field-ofx-reference = Zahlungsreferenz:
+preferences-ofx-choice-name = Der Name der Buchung
+preferences-ofx-choice-memo = Das Memo der Bank
+preferences-ofx-choice-name-and-memo = Der Name, gefolgt vom Memo
+preferences-ofx-choice-empty = Nichts (leer lassen)
+preferences-ofx-label-help = Was in die Bezeichnung einer importierten Buchung übernommen wird. Der Name ist der, den die Bank anzeigt, zum Beispiel „PRLV SEPA“; manche Banken fügen ein ausführliches Memo hinzu: den Gläubiger einer Lastschrift, den Empfänger und den Verwendungszweck einer Überweisung. Hat eine Buchung kein Memo, behält ihre Bezeichnung den Namen.
+preferences-ofx-reference-help = Was in die Zahlungsreferenz einer importierten Buchung übernommen wird; dort können Sie sie sehen und danach filtern. Hat eine Buchung kein Memo, lässt „Das Memo der Bank“ die Referenz leer. Wiederholt das Memo bereits den Namen, wird es nicht zweimal geschrieben.
+preferences-ofx-hint = Diese Einstellungen gelten für alle OFX-Kontoauszüge, unabhängig von der geöffneten Datenbank. Sie werden ab dem nächsten geöffneten Kontoauszug angewendet.
 preferences-leaf-qif = QIF-Kontoauszüge
 preferences-field-qif-order = Reihenfolge von Tag und Monat:
 preferences-qif-order-ask = Mich jedes Mal fragen
@@ -2971,3 +2984,121 @@ sharing-sheet-items = Posten
 sharing-sheet-result = Ergebnis
 sharing-sheet-payments = Zahlungen
 sharing-sheet-balances = Rückzahlungen
+
+## Der Exportassistent für eine Datenbank (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Exportassistent für die Datenbank „{ $base }“
+menu-tools-export = Exportassistent für die Datenbank…
+base-export-only-this = Nur die in der Liste ausgewählte Datenbank „{ $base }“ wird exportiert. Die anderen Datenbanken bleiben unberührt.
+base-export-purpose = Dieser Assistent kopiert die Daten der Datenbank in Dateien, die andere Programme lesen können: eine Tabellenkalkulation, eine Datenbank wie Access, ein anderes Finanzprogramm. Die Datenbank selbst wird nicht verändert.
+base-export-step-format = 1. Format
+base-export-step-options = 2. Optionen
+base-export-step-place = 3. Speicherort
+base-export-step-summary = 4. Zusammenfassung
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = Eine Arbeitsmappe mit einem Blatt pro Tabelle, lesbar mit Excel und den meisten Tabellenkalkulationen.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = Das freie Format von LibreOffice und OpenOffice, mit einem Blatt pro Tabelle.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = Eine Textdatei pro Tabelle, Werte durch Semikolons getrennt: das Format, das fast jedes Programm importieren kann, auch Access.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = Für Programmierer und Anwendungen: jede Tabelle unter ihrem Namen, mit einem Kopfteil, der den Export beschreibt.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = Derselbe Inhalt wie beim JSON, als XML geschrieben.
+base-export-format-sql = SQL-Skript (.sql)
+base-export-format-sql-hint = Die Anweisungen, die die Tabellen und ihre Daten in einer anderen Datenbank neu anlegen (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = SQLite-Datenbank (.sqlite)
+base-export-format-sqlite-hint = Eine eigenständige Datenbank ohne Passwort, die viele Werkzeuge direkt öffnen.
+base-export-format-qif = QIF, eine Datei pro Konto (.qif)
+base-export-format-qif-hint = Um Ihre Konten in ein anderes Finanzprogramm zu übernehmen (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, eine Datei pro Konto (.ofx)
+base-export-format-ofx-hint = Das Format der Kontoauszüge, das die meisten Finanzprogramme importieren können.
+base-export-lossy = Achtung: QIF und OFX können nicht alles abbilden. Übernommen werden nur die Buchungen der Konten, mit ihren Zahlungspartnern, Kategorien und Kommentaren; eine Umbuchung wird auf jeder Seite zu einer gewöhnlichen Buchung, und der Rest (Budgets, wiederkehrende Buchungen, Projekte, Zuordnungen…) bleibt zurück. Um alles zu behalten, wählen Sie ein anderes Format.
+base-export-planned-note = Geplante Buchungen und Buchungen ohne Datum werden nicht exportiert: Sie sind noch nicht bei der Bank angekommen. Ihre Anzahl wird am Ende angezeigt.
+base-export-dates-hint = Datumsangaben werden als Jahr-Monat-Tag geschrieben (2026-12-31) und Beträge in der Währung der Datenbank: So kann sich kein Programm irren.
+base-export-group-layout = Dateien
+base-export-layout-one = Alles in einer einzigen Datei
+base-export-layout-per-table = Eine Datei pro Tabelle, in einem Ordner
+base-export-group-decimal = Dezimaltrennzeichen der Beträge
+base-export-decimal-point = Punkt (1234.56)
+base-export-decimal-comma = Komma (1234,56)
+base-export-group-quotes = Anführungszeichen
+base-export-quotes-all = Jeder Wert in Anführungszeichen
+base-export-quotes-none = Keine Anführungszeichen
+base-export-csv-replacements-hint = Damit sich jede Datei fehlerfrei wieder einlesen lässt, wird ein Semikolon in einem Text zu einem Ausrufezeichen, ein Zeilenumbruch zu einem Leerzeichen und, ohne Anführungszeichen, ein Anführungszeichen zu einem Apostroph. Die Anzahl der Ersetzungen wird am Ende angezeigt.
+base-export-group-qif-order = Reihenfolge im Datum
+base-export-qif-day-month = Tag vor Monat (31/12/2026)
+base-export-qif-month-day = Monat vor Tag (12/31/2026)
+base-export-qif-order-hint = Wählen Sie die Reihenfolge, die das Programm erwartet, das die Dateien lesen wird: in Europa zuerst der Tag, in den Vereinigten Staaten zuerst der Monat.
+base-export-no-option = Dieses Format hat keine Optionen.
+base-export-choose-file = Datei wählen…
+base-export-choose-folder = Ordner wählen…
+base-export-place-file = Der Export wird in diese Datei geschrieben:
+base-export-place-folder = Der Export wird in diesen Ordner geschrieben, der dafür angelegt wird:
+base-export-place-none = Noch kein Speicherort gewählt.
+base-export-place-needed = Wählen Sie zuerst, wohin der Export geschrieben werden soll.
+base-export-folder-exists = Der Ordner „{ $name }“ existiert bereits. Gleichnamige Dateien darin werden ersetzt. Fortfahren?
+base-export-summary-base = Datenbank
+base-export-summary-format = Format
+base-export-summary-options = Optionen
+base-export-summary-place = Speicherort
+base-export-unprotected = Diese Datenbank ist durch ein Passwort geschützt, der Export jedoch nicht: Wer diese Dateien hat, kann Ihre Konten lesen. Bewahren Sie sie an einem sicheren Ort auf.
+base-export-previous = Zurück
+base-export-next = Weiter
+base-export-run = Exportieren
+base-export-running = Export läuft…
+base-export-done = Die Datenbank „{ $base }“ wurde exportiert: { $tables ->
+        [one] eine Tabelle
+       *[other] { $tables } Tabellen
+    }, { $rows ->
+        [one] eine Zeile
+       *[other] { $rows } Zeilen
+    }.
+base-export-done-accounts = Die Datenbank „{ $base }“ wurde exportiert: { $accounts ->
+        [one] ein Konto
+       *[other] { $accounts } Konten
+    }, { $operations ->
+        [one] eine Buchung
+       *[other] { $operations } Buchungen
+    }.
+base-export-done-replacements = { $count ->
+        [one] Ein Zeichen wurde in den CSV-Dateien ersetzt.
+       *[other] { $count } Zeichen wurden in den CSV-Dateien ersetzt.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } Steuerzeichen, das dieses Format nicht enthalten kann, wurde durch „�“ ersetzt.
+       *[other] { $count } Steuerzeichen, die dieses Format nicht enthalten kann, wurden durch „�“ ersetzt.
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } Text war länger als 32.767 Zeichen, die Grenze von Excel: Er wurde in der Arbeitsmappe gekürzt. Die anderen Formate behalten ihn vollständig.
+       *[other] { $count } Texte waren länger als 32.767 Zeichen, die Grenze von Excel: Sie wurden in der Arbeitsmappe gekürzt. Die anderen Formate behalten sie vollständig.
+    }
+base-export-done-anomalies = { $count ->
+        [one] Ein unlesbarer Wert wurde unverändert übernommen.
+       *[other] { $count } unlesbare Werte wurden unverändert übernommen.
+    }
+base-export-done-planned = { $count ->
+        [one] Eine geplante Buchung wurde ausgelassen.
+       *[other] { $count } geplante Buchungen wurden ausgelassen.
+    }
+base-export-done-undated = { $count ->
+        [one] Eine Buchung ohne Datum wurde ausgelassen.
+       *[other] { $count } Buchungen ohne Datum wurden ausgelassen.
+    }
+base-export-done-adjusted = { $count ->
+        [one] Ein Wert wurde an das Format angepasst.
+       *[other] { $count } Werte wurden an das Format angepasst.
+    }
+base-export-too-old = Diese Datenbank stammt aus einer älteren Version von Radinus. Öffnen Sie sie zuerst einmal in Radinus, das sie aktualisiert, und exportieren Sie sie dann.
+base-export-too-recent = Diese Datenbank wurde mit einer neueren Version von Radinus gespeichert. Aktualisieren Sie Radinus, um sie zu exportieren.
+base-export-not-radinus = Diese Datei ist keine Radinus-Datenbank.
+base-export-failed = Der Export konnte nicht durchgeführt werden: { $reason }
+
+## Das Menü Extras des Datenbankfensters nennt die Datenbank (Fabrice, 19.10.2026).
+databases-tools-selected = Ausgewählte Datenbank: „{ $base }“
+databases-tools-none = Keine Datenbank ausgewählt
+menu-tools-backup = Datenbank „{ $base }“ sichern…
+menu-tools-backup-none = Ausgewählte Datenbank sichern…
+menu-tools-restore = Datenbank „{ $base }“ wiederherstellen…
+menu-tools-restore-none = Ausgewählte Datenbank wiederherstellen…
+menu-tools-repair = Datenbank „{ $base }“ reparieren und optimieren…
+menu-tools-repair-none = Ausgewählte Datenbank reparieren und optimieren…

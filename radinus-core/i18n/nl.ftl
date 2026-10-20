@@ -450,6 +450,7 @@ operation-verification-verified = Gecontroleerd
 operation-verification-doubtful = Twijfelachtig
 operation-verification-disputed = Betwist
 operations-column-label = Omschrijving
+operations-column-reference = Betaalreferentie
 operations-column-category = Categorie
 operations-column-assignment = Toewijzing
 operations-column-payment-mode = Betaalw.
@@ -912,12 +913,13 @@ statement-column-reconciled = Afgestemd
 statement-column-fitid = FITID
 statement-column-date = Datum
 statement-column-label = Omschrijving
+statement-column-reference = Betaalreferentie
 statement-column-debit = Debet
 statement-column-credit = Credit
 statement-account = Rekening
 statement-file = Bestand
 statement-difference = Verschil
-statement-none = Er is geen bankafschrift geopend: klik op de gele map om een bestand te kiezen.
+statement-none = Er is geen bankafschrift geopend: klik op de gele map om een bestand te kiezen (OFX, CSV, QIF).
 statement-empty = Dit bankafschrift bevat geen enkele boeking.
 statement-no-match = Geen enkele rij komt overeen met het filter.
 statement-help = Info: Gebruik muisklik + toets [{ $modifier }] op de tabel om meerdere rijen te selecteren
@@ -1000,6 +1002,7 @@ statement-group-classification = Indeling van de boeking voor de berekening van 
 statement-group-status = Status van de boeking
 statement-field-date = Datum
 statement-field-label = Omschrijving
+statement-field-reference = Betaalreferentie
 statement-field-type = Soort boeking
 statement-field-amount = Bedrag
 statement-field-mode = Betaalwijze
@@ -1586,14 +1589,14 @@ print-sent-default = Overzicht naar uw standaardprinter verzonden.
 # --- Fase 17 — de bewerkingen op de database ----------------------------
 backup-archive = Radinus-archief
 backup-no-database = Er is geen database geopend.
-backup-done = Back-up geschreven in “{ $file }”.
+backup-done = De back-up van de database “{ $base }” is geschreven in “{ $file }”. De andere databases worden niet beïnvloed.
 backup-failed = Back-up niet mogelijk: { $reason }
 backup-not-started = De back-up kon niet worden gestart:
 restore-unreadable = Dit bestand is geen leesbaar Radinus-archief: { $reason }
 # De vraag zegt wat er verloren gaat voordat het verloren gaat. Het archief is
 # op dat moment al gelezen: wat zij aankondigt, is zeker.
-restore-question = “{ $file }” terugzetten? De volledige huidige inhoud van uw database wordt gewist en vervangen, en wat zich daarin bevindt, gaat verloren.
-restore-done = Terugzetten voltooid: { $accounts } rekeningen en { $operations } boekingen.
+restore-question = “{ $file }” terugzetten in de database “{ $base }”? De volledige huidige inhoud van deze database wordt gewist en vervangen, en wat zich daarin bevindt, gaat verloren. De andere databases blijven onaangeroerd.
+restore-done = De database “{ $base }” is teruggezet: { $accounts } rekeningen en { $operations } boekingen. De andere databases blijven onaangeroerd.
 restore-failed = Terugzetten niet mogelijk: { $reason }
 restore-empty-fields = Lege velden gelezen als nulwaarde: { $count }.
 
@@ -1661,9 +1664,9 @@ journal-help = Het logboek bewaart alleen de laatste technische bewerking: back-
 # --- De reparatie -------------------------------------------------------
 menu-file-repair-running = Reparatie en optimalisatie bezig…
 repair-done = { $anomalies ->
-    [0] Reparatie voltooid: geen enkele afwijking gevonden. { $lines } stappen gelogd.
-    [one] Reparatie voltooid: één afwijking gerepareerd. { $lines } stappen gelogd.
-   *[other] Reparatie voltooid: { $anomalies } afwijkingen gerepareerd. { $lines } stappen gelogd.
+    [0] Reparatie van de database “{ $base }” voltooid: geen enkele afwijking gevonden. { $lines } stappen gelogd. De andere databases worden niet beïnvloed.
+    [one] Reparatie van de database “{ $base }” voltooid: één afwijking gerepareerd. { $lines } stappen gelogd. De andere databases worden niet beïnvloed.
+   *[other] Reparatie van de database “{ $base }” voltooid: { $anomalies } afwijkingen gerepareerd. { $lines } stappen gelogd. De andere databases worden niet beïnvloed.
 }
 repair-failed = Reparatie niet mogelijk: { $reason }
 
@@ -1925,6 +1928,16 @@ preferences-branch-import = Import
 preferences-leaf-verification = Controle
 preferences-field-verification = Geïmporteerde boekingen:
 preferences-verification-hint = ‘Gecontroleerd’: u vertrouwt uw bank, een geïmporteerde boeking wordt als juist beschouwd. ‘Te controleren’: elke geïmporteerde boeking wacht op uw controle; daarna zet u ze zelf op ‘Gecontroleerd’ in de boekingenlijst. Deze instelling geldt alleen voor toekomstige imports.
+preferences-leaf-ofx = OFX-bankafschriften
+preferences-field-ofx-label = Omschrijving van de boeking:
+preferences-field-ofx-reference = Betaalreferentie:
+preferences-ofx-choice-name = De naam van de boeking
+preferences-ofx-choice-memo = Het memo van de bank
+preferences-ofx-choice-name-and-memo = De naam gevolgd door het memo
+preferences-ofx-choice-empty = Niets (leeg laten)
+preferences-ofx-label-help = Wat er in de omschrijving van een geïmporteerde boeking komt. De naam is wat de bank toont, bijvoorbeeld ‘PRLV SEPA’; sommige banken voegen er een gedetailleerd memo aan toe: de schuldeiser van een incasso, de begunstigde en het doel van een overschrijving. Als een boeking geen memo heeft, behoudt de omschrijving de naam.
+preferences-ofx-reference-help = Wat er in de betaalreferentie van een geïmporteerde boeking komt, waar u die kunt zien en erop kunt filteren. Als een boeking geen memo heeft, laat ‘Het memo van de bank’ de referentie leeg. Als het memo de naam al herhaalt, wordt het niet twee keer geschreven.
+preferences-ofx-hint = Deze instellingen gelden voor alle OFX-bankafschriften, welke database ook geopend is. Ze worden toegepast op het volgende bankafschrift dat u opent.
 preferences-leaf-qif = QIF-bankafschriften
 preferences-field-qif-order = Volgorde van dag en maand:
 preferences-qif-order-ask = Mij elke keer vragen
@@ -2978,3 +2991,121 @@ sharing-sheet-items = Onderdelen
 sharing-sheet-result = Resultaat
 sharing-sheet-payments = Betalingen
 sharing-sheet-balances = Terugbetalingen
+
+## De exportassistent voor een database (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Exportassistent voor de database “{ $base }”
+menu-tools-export = Exportassistent voor de database…
+base-export-only-this = Alleen de database “{ $base }”, die in de lijst geselecteerd is, wordt geëxporteerd. De andere databases blijven ongemoeid.
+base-export-purpose = Deze assistent kopieert de gegevens van de database naar bestanden die andere programma's kunnen lezen: een spreadsheet, een database zoals Access, een ander programma voor uw huishoudboekhouding. De database zelf wordt niet gewijzigd.
+base-export-step-format = 1. Formaat
+base-export-step-options = 2. Opties
+base-export-step-place = 3. Locatie
+base-export-step-summary = 4. Overzicht
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = Een werkmap met één blad per tabel, leesbaar in Excel en in de meeste spreadsheetprogramma's.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = Het open formaat van LibreOffice en OpenOffice, met één blad per tabel.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = Eén tekstbestand per tabel, met waarden gescheiden door puntkomma's: het formaat dat bijna elk programma kan importeren, ook Access.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = Voor programmeurs en toepassingen: elke tabel onder haar eigen naam, met een kop die de export beschrijft.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = Dezelfde inhoud als de JSON, maar in XML geschreven.
+base-export-format-sql = SQL-script (.sql)
+base-export-format-sql-hint = De opdrachten die de tabellen en hun gegevens opnieuw aanmaken in een andere database (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = SQLite-database (.sqlite)
+base-export-format-sqlite-hint = Een zelfstandige database, zonder wachtwoord, die veel programma's rechtstreeks kunnen openen.
+base-export-format-qif = QIF, één bestand per rekening (.qif)
+base-export-format-qif-hint = Om uw rekeningen over te zetten naar een ander programma voor huishoudboekhouding (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, één bestand per rekening (.ofx)
+base-export-format-ofx-hint = Het formaat van bankafschriften, dat de meeste programma's voor huishoudboekhouding kunnen importeren.
+base-export-lossy = Let op: QIF en OFX kunnen niet alles bewaren. Alleen de boekingen van de rekeningen gaan mee, met hun relaties, categorieën en opmerkingen; een overboeking wordt aan elke kant een gewone boeking, en de rest (budgetten, terugkerende boekingen, projecten, toewijzingen…) blijft achter. Kies een ander formaat om alles te behouden.
+base-export-planned-note = Geplande boekingen en boekingen zonder datum worden niet geëxporteerd: ze zijn nog niet door de bank verwerkt. Hun aantal wordt aan het einde vermeld.
+base-export-dates-hint = Datums worden geschreven als jaar-maand-dag (2026-12-31) en bedragen in de valuta van de database: geen enkel programma kan zich daarin vergissen.
+base-export-group-layout = Bestanden
+base-export-layout-one = Alles in één bestand
+base-export-layout-per-table = Eén bestand per tabel, in een map
+base-export-group-decimal = Decimaalteken voor de bedragen
+base-export-decimal-point = De punt (1234.56)
+base-export-decimal-comma = De komma (1234,56)
+base-export-group-quotes = Aanhalingstekens
+base-export-quotes-all = Elke waarde tussen aanhalingstekens
+base-export-quotes-none = Geen aanhalingstekens
+base-export-csv-replacements-hint = Zodat elk bestand zonder fouten opnieuw kan worden ingelezen, wordt een puntkomma in een tekst een uitroepteken, een regeleinde een spatie en, zonder aanhalingstekens, een aanhalingsteken een apostrof. Het aantal vervangingen wordt aan het einde vermeld.
+base-export-group-qif-order = Volgorde van de datum
+base-export-qif-day-month = Dag vóór maand (31/12/2026)
+base-export-qif-month-day = Maand vóór dag (12/31/2026)
+base-export-qif-order-hint = Kies de volgorde die het programma verwacht dat de bestanden zal lezen: in Europa eerst de dag, in de Verenigde Staten eerst de maand.
+base-export-no-option = Dit formaat heeft geen opties.
+base-export-choose-file = Bestand kiezen…
+base-export-choose-folder = Map kiezen…
+base-export-place-file = De export wordt in dit bestand geschreven:
+base-export-place-folder = De export wordt in deze map geschreven, die daarvoor wordt aangemaakt:
+base-export-place-none = Er is nog geen locatie gekozen.
+base-export-place-needed = Kies eerst waar de export moet worden opgeslagen.
+base-export-folder-exists = De map “{ $name }” bestaat al. Bestanden met dezelfde naam in die map worden vervangen. Doorgaan?
+base-export-summary-base = Database
+base-export-summary-format = Formaat
+base-export-summary-options = Opties
+base-export-summary-place = Locatie
+base-export-unprotected = Deze database is beveiligd met een wachtwoord, maar de export niet: iedereen die deze bestanden heeft, kan uw rekeningen lezen. Bewaar ze op een veilige plek.
+base-export-previous = Vorige
+base-export-next = Volgende
+base-export-run = Exporteren
+base-export-running = Bezig met exporteren…
+base-export-done = De database “{ $base }” is geëxporteerd: { $tables ->
+        [one] één tabel
+       *[other] { $tables } tabellen
+    }, { $rows ->
+        [one] één rij
+       *[other] { $rows } rijen
+    }.
+base-export-done-accounts = De database “{ $base }” is geëxporteerd: { $accounts ->
+        [one] één rekening
+       *[other] { $accounts } rekeningen
+    }, { $operations ->
+        [one] één boeking
+       *[other] { $operations } boekingen
+    }.
+base-export-done-replacements = { $count ->
+        [one] Er is één teken vervangen in de CSV-bestanden.
+       *[other] Er zijn { $count } tekens vervangen in de CSV-bestanden.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } stuurteken, dat dit formaat niet kan bevatten, is vervangen door “�”.
+       *[other] { $count } stuurtekens, die dit formaat niet kan bevatten, zijn vervangen door “�”.
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } tekst was langer dan 32.767 tekens, de limiet van Excel: hij is ingekort in de werkmap. De andere formaten bewaren hem volledig.
+       *[other] { $count } teksten waren langer dan 32.767 tekens, de limiet van Excel: ze zijn ingekort in de werkmap. De andere formaten bewaren ze volledig.
+    }
+base-export-done-anomalies = { $count ->
+        [one] Eén onleesbare waarde is ongewijzigd overgenomen.
+       *[other] { $count } onleesbare waarden zijn ongewijzigd overgenomen.
+    }
+base-export-done-planned = { $count ->
+        [one] Eén geplande boeking is overgeslagen.
+       *[other] { $count } geplande boekingen zijn overgeslagen.
+    }
+base-export-done-undated = { $count ->
+        [one] Eén boeking zonder datum is overgeslagen.
+       *[other] { $count } boekingen zonder datum zijn overgeslagen.
+    }
+base-export-done-adjusted = { $count ->
+        [one] Eén waarde is aangepast aan het formaat.
+       *[other] { $count } waarden zijn aangepast aan het formaat.
+    }
+base-export-too-old = Deze database komt uit een oudere versie van Radinus. Open ze eerst één keer in Radinus, dat ze bijwerkt, en exporteer ze daarna.
+base-export-too-recent = Deze database is opgeslagen door een nieuwere versie van Radinus. Werk Radinus bij om ze te exporteren.
+base-export-not-radinus = Dit bestand is geen Radinus-database.
+base-export-failed = De export is mislukt: { $reason }
+
+## Het menu Extra van het databasevenster noemt de database (Fabrice, 19/10/2026).
+databases-tools-selected = Geselecteerde database: “{ $base }”
+databases-tools-none = Geen database geselecteerd
+menu-tools-backup = Back-up maken van de database “{ $base }”…
+menu-tools-backup-none = Back-up maken van de geselecteerde database…
+menu-tools-restore = De database “{ $base }” terugzetten…
+menu-tools-restore-none = De geselecteerde database terugzetten…
+menu-tools-repair = De database “{ $base }” repareren en optimaliseren…
+menu-tools-repair-none = De geselecteerde database repareren en optimaliseren…

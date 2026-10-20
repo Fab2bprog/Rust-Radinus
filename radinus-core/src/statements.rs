@@ -39,6 +39,10 @@ pub struct Line {
     pub rank: usize,
     pub date: Option<NaiveDate>,
     pub label: String,
+    /// **La référence paiement** que l'opération recevra (19/10/2026) : le
+    /// MEMO de la banque, selon les réglages des Préférences — vide quand le
+    /// fichier n'en porte pas, ou que l'utilisateur ne l'a pas voulu.
+    pub reference: String,
     /// Signé, en micro-unités. La fenêtre le range en Débit ou en Crédit selon
     /// son signe, comme la liste des opérations.
     pub amount: i64,
@@ -260,6 +264,20 @@ pub fn prepare(
     account_id: i64,
     statement: &ofx_import::Statement,
 ) -> Result<Import> {
+    prepare_with(conn, account_id, statement, ofx_import::MemoOptions::default())
+}
+
+/// [`prepare`], avec ce que l'utilisateur veut faire du MEMO de la banque
+/// (Préférences › Relevés OFX, 19/10/2026). Le libellé et la référence de
+/// chaque ligne sont composés **ici**, une fois : la fenêtre les montre, la
+/// fiche de rapprochement les corrige, l'intégration les écrit. Sans MEMO —
+/// le QIF, le CSV, La Banque Postale —, rien ne change.
+pub fn prepare_with(
+    conn: &Connection,
+    account_id: i64,
+    statement: &ofx_import::Statement,
+    memo: ofx_import::MemoOptions,
+) -> Result<Import> {
     let known: HashSet<String> = conn
         .prepare("SELECT FitID FROM Operation WHERE IDCompte = ?1 AND FitID <> ''")?
         .query_map([account_id], |row| row.get::<_, String>(0))?
@@ -287,6 +305,7 @@ pub fn prepare(
         .iter()
         .map(|transaction| {
             let has_fitid = !transaction.fitid.trim().is_empty();
+            let (label, reference) = ofx_import::compose(&transaction.label, &transaction.memo, memo);
             let day = transaction
                 .date
                 .map(|date| date.format("%Y-%m-%d").to_string())
@@ -294,16 +313,14 @@ pub fn prepare(
             Line {
                 rank: transaction.rank,
                 date: transaction.date,
-                label: transaction.label.clone(),
+                label: label.clone(),
+                reference,
                 amount: transaction.amount,
                 kind: transaction.kind.clone(),
                 fitid: transaction.fitid.clone(),
                 fitid_known: has_fitid && known.contains(&transaction.fitid),
-                looks_like_duplicate: alike.contains(&(
-                    day,
-                    transaction.label.clone(),
-                    transaction.amount,
-                )),
+                // Le soupçon se cherche sur le libellé **qui sera écrit**.
+                looks_like_duplicate: alike.contains(&(day, label, transaction.amount)),
                 reconciled: false,
             }
         })
@@ -431,7 +448,7 @@ pub fn integrate(
             IDCategorie, IDAffectation, IDCompte, DatePointage, FitID, ReferencePaiement,
             NumRelevBanque, IDStatutOperation, IDOperationParent, SoldePointe, EstParent,
             GUIDCalOpPeriode, IDCheque, IDTiers, IDProjets, EstComplement, IDVerification)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, '', '', ?11, 0, 0, 0, '', 0,
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?15, '', ?11, 0, 0, 0, '', 0,
                  ?12, ?13, 0, ?14)",
         rusqlite::params![
             id,
@@ -450,6 +467,9 @@ pub fn integrate(
             // Une ligne de relevé : vérifiée ou à vérifier, selon la
             // préférence (Fabrice, 03/10/2026).
             crate::preferences::import_verification(conn)?,
+            // La référence paiement : le MEMO de la banque, ou ce que la fiche
+            // de rapprochement en a fait.
+            line.reference,
         ],
     )?;
 
@@ -459,7 +479,7 @@ pub fn integrate(
 }
 
 /// Remplace ce que la fiche de rapprochement a pu changer — la date, le
-/// libellé, le montant.
+/// libellé, la référence paiement (19/10/2026), le montant.
 ///
 /// **La fiche modifie la ligne, chez Fabrice.** Elle reçoit la transaction et
 /// la rend, et la liste se rafraîchit avec ce qui revient : date, libellé,
@@ -470,6 +490,7 @@ pub fn amend(
     rank: usize,
     date: Option<NaiveDate>,
     label: &str,
+    reference: &str,
     amount: i64,
 ) -> bool {
     let Some(line) = import.lines.iter_mut().find(|line| line.rank == rank) else {
@@ -477,6 +498,7 @@ pub fn amend(
     };
     line.date = date;
     line.label = label.to_string();
+    line.reference = reference.trim().to_string();
     line.amount = amount;
     true
 }
@@ -755,7 +777,7 @@ mod tests {
         let conn = database();
         let mut import = loaded(&conn);
         let corrected = NaiveDate::from_ymd_opt(2026, 7, 20).unwrap();
-        assert!(amend(&mut import, 1, Some(corrected), "RETRAIT CORRIGE", -60_000_000));
+        assert!(amend(&mut import, 1, Some(corrected), "RETRAIT CORRIGE", " REF 7 ", -60_000_000));
         add(&conn, &mut import, 1);
 
         let (label, date, amount): (String, String, i64) = conn
@@ -770,6 +792,159 @@ mod tests {
         assert_eq!(amount, -60_000_000);
         // Et la ligne du tableau porte la correction, comme dans l'original.
         assert_eq!(import.line(1).unwrap().label, "RETRAIT CORRIGE");
+        // La référence corrigée entre aussi, sans ses espaces au bord.
+        let reference: String = conn
+            .query_row("SELECT ReferencePaiement FROM Operation WHERE IDCompte = 1", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(reference, "REF 7");
+    }
+
+    /// **Le MEMO de la banque, du fichier à l'opération** (19/10/2026). Par
+    /// défaut il va dans la référence paiement et le libellé reste le NAME ;
+    /// coché « dans le libellé », il le suit aussi. Un relevé sans MEMO —
+    /// La Banque Postale — entre exactement comme avant.
+    #[test]
+    fn le_memo_entre_dans_la_reference_paiement() {
+        const BNP_LIKE: &str = "OFXHEADER:100\r\nDATA:OFXSGML\r\n\
+<OFX><BANKMSGSRSV1><STMTTRNRS><STMTRS><CURDEF>EUR<BANKACCTFROM><ACCTID>123456A789\
+</BANKACCTFROM><BANKTRANLIST><DTSTART>20260427<DTEND>20260724\
+<STMTTRN>\r\n<TRNTYPE>DEBIT\r\n<DTPOSTED>20260723\r\n<TRNAMT>-50,00\r\n<FITID>B1\r\n<NAME>PRLV SEPA\r\n\
+<MEMO>CAISSE INVENTEE REF/42\r\n</STMTTRN>\
+</BANKTRANLIST><LEDGERBAL><BALAMT>1830.00<DTASOF>20260724</LEDGERBAL></STMTRS></STMTTRNRS></BANKMSGSRSV1></OFX>";
+        let reference_of = |conn: &Connection| -> (String, String) {
+            conn.query_row(
+                "SELECT Libelle, ReferencePaiement FROM Operation WHERE IDCompte = 1 ORDER BY IDOperation DESC LIMIT 1",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .unwrap()
+        };
+        let statement = ofx_import::read(BNP_LIKE, "123456A789").unwrap();
+
+        // Les réglages par défaut.
+        let conn = database();
+        let mut import = prepare_with(&conn, 1, &statement, ofx_import::MemoOptions::default()).unwrap();
+        assert_eq!(import.line(1).unwrap().label, "PRLV SEPA");
+        assert_eq!(import.line(1).unwrap().reference, "CAISSE INVENTEE REF/42");
+        add(&conn, &mut import, 1);
+        assert_eq!(reference_of(&conn), ("PRLV SEPA".into(), "CAISSE INVENTEE REF/42".into()));
+
+        // Le nom suivi du mémo dans le libellé, le mémo en référence.
+        let conn = database();
+        let both = ofx_import::MemoOptions {
+            label: ofx_import::LabelSource::NameAndMemo,
+            reference: ofx_import::ReferenceSource::Memo,
+        };
+        let mut import = prepare_with(&conn, 1, &statement, both).unwrap();
+        add(&conn, &mut import, 1);
+        assert_eq!(
+            reference_of(&conn),
+            ("PRLV SEPA CAISSE INVENTEE REF/42".into(), "CAISSE INVENTEE REF/42".into())
+        );
+
+        // Le nom, et rien en référence : comme avant le 19/10/2026.
+        let conn = database();
+        let neither = ofx_import::MemoOptions {
+            label: ofx_import::LabelSource::Name,
+            reference: ofx_import::ReferenceSource::Empty,
+        };
+        let mut import = prepare_with(&conn, 1, &statement, neither).unwrap();
+        add(&conn, &mut import, 1);
+        assert_eq!(reference_of(&conn), ("PRLV SEPA".into(), "".into()));
+
+        // Sans MEMO, le mémo choisi en référence : elle reste vide.
+        let conn = database();
+        let lbp = ofx_import::read(SAMPLE, "123456A789").unwrap();
+        let mut import = prepare_with(&conn, 1, &lbp, both).unwrap();
+        assert!(import.lines.iter().all(|line| line.reference.is_empty()));
+        add(&conn, &mut import, 1);
+        assert_eq!(reference_of(&conn), ("RETRAIT DAB/TPE INTERNE".into(), "".into()));
+    }
+
+    /// **Les vrais relevés suivent toute la chaîne** (étape H du chantier MEMO,
+    /// 19/10/2026) : lecture, composition — pour chacune des douze
+    /// combinaisons des deux menus depuis le 20/10/2026 —, intégration dans
+    /// une base neuve, puis export OFX relu. Ignoré : les
+    /// relevés des utilisateurs sont confidentiels et ne vont jamais dans le
+    /// dépôt ; on les désigne par la variable `RADINUS_OFX` (chemins séparés
+    /// par `:`).
+    ///
+    ///       RADINUS_OFX=a.ofx:b.ofx cargo test -p radinus-core --lib \
+    ///           vrais_releves_jusqu_a_la_base -- --ignored --nocapture
+    #[test]
+    #[ignore]
+    fn vrais_releves_jusqu_a_la_base() {
+        let files = std::env::var("RADINUS_OFX").expect("RADINUS_OFX");
+        for path in files.split(':').filter(|path| !path.is_empty()) {
+            let text = ofx_import::decode(&std::fs::read(path).unwrap());
+            // Les douze combinaisons des deux menus (20/10/2026), la première
+            // étant celle par défaut.
+            use ofx_import::{LabelSource as L, ReferenceSource as R};
+            let mut every = vec![ofx_import::MemoOptions::default()];
+            for label in [L::Name, L::Memo, L::NameAndMemo] {
+                for reference in [R::Memo, R::Name, R::NameAndMemo, R::Empty] {
+                    let options = ofx_import::MemoOptions { label, reference };
+                    if !every.contains(&options) {
+                        every.push(options);
+                    }
+                }
+            }
+            for account in ofx_import::accounts_in(&text) {
+                for options in every.iter().copied() {
+                    let statement = ofx_import::read(&text, &account).unwrap();
+                    let conn = database();
+                    let mut import = prepare_with(&conn, 1, &statement, options).unwrap();
+                    let ranks: Vec<usize> = import.lines.iter().map(|line| line.rank).collect();
+                    for rank in ranks {
+                        assert!(matches!(add(&conn, &mut import, rank), Outcome::Added(_)));
+                    }
+
+                    // La base porte exactement ce que le fichier disait.
+                    let mut rows = conn
+                        .prepare(
+                            "SELECT IDOperation, Libelle, ReferencePaiement, Montant FROM Operation
+                             WHERE IDCompte = 1 ORDER BY IDOperation",
+                        )
+                        .unwrap();
+                    let stored: Vec<(i64, String, String, i64)> = rows
+                        .query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)))
+                        .unwrap()
+                        .map(Result::unwrap)
+                        .collect();
+                    assert_eq!(stored.len(), statement.transactions.len());
+                    for (transaction, (_, label, reference, amount)) in
+                        statement.transactions.iter().zip(&stored)
+                    {
+                        let expected = ofx_import::compose(&transaction.label, &transaction.memo, options);
+                        assert_eq!((label, reference), (&expected.0, &expected.1));
+                        assert_eq!(*amount, transaction.amount);
+                    }
+
+                    // L'export OFX rend la référence dans <MEMO>, et se relit.
+                    let ids: Vec<i64> = stored.iter().map(|row| row.0).collect();
+                    let lines = crate::exports::lines(&conn, 1, &ids).unwrap();
+                    let account_of = crate::exports::account_of(&conn, 1).unwrap();
+                    let today = NaiveDate::from_ymd_opt(2026, 10, 19).unwrap();
+                    let exported = crate::exports::ofx(&account_of, &lines, today);
+                    let back_account = ofx_import::accounts_in(&exported).into_iter().next().unwrap_or_default();
+                    let back = ofx_import::read(&exported, &back_account).unwrap();
+                    assert_eq!(back.transactions.len(), stored.len());
+                    for (again, (_, label, reference, amount)) in back.transactions.iter().zip(&stored) {
+                        assert_eq!((&again.label, &again.memo, again.amount), (label, reference, *amount));
+                    }
+
+                    let total: i64 = stored.iter().map(|row| row.3).sum();
+                    println!(
+                        "{} — compte {account} — {:?}/{:?} : {} opérations intégrées, total {total}, {} références, export OFX relu à l'identique",
+                        std::path::Path::new(path).file_name().unwrap().to_string_lossy(),
+                        options.label,
+                        options.reference,
+                        stored.len(),
+                        stored.iter().filter(|row| !row.2.is_empty()).count(),
+                    );
+                }
+            }
+        }
     }
 
     /// **L'écart, tel que l'original le calcule** — et il ne le calcule pas de
@@ -903,7 +1078,7 @@ mod tests {
         let mut import = loaded(&conn);
         assert!(matches!(add(&conn, &mut import, 99), Outcome::Unknown));
         assert_eq!(in_base(&conn), 0);
-        assert!(!amend(&mut import, 99, None, "", 0));
+        assert!(!amend(&mut import, 99, None, "", "", 0));
     }
 
     /// **Une ligne sans FITID n'est jamais un doublon avéré.** Sans

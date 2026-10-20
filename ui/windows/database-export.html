@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Assistant d'exportation de la base</title>
+    <script type="module" src="/ui/windows/database-export.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- L'assistant d'exportation d'une base (P-74, Fabrice, 19/10/2026).
+
+         **La portabilité des données** : « on peut imaginer dans un futur très
+         très lointain que Radinus soit abandonné » — l'utilisateur doit alors
+         pouvoir partir avec tout, et le verser dans un autre logiciel.
+
+         **Seule la base choisie dans la liste est exportée**, et la fenêtre le
+         dit partout : dans son titre, dans la phrase de tête qui ne s'en va
+         jamais, dans le récapitulatif et dans la phrase de fin. « Il existe des
+         gens qui ne comprennent pas tout », a prévenu Fabrice.
+
+         Quatre pages, une à la fois : le format, ses options, l'emplacement,
+         le récapitulatif. -->
+    <div class="window">
+      <aside class="panel panel--left">
+        <img
+          class="panel__image"
+          src="/ui/assets/icons/ImgRadinusClassement.png"
+          alt=""
+        />
+      </aside>
+
+      <main class="window__content window__content--scroll">
+        <section class="band">
+          <p class="export-banner" id="only-this"></p>
+          <p class="pane__hint export-purpose" id="purpose"></p>
+          <ol class="export-steps" id="steps">
+            <li data-step="0" id="step-format"></li>
+            <li data-step="1" id="step-options"></li>
+            <li data-step="2" id="step-place"></li>
+            <li data-step="3" id="step-summary"></li>
+          </ol>
+        </section>
+
+        <!-- 1. Le format. -->
+        <section class="band export-page" data-page="0" id="page-format">
+          <div class="export-choices" id="formats"></div>
+          <p class="export-warning" id="lossy" hidden></p>
+        </section>
+
+        <!-- 2. Les options, selon le format. -->
+        <section class="band export-page" data-page="1" id="page-options" hidden>
+          <div class="export-group" id="group-layout">
+            <p class="export-group__title" id="layout-title"></p>
+            <label class="export-choice">
+              <input type="radio" name="layout" value="one-file" checked />
+              <span id="layout-one"></span>
+            </label>
+            <label class="export-choice">
+              <input type="radio" name="layout" value="per-table" />
+              <span id="layout-per-table"></span>
+            </label>
+          </div>
+
+          <div class="export-group" id="group-decimal">
+            <p class="export-group__title" id="decimal-title"></p>
+            <label class="export-choice">
+              <input type="radio" name="decimal" value="comma" />
+              <span id="decimal-comma"></span>
+            </label>
+            <label class="export-choice">
+              <input type="radio" name="decimal" value="point" />
+              <span id="decimal-point"></span>
+            </label>
+          </div>
+
+          <div class="export-group" id="group-quotes">
+            <p class="export-group__title" id="quotes-title"></p>
+            <label class="export-choice">
+              <input type="radio" name="quotes" value="all" checked />
+              <span id="quotes-all"></span>
+            </label>
+            <label class="export-choice">
+              <input type="radio" name="quotes" value="none" />
+              <span id="quotes-none"></span>
+            </label>
+            <p class="pane__hint" id="csv-hint"></p>
+          </div>
+
+          <div class="export-group" id="group-order">
+            <p class="export-group__title" id="order-title"></p>
+            <label class="export-choice">
+              <input type="radio" name="order" value="day-month" checked />
+              <span id="order-day-month"></span>
+            </label>
+            <label class="export-choice">
+              <input type="radio" name="order" value="month-day" />
+              <span id="order-month-day"></span>
+            </label>
+            <p class="pane__hint" id="order-hint"></p>
+          </div>
+
+          <p class="pane__hint" id="no-option"></p>
+          <p class="pane__hint" id="dates-hint"></p>
+          <p class="pane__hint" id="planned-note"></p>
+        </section>
+
+        <!-- 3. L'emplacement. -->
+        <section class="band export-page" data-page="2" id="page-place" hidden>
+          <p>
+            <button class="text-button" id="choose" type="button"></button>
+          </p>
+          <p id="place-caption"></p>
+          <p class="export-path" id="place-path"></p>
+        </section>
+
+        <!-- 4. Le récapitulatif, et le bouton qui fait l'export. -->
+        <section class="band export-page" data-page="3" id="page-summary" hidden>
+          <dl class="export-summary">
+            <dt id="summary-base-caption"></dt>
+            <dd id="summary-base"></dd>
+            <dt id="summary-format-caption"></dt>
+            <dd id="summary-format"></dd>
+            <dt id="summary-options-caption"></dt>
+            <dd id="summary-options"></dd>
+            <dt id="summary-place-caption"></dt>
+            <dd class="export-path" id="summary-place"></dd>
+          </dl>
+          <p class="export-warning" id="unprotected" hidden></p>
+          <p class="export-done" id="done" hidden></p>
+        </section>
+
+        <div class="export-nav">
+          <button class="text-button" id="previous" type="button"></button>
+          <button class="text-button" id="next" type="button"></button>
+          <button class="text-button" id="run" type="button" hidden></button>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar">…</footer>
+    </div>
+  </body>
+</html>

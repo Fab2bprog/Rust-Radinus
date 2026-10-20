@@ -144,6 +144,8 @@ tests in the same file: a rule and its proof travel together.
 | `statements.rs` | What is done with a statement once read: matching against what the database already knows, and integrating a line. |
 | `csv_statement.rs` | A statement in CSV, and the window that cuts it into columns. |
 | `qif_import.rs` | Reading a QIF bank statement into the same `Statement` as OFX (P-73). |
+| `database_export.rs` | The export wizard: reads a whole base read-only and writes it as xlsx, ods, csv, json, xml, sql or sqlite (P-74). |
+| `account_export.rs` | The same wizard's QIF and OFX, one file per account (P-74). |
 | `csv_excel_import.rs` | The three-step Excel import: capture zone, field mapping, policies. |
 | `exports.rs` | The two banking outputs of the export menu: OFX and QIF. |
 | `sheets.rs` | One sheet, three ways to write it — Excel, OpenDocument, CSV/XML/JSON. Written once for every table in the application. |

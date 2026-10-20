@@ -445,6 +445,7 @@ operation-verification-verified = Yfirfarin
 operation-verification-doubtful = Vafasöm
 operation-verification-disputed = Véfengd
 operations-column-label = Lýsing
+operations-column-reference = Greiðslutilvísun
 operations-column-category = Flokkur
 operations-column-assignment = Úthlutun
 operations-column-payment-mode = Greiðslum.
@@ -905,12 +906,13 @@ statement-column-reconciled = Afstemmt
 statement-column-fitid = FITID
 statement-column-date = Dagsetning
 statement-column-label = Lýsing
+statement-column-reference = Greiðslutilvísun
 statement-column-debit = Debet
 statement-column-credit = Kredit
 statement-account = Reikningur
 statement-file = Skrá
 statement-difference = Mismunur
-statement-none = Ekkert reikningsyfirlit er opið: smelltu á gulu möppuna til að velja skrá.
+statement-none = Ekkert reikningsyfirlit er opið: smelltu á gulu möppuna til að velja skrá (OFX, CSV, QIF).
 statement-empty = Þetta reikningsyfirlit inniheldur engar færslur.
 statement-no-match = Engin lína samsvarar síunni.
 statement-help = Ábending: Notaðu músarsmell + [{ $modifier }]-lykilinn á töflunni til að velja margar línur
@@ -993,6 +995,7 @@ statement-group-classification = Flokkun færslunnar til útreiknings á tölfr�
 statement-group-status = Staða færslunnar
 statement-field-date = Dagsetning
 statement-field-label = Lýsing
+statement-field-reference = Greiðslutilvísun
 statement-field-type = Tegund færslu
 statement-field-amount = Upphæð
 statement-field-mode = Greiðslumáti
@@ -1573,14 +1576,14 @@ print-sent-default = Skýrsla send á sjálfgefna prentarann þinn.
 # --- Áfangi 17 — aðgerðirnar á gagnagrunninum ---------------------------
 backup-archive = Radinus-safnskrá
 backup-no-database = Enginn gagnagrunnur er opinn.
-backup-done = Öryggisafrit skrifað í „{ $file }“.
+backup-done = Öryggisafrit af gagnagrunninum „{ $base }“ skrifað í „{ $file }“. Þetta hefur engin áhrif á aðra gagnagrunna.
 backup-failed = Öryggisafritun ekki möguleg: { $reason }
 backup-not-started = Ekki tókst að hefja öryggisafritun:
 restore-unreadable = Þessi skrá er ekki læsileg Radinus-safnskrá: { $reason }
 # Spurningin segir hverju verður glatað áður en því er glatað. Safnskráin hefur
 # þegar verið lesin á þessari stundu: það sem hún boðar er öruggt.
-restore-question = Endurheimta „{ $file }“? Öllu núverandi innihaldi gagnagrunnsins þíns verður eytt og skipt út, og það sem þar er glatast.
-restore-done = Endurheimt lokið: { $accounts } reikningar og { $operations } færslur.
+restore-question = Endurheimta „{ $file }“ í gagnagrunninn „{ $base }“? Öllu núverandi innihaldi þessa gagnagrunns verður eytt og skipt út, og það sem þar er glatast. Ekki er hreyft við öðrum gagnagrunnum.
+restore-done = Gagnagrunnurinn „{ $base }“ hefur verið endurheimtur: { $accounts } reikningar og { $operations } færslur. Ekki er hreyft við öðrum gagnagrunnum.
 restore-failed = Endurheimt ekki möguleg: { $reason }
 restore-empty-fields = Auð svæði lesin sem núllgildi: { $count }.
 
@@ -1648,9 +1651,9 @@ journal-help = Dagbókin geymir aðeins síðustu tæknilegu aðgerð: öryggisa
 # --- Viðgerðin ----------------------------------------------------------
 menu-file-repair-running = Viðgerð og bestun í gangi…
 repair-done = { $anomalies ->
-    [0] Viðgerð lokið: engin frávik fundust. { $lines } skref skráð.
-    [one] Viðgerð lokið: { $anomalies } frávik lagfært. { $lines } skref skráð.
-   *[other] Viðgerð lokið: { $anomalies } frávik lagfærð. { $lines } skref skráð.
+    [0] Viðgerð á gagnagrunninum „{ $base }“ lokið: engin frávik fundust. { $lines } skref skráð. Þetta hefur engin áhrif á aðra gagnagrunna.
+    [one] Viðgerð á gagnagrunninum „{ $base }“ lokið: { $anomalies } frávik lagfært. { $lines } skref skráð. Þetta hefur engin áhrif á aðra gagnagrunna.
+   *[other] Viðgerð á gagnagrunninum „{ $base }“ lokið: { $anomalies } frávik lagfærð. { $lines } skref skráð. Þetta hefur engin áhrif á aðra gagnagrunna.
 }
 repair-failed = Viðgerð ekki möguleg: { $reason }
 
@@ -1909,6 +1912,16 @@ preferences-branch-import = Innflutningur
 preferences-leaf-verification = Yfirferð
 preferences-field-verification = Innfluttar færslur:
 preferences-verification-hint = „Yfirfarin“: þú treystir bankanum þínum, innflutt færsla telst rétt. „Óyfirfarin“: hver innflutt færsla bíður eftir yfirferð þinni; síðan setur þú hana sjálf(ur) á „Yfirfarin“ í færslulistanum. Þessi stilling gildir aðeins um innflutning héðan í frá.
+preferences-leaf-ofx = OFX-reikningsyfirlit
+preferences-field-ofx-label = Lýsing færslunnar:
+preferences-field-ofx-reference = Greiðslutilvísun:
+preferences-ofx-choice-name = Nafn færslunnar
+preferences-ofx-choice-memo = Athugasemd bankans
+preferences-ofx-choice-name-and-memo = Nafnið og síðan athugasemdin
+preferences-ofx-choice-empty = Ekkert (skilja eftir autt)
+preferences-ofx-label-help = Það sem lýsing innfluttrar færslu fær. Nafnið er það sem bankinn birtir, til dæmis „PRLV SEPA“; sumir bankar bæta við ítarlegri athugasemd: kröfuhafa beingreiðslu, viðtakanda og tilgangi millifærslu. Þegar færsla hefur enga athugasemd heldur lýsing hennar nafninu.
+preferences-ofx-reference-help = Það sem greiðslutilvísun innfluttrar færslu fær, þar sem þú getur séð hana og síað eftir henni. Þegar færsla hefur enga athugasemd skilur „Athugasemd bankans“ greiðslutilvísunina eftir auða. Ef athugasemdin endurtekur þegar nafnið er hún ekki skrifuð tvisvar.
+preferences-ofx-hint = Þessar stillingar gilda um öll OFX-reikningsyfirlit, hvaða gagnagrunnur sem er opinn. Þær taka gildi við næsta reikningsyfirlit sem er opnað.
 preferences-leaf-qif = QIF-reikningsyfirlit
 preferences-field-qif-order = Röð dags og mánaðar:
 preferences-qif-order-ask = Spyrja mig í hvert sinn
@@ -2963,3 +2976,121 @@ sharing-sheet-items = Liðir
 sharing-sheet-result = Niðurstaða
 sharing-sheet-payments = Greiðslur
 sharing-sheet-balances = Endurgreiðslur
+
+## Útflutningsaðstoð gagnagrunns (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Útflutningsaðstoð fyrir gagnagrunninn „{ $base }“
+menu-tools-export = Útflutningsaðstoð gagnagrunns…
+base-export-only-this = Aðeins gagnagrunnurinn „{ $base }“, sem er valinn í listanum, verður fluttur út. Aðrir gagnagrunnar verða ekki fyrir neinum áhrifum.
+base-export-purpose = Þessi aðstoð afritar gögn gagnagrunnsins í skrár sem önnur forrit geta lesið: töflureikni, gagnagrunn eins og Access, annað heimilisbókhaldsforrit. Gagnagrunninum sjálfum er ekki breytt.
+base-export-step-format = 1. Snið
+base-export-step-options = 2. Valkostir
+base-export-step-place = 3. Staðsetning
+base-export-step-summary = 4. Yfirlit
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = Vinnubók með einu blaði fyrir hverja töflu, sem Excel og flestir töflureiknar geta lesið.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = Opna sniðið frá LibreOffice og OpenOffice, með einu blaði fyrir hverja töflu.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = Ein textaskrá fyrir hverja töflu, gildin aðskilin með semíkommum: sniðið sem nær öll forrit geta flutt inn, Access þar með talið.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = Fyrir forritara og hugbúnað: hver tafla undir sínu nafni, með haus sem lýsir útflutningnum.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = Sama innihald og í JSON, skrifað sem XML.
+base-export-format-sql = SQL-skrifta (.sql)
+base-export-format-sql-hint = Skipanirnar sem búa töflurnar og gögn þeirra til á ný í öðrum gagnagrunni (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = SQLite-gagnagrunnur (.sqlite)
+base-export-format-sqlite-hint = Sjálfstæður gagnagrunnur, án lykilorðs, sem mörg verkfæri opna beint.
+base-export-format-qif = QIF, ein skrá fyrir hvern reikning (.qif)
+base-export-format-qif-hint = Til að flytja reikningana þína yfir í annað heimilisbókhaldsforrit (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, ein skrá fyrir hvern reikning (.ofx)
+base-export-format-ofx-hint = Snið bankayfirlita, sem flest heimilisbókhaldsforrit geta flutt inn.
+base-export-lossy = Athugaðu: QIF og OFX geta ekki geymt allt. Aðeins færslur reikninganna fara yfir, með mótaðilum, flokkum og athugasemdum; millifærsla verður að venjulegri færslu hvorum megin, og afgangurinn (fjárhagsáætlanir, greiðsluáætlanir, verkefni, úthlutanir…) fylgir ekki með. Veldu annað snið til að halda öllu.
+base-export-planned-note = Áætlaðar færslur og færslur án dagsetningar eru ekki fluttar út: þær hafa ekki enn farið í gegnum bankann. Fjöldi þeirra kemur fram í lokin.
+base-export-dates-hint = Dagsetningar eru skrifaðar ár-mánuður-dagur (2026-12-31) og upphæðir í gjaldmiðli gagnagrunnsins: ekkert forrit getur misskilið þær.
+base-export-group-layout = Skrár
+base-export-layout-one = Allt í einni skrá
+base-export-layout-per-table = Ein skrá fyrir hverja töflu, í möppu
+base-export-group-decimal = Tugabrotsskil í upphæðum
+base-export-decimal-point = Punktur (1234.56)
+base-export-decimal-comma = Komma (1234,56)
+base-export-group-quotes = Gæsalappir
+base-export-quotes-all = Hvert gildi innan gæsalappa
+base-export-quotes-none = Engar gæsalappir
+base-export-csv-replacements-hint = Svo að hver skrá lesist aftur villulaust verður semíkomma í texta að upphrópunarmerki, línuskil verða að bili og, ef engar gæsalappir eru notaðar, verða gæsalappir að úrfellingarmerki. Fjöldi útskiptinga kemur fram í lokin.
+base-export-group-qif-order = Röð í dagsetningum
+base-export-qif-day-month = Dagur á undan mánuði (31/12/2026)
+base-export-qif-month-day = Mánuður á undan degi (12/31/2026)
+base-export-qif-order-hint = Veldu röðina sem forritið sem les skrárnar býst við: dagurinn fyrst í Evrópu, mánuðurinn fyrst í Bandaríkjunum.
+base-export-no-option = Þetta snið hefur enga valkosti.
+base-export-choose-file = Velja skrána…
+base-export-choose-folder = Velja möppuna…
+base-export-place-file = Útflutningurinn verður skrifaður í þessa skrá:
+base-export-place-folder = Útflutningurinn verður skrifaður í þessa möppu, sem verður búin til fyrir hann:
+base-export-place-none = Engin staðsetning hefur verið valin enn.
+base-export-place-needed = Veldu fyrst hvert á að skrifa útflutninginn.
+base-export-folder-exists = Mappan „{ $name }“ er þegar til. Skrám með sama nafni í henni verður skipt út. Halda áfram?
+base-export-summary-base = Gagnagrunnur
+base-export-summary-format = Snið
+base-export-summary-options = Valkostir
+base-export-summary-place = Staðsetning
+base-export-unprotected = Þessi gagnagrunnur er varinn með lykilorði, en útflutningurinn verður það ekki: hver sem kemst yfir þessar skrár getur lesið reikningana þína. Geymdu þær á öruggum stað.
+base-export-previous = Til baka
+base-export-next = Áfram
+base-export-run = Flytja út
+base-export-running = Útflutningur í gangi…
+base-export-done = Gagnagrunnurinn „{ $base }“ hefur verið fluttur út: { $tables ->
+        [one] { $tables } tafla
+       *[other] { $tables } töflur
+    }, { $rows ->
+        [one] { $rows } lína
+       *[other] { $rows } línur
+    }.
+base-export-done-accounts = Gagnagrunnurinn „{ $base }“ hefur verið fluttur út: { $accounts ->
+        [one] { $accounts } reikningur
+       *[other] { $accounts } reikningar
+    }, { $operations ->
+        [one] { $operations } færsla
+       *[other] { $operations } færslur
+    }.
+base-export-done-replacements = { $count ->
+        [one] { $count } staf var skipt út í CSV-skránum.
+       *[other] { $count } stöfum var skipt út í CSV-skránum.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } stýritákni, sem þetta snið getur ekki geymt, var skipt út fyrir „�“.
+       *[other] { $count } stýritáknum, sem þetta snið getur ekki geymt, var skipt út fyrir „�“.
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } texti var lengri en 32.767 stafir, sem er hámark Excel: hann var styttur í vinnubókinni. Hin sniðin geyma hann í heild.
+       *[other] { $count } textar voru lengri en 32.767 stafir, sem er hámark Excel: þeir voru styttir í vinnubókinni. Hin sniðin geyma þá í heild.
+    }
+base-export-done-anomalies = { $count ->
+        [one] { $count } ólæsilegt gildi var afritað óbreytt.
+       *[other] { $count } ólæsileg gildi voru afrituð óbreytt.
+    }
+base-export-done-planned = { $count ->
+        [one] { $count } áætlaðri færslu var sleppt.
+       *[other] { $count } áætluðum færslum var sleppt.
+    }
+base-export-done-undated = { $count ->
+        [one] { $count } færslu án dagsetningar var sleppt.
+       *[other] { $count } færslum án dagsetningar var sleppt.
+    }
+base-export-done-adjusted = { $count ->
+        [one] { $count } gildi var aðlagað að sniðinu.
+       *[other] { $count } gildi voru aðlöguð að sniðinu.
+    }
+base-export-too-old = Þessi gagnagrunnur kemur úr eldri útgáfu af Radinus. Opnaðu hann fyrst einu sinni í Radinus, sem uppfærir hann, og fluttu hann svo út.
+base-export-too-recent = Þessi gagnagrunnur var vistaður með nýrri útgáfu af Radinus. Uppfærðu Radinus til að geta flutt hann út.
+base-export-not-radinus = Þessi skrá er ekki Radinus-gagnagrunnur.
+base-export-failed = Ekki tókst að flytja út: { $reason }
+
+## Verkfæravalmynd gagnagrunnsgluggans nefnir gagnagrunninn (Fabrice, 19/10/2026).
+databases-tools-selected = Valinn gagnagrunnur: „{ $base }“
+databases-tools-none = Enginn gagnagrunnur valinn
+menu-tools-backup = Taka öryggisafrit af gagnagrunninum „{ $base }“…
+menu-tools-backup-none = Taka öryggisafrit af völdum gagnagrunni…
+menu-tools-restore = Endurheimta gagnagrunninn „{ $base }“…
+menu-tools-restore-none = Endurheimta valinn gagnagrunn…
+menu-tools-repair = Gera við og besta gagnagrunninn „{ $base }“…
+menu-tools-repair-none = Gera við og besta valinn gagnagrunn…

@@ -11,6 +11,67 @@ Two version numbers live in this project and they do not move together:
   the line Radinus 1.x walked from 0 to 9 and is at 11 today. A database is
   migrated forward when it is opened, never backward.
 
+## [3.1.0] — 19/10/2026
+
+### Added
+
+- **A database export wizard** (Fabrice, 19/10/2026, P-74), in the Outils
+  menu of the database window — so that leaving Radinus one day never means
+  losing anything. It exports **the base selected in the list, and only it**,
+  and says so on every page. Nine formats: Excel, Calc, CSV, JSON, XML, SQL
+  script, standalone SQLite, QIF and OFX (one file per account). One sheet or
+  file per table, named after it, field names on the first row, amounts in
+  real currency and real dates — ready for Access or any database. CSV
+  decimal separator and quotes are the user's choice; QIF date order too.
+  Everything replaced or left out is counted in the closing sentence. A
+  protected base is read with its password, and the summary warns that the
+  export is not protected.
+- **The bank's OFX memo is no longer lost** (Fabrice, 19/10/2026, P-75). Some
+  banks (BNP Paribas) write a generic name — « PRLV SEPA » — and put the whole
+  detail in `MEMO`, which Radinus ignored. A new page, Préférences ›
+  Importation › Relevés OFX, has two drop-down menus (20/10/2026): what the
+  label receives — the name (default), the memo, or the name followed by the
+  memo — and what the payment reference receives — the memo (default), the
+  name, the name followed by the memo, or nothing. The decision is taken
+  operation by operation: without a memo the label keeps the name, so a
+  statement from La Banque Postale comes in exactly as before. The payment reference shows as a column of the import window and
+  of the operations list (after the label, to see and filter), and as a field
+  of « Rapprocher une transaction ». A column layout the user has already
+  arranged is kept. The detail tables of the Statistics menu — the seven
+  statistics, the Bilan croisé and the Analyse Évolution du solde — show it
+  too (20/10/2026); a ventilation shows its mother's reference.
+
+### Changed
+
+- **Backup, restore and repair say which database they act on** (Fabrice,
+  19/10/2026: « l'utilisateur peut bêtement penser que toutes les bases sont
+  sauvegardées »). The Tools menu of the database window opens on a line
+  naming the selected database, and its entries carry the name — « Sauvegarder
+  la base « Famille »… » —, greyed while no row is selected; the journal is
+  set apart. The backup file is now named after the database,
+  `Famille_Sauvegarde_20261019163512345.zip`, at local time (it used UTC), with
+  any character a system refuses replaced by `_` and `Sauvegarde_….zip` when
+  the name cannot be used; the restore question and the three closing
+  sentences name the database and say the others are not touched. Restoring
+  never depended on the file name.
+- **Longer label and payment reference**: 300 and 255 characters in every
+  form (were 100 and 50). No database is migrated — the
+  columns are text — so a base from 2.0.4 opens in 3.1.0 unchanged. A long
+  label now wraps in the printed statement instead of being cut; an ordinary
+  page prints exactly as before.
+- **QIF and OFX exports put the payment reference in the memo** (`<MEMO>`,
+  QIF `M`); the cheque number field (`CHECKNUM`, QIF `N`) receives only a
+  real cheque number.
+
+### Fixed
+
+- **One invisible control character in a label made a whole exported
+  workbook unreadable** (found on 19/10/2026 while checking the export wizard
+  on a real base): LibreOffice refused the `.ods`, and the `.xlsx` lost every
+  text after it. Such a character now becomes « � » in `.xlsx`, `.ods` and
+  `.docx`, for the right-click exports as well. A Windows line break inside a
+  text no longer shows twice in Calc.
+
 ## [3.0.0] — 03/10/2026
 
 Never published under its first number, 2.1.1: this version becomes **3.0.0**

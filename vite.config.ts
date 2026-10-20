@@ -17,6 +17,7 @@ export default defineConfig(async () => ({
         "database-selector": "ui/windows/database-selector.html",
         "database-form": "ui/windows/database-form.html",
         "password-form": "ui/windows/password-form.html",
+        "database-export": "ui/windows/database-export.html",
         preferences: "ui/windows/preferences.html",
         "about-author": "ui/windows/about-author.html",
         "about-radinus": "ui/windows/about-radinus.html",

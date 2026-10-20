@@ -1,7 +1,7 @@
-# Radinus 3.0.0
+# Radinus 3.1.0
 
 Radinus est un logiciel libre de gestion de finances personnelles (licence GNU
-GPL v3 ou ultérieure). La version 3.0.0 est une réécriture multiplateforme
+GPL v3 ou ultérieure). La version 3.1.0 est une réécriture multiplateforme
 (macOS d'abord) de Radinus 1.9.3, logiciel Windows/WinDev du même auteur.
 
 - **Auteur :** Fabrice Garcia

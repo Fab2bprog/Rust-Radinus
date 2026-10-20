@@ -132,7 +132,7 @@ const OPERATIONS = {
   account_label: "CCP",
   rows: [
     {
-      id: 1, label: "COURSES", date: "05/01/2026", clearing_date: "05/01/2026",
+      id: 1, label: "COURSES", reference: "CB SYSTEME U REF 0105", date: "05/01/2026", clearing_date: "05/01/2026",
       date_value: "2026-01-05", clearing_date_value: "2026-01-05", balance_value: 2322340000,
       month: "janvier", category: "Alimentation", assignment: "Famille",
       payment_mode: "Carte bancaire", payee: "Système U", project: "",
@@ -143,7 +143,7 @@ const OPERATIONS = {
       is_pointed: true, status_id: 1, verification_id: 2,
     },
     {
-      id: 2, label: "Alimentation", date: "05/01/2026", clearing_date: "05/01/2026",
+      id: 2, label: "Alimentation", reference: "", date: "05/01/2026", clearing_date: "05/01/2026",
       date_value: "2026-01-05", clearing_date_value: "2026-01-05", balance_value: 0,
       month: "janvier", category: "Alimentation", assignment: "Famille",
       payment_mode: "Carte bancaire", payee: "", project: "",
@@ -154,7 +154,7 @@ const OPERATIONS = {
       is_pointed: true, status_id: 1, verification_id: 2,
     },
     {
-      id: 3, label: "Complément", date: "05/01/2026", clearing_date: "05/01/2026",
+      id: 3, label: "Complément", reference: "", date: "05/01/2026", clearing_date: "05/01/2026",
       date_value: "2026-01-05", clearing_date_value: "2026-01-05", balance_value: 0,
       month: "janvier", category: "Alimentation", assignment: "Famille",
       payment_mode: "Carte bancaire", payee: "", project: "",
@@ -165,7 +165,7 @@ const OPERATIONS = {
       is_pointed: true, status_id: 1, verification_id: 2,
     },
     {
-      id: 4, label: "SALAIRE", date: "28/01/2026", clearing_date: "28/01/2026",
+      id: 4, label: "SALAIRE", reference: "", date: "28/01/2026", clearing_date: "28/01/2026",
       date_value: "2026-01-28", clearing_date_value: "2026-01-28", balance_value: 0,
       month: "janvier", category: "Salaire", assignment: "Monsieur",
       payment_mode: "Virement", payee: "", project: "",
@@ -525,6 +525,64 @@ const UI_TEXTS = {
   "menu-file-restore": "Restauration de la base de données",
   "menu-file-repair": "Réparation et optimisation de la base de données",
   "menu-tools-password": "Protection de la base par mot de passe",
+  // L'assistant d'exportation d'une base (P-74, 19/10/2026).
+  "menu-tools-export": "Assistant d'exportation de la base…",
+  "base-export-purpose": "Cet assistant copie les données de la base dans des fichiers que d'autres logiciels savent lire : un tableur, une base de données comme Access, un autre logiciel de comptes. La base elle-même n'est pas modifiée.",
+  "base-export-step-format": "1. Le format",
+  "base-export-step-options": "2. Les options",
+  "base-export-step-place": "3. L'emplacement",
+  "base-export-step-summary": "4. Le récapitulatif",
+  "base-export-format-xlsx": "Excel (.xlsx)",
+  "base-export-format-xlsx-hint": "Un classeur avec une feuille par table, lisible par Excel et par la plupart des tableurs.",
+  "base-export-format-ods": "Calc (.ods)",
+  "base-export-format-ods-hint": "Le format libre de LibreOffice et d'OpenOffice, avec une feuille par table.",
+  "base-export-format-csv": "CSV (.csv)",
+  "base-export-format-csv-hint": "Un fichier texte par table, valeurs séparées par des points-virgules : le format que presque tous les logiciels savent importer, Access compris.",
+  "base-export-format-json": "JSON (.json)",
+  "base-export-format-json-hint": "Pour les programmeurs et les applications : chaque table sous son nom, avec un en-tête qui décrit l'export.",
+  "base-export-format-xml": "XML (.xml)",
+  "base-export-format-xml-hint": "Le même contenu que le JSON, écrit en XML.",
+  "base-export-format-sql": "Script SQL (.sql)",
+  "base-export-format-sql-hint": "Les instructions qui recréent les tables et leurs données dans une autre base de données (MySQL, PostgreSQL, SQLite…).",
+  "base-export-format-sqlite": "Base SQLite (.sqlite)",
+  "base-export-format-sqlite-hint": "Une base de données autonome, sans mot de passe, que de nombreux outils ouvrent directement.",
+  "base-export-format-qif": "QIF, un fichier par compte (.qif)",
+  "base-export-format-qif-hint": "Pour reprendre ses comptes dans un autre logiciel de comptes (Money, Quicken, GnuCash, Grisbi…).",
+  "base-export-format-ofx": "OFX, un fichier par compte (.ofx)",
+  "base-export-format-ofx-hint": "Le format des relevés bancaires, que la plupart des logiciels de comptes savent importer.",
+  "base-export-lossy": "Attention : le QIF et l'OFX ne savent pas tout dire. Seules les opérations des comptes passent, avec leurs tiers, leurs catégories et leurs commentaires ; un virement devient une opération ordinaire de chaque côté, et le reste (budgets, échéanciers, projets, affectations…) ne suit pas. Pour tout garder, choisissez un autre format.",
+  "base-export-planned-note": "Les opérations prévues et les opérations sans date ne sont pas exportées : elles ne sont pas encore passées en banque. Leur nombre sera indiqué à la fin.",
+  "base-export-dates-hint": "Les dates sont écrites année-mois-jour (2026-12-31) et les montants dans la devise de la base : aucun logiciel ne peut s'y tromper.",
+  "base-export-group-layout": "Fichiers",
+  "base-export-layout-one": "Tout dans un seul fichier",
+  "base-export-layout-per-table": "Un fichier par table, dans un dossier",
+  "base-export-group-decimal": "Séparateur décimal des montants",
+  "base-export-decimal-point": "Le point (1234.56)",
+  "base-export-decimal-comma": "La virgule (1234,56)",
+  "base-export-group-quotes": "Guillemets",
+  "base-export-quotes-all": "Chaque valeur entre guillemets",
+  "base-export-quotes-none": "Aucun guillemet",
+  "base-export-csv-replacements-hint": "Pour que chaque fichier se relise sans erreur, un point-virgule dans un texte devient un point d'exclamation, un retour à la ligne devient une espace et, sans guillemets, un guillemet devient une apostrophe. Le nombre de remplacements sera indiqué à la fin.",
+  "base-export-group-qif-order": "Ordre des dates",
+  "base-export-qif-day-month": "Le jour avant le mois (31/12/2026)",
+  "base-export-qif-month-day": "Le mois avant le jour (12/31/2026)",
+  "base-export-qif-order-hint": "Choisissez l'ordre qu'attend le logiciel qui lira les fichiers : le jour d'abord en Europe, le mois d'abord aux États-Unis.",
+  "base-export-no-option": "Ce format n'a pas d'option.",
+  "base-export-choose-file": "Choisir le fichier…",
+  "base-export-choose-folder": "Choisir le dossier…",
+  "base-export-place-file": "L'export sera écrit dans ce fichier :",
+  "base-export-place-folder": "L'export sera écrit dans ce dossier, créé pour l'occasion :",
+  "base-export-place-none": "Aucun emplacement n'est encore choisi.",
+  "base-export-place-needed": "Choisissez d'abord où écrire l'export.",
+  "base-export-summary-base": "Base",
+  "base-export-summary-format": "Format",
+  "base-export-summary-options": "Options",
+  "base-export-summary-place": "Emplacement",
+  "base-export-unprotected": "Cette base est protégée par un mot de passe, mais l'export ne le sera pas : quiconque aura ces fichiers pourra lire vos comptes. Rangez-les en lieu sûr.",
+  "base-export-previous": "Précédent",
+  "base-export-next": "Suivant",
+  "base-export-run": "Exporter",
+  "base-export-running": "Exportation en cours…",
   "menu-file-log": "Afficher le log",
   "databases-select": "Veuillez sélectionner une base de données",
   "about-author-name": "Auteur : Fabrice Garcia",
@@ -1459,6 +1517,16 @@ const UI_TEXTS = {
   "preferences-electricity-blue": "Revenir au Tarif Bleu EDF",
   "preferences-electricity-hint": "Le tarif de votre contrat, repris par l'outil « Consommation d'un appareil électrique ». Par défaut : le Tarif Bleu d'EDF au 1er août 2026, prix TTC, compteur de 3 à 6 kVA. Ces prix changent souvent en février et en août : recopiez ceux de votre facture.",
   "preferences-leaf-qif": "Relevés QIF",
+  "preferences-leaf-ofx": "Relevés OFX",
+  "preferences-field-ofx-label": "Libellé de l'opération :",
+  "preferences-field-ofx-reference": "Référence paiement :",
+  "preferences-ofx-choice-name": "Le nom de l'opération",
+  "preferences-ofx-choice-memo": "Le mémo de la banque",
+  "preferences-ofx-choice-name-and-memo": "Le nom suivi du mémo",
+  "preferences-ofx-choice-empty": "Rien (laisser vide)",
+  "preferences-ofx-label-help": "Ce que reçoit le libellé d'une opération importée. Le nom est celui que la banque affiche, par exemple « PRLV SEPA » ; certaines banques y ajoutent un mémo détaillé : le créancier d'un prélèvement, le bénéficiaire et le motif d'un virement. Quand une opération n'a pas de mémo, son libellé garde le nom.",
+  "preferences-ofx-reference-help": "Ce que reçoit la référence paiement d'une opération importée, où vous pouvez la voir et la filtrer. Quand une opération n'a pas de mémo, « Le mémo de la banque » laisse la référence vide. Si le mémo répète déjà le nom, il n'est pas écrit deux fois.",
+  "preferences-ofx-hint": "Ces réglages valent pour tous les relevés OFX, quelle que soit la base ouverte. Ils s'appliquent au prochain relevé ouvert.",
   "preferences-field-qif-order": "Ordre du jour et du mois :",
   "preferences-qif-order-ask": "Me demander à chaque fois",
   "preferences-qif-order-day-month": "Toujours jour/mois (05/03 = 5 mars)",
@@ -1493,12 +1561,14 @@ const UI_TEXTS = {
   "statement-column-fitid": "FITID",
   "statement-column-date": "Date",
   "statement-column-label": "Libelle",
+  "statement-column-reference": "Référence paiement",
+  "operations-column-reference": "Référence paiement",
   "statement-column-debit": "Debit",
   "statement-column-credit": "Credit",
   "statement-account": "Compte",
   "statement-file": "Fichier",
   "statement-difference": "Ecart",
-  "statement-none": "Aucun relevé n'est ouvert : cliquez sur le dossier jaune pour choisir un fichier.",
+  "statement-none": "Aucun relevé n'est ouvert : cliquez sur le dossier jaune pour choisir un fichier (OFX, CSV, QIF).",
   "statement-empty": "Ce relevé ne contient aucune opération.",
   "statement-no-match": "Aucune ligne ne correspond au filtre.",
   "statement-help": "Info : Utilisez Clic Souris + touche [CMD] sur le tableau pour sélectionner plusieurs lignes",
@@ -1516,6 +1586,7 @@ const UI_TEXTS = {
   "statement-group-status": "Statut de l'opération",
   "statement-field-date": "Date",
   "statement-field-label": "Libelle",
+  "statement-field-reference": "Référence paiement",
   "statement-field-type": "Type Opération",
   "statement-field-amount": "Montant",
   "statement-field-mode": "Mode Operation",
@@ -1789,13 +1860,17 @@ const DELETED_TEXTS = {
 };
 
 /// Installs a stub of Tauri's bridge that records every call.
-function bridge({ startupError = null, needsConfirmation = true, plainQuestion = false, slowLoadMs = 0, refusedDeletion = false, duplicateName = null, accountRefusal = null, manyOperations = false, scatteredChildren = false, operationRefusal = null, operationIsASub = false, operationDatelessButPointed = false, operationComment = "", subIsComplement = false, missingParent = false, exportCancelled = false, exportFails = null, noYear = false, pickCancelled = false, fileAccounts = ["123456A789"], pickedIsCsv = false, pickedIsQif = false, qifAmbiguous = false, qifAccounts = ["releve.qif"], referenceTaken = false, accountGone = false, storedLayout = null, databaseOpen = true, clipboardRefuses = "nothing", manyAccounts = false, storedWelcome = null, loanUnavailable = false } = {}) {
+function bridge({ startupError = null, needsConfirmation = true, plainQuestion = false, slowLoadMs = 0, refusedDeletion = false, duplicateName = null, accountRefusal = null, manyOperations = false, scatteredChildren = false, operationRefusal = null, operationIsASub = false, operationDatelessButPointed = false, operationComment = "", subIsComplement = false, missingParent = false, exportCancelled = false, exportFails = null, noYear = false, pickCancelled = false, fileAccounts = ["123456A789"], pickedIsCsv = false, pickedIsQif = false, qifAmbiguous = false, qifAccounts = ["releve.qif"], referenceTaken = false, accountGone = false, storedLayout = null, databaseOpen = true, clipboardRefuses = "nothing", manyAccounts = false, storedWelcome = null, loanUnavailable = false, databases = null, exportPlaceExists = false, exportProtected = false, baseExportRefused = null } = {}) {
   return `
     const OPERATION_JSON = ${JSON.stringify(JSON.stringify(OPERATION))};
     const SUB_OPERATION_JSON = ${JSON.stringify(JSON.stringify(SUB_OPERATION))};
     const MATRIX_JSON = ${JSON.stringify(JSON.stringify(MATRIX))};
     const CROSSED_JSON = ${JSON.stringify(JSON.stringify(CROSSED))};
     const TEXTS_JSON = ${JSON.stringify(JSON.stringify(UI_TEXTS))};
+    const DATABASES_JSON = ${JSON.stringify(JSON.stringify(databases))};
+    const EXPORT_PLACE_EXISTS = ${JSON.stringify(exportPlaceExists)};
+    const EXPORT_PROTECTED = ${JSON.stringify(exportProtected)};
+    const BASE_EXPORT_REFUSED = ${JSON.stringify(baseExportRefused)};
     const TEXTS_BY_KIND = ${JSON.stringify(JSON.stringify(UI_TEXTS_BY_KIND))};
     const OPERATIONS_JSON = ${JSON.stringify(JSON.stringify(OPERATIONS))};
     const ACCOUNTS_JSON = ${JSON.stringify(JSON.stringify(ACCOUNTS))};
@@ -1978,8 +2053,8 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
       // looks_like_duplicate le soupçon : même date, même libellé, même
       // montant. Les trois lignes couvrent les trois cas. (Pas d'accent grave
       // ici : ce texte est injecté dans un gabarit de chaînes.)
-      const line = (rank, date, label, amount, known, alike) => ({
-        rank, date, label, amount,
+      const line = (rank, date, label, amount, known, alike, reference = "") => ({
+        rank, date, label, amount, reference,
         // Le vrai contrôleur envoie les deux : le texte pour lire, l'ISO pour
         // ranger. Le faux pont doit en faire autant, sinon la colonne Date
         // trierait sur « undefined ».
@@ -1990,7 +2065,7 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
       });
       return [
         line(1, "23/07/2026", "RETRAIT DAB/TPE INTERNE", -50000000, false, false),
-        line(2, "22/07/2026", "ACHAT CB COMMERCE TROIS", -120000000, true, true),
+        line(2, "22/07/2026", "ACHAT CB COMMERCE TROIS", -120000000, true, true, "CAISSE INVENTEE ECH/220726 REF/42 LIB/COTISATION ANNUELLE DE LA CAISSE"),
         line(3, "21/07/2026", "VIREMENT SALAIRE", 2000000000, false, true),
       ];
     };
@@ -2405,6 +2480,7 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               rank: args.rank,
               date: "2026-07-23",
               label: row ? row.label : "",
+              reference: row ? row.reference : "",
               direction: row && row.amount < 0 ? "D" : "C",
               amount: "50,00",
               clearing_date: "2026-07-23",
@@ -2595,6 +2671,12 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
           // tenue par la page.
           case "preferences_qif":
             return Promise.resolve(window.__qifPreferences ?? { order: "ask", label: "both" });
+          case "preferences_ofx":
+            return Promise.resolve(window.__ofxPreferences ?? { label: "name", reference: "memo" });
+          case "save_preferences_ofx":
+            window.__ofxPreferences = { label: args.label, reference: args.reference };
+            window.__ofxSaves = (window.__ofxSaves ?? 0) + 1;
+            return Promise.resolve(null);
           case "save_preferences_qif":
             window.__qifPreferences = { order: args.order, label: args.label };
             window.__qifSaves = (window.__qifSaves ?? 0) + 1;
@@ -4147,6 +4229,44 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
           case "close_holiday":
             window.__holidayClosed = (window.__holidayClosed ?? 0) + 1;
             return Promise.resolve(null);
+          // --- L'assistant d'exportation d'une base (P-74) ----------------
+          case "list_databases":
+            return Promise.resolve(JSON.parse(DATABASES_JSON));
+          case "database_tool_labels":
+            window.__toolLabels = (window.__toolLabels ?? []).concat([args.label]);
+            return Promise.resolve(
+              args.label === null
+                ? { header: "Aucune base sélectionnée", backup: "Sauvegarder la base sélectionnée…", restore: "Restaurer la base sélectionnée…", repair: "Réparer et optimiser la base sélectionnée…" }
+                : { header: "Base sélectionnée : « " + args.label + " »", backup: "Sauvegarder la base « " + args.label + " »…", restore: "Restaurer la base « " + args.label + " »…", repair: "Réparer et optimiser la base « " + args.label + " »…" },
+            );
+          case "open_database_export":
+            window.__exportOpened = args;
+            return Promise.resolve(null);
+          case "database_export_intro":
+            window.__exportIntro = args;
+            return Promise.resolve({
+              banner: "Seule la base « " + args.label + " », sélectionnée dans la liste, sera exportée. Les autres bases ne sont pas concernées.",
+              protected: EXPORT_PROTECTED,
+            });
+          case "database_export_destination": {
+            window.__exportPicks = (window.__exportPicks ?? 0) + 1;
+            window.__exportPicked = args;
+            const folder = ["csv", "qif", "ofx"].includes(args.format) || (args.format !== "sqlite" && args.layout === "per-table");
+            const stem = args.label + " - export 2026-10-19";
+            return Promise.resolve({
+              destination: folder ? "/home/lea/Documents/" + stem : "/home/lea/Documents/" + stem + "." + args.format,
+              folder,
+              question: folder && EXPORT_PLACE_EXISTS ? "Le dossier « " + stem + " » existe déjà. Les fichiers de même nom qu'il contient seront remplacés. Continuer ?" : null,
+            });
+          }
+          case "run_database_export":
+            window.__exportRuns = (window.__exportRuns ?? 0) + 1;
+            window.__exportRun = args;
+            if (BASE_EXPORT_REFUSED) return Promise.reject(BASE_EXPORT_REFUSED);
+            return Promise.resolve("La base « " + args.label + " » a été exportée : 21 tables, 1234 lignes.");
+          case "forget_database_export":
+            window.__exportForgotten = (window.__exportForgotten ?? 0) + 1;
+            return Promise.resolve(null);
           default:
             return Promise.resolve(null);
         }
@@ -4257,6 +4377,7 @@ async function openWindow(page, url, options) {
         "rib.html": "?account=1",
         "journal.html": "",
         "attachments.html": "?operation=1",
+        "database-export.html": "?path=databases%2Ffamille%2Fradinus.sqlite&label=Famille",
       }[name] ?? "";
     const errors = await openWindow(page, `http://localhost:4173/ui/windows/${name}${query}`);
     check(`pages : ${name} s'ouvre sans une plainte`, errors.length === 0, errors.join(" | "));
@@ -7323,7 +7444,7 @@ async function openWindow(page, url, options) {
   // donne à lire (04_SPECIFICATIONS_FENETRES.md, F02).
   check(
     "liste opérations : le commentaire se lit au survol",
-    (await page.locator(".list__row >> nth=0 >> .list__cell >> nth=15").getAttribute("title")) ===
+    (await page.locator(".list__row >> nth=0 >> .list__cell >> nth=16").getAttribute("title")) ===
       "Marché du dimanche",
   );
 
@@ -7925,8 +8046,16 @@ async function openWindow(page, url, options) {
   const detailTitles = await page.locator(".list--detail .list__title-text").allTextContents();
   check(
     "détail : la vérification est entre le libellé et la catégorie",
-    detailTitles[2] === "Libelle" && detailTitles[3] === "Vérification",
+    // La référence paiement s'est glissée entre les deux (20/10/2026).
+    detailTitles[2] === "Libelle" && detailTitles[3] === "Référence paiement" && detailTitles[4] === "Vérification",
     JSON.stringify(detailTitles.slice(0, 5)),
+  );
+  const referenceCell = page.locator(".list--detail .list__row >> nth=1 >> .list__cell >> nth=3");
+  check(
+    "détail : la référence paiement se lit dans sa colonne, entière au survol",
+    (await page.locator(".list--detail .list__row >> nth=0 >> .list__cell >> nth=3").textContent()) ===
+      "CB SYSTEME U REF 0105" &&
+      (await referenceCell.getAttribute("title")) === (await referenceCell.textContent()),
   );
   const chosenVerification = page.locator(
     ".list--detail .list__row >> nth=0 >> .list__combo >> nth=0",
@@ -7941,7 +8070,7 @@ async function openWindow(page, url, options) {
   );
   check(
     "détail : les autres lignes la montrent en toutes lettres",
-    (await page.locator(".list--detail .list__row >> nth=1 >> .list__cell >> nth=3").textContent()) ===
+    (await page.locator(".list--detail .list__row >> nth=1 >> .list__cell >> nth=4").textContent()) ===
       "Vérifiée",
   );
 
@@ -9341,7 +9470,7 @@ async function openWindow(page, url, options) {
   // les en-têtes, et l'ordre, la présence et les largeurs sont retenus.
   const URL = "http://localhost:4173/ui/windows/operations-list.html?account=1";
   const BORN =
-    "fold|date|clearing-date|status|verification|label|category|assignment|payment-mode|payee|project|month|debit|credit|balance|comments|attachments|check";
+    "fold|date|clearing-date|status|verification|label|reference|category|assignment|payment-mode|payee|project|month|debit|credit|balance|comments|attachments|check";
   const heads = (page) =>
     page.evaluate(() =>
       [...document.querySelectorAll(".list__header > .list__title")]
@@ -9364,7 +9493,9 @@ async function openWindow(page, url, options) {
     await page.mouse.move(toX, from.y, { steps: 6 });
   };
 
-  const page = await browser.newPage({ viewport: { width: 1700, height: 800 } });
+  // 1900 de large depuis la colonne « Référence paiement » (19/10/2026) : les
+  // dix-huit colonnes doivent tenir à l'écran pour qu'on les glisse.
+  const page = await browser.newPage({ viewport: { width: 1900, height: 800 } });
   await openWindow(page, URL);
   check("colonnes : sans rien d'enregistré, le tableau naît comme avant", (await heads(page)) === BORN, await heads(page));
   check(
@@ -9380,8 +9511,8 @@ async function openWindow(page, url, options) {
   await page.waitForTimeout(100);
   const entries = page.locator('.context-menu--columns [data-menu="show-hide"] .context-menu__entry--check');
   check(
-    "colonnes : le clic droit sur les en-têtes liste les dix-sept colonnes, toutes cochées",
-    (await entries.count()) === 17 &&
+    "colonnes : le clic droit sur les en-têtes liste les dix-huit colonnes, toutes cochées",
+    (await entries.count()) === 18 &&
       (await entries.evaluateAll((all) => all.every((entry) => entry.ariaChecked === "true"))) &&
       (await entries.nth(0).textContent()) === "Date",
     String(await entries.count()),
@@ -9420,7 +9551,7 @@ async function openWindow(page, url, options) {
   check(
     "colonnes : décocher « Categorie » la retire de l'en-tête et des lignes",
     !(await heads(page)).includes("category") &&
-      (await page.locator(".list__row >> nth=0 >> .list__cell").count()) === 17,
+      (await page.locator(".list__row >> nth=0 >> .list__cell").count()) === 18,
     await heads(page),
   );
   check(
@@ -9443,7 +9574,7 @@ async function openWindow(page, url, options) {
     await page.evaluate(() => {
       const tracks = document.querySelector(".list__header").style.gridTemplateColumns;
       return (
-        tracks.split(" ").length === 17 &&
+        tracks.split(" ").length === 18 &&
         document.querySelector(".list__row").style.gridTemplateColumns === tracks
       );
     }),
@@ -9697,7 +9828,7 @@ async function openWindow(page, url, options) {
   check(
     "colonnes : rouverte, la fenêtre retrouve l'ordre et les colonnes masquées",
     (await heads(reopened)) ===
-      "fold|check|balance|credit|debit|month|project|payee|payment-mode|assignment|category|label|verification|status|clearing-date|date",
+      "fold|check|balance|credit|debit|month|project|payee|payment-mode|assignment|category|reference|label|verification|status|clearing-date|date",
     await heads(reopened),
   );
   check(
@@ -9752,16 +9883,16 @@ async function openWindow(page, url, options) {
   const older = await browser.newPage({ viewport: { width: 1700, height: 800 } });
   await openWindow(older, URL, {
     storedLayout: {
-      // Enregistrée avant que « Vérification » et « Statut » n'existent, le
-      // libellé en tête.
-      order: BORN.split("|").slice(1).filter((name) => !["status", "verification"].includes(name)).sort((a, b) => (a === "label" ? -1 : b === "label" ? 1 : 0)),
+      // Enregistrée avant que « Vérification », « Statut » et « Référence
+      // paiement » n'existent, le libellé en tête.
+      order: BORN.split("|").slice(1).filter((name) => !["status", "verification", "reference"].includes(name)).sort((a, b) => (a === "label" ? -1 : b === "label" ? 1 : 0)),
       hidden: ["month"],
       widths: {},
     },
   });
   check(
     "colonnes : une colonne inconnue de la disposition vient après sa voisine de naissance, le reste est gardé",
-    (await heads(older)).startsWith("fold|label|date|clearing-date|status|verification|category|") &&
+    (await heads(older)).startsWith("fold|label|reference|date|clearing-date|status|verification|category|") &&
       !(await heads(older)).includes("month"),
     await heads(older),
   );
@@ -9770,6 +9901,44 @@ async function openWindow(page, url, options) {
     await older.evaluate(() => window.__calls.every(([c]) => c !== "reset_table_layout")),
   );
   await older.close();
+
+  // --- **La colonne « Référence paiement » chez un utilisateur qui a déjà
+  // réglé ses colonnes** (Fabrice, 19/10/2026 : « est-ce que ça pose un
+  // problème si l'utilisateur a déjà colorisé et réordonné des colonnes ? »).
+  // Sa disposition, enregistrée avant la colonne, est gardée entière — ordre,
+  // largeur, couleurs, colonne masquée — et la nouvelle vient juste après le
+  // libellé, là où il l'a mis.
+  const before19 = await browser.newPage({ viewport: { width: 1900, height: 800 } });
+  const kept19 = BORN.split("|").slice(1).filter((name) => name !== "reference");
+  await openWindow(before19, URL, {
+    storedLayout: {
+      order: ["label", ...kept19.filter((name) => name !== "label" && name !== "month"), "month"],
+      hidden: ["comments"],
+      widths: { label: 300 },
+      colors: { label: "blue", debit: "pink" },
+    },
+  });
+  check(
+    "référence paiement : chez qui a réglé ses colonnes, elle vient juste après le libellé, et tout le reste est gardé",
+    (await heads(before19)) ===
+      "fold|label|reference|date|clearing-date|status|verification|category|assignment|payment-mode|payee|project|debit|credit|balance|attachments|check|month",
+    await heads(before19),
+  );
+  check(
+    "référence paiement : les couleurs et la largeur choisies restent, la nouvelle colonne arrive sans teinte",
+    await before19.evaluate(() => {
+      const row = document.querySelector(".list__row");
+      const tints = [...row.children].map((cell) => cell.dataset.tint ?? "").filter(Boolean).join("|");
+      const label = document.querySelector('.list__title[data-column="label"]').getBoundingClientRect().width;
+      return tints === "blue|pink" && Math.round(label) === 300;
+    }),
+  );
+  check(
+    "référence paiement : rien n'est réinitialisé, et la référence se lit dans la ligne",
+    (await before19.evaluate(() => window.__calls.every(([c]) => c !== "reset_table_layout"))) &&
+      (await before19.locator(".list__row >> nth=0 >> .list__cell >> nth=2").textContent()) === "CB SYSTEME U REF 0105",
+  );
+  await before19.close();
 
   // --- Une disposition que le tableau ne reconnaît pas : naissance, et oubli.
   for (const [what, broken] of [
@@ -10135,7 +10304,7 @@ async function openWindow(page, url, options) {
     "préférences : la feuille « Colonnes des tableaux » est sous « Affichage »",
     (await page.locator(".tree > *").evaluateAll((all) =>
       all.map((piece) => piece.dataset.leaf ?? piece.textContent).join("|"),
-    )) === "Affichage|language|currency|zoom|columns|Importation|verification|qif|Outils|electricity|Réinitialisation|comfort" &&
+    )) === "Affichage|language|currency|zoom|columns|Importation|verification|ofx|qif|Outils|electricity|Réinitialisation|comfort" &&
       (await page.locator('.tree__leaf[data-leaf="columns"]').textContent()) === "Colonnes des tableaux",
   );
   await page.click('.tree__leaf[data-leaf="columns"]');
@@ -10600,7 +10769,7 @@ async function openWindow(page, url, options) {
   // de la fenêtre. » Une disposition **par statistique**, et le bilan croisé
   // avec la sienne — et, lui, la colonne « Vérification » en plus.
   const BORN =
-    "date|clearing-date|label|verification|category|assignment|payment-mode|payee|project|amount|comments";
+    "date|clearing-date|label|reference|verification|category|assignment|payment-mode|payee|project|amount|comments";
   const heads = (page) =>
     page.evaluate(() =>
       [...document.querySelectorAll("#header > .list__title")]
@@ -10630,7 +10799,7 @@ async function openWindow(page, url, options) {
     ["bilan croisé", "crossed-balance.html?accounts=1,2&year=2026&month=9", "crossed-balance"],
   ]) {
     const page = await open(url);
-    check(`${what} : le détail naît avec ses onze colonnes, dans l'ordre`, (await heads(page)) === BORN, await heads(page));
+    check(`${what} : le détail naît avec ses douze colonnes, dans l'ordre`, (await heads(page)) === BORN, await heads(page));
     check(
       `${what} : il demande sa disposition sous son propre nom — « ${table} »`,
       (await asked(page)) === table,
@@ -10642,8 +10811,8 @@ async function openWindow(page, url, options) {
     await openChecks(page);
     await page.waitForTimeout(100);
     check(
-      `${what} : le clic droit sur les en-têtes du détail liste ses onze colonnes — aucune n'est fixe`,
-      (await page.locator('.context-menu--columns [data-menu="show-hide"] .context-menu__entry--check').count()) === 11 &&
+      `${what} : le clic droit sur les en-têtes du détail liste ses douze colonnes — aucune n'est fixe`,
+      (await page.locator('.context-menu--columns [data-menu="show-hide"] .context-menu__entry--check').count()) === 12 &&
         (await page.locator(".context-menu--columns .context-menu__entry:not(.context-menu__entry--head)").last().textContent()) ===
           "Rétablir les colonnes par défaut",
     );
@@ -10672,7 +10841,7 @@ async function openWindow(page, url, options) {
     sent = await saves(page);
     check(
       `${what} : glisser « Montant » le met en tête, et l'ordre est retenu`,
-      (await heads(page)).startsWith("amount|date|label|verification|") &&
+      (await heads(page)).startsWith("amount|date|label|reference|verification|") &&
         sent[sent.length - 1].table === table &&
         sent[sent.length - 1].layout.order[0] === "amount",
       await heads(page),
@@ -10708,19 +10877,27 @@ async function openWindow(page, url, options) {
     );
     check(
       `${what} : l'export du détail suit l'ordre choisi, sans la colonne masquée`,
-      heading.split("|").length === 10 && heading.split("|")[3] === "Vérification",
+      heading.split("|").length === 11 && heading.split("|")[3] === "Référence paiement" &&
+        heading.split("|")[4] === "Vérification",
       heading,
     );
     await page.close();
   }
 
   // Rouverte, une statistique retrouve sa disposition.
-  const stored = { order: BORN.split("|").reverse(), hidden: ["comments"], widths: { label: 300 } };
+  // Une disposition réglée avant la colonne « Référence paiement » (20/10/2026) :
+  // la nouvelle venue se range après le libellé, là où l'utilisateur l'a mis,
+  // et rien d'autre ne bouge.
+  const stored = {
+    order: BORN.split("|").filter((id) => id !== "reference").reverse(),
+    hidden: ["comments"],
+    widths: { label: 300 },
+  };
   const again = await open("statistics.html?axis=payee&accounts=1,2&year=2026", { storedLayout: stored });
   check(
-    "stat par tiers : rouverte, le détail retrouve son ordre, ses colonnes masquées et ses largeurs",
+    "stat par tiers : rouverte, le détail retrouve son ordre, ses colonnes masquées et ses largeurs — la référence après le libellé",
     (await heads(again)) ===
-      "amount|project|payee|payment-mode|assignment|category|verification|label|clearing-date|date" &&
+      "amount|project|payee|payment-mode|assignment|category|verification|label|reference|clearing-date|date" &&
       Math.round((await again.locator('#header .list__title[data-column="label"]').boundingBox()).width) === 300,
     await heads(again),
   );
@@ -10749,8 +10926,9 @@ async function openWindow(page, url, options) {
   // --- Le bilan croisé a reçu la colonne « Vérification ».
   const crossed = await open("crossed-balance.html?accounts=1,2&year=2026&month=9");
   check(
-    "bilan croisé : « Vérification » est entre « Libelle » et « Categorie », le mot dans sa couleur",
-    (await crossed.locator("#header .list__title >> nth=3").textContent()).startsWith("Vérification") &&
+    "bilan croisé : « Vérification » suit « Libelle » et « Référence paiement », le mot dans sa couleur",
+    (await crossed.locator("#header .list__title >> nth=3").textContent()).startsWith("Référence paiement") &&
+      (await crossed.locator("#header .list__title >> nth=4").textContent()).startsWith("Vérification") &&
       (await crossed.evaluate(() => {
         const cell = document.querySelector(".list--detail .list__row .list__cell--verification");
         return cell !== null && cell.textContent === "Vérifiée" && cell.dataset.verification === "2" &&
@@ -10838,10 +11016,10 @@ async function openWindow(page, url, options) {
       (await page.textContent("#heading")) === "Analyse de l'évolution du solde",
   );
   check(
-    "analyse : sous le graphique, le splitter puis le tableau — douze colonnes, « Compte » en tête",
+    "analyse : sous le graphique, le splitter puis le tableau — treize colonnes, « Compte » en tête",
     (await page.locator("#splitter").count()) === 1 &&
       (await page.locator("#header > .list__title").evaluateAll((cells) => cells.map((cell) => cell.dataset.column).join("|"))) ===
-        "account|date|clearing-date|label|verification|category|assignment|payment-mode|payee|project|amount|comments" &&
+        "account|date|clearing-date|label|reference|verification|category|assignment|payment-mode|payee|project|amount|comments" &&
       (await page.locator("#header > .list__title >> nth=0").textContent()).startsWith("Compte"),
   );
   check(
@@ -11036,9 +11214,10 @@ async function openWindow(page, url, options) {
   await page.click(".context-menu > .context-menu__entry:not(.context-menu__entry--head) >> nth=0");
   await page.waitForTimeout(250);
   check(
-    "analyse : l'export du tableau porte le nom de la fenêtre et ses douze colonnes",
+    "analyse : l'export du tableau porte le nom de la fenêtre et ses treize colonnes",
     await page.evaluate(
-      () => window.__exported.sheet.name === "Analyse du solde" && window.__exported.sheet.rows[0].length === 12,
+      () => window.__exported.sheet.name === "Analyse du solde" && window.__exported.sheet.rows[0].length === 13 &&
+        window.__exported.sheet.rows[0][4].text === "Référence paiement",
     ),
   );
   await page.click('#header .list__title[data-column="amount"]', { button: "right" });
@@ -11250,14 +11429,15 @@ async function openWindow(page, url, options) {
     JSON.stringify(copied),
   );
   check(
-    "copier : une cellule par colonne affichée — dix-huit —, les colonnes sans texte vides",
-    copied.every((line) => line.length === 18) && copied[0][0] === "" && copied[0][1] === "05/01/2026",
+    "copier : une cellule par colonne affichée — dix-neuf —, les colonnes sans texte vides",
+    copied.every((line) => line.length === 19) && copied[0][0] === "" && copied[0][1] === "05/01/2026" &&
+      copied[0][6] === "CB SYSTEME U REF 0105" && copied[1][6] === "",
     String(copied[0].length),
   );
   check(
     "copier : dans les lignes aussi, les montants sont des nombres purs",
-    copied[0][12] === "-100,00" && copied[0][13] === "" && copied[1][13] === "2216,71" && copied[0][14] === "2322,34",
-    JSON.stringify([copied[0].slice(12, 15), copied[1].slice(12, 15)]),
+    copied[0][13] === "-100,00" && copied[0][14] === "" && copied[1][14] === "2216,71" && copied[0][15] === "2322,34",
+    JSON.stringify([copied[0].slice(13, 16), copied[1].slice(13, 16)]),
   );
   check(
     "copier : la sélection n'a pas bougé",
@@ -11312,7 +11492,7 @@ async function openWindow(page, url, options) {
   // --- Les lignes suivent les colonnes qu'on a choisies.
   await empty.click('.list__title[data-column="label"]', { button: "right" });
   await openChecks(empty);
-  for (const name of ["clearing-date", "status", "verification", "category", "assignment", "payment-mode", "payee", "project", "month", "comments", "attachments", "check"]) {
+  for (const name of ["clearing-date", "status", "verification", "reference", "category", "assignment", "payment-mode", "payee", "project", "month", "comments", "attachments", "check"]) {
     await empty.click(`.context-menu--columns [data-column="${name}"]`);
   }
   await empty.keyboard.press("Escape");
@@ -11437,8 +11617,11 @@ async function openWindow(page, url, options) {
     await matrix.keyboard.press("Meta+c");
     await matrix.waitForTimeout(150);
     check(
-      `copier, ${what} : dans le détail du bas, ⌘C copie la ligne choisie — onze cellules`,
-      (await matrix.evaluate(() => window.__clipboard.slice(-1)[0].split("\t").length)) === 11,
+      `copier, ${what} : dans le détail du bas, ⌘C copie la ligne choisie — douze cellules, la référence en quatrième`,
+      (await matrix.evaluate(() => {
+        const cells = window.__clipboard.slice(-1)[0].split("\t");
+        return cells.length === 12 && cells[3] === "CB SYSTEME U REF 0105";
+      })),
       await matrix.evaluate(() => JSON.stringify(window.__clipboard.slice(-1)[0])),
     );
     await matrix.close();
@@ -16463,12 +16646,12 @@ async function openWindow(page, url, options) {
   const page = await browser.newPage();
   await openWindow(page, "http://localhost:4173/ui/windows/preferences.html");
   check(
-    "préférences : « Relevés QIF » sous la branche « Importation », après « Vérification »",
+    "préférences : « Relevés QIF » sous la branche « Importation », après « Relevés OFX »",
     await page.evaluate(() => {
       const leaf = document.querySelector('.tree__leaf[data-leaf="qif"]');
       return (
         leaf.textContent === "Relevés QIF" &&
-        leaf.previousElementSibling.dataset.leaf === "verification"
+        leaf.previousElementSibling.dataset.leaf === "ofx"
       );
     }),
   );
@@ -16523,6 +16706,136 @@ async function openWindow(page, url, options) {
   await bare.close();
 }
 
+// --- Relevés : la référence paiement (19/10/2026) -----------------------
+//
+// Le MEMO de la banque arrive dans la référence paiement : une colonne de la
+// fenêtre d'importation, après le libellé, et un champ modifiable de la fiche
+// « Rapprocher une transaction ».
+{
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/statement-import.html?account=1");
+  await page.click("#open");
+  await page.waitForTimeout(300);
+  const titles = (await page.locator(".list__title").allTextContents()).map((title) => title.trim());
+  check(
+    "relevé : la colonne « Référence paiement » suit « Libelle »",
+    titles.indexOf("Référence paiement") === titles.indexOf("Libelle") + 1 && titles.includes("Référence paiement"),
+    titles.join(" | "),
+  );
+  const cell = page.locator(".list__row").nth(1).locator(".list__cell", { hasText: "CAISSE INVENTEE" });
+  check(
+    "relevé : la référence se lit dans sa colonne, entière au survol",
+    (await cell.count()) === 1 &&
+      (await cell.getAttribute("title")) === "CAISSE INVENTEE ECH/220726 REF/42 LIB/COTISATION ANNUELLE DE LA CAISSE",
+  );
+  await page.close();
+
+  const form = await browser.newPage();
+  await openWindow(form, "http://localhost:4173/ui/windows/statement-form.html?account=1&rank=2");
+  check(
+    "rapprocher : le champ « Référence paiement » porte le MEMO, sous le libellé",
+    (await form.inputValue("#reference")) === "CAISSE INVENTEE ECH/220726 REF/42 LIB/COTISATION ANNUELLE DE LA CAISSE" &&
+      (await form.locator("#reference-label").textContent()) === "Référence paiement" &&
+      (await form.getAttribute("#reference", "maxlength")) === "255" &&
+      (await form.getAttribute("#label", "maxlength")) === "300",
+  );
+  await form.fill("#reference", "REF CORRIGEE");
+  await form.click("#validate");
+  await form.waitForTimeout(150);
+  check(
+    "rapprocher : la référence corrigée part avec la ligne",
+    await form.evaluate(() => window.__amended?.reference === "REF CORRIGEE" && window.__amended?.rank === 2),
+    await form.evaluate(() => JSON.stringify(window.__amended)),
+  );
+  await form.close();
+}
+
+// --- Préférences : les relevés OFX (19/10/2026, menus le 20/10/2026) -----
+//
+// Que faire du nom et du mémo de la banque : deux menus déroulants, l'un pour
+// le libellé, l'autre pour la référence paiement. Par défaut, le nom dans le
+// libellé et le mémo dans la référence (Fabrice). Des réglages du logiciel,
+// vivants sans base.
+{
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/preferences.html");
+  check(
+    "préférences : « Relevés OFX » sous « Importation », après « Vérification »",
+    await page.evaluate(() => {
+      const leaf = document.querySelector('.tree__leaf[data-leaf="ofx"]');
+      return leaf.textContent === "Relevés OFX" && leaf.previousElementSibling.dataset.leaf === "verification";
+    }),
+  );
+  await page.click('.tree__leaf[data-leaf="ofx"]');
+  await page.waitForTimeout(100);
+  const options = (id) =>
+    page.locator(`#${id} option`).evaluateAll((all) => all.map((o) => `${o.value}=${o.textContent}`).join("|"));
+  check(
+    "préférences OFX : le libellé, trois choix ; le nom par défaut",
+    (await page.locator("#ofx-label-label").textContent()) === "Libellé de l'opération :" &&
+      (await page.inputValue("#ofx-label")) === "name" &&
+      (await options("ofx-label")) ===
+        "name=Le nom de l'opération|memo=Le mémo de la banque|name-and-memo=Le nom suivi du mémo",
+    await options("ofx-label"),
+  );
+  check(
+    "préférences OFX : la référence paiement, quatre choix ; le mémo par défaut",
+    (await page.locator("#ofx-reference-label").textContent()) === "Référence paiement :" &&
+      (await page.inputValue("#ofx-reference")) === "memo" &&
+      (await options("ofx-reference")) ===
+        "memo=Le mémo de la banque|name=Le nom de l'opération|name-and-memo=Le nom suivi du mémo|empty=Rien (laisser vide)",
+    await options("ofx-reference"),
+  );
+  check(
+    "préférences OFX : chaque menu a sa bulle, sur son titre et sur lui",
+    ((await page.getAttribute("#ofx-label", "title")) ?? "").startsWith("Ce que reçoit le libellé") &&
+      ((await page.getAttribute("#ofx-label-label", "title")) ?? "").startsWith("Ce que reçoit le libellé") &&
+      ((await page.getAttribute("#ofx-reference", "title")) ?? "").startsWith("Ce que reçoit la référence") &&
+      ((await page.getAttribute("#ofx-reference-label", "title")) ?? "").startsWith("Ce que reçoit la référence"),
+  );
+  check("préférences OFX : plus de cases à cocher", (await page.locator("#pane-ofx input[type=checkbox]").count()) === 0);
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check("préférences OFX : rien de changé, rien d'écrit", await page.evaluate(() => (window.__ofxSaves ?? 0) === 0));
+  await page.selectOption("#ofx-label", "memo");
+  await page.selectOption("#ofx-reference", "empty");
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check(
+    "préférences OFX : la disquette enregistre les deux menus",
+    await page.evaluate(
+      () => window.__ofxPreferences?.label === "memo" && window.__ofxPreferences?.reference === "empty" && window.__ofxSaves === 1,
+    ),
+    await page.evaluate(() => JSON.stringify(window.__ofxPreferences)),
+  );
+  await page.close();
+
+  // Rouverte, la page montre ce qui est enregistré.
+  const again = await browser.newPage();
+  await again.addInitScript(() => {
+    window.__ofxPreferences = { label: "name-and-memo", reference: "name" };
+  });
+  await openWindow(again, "http://localhost:4173/ui/windows/preferences.html");
+  await again.click('.tree__leaf[data-leaf="ofx"]');
+  check(
+    "préférences OFX : rouverte, elle montre les choix enregistrés",
+    (await again.inputValue("#ofx-label")) === "name-and-memo" && (await again.inputValue("#ofx-reference")) === "name",
+  );
+  await again.close();
+
+  const bare = await browser.newPage();
+  await openWindow(bare, "http://localhost:4173/ui/windows/preferences.html", { databaseOpen: false });
+  await bare.click('.tree__leaf[data-leaf="ofx"]');
+  await bare.selectOption("#ofx-label", "name-and-memo");
+  await bare.click("#save");
+  await bare.waitForTimeout(150);
+  check(
+    "préférences OFX : sans base ouverte, la feuille vit et s'enregistre",
+    await bare.evaluate(() => window.__ofxPreferences?.label === "name-and-memo" && window.__ofxPreferences?.reference === "memo"),
+  );
+  await bare.close();
+}
+
 // --- Le menu Outils du sélecteur de bases (08/08/2026) ------------------
 //
 // « Protection de la base par mot de passe » y est entrée le 08/08/2026 sur
@@ -16545,12 +16858,13 @@ async function openWindow(page, url, options) {
     tools.includes("Protection de la base par mot de passe"),
     tools.join(" | "),
   );
+  // Depuis le 19/10/2026, l'assistant d'exportation la suit (P-74) : elle
+  // reste juste après la réparation, et le journal ferme toujours le menu.
   check(
-    "bases : elle est rangée entre la réparation et le journal",
+    "bases : elle est rangée après la réparation, le journal en dernier",
     tools.indexOf("Protection de la base par mot de passe") ===
-      tools.findIndex((label) => label.startsWith("Réparation")) + 1 &&
-      tools.indexOf("Protection de la base par mot de passe") ===
-        tools.indexOf("Afficher le log") - 1,
+      tools.findIndex((label) => label.startsWith("Réparer")) + 1 &&
+      tools.indexOf("Afficher le log") === tools.length - 1,
     tools.join(" | "),
   );
   check(
@@ -16559,6 +16873,348 @@ async function openWindow(page, url, options) {
     tools.join(" | "),
   );
   await page.close();
+}
+
+// --- Le menu Outils des bases nomme la base (19/10/2026) ----------------
+//
+// Fabrice : « l'utilisateur peut bêtement penser que toutes les bases sont
+// sauvegardées ». Le menu dit sur quelle base il agit, grise ce qui vise une
+// base tant qu'aucune n'est choisie, et sépare le journal, qui ne vise rien.
+{
+  const DATABASES = [
+    { folder: "famille", path: "databases/famille/radinus.sqlite", label: "Famille", comment: "", created_on: "2026-01-02", created_by: "1.0", schema_version: 30, current: true },
+    { folder: "perso", path: "databases/perso/radinus.sqlite", label: "Perso", comment: "", created_on: "2026-02-03", created_by: "1.0", schema_version: 30, current: false },
+  ];
+  const page = await browser.newPage();
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/database-selector.html", { databases: DATABASES });
+  check("menu Outils nommé : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" | "));
+  const entry = page.locator(".window-menu__holder", { has: page.locator('[data-menu="tools"]') }).locator("> :first-child");
+  const state = () =>
+    page.evaluate(() => {
+      const menu = document.querySelector('[data-menu="tools"]');
+      const pick = (choice) => menu.querySelector('[data-choice="' + choice + '"]');
+      return {
+        heading: pick("heading").textContent,
+        backup: pick("backup_database").textContent,
+        restore: pick("restore_database").textContent,
+        repair: pick("repair_database").textContent,
+        greyed: ["backup_database", "restore_database", "repair_database", "open_password_form", "export"].map((c) => pick(c).disabled),
+        log: [...menu.querySelectorAll(".window-menu__choice")].pop().disabled,
+        separatorBeforeLog: [...menu.children].at(-2).classList.contains("window-menu__separator"),
+      };
+    });
+  await entry.click();
+  await page.waitForTimeout(80);
+  let seen = await state();
+  check(
+    "menu Outils nommé : sans base choisie, il le dit et grise tout ce qui vise une base",
+    seen.heading === "Aucune base sélectionnée" &&
+      seen.backup === "Sauvegarder la base sélectionnée…" &&
+      seen.greyed.every(Boolean) &&
+      !seen.log,
+    JSON.stringify(seen),
+  );
+  check("menu Outils nommé : le journal est séparé d'un trait", seen.separatorBeforeLog);
+  await page.click("body", { position: { x: 5, y: 5 } }).catch(() => undefined);
+  await page.locator(".list__row").nth(1).click();
+  await entry.click();
+  await page.waitForTimeout(80);
+  seen = await state();
+  check(
+    "menu Outils nommé : une base choisie, chaque entrée porte son nom",
+    seen.heading === "Base sélectionnée : « Perso »" &&
+      seen.backup === "Sauvegarder la base « Perso »…" &&
+      seen.restore === "Restaurer la base « Perso »…" &&
+      seen.repair === "Réparer et optimiser la base « Perso »…" &&
+      seen.greyed.every((off) => !off),
+    JSON.stringify(seen),
+  );
+  await page.click('[data-choice="backup_database"]');
+  await page.waitForTimeout(100);
+  check(
+    "menu Outils nommé : la sauvegarde vise la base choisie",
+    await page.evaluate(() =>
+      window.__calls.some(([command, args]) => command === "backup_database" && args.path === "databases/perso/radinus.sqlite"),
+    ),
+  );
+  await page.close();
+}
+
+// --- P-74 : l'assistant d'exportation d'une base (19/10/2026) -----------
+//
+// Fabrice : « il existe des gens qui ne comprennent pas tout ». L'assistant
+// n'exporte que la base choisie dans la liste, et le dit partout ; il est grisé
+// sans ligne choisie ; chaque format ne montre que ses options ; on n'arrive
+// au bouton « Exporter » qu'avec un emplacement, qu'un changement de format
+// annule ; la clé de la base n'y passe jamais, et la porte l'oublie.
+{
+  const DATABASES = [
+    { folder: "famille", path: "databases/famille/radinus.sqlite", label: "Famille", comment: "", created_on: "2026-01-02", created_by: "1.0", schema_version: 30, current: true },
+    { folder: "perso", path: "databases/perso/radinus.sqlite", label: "Perso", comment: "", created_on: "2026-02-03", created_by: "1.0", schema_version: 30, current: false },
+  ];
+
+  // Le menu du sélecteur : l'entrée, sa place, grisée sans ligne choisie.
+  const selector = await browser.newPage();
+  const selectorErrors = await openWindow(selector, "http://localhost:4173/ui/windows/database-selector.html", { databases: DATABASES });
+  check("assistant d'exportation : le sélecteur s'ouvre sans une plainte", selectorErrors.length === 0, selectorErrors.join(" | "));
+  const tools = await selector.evaluate(() =>
+    [...document.querySelectorAll('[data-menu="tools"] .window-menu__choice')].map((choice) => choice.textContent),
+  );
+  check(
+    "assistant d'exportation : il est au menu Outils, après la protection et avant le journal",
+    tools.indexOf("Assistant d'exportation de la base…") === tools.indexOf("Protection de la base par mot de passe") + 1 &&
+      tools.indexOf("Assistant d'exportation de la base…") === tools.indexOf("Afficher le log") - 1,
+    tools.join(" | "),
+  );
+  const toolsEntry = selector.locator(".window-menu__holder", { has: selector.locator('[data-menu="tools"]') }).locator("> :first-child");
+  await toolsEntry.click();
+  check(
+    "assistant d'exportation : grisé tant qu'aucune base n'est choisie",
+    await selector.evaluate(() => document.querySelector('[data-choice="export"]').disabled),
+  );
+  await selector.click("body", { position: { x: 5, y: 5 } }).catch(() => undefined);
+  await selector.locator(".list__row").nth(1).click();
+  await toolsEntry.click();
+  check(
+    "assistant d'exportation : une base choisie l'allume",
+    await selector.evaluate(() => !document.querySelector('[data-choice="export"]').disabled),
+  );
+  await selector.click('[data-choice="export"]');
+  await selector.waitForTimeout(150);
+  check(
+    "assistant d'exportation : il s'ouvre sur la base choisie, et sur elle seule",
+    await selector.evaluate(
+      () =>
+        window.__exportOpened?.path === "databases/perso/radinus.sqlite" &&
+        window.__exportOpened?.label === "Perso" &&
+        window.__exportOpened?.password === null,
+    ),
+    await selector.evaluate(() => JSON.stringify(window.__exportOpened)),
+  );
+  await selector.close();
+
+  // L'assistant lui-même.
+  const url = "http://localhost:4173/ui/windows/database-export.html?path=databases%2Ffamille%2Fradinus.sqlite&label=Famille";
+  const page = await browser.newPage();
+  const errors = await openWindow(page, url);
+  check("assistant d'exportation : la fenêtre s'ouvre sans une plainte", errors.length === 0, errors.join(" | "));
+  const visible = (id) => page.evaluate((id) => {
+    const node = document.getElementById(id);
+    return Boolean(node) && !node.closest("[hidden]");
+  }, id);
+  check(
+    "assistant d'exportation : la phrase de tête nomme la base, et dit qu'elle seule part",
+    await page.evaluate(() => {
+      const banner = document.getElementById("only-this").textContent;
+      return banner.includes("« Famille »") && banner.startsWith("Seule la base");
+    }),
+  );
+  check(
+    "assistant d'exportation : elle est demandée pour cette base-là",
+    await page.evaluate(() => window.__exportIntro?.path === "databases/famille/radinus.sqlite"),
+  );
+  check(
+    "assistant d'exportation : neuf formats, Excel choisi d'abord, chacun avec sa ligne d'explication",
+    await page.evaluate(() => {
+      const radios = [...document.querySelectorAll('input[name="format"]')];
+      return (
+        radios.length === 9 &&
+        radios.map((radio) => radio.value).join(",") === "xlsx,ods,csv,json,xml,sql,sqlite,qif,ofx" &&
+        document.querySelector('input[name="format"]:checked').value === "xlsx" &&
+        [...document.querySelectorAll(".export-choice__hint")].every((hint) => hint.textContent.length > 20 && !hint.textContent.startsWith("base-export"))
+      );
+    }),
+  );
+  check("assistant d'exportation : pas de mise en garde pour Excel", !(await visible("lossy")));
+  check("assistant d'exportation : la première page n'a pas de bouton Précédent", !(await visible("previous")));
+  await page.check('input[name="format"][value="qif"]');
+  check("assistant d'exportation : le QIF prévient qu'il ne garde pas tout", await visible("lossy"));
+
+  // Les options de chaque format, et rien d'autre.
+  const optionsOf = async (format) => {
+    await page.check(`input[name="format"][value="${format}"]`);
+    await page.click("#next");
+    const shown = {};
+    for (const id of ["group-layout", "group-decimal", "group-quotes", "group-order", "no-option", "planned-note", "dates-hint"]) {
+      shown[id] = await visible(id);
+    }
+    await page.click("#previous");
+    return Object.entries(shown).filter(([, on]) => on).map(([id]) => id).join(",");
+  };
+  check("assistant d'exportation : Excel propose un fichier ou un par table", (await optionsOf("xlsx")) === "group-layout,dates-hint");
+  check("assistant d'exportation : le CSV propose le séparateur et les guillemets", (await optionsOf("csv")) === "group-decimal,group-quotes,dates-hint");
+  check("assistant d'exportation : le QIF propose l'ordre des dates et dit ce qu'il laisse", (await optionsOf("qif")) === "group-order,planned-note");
+  check("assistant d'exportation : la base SQLite n'a pas d'option", (await optionsOf("sqlite")) === "no-option,dates-hint");
+  check("assistant d'exportation : l'OFX non plus, et dit ce qu'il laisse", (await optionsOf("ofx")) === "no-option,planned-note");
+  check(
+    "assistant d'exportation : le QIF met le jour avant le mois par défaut",
+    await page.evaluate(() => document.querySelector('input[name="order"]:checked').value === "day-month"),
+  );
+  check(
+    "assistant d'exportation : le CSV met toutes les valeurs entre guillemets par défaut",
+    await page.evaluate(() => document.querySelector('input[name="quotes"]:checked').value === "all"),
+  );
+
+  // Pas de récapitulatif sans emplacement.
+  await page.check('input[name="format"][value="csv"]');
+  await page.click("#next");
+  await page.check('input[name="decimal"][value="point"]');
+  await page.check('input[name="quotes"][value="none"]');
+  await page.click("#next");
+  check(
+    "assistant d'exportation : le CSV se choisit par dossier",
+    (await page.locator("#choose").textContent()) === "Choisir le dossier…",
+  );
+  await page.click("#next");
+  check(
+    "assistant d'exportation : sans emplacement, pas de récapitulatif",
+    (await visible("page-place")) &&
+      (await page.locator("#info-bar").textContent()) === "Choisissez d'abord où écrire l'export." &&
+      (await page.evaluate(() => document.getElementById("info-bar").classList.contains("info-bar--alert"))),
+  );
+  await page.click("#choose");
+  await page.waitForTimeout(100);
+  check(
+    "assistant d'exportation : le dialogue reçoit la base, le format et la disposition",
+    await page.evaluate(() => window.__exportPicked?.label === "Famille" && window.__exportPicked?.format === "csv"),
+  );
+  check(
+    "assistant d'exportation : l'emplacement est montré, avec le nom de la base et la date",
+    (await page.locator("#place-path").textContent()) === "/home/lea/Documents/Famille - export 2026-10-19" &&
+      (await page.locator("#place-caption").textContent()).startsWith("L'export sera écrit dans ce dossier"),
+  );
+  await page.click("#next");
+  check(
+    "assistant d'exportation : le récapitulatif redit la base, le format, les options, l'emplacement",
+    await page.evaluate(
+      () =>
+        document.getElementById("summary-base").textContent === "Famille" &&
+        document.getElementById("summary-format").textContent === "CSV (.csv)" &&
+        document.getElementById("summary-options").textContent === "Le point (1234.56) ; Aucun guillemet" &&
+        document.getElementById("summary-place").textContent === "/home/lea/Documents/Famille - export 2026-10-19",
+    ),
+  );
+  check("assistant d'exportation : une base sans mot de passe n'appelle pas la mise en garde", !(await visible("unprotected")));
+  check("assistant d'exportation : le récapitulatif a son bouton Exporter", (await visible("run")) && !(await visible("next")));
+  await page.click("#run");
+  await page.waitForTimeout(150);
+  check(
+    "assistant d'exportation : l'export reçoit exactement les choix faits",
+    await page.evaluate(() => {
+      const run = window.__exportRun;
+      return (
+        run?.path === "databases/famille/radinus.sqlite" &&
+        run.label === "Famille" &&
+        run.request.format === "csv" &&
+        run.request.decimal_comma === false &&
+        run.request.quote_all === false &&
+        run.request.destination === "/home/lea/Documents/Famille - export 2026-10-19" &&
+        !("password" in run)
+      );
+    }),
+    await page.evaluate(() => JSON.stringify(window.__exportRun)),
+  );
+  check(
+    "assistant d'exportation : la phrase de fin est montrée, et l'on n'exporte pas deux fois par mégarde",
+    (await page.locator("#done").textContent()).includes("« Famille » a été exportée") &&
+      (await page.evaluate(() => document.getElementById("run").disabled)),
+  );
+
+  // Changer de format annule l'emplacement : un dossier CSV ne convient pas
+  // à un classeur.
+  await page.click("#previous");
+  await page.click("#previous");
+  await page.click("#previous");
+  await page.check('input[name="format"][value="xlsx"]');
+  await page.click("#next");
+  await page.click("#next");
+  check(
+    "assistant d'exportation : un autre format efface l'emplacement choisi",
+    (await page.locator("#place-path").textContent()) === "" &&
+      (await page.locator("#choose").textContent()) === "Choisir le fichier…",
+  );
+  await page.click("#previous");
+  await page.check('input[name="layout"][value="per-table"]');
+  await page.click("#next");
+  check(
+    "assistant d'exportation : un fichier par table se choisit par dossier",
+    (await page.locator("#choose").textContent()) === "Choisir le dossier…",
+  );
+
+  // Rouverte sur une autre base : tout repart de zéro.
+  await page.evaluate(() =>
+    window.__listeners["window-parameters:database-export"]({
+      event: "window-parameters:database-export",
+      id: 1,
+      payload: "path=databases%2Fperso%2Fradinus.sqlite&label=Perso",
+    }),
+  );
+  await page.waitForTimeout(100);
+  check(
+    "assistant d'exportation : rouverte sur une autre base, elle repart de la première page et la nomme",
+    (await visible("page-format")) &&
+      (await page.evaluate(() => document.querySelector('input[name="format"]:checked').value === "xlsx")) &&
+      (await page.locator("#only-this").textContent()).includes("« Perso »"),
+  );
+
+  // La porte oublie la clé.
+  await page.click("#close");
+  await page.waitForTimeout(100);
+  check(
+    "assistant d'exportation : la porte fait oublier la clé, puis ferme",
+    await page.evaluate(
+      () => window.__exportForgotten === 1 && window.__calls.some(([command]) => command === "plugin:window|hide"),
+    ),
+  );
+  await page.close();
+
+  // Un dossier qui existe : on demande, et « non » ne change rien.
+  const exists = await browser.newPage();
+  await openWindow(exists, url, { exportPlaceExists: true, exportProtected: true });
+  await exists.check('input[name="format"][value="ofx"]');
+  await exists.click("#next");
+  await exists.click("#next");
+  await exists.click("#choose");
+  await exists.waitForTimeout(100);
+  check(
+    "assistant d'exportation : un dossier qui existe déjà fait poser la question",
+    (await exists.locator(".dialog__question").textContent())?.includes("existe déjà"),
+  );
+  await exists.click(".dialog__button:not(.dialog__button--primary)");
+  await exists.waitForTimeout(80);
+  check("assistant d'exportation : « non » ne retient pas l'emplacement", (await exists.locator("#place-path").textContent()) === "");
+  await exists.click("#choose");
+  await exists.waitForTimeout(100);
+  await exists.click(".dialog__button--primary");
+  await exists.waitForTimeout(80);
+  check("assistant d'exportation : « oui » le retient", (await exists.locator("#place-path").textContent()) !== "");
+  await exists.click("#next");
+  check(
+    "assistant d'exportation : une base protégée prévient que l'export ne le sera pas",
+    await exists.evaluate(() => {
+      const warning = document.getElementById("unprotected");
+      return !warning.closest("[hidden]") && warning.textContent.includes("mot de passe");
+    }),
+  );
+  await exists.close();
+
+  // Un refus du noyau se lit dans la barre, et rien n'est marqué fait.
+  const refused = await browser.newPage();
+  await openWindow(refused, url, { baseExportRefused: "Le mot de passe ne convient pas." });
+  await refused.click("#next");
+  await refused.click("#next");
+  await refused.click("#choose");
+  await refused.waitForTimeout(80);
+  await refused.click("#next");
+  await refused.click("#run");
+  await refused.waitForTimeout(120);
+  check(
+    "assistant d'exportation : un refus est dit en rouge, et l'on peut réessayer",
+    (await refused.locator("#info-bar").textContent()) === "Le mot de passe ne convient pas." &&
+      (await refused.evaluate(() => document.getElementById("info-bar").classList.contains("info-bar--alert"))) &&
+      (await refused.evaluate(() => !document.getElementById("run").disabled && document.getElementById("done").hidden)),
+  );
+  await refused.close();
 }
 
 // --- Les deux « À propos » portent les mêmes mentions (08/08/2026) ------

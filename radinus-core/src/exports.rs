@@ -48,7 +48,14 @@ pub struct Line {
     pub fitid: String,
     pub payee: String,
     pub category: String,
+    /// La référence paiement — souvent le MEMO de la banque depuis le
+    /// 19/10/2026. Elle part dans le **mémo** du fichier, jamais dans le
+    /// numéro de chèque : « ça n'a rien à voir avec un numéro de chèque »
+    /// (Fabrice).
     pub reference: String,
+    /// Le numéro du chèque, quand l'opération est liée à un chèque du
+    /// chéquier ; vide sinon. Lui seul va dans `CHECKNUM` et dans `N`.
+    pub check_number: String,
 }
 
 /// Ce que l'en-tête d'un OFX doit dire du compte.
@@ -118,10 +125,11 @@ pub fn account_of(conn: &Connection, account_id: i64) -> Result<Account> {
 pub fn lines(conn: &Connection, account_id: i64, ids: &[i64]) -> Result<Vec<Line>> {
     let mut statement = conn.prepare(
         "SELECT o.Date, o.Libelle, o.Montant, o.FitID, o.ReferencePaiement,
-                COALESCE(t.Libelle, ''), COALESCE(c.Libelle, '')
+                COALESCE(t.Libelle, ''), COALESCE(c.Libelle, ''), COALESCE(chq.NumChq, 0)
          FROM Operation o
          LEFT JOIN Tiers t ON t.IDTiers = o.IDTiers
          LEFT JOIN Categorie c ON c.IDCategorie = o.IDCategorie
+         LEFT JOIN Cheque chq ON chq.IDCheque = o.IDCheque AND o.IDCheque <> 0
          WHERE o.IDOperation = ?1 AND o.IDCompte = ?2",
     )?;
     let mut found = Vec::with_capacity(ids.len());
@@ -139,6 +147,10 @@ pub fn lines(conn: &Connection, account_id: i64, ids: &[i64]) -> Result<Vec<Line
             reference: row.get(4)?,
             payee: row.get(5)?,
             category: row.get(6)?,
+            check_number: match row.get::<_, i64>(7)? {
+                0 => String::new(),
+                number => number.to_string(),
+            },
         });
     }
     Ok(found)
@@ -237,6 +249,15 @@ pub fn ofx(account: &Account, lines: &[Line], today: NaiveDate) -> String {
         written.push_str(&format!("<TRNAMT>{}\r\n", amount(line.amount)));
         written.push_str(&format!("<FITID>{}\r\n", sgml(&line.fitid)));
         written.push_str(&format!("<NAME>{}\r\n", sgml(&line.label)));
+        // Le numéro d'un vrai chèque, et la référence paiement en mémo
+        // (19/10/2026). Une balise vide n'est pas écrite.
+        if !line.check_number.trim().is_empty() {
+            written.push_str(&format!("<CHECKNUM>{}\r\n", sgml(line.check_number.trim())));
+        }
+        let memo = line.reference.replace(['\r', '\n'], " ");
+        if !memo.trim().is_empty() {
+            written.push_str(&format!("<MEMO>{}\r\n", sgml(memo.trim())));
+        }
         written.push_str("</STMTTRN>\r\n");
     }
 
@@ -259,8 +280,10 @@ pub fn ofx(account: &Account, lines: &[Line], today: NaiveDate) -> String {
 /// Écrit le QIF — les codes standards du format, un enregistrement par
 /// opération, fermé par `^`.
 ///
-/// `D` la date, `T` le montant signé, `P` le tiers, `M` le libellé, `L` la
-/// catégorie, `N` la référence de paiement. Une ligne dont le contenu est vide
+/// `D` la date, `T` le montant signé, `P` le tiers, `M` le libellé suivi de la
+/// référence paiement, `L` la catégorie, `N` le numéro d'un vrai chèque — et
+/// rien d'autre : la référence « n'a rien à voir avec un numéro de chèque »
+/// (Fabrice, 19/10/2026). Une ligne dont le contenu est vide
 /// n'est pas écrite : le format n'exige que la date et le montant, et un `P`
 /// suivi de rien ne dirait rien.
 ///
@@ -274,11 +297,16 @@ pub fn qif(lines: &[Line]) -> String {
             written.push_str(&format!("D{}\n", date.format("%d/%m/%Y")));
         }
         written.push_str(&format!("T{}\n", amount(line.amount)));
+        let memo = match (line.label.trim(), line.reference.trim()) {
+            (label, "") => label.to_string(),
+            ("", reference) => reference.to_string(),
+            (label, reference) => format!("{label} - {reference}"),
+        };
         for (code, value) in [
             ('P', &line.payee),
-            ('M', &line.label),
+            ('M', &memo),
             ('L', &line.category),
-            ('N', &line.reference),
+            ('N', &line.check_number),
         ] {
             let cleaned = value.replace(['\r', '\n'], " ");
             if !cleaned.trim().is_empty() {
@@ -331,6 +359,7 @@ mod tests {
             payee: "E. Leclerc".to_string(),
             category: "Alimentation".to_string(),
             reference: "CB1234".to_string(),
+            check_number: String::new(),
         }
     }
 
@@ -431,15 +460,53 @@ mod tests {
         assert!(records[0].contains("D03/07/2026\n"));
         assert!(records[0].contains("T-57.68\n"));
         assert!(records[0].contains("PE. Leclerc\n"));
-        assert!(records[0].contains("MACHAT CB\n"));
+        // La référence paiement suit le libellé en mémo ; `N` ne porte qu'un
+        // vrai numéro de chèque (Fabrice, 19/10/2026).
+        assert!(records[0].contains("MACHAT CB - CB1234\n"));
         assert!(records[0].contains("LAlimentation\n"));
-        assert!(records[0].contains("NCB1234\n"));
+        assert!(!records[0].contains("\nN"), "pas de numéro de chèque : pas de N");
 
         // **Une ligne vide ne s'écrit pas** : un `P` suivi de rien ne dirait
         // rien.
         assert!(!records[1].contains("\nP"));
         assert!(!records[1].contains("\nL"));
         assert!(records[1].contains("T-57.68\n"));
+    }
+
+    /// **La référence paiement part en mémo, le numéro de chèque à sa place**
+    /// (Fabrice, 19/10/2026 : « ça n'a rien à voir avec un numéro de
+    /// chèque »). Une référence vide, ou un chèque absent, n'écrit rien.
+    #[test]
+    fn la_reference_va_en_memo_et_le_cheque_a_sa_place() {
+        let account = Account {
+            bank: "12345".into(),
+            branch: "00001".into(),
+            number: "123456A789".into(),
+            currency: "EUR".into(),
+            balance_bank: 0,
+            balance_real: 0,
+        };
+        let mut prlv = a_line(3, "PRLV SEPA", -1_000_000, "F1");
+        prlv.reference = "URSSAF REF/42 & CO".into();
+        let mut cheque = a_line(4, "CHEQUE", -2_000_000, "F2");
+        cheque.reference = String::new();
+        cheque.check_number = "2256129".into();
+        let mut plain = a_line(5, "RETRAIT", -3_000_000, "F3");
+        plain.reference = String::new();
+        let today = NaiveDate::from_ymd_opt(2026, 10, 19).unwrap();
+        let written = ofx(&account, &[prlv.clone(), cheque.clone(), plain.clone()], today);
+        assert!(written.contains("<NAME>PRLV SEPA\r\n<MEMO>URSSAF REF/42 &amp; CO\r\n</STMTTRN>"));
+        assert!(written.contains("<NAME>CHEQUE\r\n<CHECKNUM>2256129\r\n</STMTTRN>"));
+        assert!(written.contains("<NAME>RETRAIT\r\n</STMTTRN>"));
+        // Et notre propre lecteur relit le mémo là où la banque l'aurait mis.
+        let read = crate::ofx_import::read(&written, "123456A789").unwrap();
+        assert_eq!(read.transactions[0].memo, "URSSAF REF/42 & CO");
+        assert_eq!(read.transactions[0].label, "PRLV SEPA");
+
+        let written = qif(&[prlv, cheque, plain]);
+        assert!(written.contains("MPRLV SEPA - URSSAF REF/42 & CO\n"));
+        assert!(written.contains("N2256129\n"));
+        assert_eq!(written.matches("\nN").count(), 1, "un seul N : celui du vrai chèque");
     }
 
     /// Le SGML de l'OFX ne supporte ni `<` ni `&` dans une valeur, et une

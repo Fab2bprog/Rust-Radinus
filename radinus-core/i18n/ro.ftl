@@ -456,6 +456,7 @@ operation-verification-verified = Verificată
 operation-verification-doubtful = Îndoielnică
 operation-verification-disputed = Contestată
 operations-column-label = Descriere
+operations-column-reference = Referință plată
 operations-column-category = Categorie
 operations-column-assignment = Alocare
 operations-column-payment-mode = ModOp
@@ -926,12 +927,13 @@ statement-column-reconciled = Reconciliat
 statement-column-fitid = FITID
 statement-column-date = Data
 statement-column-label = Descriere
+statement-column-reference = Referință plată
 statement-column-debit = Debit
 statement-column-credit = Credit
 statement-account = Cont
 statement-file = Fișier
 statement-difference = Diferență
-statement-none = Niciun extras de cont nu este deschis: faceți clic pe folderul galben pentru a alege un fișier.
+statement-none = Niciun extras de cont nu este deschis: faceți clic pe folderul galben pentru a alege un fișier (OFX, CSV, QIF).
 statement-empty = Acest extras de cont nu conține nicio operațiune.
 statement-no-match = Niciun rând nu corespunde filtrului.
 statement-help = Info: Utilizați clic de mouse + tasta [{ $modifier }] pe tabel pentru a selecta mai multe rânduri
@@ -1020,6 +1022,7 @@ statement-group-classification = Clasificarea operațiunii pentru calculul stati
 statement-group-status = Starea operațiunii
 statement-field-date = Data
 statement-field-label = Descriere
+statement-field-reference = Referință plată
 statement-field-type = Tip operațiune
 statement-field-amount = Sumă
 statement-field-mode = Mod operațiune
@@ -1612,14 +1615,14 @@ print-sent-default = Raport trimis la imprimanta dumneavoastră implicită.
 # --- Faza 17 — operațiunile asupra bazei de date ------------------------
 backup-archive = Arhivă Radinus
 backup-no-database = Nicio bază de date nu este deschisă.
-backup-done = Copie de siguranță scrisă în „{ $file }”.
+backup-done = Copia de siguranță a bazei „{ $base }” a fost scrisă în „{ $file }”. Celelalte baze nu sunt afectate.
 backup-failed = Copie de siguranță imposibilă: { $reason }
 backup-not-started = Copia de siguranță nu a putut fi începută:
 restore-unreadable = Acest fișier nu este o arhivă Radinus lizibilă: { $reason }
 # Întrebarea spune ce se va pierde înainte de a se pierde. Arhiva a fost deja
 # citită în acel moment: ceea ce anunță este sigur.
-restore-question = Restaurați „{ $file }”? Tot conținutul actual al bazei dumneavoastră va fi șters și înlocuit, iar ceea ce se află în ea va fi pierdut.
-restore-done = Restaurare terminată: { $accounts } conturi și { $operations } operațiuni.
+restore-question = Restaurați „{ $file }” în baza „{ $base }”? Tot conținutul actual al acestei baze va fi șters și înlocuit, iar ceea ce se află în ea va fi pierdut. Celelalte baze nu sunt atinse.
+restore-done = Baza „{ $base }” a fost restaurată: { $accounts } conturi și { $operations } operațiuni. Celelalte baze nu sunt atinse.
 restore-failed = Restaurare imposibilă: { $reason }
 restore-empty-fields = Câmpuri goale citite ca valoare nulă: { $count }.
 
@@ -1687,10 +1690,10 @@ journal-help = Jurnalul păstrează doar ultima operațiune tehnică: copie de s
 # --- Repararea ----------------------------------------------------------
 menu-file-repair-running = Reparare și optimizare în curs…
 repair-done = { $anomalies ->
-    [0] Reparare terminată: nicio anomalie găsită. Etape jurnalizate: { $lines }.
-    [one] Reparare terminată: o anomalie reparată. Etape jurnalizate: { $lines }.
-    [few] Reparare terminată: { $anomalies } anomalii reparate. Etape jurnalizate: { $lines }.
-   *[other] Reparare terminată: { $anomalies } de anomalii reparate. Etape jurnalizate: { $lines }.
+    [0] Repararea bazei „{ $base }” s-a încheiat: nicio anomalie găsită. Etape jurnalizate: { $lines }. Celelalte baze nu sunt afectate.
+    [one] Repararea bazei „{ $base }” s-a încheiat: o anomalie reparată. Etape jurnalizate: { $lines }. Celelalte baze nu sunt afectate.
+    [few] Repararea bazei „{ $base }” s-a încheiat: { $anomalies } anomalii reparate. Etape jurnalizate: { $lines }. Celelalte baze nu sunt afectate.
+   *[other] Repararea bazei „{ $base }” s-a încheiat: { $anomalies } de anomalii reparate. Etape jurnalizate: { $lines }. Celelalte baze nu sunt afectate.
 }
 repair-failed = Reparare imposibilă: { $reason }
 
@@ -1952,6 +1955,16 @@ preferences-branch-import = Import
 preferences-leaf-verification = Verificare
 preferences-field-verification = Operațiuni importate:
 preferences-verification-hint = „Verificată”: aveți încredere în banca dumneavoastră, o operațiune importată este considerată corectă. „De verificat”: fiecare operațiune importată așteaptă controlul dumneavoastră; apoi o treceți chiar dumneavoastră la „Verificată” în lista operațiunilor. Această setare se aplică numai importurilor viitoare.
+preferences-leaf-ofx = Extrase de cont OFX
+preferences-field-ofx-label = Descrierea operațiunii:
+preferences-field-ofx-reference = Referință plată:
+preferences-ofx-choice-name = Numele operațiunii
+preferences-ofx-choice-memo = Nota băncii
+preferences-ofx-choice-name-and-memo = Numele urmat de notă
+preferences-ofx-choice-empty = Nimic (lăsați gol)
+preferences-ofx-label-help = Ce primește descrierea unei operațiuni importate. Numele este cel afișat de bancă, de exemplu „PRLV SEPA”; unele bănci adaugă o notă detaliată: creditorul unui debit direct, beneficiarul și motivul unui transfer. Când o operațiune nu are notă, descrierea ei păstrează numele.
+preferences-ofx-reference-help = Ce primește referința de plată a unei operațiuni importate, unde o puteți vedea și filtra. Când o operațiune nu are notă, opțiunea „Nota băncii” lasă referința goală. Dacă nota repetă deja numele, ea nu este scrisă de două ori.
+preferences-ofx-hint = Aceste setări se aplică tuturor extraselor de cont OFX, oricare ar fi baza de date deschisă. Ele intră în vigoare la următorul extras de cont deschis.
 preferences-leaf-qif = Extrase de cont QIF
 preferences-field-qif-order = Ordinea zilei și a lunii:
 preferences-qif-order-ask = Întrebați-mă de fiecare dată
@@ -3031,3 +3044,132 @@ sharing-sheet-items = Articole
 sharing-sheet-result = Rezultat
 sharing-sheet-payments = Plăți
 sharing-sheet-balances = Rambursări
+
+## Asistentul de export al unei baze de date (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Asistentul de export al bazei „{ $base }”
+menu-tools-export = Asistentul de export al bazei…
+base-export-only-this = Doar baza „{ $base }”, selectată în listă, va fi exportată. Celelalte baze nu sunt afectate.
+base-export-purpose = Acest asistent copiază datele bazei în fișiere pe care alte programe le pot citi: o foaie de calcul, o bază de date precum Access, un alt program de gestiune a banilor. Baza în sine nu este modificată.
+base-export-step-format = 1. Formatul
+base-export-step-options = 2. Opțiunile
+base-export-step-place = 3. Locația
+base-export-step-summary = 4. Rezumatul
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = Un registru de calcul cu câte o foaie pentru fiecare tabel, care poate fi citit de Excel și de majoritatea programelor de calcul tabelar.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = Formatul liber al LibreOffice și OpenOffice, cu câte o foaie pentru fiecare tabel.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = Câte un fișier text pentru fiecare tabel, cu valorile separate prin punct și virgulă: formatul pe care aproape toate programele îl pot importa, inclusiv Access.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = Pentru programatori și aplicații: fiecare tabel sub numele său, cu un antet care descrie exportul.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = Același conținut ca în JSON, scris în XML.
+base-export-format-sql = Script SQL (.sql)
+base-export-format-sql-hint = Instrucțiunile care recreează tabelele și datele lor într-o altă bază de date (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = Bază SQLite (.sqlite)
+base-export-format-sqlite-hint = O bază de date de sine stătătoare, fără parolă, pe care multe instrumente o deschid direct.
+base-export-format-qif = QIF, un fișier pe cont (.qif)
+base-export-format-qif-hint = Pentru a vă muta conturile într-un alt program de gestiune a banilor (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, un fișier pe cont (.ofx)
+base-export-format-ofx-hint = Formatul extraselor de cont bancare, pe care majoritatea programelor de gestiune a banilor îl pot importa.
+base-export-lossy = Atenție: QIF și OFX nu pot reda totul. Trec doar operațiunile din conturi, cu terții, categoriile și comentariile lor; un transfer devine o operațiune obișnuită de fiecare parte, iar restul (bugete, operațiuni periodice, proiecte, alocări…) nu este preluat. Pentru a păstra totul, alegeți un alt format.
+base-export-planned-note = Operațiunile planificate și operațiunile fără dată nu sunt exportate: ele nu au trecut încă prin bancă. Numărul lor va fi indicat la final.
+base-export-dates-hint = Datele sunt scrise an-lună-zi (2026-12-31), iar sumele în moneda bazei: niciun program nu le poate citi greșit.
+base-export-group-layout = Fișiere
+base-export-layout-one = Totul într-un singur fișier
+base-export-layout-per-table = Câte un fișier pentru fiecare tabel, într-un folder
+base-export-group-decimal = Separatorul zecimal al sumelor
+base-export-decimal-point = Punctul (1234.56)
+base-export-decimal-comma = Virgula (1234,56)
+base-export-group-quotes = Ghilimele
+base-export-quotes-all = Fiecare valoare între ghilimele
+base-export-quotes-none = Fără ghilimele
+base-export-csv-replacements-hint = Pentru ca fiecare fișier să poată fi recitit fără erori, un punct și virgulă dintr-un text devine semn de exclamare, un rând nou devine spațiu și, fără ghilimele, o ghilimea devine apostrof. Numărul înlocuirilor va fi indicat la final.
+base-export-group-qif-order = Ordinea datei
+base-export-qif-day-month = Ziua înaintea lunii (31/12/2026)
+base-export-qif-month-day = Luna înaintea zilei (12/31/2026)
+base-export-qif-order-hint = Alegeți ordinea pe care o așteaptă programul care va citi fișierele: întâi ziua în Europa, întâi luna în Statele Unite.
+base-export-no-option = Acest format nu are opțiuni.
+base-export-choose-file = Alegeți fișierul…
+base-export-choose-folder = Alegeți folderul…
+base-export-place-file = Exportul va fi scris în acest fișier:
+base-export-place-folder = Exportul va fi scris în acest folder, creat special pentru el:
+base-export-place-none = Nu a fost aleasă încă nicio locație.
+base-export-place-needed = Alegeți mai întâi unde să fie scris exportul.
+base-export-folder-exists = Folderul „{ $name }” există deja. Fișierele cu același nume din el vor fi înlocuite. Continuați?
+base-export-summary-base = Bază
+base-export-summary-format = Format
+base-export-summary-options = Opțiuni
+base-export-summary-place = Locație
+base-export-unprotected = Această bază este protejată prin parolă, dar exportul nu va fi: oricine are aceste fișiere vă poate citi conturile. Păstrați-le într-un loc sigur.
+base-export-previous = Precedentul
+base-export-next = Următorul
+base-export-run = Exportați
+base-export-running = Export în curs…
+base-export-done = Baza „{ $base }” a fost exportată: { $tables ->
+        [one] un tabel
+        [few] { $tables } tabele
+       *[other] { $tables } de tabele
+    }, { $rows ->
+        [one] un rând
+        [few] { $rows } rânduri
+       *[other] { $rows } de rânduri
+    }.
+base-export-done-accounts = Baza „{ $base }” a fost exportată: { $accounts ->
+        [one] un cont
+        [few] { $accounts } conturi
+       *[other] { $accounts } de conturi
+    }, { $operations ->
+        [one] o operațiune
+        [few] { $operations } operațiuni
+       *[other] { $operations } de operațiuni
+    }.
+base-export-done-replacements = { $count ->
+        [one] Un caracter a fost înlocuit în fișierele CSV.
+        [few] { $count } caractere au fost înlocuite în fișierele CSV.
+       *[other] { $count } de caractere au fost înlocuite în fișierele CSV.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } caracter de control, pe care acest format nu îl poate conține, a fost înlocuit cu „�”.
+        [few] { $count } caractere de control, pe care acest format nu le poate conține, au fost înlocuite cu „�”.
+       *[other] { $count } de caractere de control, pe care acest format nu le poate conține, au fost înlocuite cu „�”.
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } text depășea 32.767 de caractere, limita Excel: a fost tăiat în registrul de lucru. Celelalte formate îl păstrează întreg.
+        [few] { $count } texte depășeau 32.767 de caractere, limita Excel: au fost tăiate în registrul de lucru. Celelalte formate le păstrează întregi.
+       *[other] { $count } de texte depășeau 32.767 de caractere, limita Excel: au fost tăiate în registrul de lucru. Celelalte formate le păstrează întregi.
+    }
+base-export-done-anomalies = { $count ->
+        [one] O valoare ilizibilă a fost copiată ca atare.
+        [few] { $count } valori ilizibile au fost copiate ca atare.
+       *[other] { $count } de valori ilizibile au fost copiate ca atare.
+    }
+base-export-done-planned = { $count ->
+        [one] O operațiune planificată a fost lăsată deoparte.
+        [few] { $count } operațiuni planificate au fost lăsate deoparte.
+       *[other] { $count } de operațiuni planificate au fost lăsate deoparte.
+    }
+base-export-done-undated = { $count ->
+        [one] O operațiune fără dată a fost lăsată deoparte.
+        [few] { $count } operațiuni fără dată au fost lăsate deoparte.
+       *[other] { $count } de operațiuni fără dată au fost lăsate deoparte.
+    }
+base-export-done-adjusted = { $count ->
+        [one] O valoare a fost ajustată pentru format.
+        [few] { $count } valori au fost ajustate pentru format.
+       *[other] { $count } de valori au fost ajustate pentru format.
+    }
+base-export-too-old = Această bază provine dintr-o versiune mai veche de Radinus. Deschideți-o mai întâi o dată în Radinus, care o va actualiza, apoi exportați-o.
+base-export-too-recent = Această bază a fost salvată de o versiune mai recentă de Radinus. Actualizați Radinus pentru a o exporta.
+base-export-not-radinus = Acest fișier nu este o bază Radinus.
+base-export-failed = Exportul nu a putut fi realizat: { $reason }
+
+## Meniul Instrumente al ferestrei bazelor numește baza (Fabrice, 19/10/2026).
+databases-tools-selected = Bază selectată: „{ $base }”
+databases-tools-none = Nicio bază selectată
+menu-tools-backup = Faceți o copie de siguranță a bazei „{ $base }”…
+menu-tools-backup-none = Faceți o copie de siguranță a bazei selectate…
+menu-tools-restore = Restaurați baza „{ $base }”…
+menu-tools-restore-none = Restaurați baza selectată…
+menu-tools-repair = Reparați și optimizați baza „{ $base }”…
+menu-tools-repair-none = Reparați și optimizați baza selectată…

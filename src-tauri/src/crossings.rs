@@ -2158,10 +2158,12 @@ fn la_consommation_d_un_appareil_tient_par_quatre_mains() {
 #[test]
 fn les_colonnes_d_un_tableau_reglable_portent_des_noms_que_le_noyau_accepte() {
     for (file, count) in [
-        ("ui/windows/operations-list.ts", 18),
-        ("ui/windows/statistics.ts", 11),
-        ("ui/windows/crossed-balance.ts", 11),
-        ("ui/windows/balance-analysis.ts", 12),
+        // 19 depuis la colonne « Référence paiement » (19/10/2026).
+        ("ui/windows/operations-list.ts", 19),
+        // 12, 12 et 13 depuis la même colonne dans les détails (20/10/2026).
+        ("ui/windows/statistics.ts", 12),
+        ("ui/windows/crossed-balance.ts", 12),
+        ("ui/windows/balance-analysis.ts", 13),
     ] {
         let page = read(file);
         let mut names: Vec<String> = page

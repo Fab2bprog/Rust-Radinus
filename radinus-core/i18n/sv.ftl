@@ -445,6 +445,7 @@ operation-verification-verified = Kontrollerad
 operation-verification-doubtful = Tveksam
 operation-verification-disputed = Bestridd
 operations-column-label = Beskrivning
+operations-column-reference = Betalningsreferens
 operations-column-category = Kategori
 operations-column-assignment = Tilldelning
 operations-column-payment-mode = Betalsätt
@@ -905,12 +906,13 @@ statement-column-reconciled = Avstämd
 statement-column-fitid = FITID
 statement-column-date = Datum
 statement-column-label = Beskrivning
+statement-column-reference = Betalningsreferens
 statement-column-debit = Debet
 statement-column-credit = Kredit
 statement-account = Konto
 statement-file = Fil
 statement-difference = Differens
-statement-none = Inget kontoutdrag är öppet: klicka på den gula mappen för att välja en fil.
+statement-none = Inget kontoutdrag är öppet: klicka på den gula mappen för att välja en fil (OFX, CSV, QIF).
 statement-empty = Det här kontoutdraget innehåller inga transaktioner.
 statement-no-match = Ingen rad motsvarar filtret.
 statement-help = Info: Använd musklick + tangenten [{ $modifier }] i tabellen för att markera flera rader
@@ -992,6 +994,7 @@ statement-group-classification = Klassificering av transaktionen för statistikb
 statement-group-status = Transaktionens status
 statement-field-date = Datum
 statement-field-label = Beskrivning
+statement-field-reference = Betalningsreferens
 statement-field-type = Transaktionstyp
 statement-field-amount = Belopp
 statement-field-mode = Transaktionssätt
@@ -1574,14 +1577,14 @@ print-sent-default = Rapporten har skickats till din standardskrivare.
 # --- Fas 17 — åtgärderna på databasen -----------------------------------
 backup-archive = Radinus-arkiv
 backup-no-database = Ingen databas är öppen.
-backup-done = Säkerhetskopian skriven till ”{ $file }”.
+backup-done = Databasen ”{ $base }” har säkerhetskopierats till ”{ $file }”. De andra databaserna påverkas inte.
 backup-failed = Det gick inte att göra säkerhetskopian: { $reason }
 backup-not-started = Säkerhetskopieringen kunde inte startas:
 restore-unreadable = Den här filen är inget läsbart Radinus-arkiv: { $reason }
 # Frågan säger vad som går förlorat innan det går förlorat. Arkivet har redan
 # lästs vid det laget: det som den aviserar är säkert.
-restore-question = Återställa ”{ $file }”? Allt nuvarande innehåll i din databas raderas och ersätts, och det som finns där går förlorat.
-restore-done = Återställningen är klar: { $accounts } konton och { $operations } transaktioner.
+restore-question = Återställa ”{ $file }” till databasen ”{ $base }”? Allt nuvarande innehåll i den här databasen raderas och ersätts, och det som finns där går förlorat. De andra databaserna berörs inte.
+restore-done = Databasen ”{ $base }” har återställts: { $accounts } konton och { $operations } transaktioner. De andra databaserna berörs inte.
 restore-failed = Det gick inte att återställa: { $reason }
 restore-empty-fields = Tomma fält lästa som nollvärde: { $count }.
 
@@ -1649,9 +1652,9 @@ journal-help = Loggen behåller bara den senaste tekniska åtgärden: säkerhets
 # --- Reparationen -------------------------------------------------------
 menu-file-repair-running = Reparation och optimering pågår…
 repair-done = { $anomalies ->
-    [0] Reparationen är klar: ingen avvikelse hittades. { $lines } steg loggade.
-    [one] Reparationen är klar: en avvikelse reparerad. { $lines } steg loggade.
-   *[other] Reparationen är klar: { $anomalies } avvikelser reparerade. { $lines } steg loggade.
+    [0] Reparationen av databasen ”{ $base }” är klar: ingen avvikelse hittades. { $lines } steg loggade. De andra databaserna påverkas inte.
+    [one] Reparationen av databasen ”{ $base }” är klar: en avvikelse reparerad. { $lines } steg loggade. De andra databaserna påverkas inte.
+   *[other] Reparationen av databasen ”{ $base }” är klar: { $anomalies } avvikelser reparerade. { $lines } steg loggade. De andra databaserna påverkas inte.
 }
 repair-failed = Det gick inte att reparera: { $reason }
 
@@ -1910,6 +1913,16 @@ preferences-branch-import = Import
 preferences-leaf-verification = Kontroll
 preferences-field-verification = Importerade transaktioner:
 preferences-verification-hint = ”Kontrollerad”: du litar på din bank, en importerad transaktion anses vara riktig. ”Att kontrollera”: varje importerad transaktion väntar på din kontroll; sedan sätter du den själv till ”Kontrollerad” i transaktionslistan. Inställningen gäller bara kommande importer.
+preferences-leaf-ofx = OFX-kontoutdrag
+preferences-field-ofx-label = Transaktionens beskrivning:
+preferences-field-ofx-reference = Betalningsreferens:
+preferences-ofx-choice-name = Transaktionens namn
+preferences-ofx-choice-memo = Bankens memo
+preferences-ofx-choice-name-and-memo = Namnet följt av memot
+preferences-ofx-choice-empty = Ingenting (lämna tomt)
+preferences-ofx-label-help = Det som hamnar i beskrivningen för en importerad transaktion. Namnet är det som banken visar, till exempel ”PRLV SEPA”; vissa banker lägger till ett detaljerat memo: borgenären för ett autogiro, mottagaren och syftet med en överföring. När en transaktion saknar memo behåller beskrivningen namnet.
+preferences-ofx-reference-help = Det som hamnar i betalningsreferensen för en importerad transaktion, där du kan se den och filtrera på den. När en transaktion saknar memo lämnar ”Bankens memo” referensen tom. Om memot redan upprepar namnet skrivs det inte två gånger.
+preferences-ofx-hint = Inställningarna gäller alla OFX-kontoutdrag, oavsett vilken databas som är öppen. De tillämpas på nästa kontoutdrag som öppnas.
 preferences-leaf-qif = QIF-kontoutdrag
 preferences-field-qif-order = Ordning för dag och månad:
 preferences-qif-order-ask = Fråga mig varje gång
@@ -2962,3 +2975,121 @@ sharing-sheet-items = Poster
 sharing-sheet-result = Resultat
 sharing-sheet-payments = Betalningar
 sharing-sheet-balances = Återbetalningar
+
+## Guiden för export av en databas (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Exportguide för databasen ”{ $base }”
+menu-tools-export = Exportguide för databasen…
+base-export-only-this = Endast databasen ”{ $base }”, som är markerad i listan, exporteras. De andra databaserna påverkas inte.
+base-export-purpose = Den här guiden kopierar databasens data till filer som andra program kan läsa: ett kalkylprogram, en databas som Access, ett annat program för privatekonomi. Själva databasen ändras inte.
+base-export-step-format = 1. Format
+base-export-step-options = 2. Alternativ
+base-export-step-place = 3. Plats
+base-export-step-summary = 4. Sammanfattning
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = En arbetsbok med ett blad per tabell, som kan läsas av Excel och de flesta kalkylprogram.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = Det öppna formatet för LibreOffice och OpenOffice, med ett blad per tabell.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = En textfil per tabell, med värden åtskilda av semikolon: det format som nästan alla program kan importera, även Access.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = För programmerare och applikationer: varje tabell under sitt eget namn, med ett huvud som beskriver exporten.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = Samma innehåll som JSON, men skrivet i XML.
+base-export-format-sql = SQL-skript (.sql)
+base-export-format-sql-hint = De instruktioner som återskapar tabellerna och deras data i en annan databas (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = SQLite-databas (.sqlite)
+base-export-format-sqlite-hint = En fristående databas, utan lösenord, som många verktyg kan öppna direkt.
+base-export-format-qif = QIF, en fil per konto (.qif)
+base-export-format-qif-hint = För att flytta över dina konton till ett annat program för privatekonomi (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, en fil per konto (.ofx)
+base-export-format-ofx-hint = Formatet för kontoutdrag, som de flesta program för privatekonomi kan importera.
+base-export-lossy = Obs! QIF och OFX kan inte rymma allt. Bara kontonas transaktioner följer med, med motparter, kategorier och kommentarer; en överföring blir en vanlig transaktion på vardera sidan, och resten (budgetar, återkommande transaktioner, projekt, tilldelningar…) blir kvar. Välj ett annat format om du vill behålla allt.
+base-export-planned-note = Planerade transaktioner och transaktioner utan datum exporteras inte: de har ännu inte gått igenom banken. Antalet anges i slutet.
+base-export-dates-hint = Datum skrivs som år-månad-dag (2026-12-31) och belopp i databasens valuta: inget program kan missförstå dem.
+base-export-group-layout = Filer
+base-export-layout-one = Allt i en enda fil
+base-export-layout-per-table = En fil per tabell, i en mapp
+base-export-group-decimal = Decimaltecken för belopp
+base-export-decimal-point = Punkt (1234.56)
+base-export-decimal-comma = Komma (1234,56)
+base-export-group-quotes = Citattecken
+base-export-quotes-all = Varje värde inom citattecken
+base-export-quotes-none = Inga citattecken
+base-export-csv-replacements-hint = För att varje fil ska kunna läsas in igen utan fel blir ett semikolon i en text ett utropstecken, en radbrytning ett mellanslag och, utan citattecken, ett citattecken en apostrof. Antalet ersättningar anges i slutet.
+base-export-group-qif-order = Datumordning
+base-export-qif-day-month = Dag före månad (31/12/2026)
+base-export-qif-month-day = Månad före dag (12/31/2026)
+base-export-qif-order-hint = Välj den ordning som programmet som ska läsa filerna förväntar sig: dagen först i Europa, månaden först i USA.
+base-export-no-option = Det här formatet har inga alternativ.
+base-export-choose-file = Välj fil…
+base-export-choose-folder = Välj mapp…
+base-export-place-file = Exporten skrivs till den här filen:
+base-export-place-folder = Exporten skrivs till den här mappen, som skapas för ändamålet:
+base-export-place-none = Ingen plats har valts ännu.
+base-export-place-needed = Välj först var exporten ska sparas.
+base-export-folder-exists = Mappen ”{ $name }” finns redan. Filer med samma namn i den ersätts. Vill du fortsätta?
+base-export-summary-base = Databas
+base-export-summary-format = Format
+base-export-summary-options = Alternativ
+base-export-summary-place = Plats
+base-export-unprotected = Den här databasen är skyddad med ett lösenord, men exporten blir det inte: alla som har de här filerna kan läsa dina konton. Förvara dem på ett säkert ställe.
+base-export-previous = Föregående
+base-export-next = Nästa
+base-export-run = Exportera
+base-export-running = Exporterar…
+base-export-done = Databasen ”{ $base }” har exporterats: { $tables ->
+        [one] en tabell
+       *[other] { $tables } tabeller
+    }, { $rows ->
+        [one] en rad
+       *[other] { $rows } rader
+    }.
+base-export-done-accounts = Databasen ”{ $base }” har exporterats: { $accounts ->
+        [one] ett konto
+       *[other] { $accounts } konton
+    }, { $operations ->
+        [one] en transaktion
+       *[other] { $operations } transaktioner
+    }.
+base-export-done-replacements = { $count ->
+        [one] Ett tecken ersattes i CSV-filerna.
+       *[other] { $count } tecken ersattes i CSV-filerna.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } kontrolltecken, som det här formatet inte kan innehålla, ersattes med ”�”.
+       *[other] { $count } kontrolltecken, som det här formatet inte kan innehålla, ersattes med ”�”.
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } text var längre än 32 767 tecken, Excels gräns: den kortades i arbetsboken. De andra formaten behåller den i sin helhet.
+       *[other] { $count } texter var längre än 32 767 tecken, Excels gräns: de kortades i arbetsboken. De andra formaten behåller dem i sin helhet.
+    }
+base-export-done-anomalies = { $count ->
+        [one] Ett oläsbart värde kopierades oförändrat.
+       *[other] { $count } oläsbara värden kopierades oförändrade.
+    }
+base-export-done-planned = { $count ->
+        [one] En planerad transaktion utelämnades.
+       *[other] { $count } planerade transaktioner utelämnades.
+    }
+base-export-done-undated = { $count ->
+        [one] En transaktion utan datum utelämnades.
+       *[other] { $count } transaktioner utan datum utelämnades.
+    }
+base-export-done-adjusted = { $count ->
+        [one] Ett värde anpassades till formatet.
+       *[other] { $count } värden anpassades till formatet.
+    }
+base-export-too-old = Den här databasen kommer från en äldre version av Radinus. Öppna den först en gång i Radinus, som uppdaterar den, och exportera den sedan.
+base-export-too-recent = Den här databasen har sparats av en nyare version av Radinus. Uppdatera Radinus för att exportera den.
+base-export-not-radinus = Den här filen är inte en Radinus-databas.
+base-export-failed = Exporten kunde inte genomföras: { $reason }
+
+## Verktygsmenyn i databasfönstret visar databasens namn (Fabrice, 19/10/2026).
+databases-tools-selected = Vald databas: ”{ $base }”
+databases-tools-none = Ingen databas vald
+menu-tools-backup = Säkerhetskopiera databasen ”{ $base }”…
+menu-tools-backup-none = Säkerhetskopiera den valda databasen…
+menu-tools-restore = Återställ databasen ”{ $base }”…
+menu-tools-restore-none = Återställ den valda databasen…
+menu-tools-repair = Reparera och optimera databasen ”{ $base }”…
+menu-tools-repair-none = Reparera och optimera den valda databasen…

@@ -814,6 +814,9 @@ pub fn read(text: &str, account: usize, file_name: &str, options: Options) -> Re
             kind: record.first('N'),
             label,
             fitid: String::new(),
+            // Le QIF et le CSV n'ont pas de MEMO à part : le QIF range déjà le
+            // sien selon ses propres réglages (P-73), le CSV n'en a pas.
+            memo: String::new(),
         });
     }
 
@@ -1231,6 +1234,7 @@ mod tests {
             payee: String::new(),
             category: "Alimentation".into(),
             reference: String::new(),
+            check_number: String::new(),
         };
         let written = crate::exports::qif(&[
             line(day(2026, 7, 14), "Marché", -23_450_000),

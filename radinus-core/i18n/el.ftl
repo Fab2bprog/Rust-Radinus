@@ -450,6 +450,7 @@ operation-verification-verified = Ελεγμένη
 operation-verification-doubtful = Αμφίβολη
 operation-verification-disputed = Αμφισβητούμενη
 operations-column-label = Περιγραφή
+operations-column-reference = Αναφορά πληρωμής
 operations-column-category = Κατηγορία
 operations-column-assignment = Κατανομή
 operations-column-payment-mode = ΤρόποςΚίν
@@ -913,12 +914,13 @@ statement-column-reconciled = Συμφωνημένη
 statement-column-fitid = FITID
 statement-column-date = Ημερομηνία
 statement-column-label = Περιγραφή
+statement-column-reference = Αναφορά πληρωμής
 statement-column-debit = Χρέωση
 statement-column-credit = Πίστωση
 statement-account = Λογαριασμός
 statement-file = Αρχείο
 statement-difference = Διαφορά
-statement-none = Δεν έχει ανοίξει καμία κατάσταση λογαριασμού: κάντε κλικ στον κίτρινο φάκελο για να επιλέξετε ένα αρχείο.
+statement-none = Δεν έχει ανοίξει καμία κατάσταση λογαριασμού: κάντε κλικ στον κίτρινο φάκελο για να επιλέξετε ένα αρχείο (OFX, CSV, QIF).
 statement-empty = Αυτή η κατάσταση λογαριασμού δεν περιέχει καμία κίνηση.
 statement-no-match = Καμία γραμμή δεν αντιστοιχεί στο φίλτρο.
 statement-help = Πληροφορία: Χρησιμοποιήστε κλικ ποντικιού + πλήκτρο [{ $modifier }] στον πίνακα για να επιλέξετε πολλές γραμμές
@@ -1001,6 +1003,7 @@ statement-group-classification = Ταξινόμηση της κίνησης γι
 statement-group-status = Κατάσταση της κίνησης
 statement-field-date = Ημερομηνία
 statement-field-label = Περιγραφή
+statement-field-reference = Αναφορά πληρωμής
 statement-field-type = Τύπος κίνησης
 statement-field-amount = Ποσό
 statement-field-mode = Τρόπος κίνησης
@@ -1587,14 +1590,14 @@ print-sent-default = Η κατάσταση στάλθηκε στον προεπ�
 # --- Φάση 17 — οι λειτουργίες στη βάση δεδομένων -----------------------
 backup-archive = Αρχειοθήκη Radinus
 backup-no-database = Καμία βάση δεδομένων δεν είναι ανοιχτή.
-backup-done = Το αντίγραφο ασφαλείας γράφτηκε στο «{ $file }».
+backup-done = Το αντίγραφο ασφαλείας της βάσης «{ $base }» γράφτηκε στο «{ $file }». Οι άλλες βάσεις δεν επηρεάζονται.
 backup-failed = Αδύνατο το αντίγραφο ασφαλείας: { $reason }
 backup-not-started = Δεν ήταν δυνατή η έναρξη του αντιγράφου ασφαλείας:
 restore-unreadable = Αυτό το αρχείο δεν είναι αναγνώσιμη αρχειοθήκη Radinus: { $reason }
 # Η ερώτηση λέει τι θα χαθεί προτού χαθεί. Η αρχειοθήκη έχει ήδη διαβαστεί
 # σε αυτό το σημείο: ό,τι ανακοινώνει είναι βέβαιο.
-restore-question = Να γίνει επαναφορά του «{ $file }»; Όλο το τρέχον περιεχόμενο της βάσης σας θα διαγραφεί και θα αντικατασταθεί, και ό,τι βρίσκεται εκεί θα χαθεί.
-restore-done = Η επαναφορά ολοκληρώθηκε: { $accounts } λογαριασμοί και { $operations } κινήσεις.
+restore-question = Να γίνει επαναφορά του «{ $file }» στη βάση «{ $base }»; Όλο το τρέχον περιεχόμενο αυτής της βάσης θα διαγραφεί και θα αντικατασταθεί, και ό,τι βρίσκεται εκεί θα χαθεί. Οι άλλες βάσεις δεν αγγίζονται.
+restore-done = Η βάση «{ $base }» επαναφέρθηκε: { $accounts } λογαριασμοί και { $operations } κινήσεις. Οι άλλες βάσεις δεν αγγίζονται.
 restore-failed = Αδύνατη η επαναφορά: { $reason }
 restore-empty-fields = Κενά πεδία που διαβάστηκαν ως μηδενική τιμή: { $count }.
 
@@ -1662,9 +1665,9 @@ journal-help = Το ημερολόγιο κρατά μόνο την τελευτ
 # --- Η επιδιόρθωση -----------------------------------------------------
 menu-file-repair-running = Επιδιόρθωση και βελτιστοποίηση σε εξέλιξη…
 repair-done = { $anomalies ->
-    [0] Η επιδιόρθωση ολοκληρώθηκε: δεν βρέθηκε καμία ανωμαλία. { $lines } βήματα καταγράφηκαν.
-    [one] Η επιδιόρθωση ολοκληρώθηκε: μία ανωμαλία επιδιορθώθηκε. { $lines } βήματα καταγράφηκαν.
-   *[other] Η επιδιόρθωση ολοκληρώθηκε: { $anomalies } ανωμαλίες επιδιορθώθηκαν. { $lines } βήματα καταγράφηκαν.
+    [0] Η επιδιόρθωση της βάσης «{ $base }» ολοκληρώθηκε: δεν βρέθηκε καμία ανωμαλία. { $lines } βήματα καταγράφηκαν. Οι άλλες βάσεις δεν επηρεάζονται.
+    [one] Η επιδιόρθωση της βάσης «{ $base }» ολοκληρώθηκε: μία ανωμαλία επιδιορθώθηκε. { $lines } βήματα καταγράφηκαν. Οι άλλες βάσεις δεν επηρεάζονται.
+   *[other] Η επιδιόρθωση της βάσης «{ $base }» ολοκληρώθηκε: { $anomalies } ανωμαλίες επιδιορθώθηκαν. { $lines } βήματα καταγράφηκαν. Οι άλλες βάσεις δεν επηρεάζονται.
 }
 repair-failed = Αδύνατη η επιδιόρθωση: { $reason }
 
@@ -1926,6 +1929,16 @@ preferences-branch-import = Εισαγωγή
 preferences-leaf-verification = Έλεγχος
 preferences-field-verification = Εισαγόμενες κινήσεις:
 preferences-verification-hint = «Ελεγμένη»: εμπιστεύεστε την τράπεζά σας, μια εισαγόμενη κίνηση θεωρείται σωστή. «Προς έλεγχο»: κάθε εισαγόμενη κίνηση περιμένει τον έλεγχό σας· έπειτα την αλλάζετε εσείς σε «Ελεγμένη» στη λίστα κινήσεων. Η ρύθμιση αυτή ισχύει μόνο για τις επόμενες εισαγωγές.
+preferences-leaf-ofx = Καταστάσεις λογαριασμού OFX
+preferences-field-ofx-label = Περιγραφή της κίνησης:
+preferences-field-ofx-reference = Αναφορά πληρωμής:
+preferences-ofx-choice-name = Το όνομα της κίνησης
+preferences-ofx-choice-memo = Η σημείωση της τράπεζας
+preferences-ofx-choice-name-and-memo = Το όνομα και μετά η σημείωση
+preferences-ofx-choice-empty = Τίποτα (να μείνει κενό)
+preferences-ofx-label-help = Τι λαμβάνει η περιγραφή μιας εισαγόμενης κίνησης. Το όνομα είναι αυτό που εμφανίζει η τράπεζα, για παράδειγμα «PRLV SEPA»· ορισμένες τράπεζες προσθέτουν μια λεπτομερή σημείωση: τον πιστωτή μιας άμεσης χρέωσης, τον δικαιούχο και την αιτιολογία μιας μεταφοράς. Όταν μια κίνηση δεν έχει σημείωση, η περιγραφή της κρατά το όνομα.
+preferences-ofx-reference-help = Τι λαμβάνει η αναφορά πληρωμής μιας εισαγόμενης κίνησης, όπου μπορείτε να τη δείτε και να φιλτράρετε με βάση αυτήν. Όταν μια κίνηση δεν έχει σημείωση, η επιλογή «Η σημείωση της τράπεζας» αφήνει την αναφορά κενή. Αν η σημείωση επαναλαμβάνει ήδη το όνομα, δεν γράφεται δύο φορές.
+preferences-ofx-hint = Αυτές οι ρυθμίσεις ισχύουν για όλες τις καταστάσεις λογαριασμού OFX, όποια βάση δεδομένων κι αν είναι ανοιχτή. Εφαρμόζονται στην επόμενη κατάσταση λογαριασμού που θα ανοίξετε.
 preferences-leaf-qif = Καταστάσεις λογαριασμού QIF
 preferences-field-qif-order = Σειρά ημέρας και μήνα:
 preferences-qif-order-ask = Να ερωτώμαι κάθε φορά
@@ -2980,3 +2993,121 @@ sharing-sheet-items = Είδη
 sharing-sheet-result = Αποτέλεσμα
 sharing-sheet-payments = Πληρωμές
 sharing-sheet-balances = Επιστροφές
+
+## Ο οδηγός εξαγωγής μιας βάσης (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Οδηγός εξαγωγής της βάσης «{ $base }»
+menu-tools-export = Οδηγός εξαγωγής της βάσης…
+base-export-only-this = Θα εξαχθεί μόνο η βάση «{ $base }», που είναι επιλεγμένη στη λίστα. Οι άλλες βάσεις δεν επηρεάζονται.
+base-export-purpose = Αυτός ο οδηγός αντιγράφει τα δεδομένα της βάσης σε αρχεία που μπορούν να διαβάσουν άλλα προγράμματα: ένα υπολογιστικό φύλλο, μια βάση δεδομένων όπως η Access, ένα άλλο πρόγραμμα διαχείρισης οικονομικών. Η ίδια η βάση δεν αλλάζει.
+base-export-step-format = 1. Μορφή
+base-export-step-options = 2. Επιλογές
+base-export-step-place = 3. Θέση
+base-export-step-summary = 4. Σύνοψη
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = Ένα βιβλίο εργασίας με ένα φύλλο ανά πίνακα, που ανοίγει στο Excel και στα περισσότερα προγράμματα υπολογιστικών φύλλων.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = Η ανοιχτή μορφή του LibreOffice και του OpenOffice, με ένα φύλλο ανά πίνακα.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = Ένα αρχείο κειμένου ανά πίνακα, με τις τιμές χωρισμένες με ερωτηματικό (;): η μορφή που σχεδόν κάθε πρόγραμμα μπορεί να εισαγάγει, ακόμη και η Access.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = Για προγραμματιστές και εφαρμογές: κάθε πίνακας με το όνομά του, με μια κεφαλίδα που περιγράφει την εξαγωγή.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = Το ίδιο περιεχόμενο με το JSON, γραμμένο σε XML.
+base-export-format-sql = Σενάριο SQL (.sql)
+base-export-format-sql-hint = Οι εντολές που αναδημιουργούν τους πίνακες και τα δεδομένα τους σε μια άλλη βάση δεδομένων (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = Βάση SQLite (.sqlite)
+base-export-format-sqlite-hint = Μια αυτόνομη βάση δεδομένων, χωρίς κωδικό, που πολλά εργαλεία ανοίγουν απευθείας.
+base-export-format-qif = QIF, ένα αρχείο ανά λογαριασμό (.qif)
+base-export-format-qif-hint = Για να μεταφέρετε τους λογαριασμούς σας σε άλλο πρόγραμμα διαχείρισης οικονομικών (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, ένα αρχείο ανά λογαριασμό (.ofx)
+base-export-format-ofx-hint = Η μορφή των τραπεζικών καταστάσεων λογαριασμού, που τα περισσότερα προγράμματα διαχείρισης οικονομικών μπορούν να εισαγάγουν.
+base-export-lossy = Προσοχή: τα QIF και OFX δεν μπορούν να αποδώσουν τα πάντα. Περνούν μόνο οι κινήσεις των λογαριασμών, με τους αντισυμβαλλομένους, τις κατηγορίες και τα σχόλιά τους· μια μεταφορά γίνεται απλή κίνηση σε κάθε πλευρά, και τα υπόλοιπα (προϋπολογισμοί, επαναλαμβανόμενες κινήσεις, έργα, κατανομές…) μένουν πίσω. Για να κρατήσετε τα πάντα, επιλέξτε άλλη μορφή.
+base-export-planned-note = Οι προγραμματισμένες κινήσεις και οι κινήσεις χωρίς ημερομηνία δεν εξάγονται: δεν έχουν περάσει ακόμη από την τράπεζα. Το πλήθος τους θα αναφερθεί στο τέλος.
+base-export-dates-hint = Οι ημερομηνίες γράφονται έτος-μήνας-ημέρα (2026-12-31) και τα ποσά στο νόμισμα της βάσης: κανένα πρόγραμμα δεν μπορεί να τα διαβάσει λάθος.
+base-export-group-layout = Αρχεία
+base-export-layout-one = Όλα σε ένα μόνο αρχείο
+base-export-layout-per-table = Ένα αρχείο ανά πίνακα, σε έναν φάκελο
+base-export-group-decimal = Υποδιαστολή των ποσών
+base-export-decimal-point = Η τελεία (1234.56)
+base-export-decimal-comma = Το κόμμα (1234,56)
+base-export-group-quotes = Εισαγωγικά
+base-export-quotes-all = Κάθε τιμή σε εισαγωγικά
+base-export-quotes-none = Χωρίς εισαγωγικά
+base-export-csv-replacements-hint = Για να ξαναδιαβάζεται κάθε αρχείο χωρίς σφάλμα, ένα ερωτηματικό (;) μέσα σε κείμενο γίνεται θαυμαστικό (!), μια αλλαγή γραμμής γίνεται κενό και, χωρίς εισαγωγικά, ένα εισαγωγικό γίνεται απόστροφος. Το πλήθος των αντικαταστάσεων θα αναφερθεί στο τέλος.
+base-export-group-qif-order = Σειρά ημερομηνίας
+base-export-qif-day-month = Η ημέρα πριν από τον μήνα (31/12/2026)
+base-export-qif-month-day = Ο μήνας πριν από την ημέρα (12/31/2026)
+base-export-qif-order-hint = Επιλέξτε τη σειρά που περιμένει το πρόγραμμα που θα διαβάσει τα αρχεία: πρώτα η ημέρα στην Ευρώπη, πρώτα ο μήνας στις Ηνωμένες Πολιτείες.
+base-export-no-option = Αυτή η μορφή δεν έχει επιλογές.
+base-export-choose-file = Επιλογή αρχείου…
+base-export-choose-folder = Επιλογή φακέλου…
+base-export-place-file = Η εξαγωγή θα γραφτεί σε αυτό το αρχείο:
+base-export-place-folder = Η εξαγωγή θα γραφτεί σε αυτόν τον φάκελο, που θα δημιουργηθεί γι' αυτήν:
+base-export-place-none = Δεν έχει επιλεγεί ακόμη θέση.
+base-export-place-needed = Επιλέξτε πρώτα πού θα γραφτεί η εξαγωγή.
+base-export-folder-exists = Ο φάκελος «{ $name }» υπάρχει ήδη. Τα αρχεία του με το ίδιο όνομα θα αντικατασταθούν. Να συνεχιστεί;
+base-export-summary-base = Βάση
+base-export-summary-format = Μορφή
+base-export-summary-options = Επιλογές
+base-export-summary-place = Θέση
+base-export-unprotected = Αυτή η βάση προστατεύεται με κωδικό, αλλά η εξαγωγή δεν θα προστατεύεται: όποιος έχει αυτά τα αρχεία μπορεί να διαβάσει τους λογαριασμούς σας. Φυλάξτε τα σε ασφαλές μέρος.
+base-export-previous = Προηγούμενο
+base-export-next = Επόμενο
+base-export-run = Εξαγωγή
+base-export-running = Εξαγωγή σε εξέλιξη…
+base-export-done = Η βάση «{ $base }» εξήχθη: { $tables ->
+        [one] ένας πίνακας
+       *[other] { $tables } πίνακες
+    }, { $rows ->
+        [one] μία γραμμή
+       *[other] { $rows } γραμμές
+    }.
+base-export-done-accounts = Η βάση «{ $base }» εξήχθη: { $accounts ->
+        [one] ένας λογαριασμός
+       *[other] { $accounts } λογαριασμοί
+    }, { $operations ->
+        [one] μία κίνηση
+       *[other] { $operations } κινήσεις
+    }.
+base-export-done-replacements = { $count ->
+        [one] Ένας χαρακτήρας αντικαταστάθηκε στα αρχεία CSV.
+       *[other] { $count } χαρακτήρες αντικαταστάθηκαν στα αρχεία CSV.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } χαρακτήρας ελέγχου, που αυτή η μορφή δεν μπορεί να περιέχει, αντικαταστάθηκε με «�».
+       *[other] { $count } χαρακτήρες ελέγχου, που αυτή η μορφή δεν μπορεί να περιέχει, αντικαταστάθηκαν με «�».
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } κείμενο ξεπερνούσε τους 32.767 χαρακτήρες, το όριο του Excel: κόπηκε στο βιβλίο εργασίας. Οι άλλες μορφές το διατηρούν ολόκληρο.
+       *[other] { $count } κείμενα ξεπερνούσαν τους 32.767 χαρακτήρες, το όριο του Excel: κόπηκαν στο βιβλίο εργασίας. Οι άλλες μορφές τα διατηρούν ολόκληρα.
+    }
+base-export-done-anomalies = { $count ->
+        [one] Μία μη αναγνώσιμη τιμή αντιγράφηκε ως είχε.
+       *[other] { $count } μη αναγνώσιμες τιμές αντιγράφηκαν ως είχαν.
+    }
+base-export-done-planned = { $count ->
+        [one] Μία προγραμματισμένη κίνηση παραλείφθηκε.
+       *[other] { $count } προγραμματισμένες κινήσεις παραλείφθηκαν.
+    }
+base-export-done-undated = { $count ->
+        [one] Μία κίνηση χωρίς ημερομηνία παραλείφθηκε.
+       *[other] { $count } κινήσεις χωρίς ημερομηνία παραλείφθηκαν.
+    }
+base-export-done-adjusted = { $count ->
+        [one] Μία τιμή προσαρμόστηκε στη μορφή.
+       *[other] { $count } τιμές προσαρμόστηκαν στη μορφή.
+    }
+base-export-too-old = Αυτή η βάση προέρχεται από παλαιότερη έκδοση του Radinus. Ανοίξτε την πρώτα μία φορά στο Radinus, που θα την ενημερώσει, και μετά εξαγάγετέ την.
+base-export-too-recent = Αυτή η βάση αποθηκεύτηκε από νεότερη έκδοση του Radinus. Ενημερώστε το Radinus για να την εξαγάγετε.
+base-export-not-radinus = Αυτό το αρχείο δεν είναι βάση Radinus.
+base-export-failed = Η εξαγωγή δεν μπόρεσε να γίνει: { $reason }
+
+## Το μενού Εργαλεία του παραθύρου των βάσεων ονομάζει τη βάση (Fabrice, 19/10/2026).
+databases-tools-selected = Επιλεγμένη βάση: «{ $base }»
+databases-tools-none = Δεν έχει επιλεγεί καμία βάση
+menu-tools-backup = Αντίγραφο ασφαλείας της βάσης «{ $base }»…
+menu-tools-backup-none = Αντίγραφο ασφαλείας της επιλεγμένης βάσης…
+menu-tools-restore = Επαναφορά της βάσης «{ $base }»…
+menu-tools-restore-none = Επαναφορά της επιλεγμένης βάσης…
+menu-tools-repair = Επιδιόρθωση και βελτιστοποίηση της βάσης «{ $base }»…
+menu-tools-repair-none = Επιδιόρθωση και βελτιστοποίηση της επιλεγμένης βάσης…

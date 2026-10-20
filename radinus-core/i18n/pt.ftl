@@ -411,6 +411,7 @@ operation-verification-verified = Verificada
 operation-verification-doubtful = Duvidosa
 operation-verification-disputed = Contestada
 operations-column-label = Descrição
+operations-column-reference = Referência de pagamento
 operations-column-category = Categoria
 operations-column-assignment = Afetação
 operations-column-payment-mode = ModoOp
@@ -818,12 +819,13 @@ statement-column-reconciled = Conciliado
 statement-column-fitid = FITID
 statement-column-date = Data
 statement-column-label = Descrição
+statement-column-reference = Referência de pagamento
 statement-column-debit = Débito
 statement-column-credit = Crédito
 statement-account = Conta
 statement-file = Ficheiro
 statement-difference = Diferença
-statement-none = Não há nenhum extrato aberto: clique na pasta amarela para escolher um ficheiro.
+statement-none = Não há nenhum extrato aberto: clique na pasta amarela para escolher um ficheiro (OFX, CSV, QIF).
 statement-empty = Este extrato não contém nenhuma operação.
 statement-no-match = Nenhuma linha corresponde ao filtro.
 statement-help = Info: utilize Clique do rato + tecla [{ $modifier }] na tabela para selecionar várias linhas
@@ -902,6 +904,7 @@ statement-group-classification = Classificação da operação para o cálculo d
 statement-group-status = Estado da operação
 statement-field-date = Data
 statement-field-label = Descrição
+statement-field-reference = Referência de pagamento
 statement-field-type = Tipo de operação
 statement-field-amount = Montante
 statement-field-mode = Modo de pagamento
@@ -1419,12 +1422,12 @@ print-sent-default = Mapa enviado para a sua impressora por defeito.
 # --- As operações sobre a base de dados ---------------------------------
 backup-archive = Arquivo Radinus
 backup-no-database = Não há nenhuma base de dados aberta.
-backup-done = Cópia de segurança escrita em « { $file } ».
+backup-done = A base « { $base } » foi guardada em « { $file } ». As outras bases não são afetadas.
 backup-failed = Não foi possível fazer a cópia de segurança: { $reason }
 backup-not-started = Não foi possível iniciar a cópia de segurança:
 restore-unreadable = Este ficheiro não é um arquivo Radinus legível: { $reason }
-restore-question = Restaurar « { $file } »? Todo o conteúdo atual da sua base será apagado e substituído, e o que lá estiver perder-se-á.
-restore-done = Restauro terminado: { $accounts } contas e { $operations } operações.
+restore-question = Restaurar « { $file } » na base « { $base } »? Todo o conteúdo atual desta base será apagado e substituído, e o que lá estiver perder-se-á. As outras bases não são tocadas.
+restore-done = A base « { $base } » foi restaurada: { $accounts } contas e { $operations } operações. As outras bases não são tocadas.
 restore-failed = Não foi possível restaurar: { $reason }
 restore-empty-fields = Campos vazios lidos como valor nulo: { $count }.
 
@@ -1489,9 +1492,9 @@ journal-help = O registo só guarda a última operação técnica: cópia de seg
 
 menu-file-repair-running = Reparação e otimização em curso…
 repair-done = { $anomalies ->
-    [0] Reparação terminada: nenhuma anomalia encontrada. { $lines } etapas registadas.
-    [one] Reparação terminada: uma anomalia reparada. { $lines } etapas registadas.
-   *[other] Reparação terminada: { $anomalies } anomalias reparadas. { $lines } etapas registadas.
+    [0] Reparação da base « { $base } » terminada: nenhuma anomalia encontrada. { $lines } etapas registadas. As outras bases não são afetadas.
+    [one] Reparação da base « { $base } » terminada: uma anomalia reparada. { $lines } etapas registadas. As outras bases não são afetadas.
+   *[other] Reparação da base « { $base } » terminada: { $anomalies } anomalias reparadas. { $lines } etapas registadas. As outras bases não são afetadas.
 }
 repair-failed = Não foi possível reparar: { $reason }
 
@@ -1732,6 +1735,16 @@ preferences-branch-import = Importação
 preferences-leaf-verification = Verificação
 preferences-field-verification = Operações importadas:
 preferences-verification-hint = «Verificada»: confia no seu banco, uma operação importada é tida como correta. «Por verificar»: cada operação importada aguarda o seu controlo; depois passa-a você mesmo a «Verificada» na lista de operações. Esta definição só se aplica às importações futuras.
+preferences-leaf-ofx = Extratos OFX
+preferences-field-ofx-label = Descrição da operação:
+preferences-field-ofx-reference = Referência de pagamento:
+preferences-ofx-choice-name = O nome da operação
+preferences-ofx-choice-memo = O memo do banco
+preferences-ofx-choice-name-and-memo = O nome seguido do memo
+preferences-ofx-choice-empty = Nada (deixar vazio)
+preferences-ofx-label-help = O que recebe a descrição de uma operação importada. O nome é o que o banco apresenta, por exemplo «PRLV SEPA»; alguns bancos acrescentam um memo detalhado: o credor de um débito direto, o beneficiário e o motivo de uma transferência. Quando uma operação não tem memo, a sua descrição mantém o nome.
+preferences-ofx-reference-help = O que recebe a referência de pagamento de uma operação importada, onde a pode ver e filtrar. Quando uma operação não tem memo, «O memo do banco» deixa a referência vazia. Se o memo já repetir o nome, não é escrito duas vezes.
+preferences-ofx-hint = Estas definições aplicam-se a todos os extratos OFX, seja qual for a base de dados aberta. Aplicam-se ao próximo extrato aberto.
 preferences-leaf-qif = Extratos QIF
 preferences-field-qif-order = Ordem do dia e do mês:
 preferences-qif-order-ask = Perguntar-me sempre
@@ -2785,3 +2798,121 @@ sharing-sheet-items = Rubricas
 sharing-sheet-result = Resultado
 sharing-sheet-payments = Pagamentos
 sharing-sheet-balances = Reembolsos
+
+## O assistente de exportação de uma base (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Assistente de exportação da base « { $base } »
+menu-tools-export = Assistente de exportação da base…
+base-export-only-this = Só a base « { $base } », selecionada na lista, será exportada. As outras bases não são afetadas.
+base-export-purpose = Este assistente copia os dados da base para ficheiros que outros programas sabem ler: uma folha de cálculo, uma base de dados como o Access, outro programa de gestão de contas. A própria base não é alterada.
+base-export-step-format = 1. O formato
+base-export-step-options = 2. As opções
+base-export-step-place = 3. A localização
+base-export-step-summary = 4. O resumo
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = Um livro com uma folha por tabela, que o Excel e a maioria das folhas de cálculo conseguem ler.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = O formato livre do LibreOffice e do OpenOffice, com uma folha por tabela.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = Um ficheiro de texto por tabela, com os valores separados por ponto e vírgula: o formato que quase todos os programas sabem importar, incluindo o Access.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = Para programadores e aplicações: cada tabela com o seu nome, com um cabeçalho que descreve a exportação.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = O mesmo conteúdo que o JSON, escrito em XML.
+base-export-format-sql = Script SQL (.sql)
+base-export-format-sql-hint = As instruções que recriam as tabelas e os seus dados noutra base de dados (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = Base SQLite (.sqlite)
+base-export-format-sqlite-hint = Uma base de dados autónoma, sem palavra-passe, que muitas ferramentas abrem diretamente.
+base-export-format-qif = QIF, um ficheiro por conta (.qif)
+base-export-format-qif-hint = Para levar as suas contas para outro programa de gestão de contas (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, um ficheiro por conta (.ofx)
+base-export-format-ofx-hint = O formato dos extratos bancários, que a maioria dos programas de gestão de contas sabe importar.
+base-export-lossy = Atenção: o QIF e o OFX não conseguem guardar tudo. Só passam as operações das contas, com os seus terceiros, as suas categorias e os seus comentários; uma transferência torna-se uma operação normal de cada lado, e o resto (orçamentos, operações periódicas, projetos, afetações…) fica para trás. Para guardar tudo, escolha outro formato.
+base-export-planned-note = As operações previstas e as operações sem data não são exportadas: ainda não passaram pelo banco. O seu número será indicado no fim.
+base-export-dates-hint = As datas são escritas ano-mês-dia (2026-12-31) e os montantes na moeda da base: nenhum programa se pode enganar.
+base-export-group-layout = Ficheiros
+base-export-layout-one = Tudo num único ficheiro
+base-export-layout-per-table = Um ficheiro por tabela, numa pasta
+base-export-group-decimal = Separador decimal dos montantes
+base-export-decimal-point = O ponto (1234.56)
+base-export-decimal-comma = A vírgula (1234,56)
+base-export-group-quotes = Aspas
+base-export-quotes-all = Cada valor entre aspas
+base-export-quotes-none = Sem aspas
+base-export-csv-replacements-hint = Para que cada ficheiro possa ser relido sem erros, um ponto e vírgula num texto passa a ponto de exclamação, uma mudança de linha passa a espaço e, sem aspas, umas aspas passam a apóstrofo. O número de substituições será indicado no fim.
+base-export-group-qif-order = Ordem das datas
+base-export-qif-day-month = O dia antes do mês (31/12/2026)
+base-export-qif-month-day = O mês antes do dia (12/31/2026)
+base-export-qif-order-hint = Escolha a ordem que o programa que vai ler os ficheiros espera: primeiro o dia na Europa, primeiro o mês nos Estados Unidos.
+base-export-no-option = Este formato não tem opções.
+base-export-choose-file = Escolher o ficheiro…
+base-export-choose-folder = Escolher a pasta…
+base-export-place-file = A exportação será escrita neste ficheiro:
+base-export-place-folder = A exportação será escrita nesta pasta, criada para o efeito:
+base-export-place-none = Ainda não foi escolhida nenhuma localização.
+base-export-place-needed = Escolha primeiro onde escrever a exportação.
+base-export-folder-exists = A pasta « { $name } » já existe. Os ficheiros com o mesmo nome que ela contém serão substituídos. Continuar?
+base-export-summary-base = Base
+base-export-summary-format = Formato
+base-export-summary-options = Opções
+base-export-summary-place = Localização
+base-export-unprotected = Esta base está protegida por uma palavra-passe, mas a exportação não estará: qualquer pessoa que tenha estes ficheiros poderá ler as suas contas. Guarde-os num lugar seguro.
+base-export-previous = Anterior
+base-export-next = Seguinte
+base-export-run = Exportar
+base-export-running = A exportar…
+base-export-done = A base « { $base } » foi exportada: { $tables ->
+        [one] { $tables } tabela
+       *[other] { $tables } tabelas
+    }, { $rows ->
+        [one] { $rows } linha
+       *[other] { $rows } linhas
+    }.
+base-export-done-accounts = A base « { $base } » foi exportada: { $accounts ->
+        [one] { $accounts } conta
+       *[other] { $accounts } contas
+    }, { $operations ->
+        [one] { $operations } operação
+       *[other] { $operations } operações
+    }.
+base-export-done-replacements = { $count ->
+        [one] Foi substituído { $count } carácter nos ficheiros CSV.
+       *[other] Foram substituídos { $count } caracteres nos ficheiros CSV.
+    }
+base-export-done-controls = { $count ->
+        [one] Foi substituído { $count } carácter de controlo, que este formato não pode conter, por « � ».
+       *[other] Foram substituídos { $count } caracteres de controlo, que este formato não pode conter, por « � ».
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } texto ultrapassava os 32.767 caracteres, o limite do Excel: foi cortado no livro. Os outros formatos mantêm-no inteiro.
+       *[other] { $count } textos ultrapassavam os 32.767 caracteres, o limite do Excel: foram cortados no livro. Os outros formatos mantêm-nos inteiros.
+    }
+base-export-done-anomalies = { $count ->
+        [one] { $count } valor ilegível foi copiado tal como estava.
+       *[other] { $count } valores ilegíveis foram copiados tal como estavam.
+    }
+base-export-done-planned = { $count ->
+        [one] { $count } operação prevista foi deixada de fora.
+       *[other] { $count } operações previstas foram deixadas de fora.
+    }
+base-export-done-undated = { $count ->
+        [one] { $count } operação sem data foi deixada de fora.
+       *[other] { $count } operações sem data foram deixadas de fora.
+    }
+base-export-done-adjusted = { $count ->
+        [one] { $count } valor foi ajustado ao formato.
+       *[other] { $count } valores foram ajustados ao formato.
+    }
+base-export-too-old = Esta base vem de uma versão mais antiga do Radinus. Abra-a primeiro uma vez no Radinus, que a vai atualizar, e depois exporte-a.
+base-export-too-recent = Esta base foi guardada por uma versão mais recente do Radinus. Atualize o Radinus para a exportar.
+base-export-not-radinus = Este ficheiro não é uma base Radinus.
+base-export-failed = Não foi possível fazer a exportação: { $reason }
+
+## O menu Ferramentas da janela das bases indica o nome da base (Fabrice, 19/10/2026).
+databases-tools-selected = Base selecionada: « { $base } »
+databases-tools-none = Nenhuma base selecionada
+menu-tools-backup = Fazer uma cópia de segurança da base « { $base } »…
+menu-tools-backup-none = Fazer uma cópia de segurança da base selecionada…
+menu-tools-restore = Restaurar a base « { $base } »…
+menu-tools-restore-none = Restaurar a base selecionada…
+menu-tools-repair = Reparar e otimizar a base « { $base } »…
+menu-tools-repair-none = Reparar e otimizar a base selecionada…

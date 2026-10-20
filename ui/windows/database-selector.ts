@@ -228,18 +228,63 @@ function toolsMenu(entry: HTMLElement): HTMLElement {
   choices.dataset.menu = "tools";
   choices.hidden = true;
 
+  // Les trois premiers libellés portent le nom de la base : ils sont posés
+  // par `dressTools`, à chaque ouverture du menu.
   const entries: [string, string | null][] = [
-    [t("menu-file-backup"), "backup_database"],
-    [t("menu-file-restore"), "restore_database"],
-    [t("menu-file-repair"), "repair_database"],
+    ["", "backup_database"],
+    ["", "restore_database"],
+    ["", "repair_database"],
     [t("menu-tools-password"), "open_password_form"],
+    [t("menu-tools-export"), "open_database_export"],
     [t("menu-file-log"), null],
   ];
+
+  /// **Ce menu dit sur quelle base il agit** (Fabrice, 19/10/2026 :
+  /// « l'utilisateur peut bêtement penser que toutes les bases sont
+  /// sauvegardées »). Une ligne de titre nomme la base choisie, chaque entrée
+  /// qui la vise porte son nom, et sans ligne choisie ces entrées sont
+  /// grisées. Le journal, qui ne vise aucune base, est séparé d'un trait.
+  const heading = document.createElement("div");
+  heading.className = "window-menu__heading";
+  heading.dataset.choice = "heading";
+  choices.append(heading);
+  const targeted: HTMLButtonElement[] = [];
+  const named = new Map<string, HTMLButtonElement>();
+
+  async function dressTools(): Promise<void> {
+    const row = chosen();
+    for (const button of targeted) {
+      button.disabled = row === null;
+    }
+    try {
+      const labels = await invoke<{ header: string; backup: string; restore: string; repair: string }>(
+        "database_tool_labels",
+        { label: row?.label ?? null },
+      );
+      heading.textContent = labels.header;
+      named.get("backup_database")!.textContent = labels.backup;
+      named.get("restore_database")!.textContent = labels.restore;
+      named.get("repair_database")!.textContent = labels.repair;
+    } catch (error) {
+      say(tError("ui-read-failed", error), true);
+    }
+  }
+
   for (const [label, command] of entries) {
+    if (command === null) {
+      const rule = document.createElement("div");
+      rule.className = "window-menu__separator";
+      choices.append(rule);
+    }
     const button = document.createElement("button");
     button.type = "button";
     button.className = "window-menu__choice window-menu__choice--plain";
     button.textContent = label;
+    if (command !== null) {
+      targeted.push(button);
+      named.set(command, button);
+      button.dataset.choice = command === "open_database_export" ? "export" : command;
+    }
     button.addEventListener("click", () => {
       choices.hidden = true;
       if (command === null) {
@@ -265,6 +310,24 @@ function toolsMenu(entry: HTMLElement): HTMLElement {
         return;
       }
 
+      // **L'export lit la base, il lui faut donc sa clé** — demandée ici
+      // comme pour une sauvegarde, et gardée par Rust le temps de
+      // l'assistant : la fenêtre de l'assistant ne la voit jamais.
+      if (command === "open_database_export") {
+        void (async () => {
+          const password = await unlocked(row);
+          if (password === false) {
+            return;
+          }
+          try {
+            await invoke(command, { path: row.path, label: row.label, password });
+          } catch (error) {
+            say(tError("ui-open-failed", error), true);
+          }
+        })();
+        return;
+      }
+
       // La base visée n'est pas forcément celle qui est ouverte : si elle est
       // protégée, l'opération a besoin de sa clé pour la lire.
       void (async () => {
@@ -285,7 +348,11 @@ function toolsMenu(entry: HTMLElement): HTMLElement {
   entry.addEventListener("click", (event) => {
     event.stopPropagation();
     choices.hidden = !choices.hidden;
+    if (!choices.hidden) {
+      void dressTools();
+    }
   });
+  void dressTools();
   document.addEventListener("click", () => {
     choices.hidden = true;
   });

@@ -27,6 +27,9 @@ use rusqlite::{Connection, Result};
 pub struct OperationRow {
     pub id: i64,
     pub label: String,
+    /// `ReferencePaiement` — la colonne « Référence paiement » de la liste
+    /// (Fabrice, 19/10/2026), où arrive le MEMO des relevés OFX.
+    pub reference: String,
     pub date: Option<NaiveDate>,
     pub clearing_date: Option<NaiveDate>,
     pub amount: i64,
@@ -99,7 +102,7 @@ pub(crate) const SELECT_ROW: &str = "
            COALESCE((SELECT c.CommentaireTxt FROM Commentaire c
                      WHERE c.IDOperation = o.IDOperation), ''),
            (SELECT COUNT(*) FROM PiecesJointes p WHERE p.IDOperation = o.IDOperation),
-           o.IDVerification
+           o.IDVerification, o.ReferencePaiement
     FROM Operation o
     LEFT JOIN Categorie cat ON cat.IDCategorie = o.IDCategorie
     LEFT JOIN Affectation aff ON aff.IDAffectation = o.IDAffectation
@@ -120,6 +123,7 @@ pub(crate) fn read_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<(OperationRo
         OperationRow {
             id: row.get(0)?,
             label: row.get(1)?,
+            reference: row.get(23)?,
             date: date(2)?,
             clearing_date: date(3)?,
             amount: row.get(4)?,
@@ -145,6 +149,42 @@ pub(crate) fn read_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<(OperationRo
         },
         parent_id,
     ))
+}
+
+/// **Une ventilation montre la référence paiement de sa mère** (Fabrice,
+/// 20/10/2026).
+///
+/// Une sous-opération n'a pas de référence à elle : sa fiche n'a pas ce champ
+/// et la case reste vide en base. Les détails des statistiques et du bilan
+/// croisé montrent pourtant les ventilations *à la place* des mères — c'est
+/// elles qui sont classées. Sans ceci, la colonne « Référence paiement » y
+/// serait vide, alors que c'est le même prélèvement de la banque.
+///
+/// **Un affichage, rien n'est écrit.** Une fille qui porterait sa propre
+/// référence — une vieille base — la garde.
+pub(crate) fn with_mothers_reference(
+    conn: &Connection,
+    rows: &mut [(OperationRow, i64)],
+) -> Result<()> {
+    let mut mother = conn.prepare_cached("SELECT ReferencePaiement FROM Operation WHERE IDOperation = ?1")?;
+    let mut known: std::collections::HashMap<i64, String> = std::collections::HashMap::new();
+    for (row, parent_id) in rows.iter_mut() {
+        if *parent_id == 0 || !row.reference.trim().is_empty() {
+            continue;
+        }
+        if !known.contains_key(parent_id) {
+            let found: Option<String> = mother
+                .query_row([*parent_id], |found| found.get(0))
+                .map(Some)
+                .or_else(|error| match error {
+                    rusqlite::Error::QueryReturnedNoRows => Ok(None),
+                    other => Err(other),
+                })?;
+            known.insert(*parent_id, found.unwrap_or_default());
+        }
+        row.reference = known[parent_id].clone();
+    }
+    Ok(())
 }
 
 /// Every operation of `account` whose date falls between `from` and `to`,

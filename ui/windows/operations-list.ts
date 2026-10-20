@@ -33,6 +33,8 @@ const CHANGED_EVENT = "data-changed:operations";
 interface Row {
   id: number;
   label: string;
+  /// La référence paiement (19/10/2026).
+  reference: string;
   date: string;
   clearing_date: string;
   /// Les deux mêmes dates en ISO. **Le tableau trie là-dessus**, jamais sur ce
@@ -444,6 +446,22 @@ const table = new Table<Row>({
       width: "2fr",
       // La colonne qu'on lit : elle a droit à la place des autres.
       minWidth: 150,
+    },
+    {
+      // **La référence paiement, juste après le libellé** (Fabrice,
+      // 19/10/2026) : c'est là qu'arrive le MEMO des relevés OFX — le
+      // créancier, le bénéficiaire, le motif. Elle se voit, se trie et se
+      // filtre comme les autres ; elle se modifie dans la fiche opération.
+      // Coupée proprement à l'écran, entière au survol.
+      id: "reference",
+      title: () => t("operations-column-reference"),
+      cell: (row) => row.reference,
+      render: (row, cell) => {
+        cell.textContent = row.reference;
+        cell.title = row.reference;
+      },
+      width: "1.2fr",
+      minWidth: 100,
     },
     nomenclatureColumn(
       "operations-column-category",

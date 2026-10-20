@@ -25,6 +25,7 @@ interface Line {
   rank: number;
   date: string;
   label: string;
+  reference: string;
   direction: string;
   amount: string;
   clearing_date: string;
@@ -114,6 +115,7 @@ async function load(): Promise<void> {
     const line = await invoke<Line>("statement_line", { accountId, rank });
     element<HTMLInputElement>("date").value = line.date;
     element<HTMLInputElement>("label").value = line.label;
+    element<HTMLInputElement>("reference").value = line.reference;
     element<HTMLSelectElement>("direction").value = line.direction;
     element<HTMLInputElement>("amount").value = line.amount;
     element<HTMLInputElement>("clearing-date").value = line.clearing_date;
@@ -148,6 +150,7 @@ async function validate(): Promise<void> {
       rank,
       date: element<HTMLInputElement>("date").value,
       label: element<HTMLInputElement>("label").value,
+      reference: element<HTMLInputElement>("reference").value,
       amount: typedAmount(),
     });
 
@@ -221,6 +224,7 @@ function dress(): void {
     ["group-status", "statement-group-status"],
     ["date-label", "statement-field-date"],
     ["label-label", "statement-field-label"],
+    ["reference-label", "statement-field-reference"],
     ["direction-label", "statement-field-type"],
     ["amount-label", "statement-field-amount"],
     ["payment-mode-label", "statement-field-mode"],

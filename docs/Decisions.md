@@ -3009,6 +3009,122 @@ bancaire aussi »* — *« je veux quelque chose de robuste et de fiable »*.
    the suspicion alone. Integrating pastel lines in bulk still asks nothing —
    the original's behaviour —, an open question left to Fabrice.
 
+## P-74 — The database export wizard (19/10/2026)
+
+*« On peut imaginer dans un futur très très lointain que Radinus soit
+abandonné… il faut lui donner des moyens performants d'exporter la base »* —
+*« plutôt à ce que ces données soient intégrées dans un autre logiciel »* —
+*« je veux que l'utilisateur ne perde rien »*.
+
+1. **Data portability, not a report.** One sheet (or file) per table, named
+   exactly after the table, first row = the field names — what Access or any
+   database expects to import. Every transaction and nomenclature table
+   leaves; only `PiecesJointes`, `ParamSecurite`, `Preferences` and
+   `Parametres` stay (*« les pièces jointes je m'en fiche, la table mot de
+   passe : je m'en fiche »*). A catalogue test fails the day a table or a
+   column is added without being placed — nothing can be forgotten silently.
+2. **Raw data, except money and dates**: amounts in real currency (micro-units
+   divided out, exact to the last digit), dates as real dates, ISO
+   `yyyy-mm-dd` in every text format — the only form no software reads the
+   wrong way round (Fabrice's question on French vs English dates). An `Export`
+   table says who wrote it, when, from which base, in which currency and
+   schema version; JSON and XML carry the same as a header.
+3. **Nine formats**: Excel, Calc, CSV, JSON, XML, SQL script, standalone
+   SQLite, and QIF / OFX one file per account. Excel, Calc, JSON, XML, SQL:
+   one file or one per table, by choice; CSV always one per table; SQLite
+   always one file.
+4. **CSV, by the user's choice**: decimal point or comma; all fields quoted or
+   none, never a mix (*« c'est l'utilisateur qui choisit »*). A `;` in a text
+   becomes `!`, a line break a space, and without quotes a `"` becomes `'` —
+   every replacement counted and announced.
+5. **QIF and OFX are lossy and say so** before the user chooses. Planned and
+   undated operations are left out and counted; a transfer is written as a
+   plain operation on each side; QIF date order is a choice, day/month by
+   default.
+6. **Only the base selected in the list is exported**, and the wizard says
+   so everywhere — title, the bold sentence that never leaves the top of the
+   page, summary, closing sentence, file names (*« il existe des gens qui ne
+   comprennent pas tout »*). The menu entry (Outils of the database window)
+   is greyed while no row is selected.
+7. **The base is opened read-only**; the open base is read through its own
+   connection. A protected base's password is asked by the selector and kept
+   by Rust for the wizard's lifetime only — the window never sees it — and
+   the export itself is **not** protected, which the summary says.
+8. **Files are named `<Base> - export 2026-10-19`**; replacing an existing
+   folder is asked first, a file by the system's own save dialog. Every file
+   is written beside its place then renamed: never a half-written file.
+9. **Checked on Fabrice's two real backups** (≈ 2,950 rows each): every value
+   of every table read back from every format, the xlsx and ods opened by
+   LibreOffice itself, the SQL script replayed in SQLite, PostgreSQL and
+   MariaDB, the QIF balances equal to Radinus's own. What this found:
+   - **one control character in a label made a whole workbook unreadable**
+     (the .ods refused, the .xlsx emptied of its texts) — it now becomes « � »
+     in .xlsx, .ods, .docx and .xml, counted in the closing sentence; the old
+     right-click exports are fixed with it;
+   - a Windows line break showed twice in Calc — now one paragraph break;
+   - Excel's limits: a text over 32,767 characters is cut **in the .xlsx
+     only** and announced; a date before 1 March 1900, which Excel cannot
+     hold, leaves as text and is counted;
+   - MySQL's command-line client drops Windows line breaks: the script's
+     header says to import with `--binary-mode`;
+   - in French and Portuguese the singular also covers zero: every count is
+     written in figures (« 0 ligne », never « une ligne » for none).
+   Proportion was kept (Fabrice: *« le mieux est l'ennemi du bien »*): a
+   Radinus base holds thousands of rows, not hundreds of thousands, and the
+   tests stay at that scale.
+
+## P-75 — The OFX memo and the payment reference (19/10/2026)
+
+A user sent a BNP Paribas statement: every direct debit came in as « PRLV
+SEPA », the detail being in `MEMO`, which Radinus never read. La Banque
+Postale writes no `MEMO` at all and cuts `NAME` at 32 characters — nothing can
+be recovered there.
+
+1. **The user chooses, in the preferences** (*« plutôt donner le choix à
+   l'utilisateur »*): Préférences › Importation › Relevés OFX. First two
+   tick boxes; on 20/10/2026 two drop-down menus instead (*« ça ne laisse
+   pas assez de liberté »*) — the **label** receives the name, the memo, or
+   the name followed by the memo; the **payment reference** the memo, the
+   name, the name followed by the memo, or nothing. **Defaults: the name in
+   the label, the memo in the reference** (*« les choix les plus
+   logiques »*). Without a memo the label keeps the name (*« comme le cas de
+   la Banque Postale »*); a reference is cut at 255 characters. Software
+   settings (`radinus_config.json`), the same for every base; the boxes of
+   the day before are translated, then forgotten. **OFX only** (*« là on
+   parle de l'OFX, un point c'est tout »*): the QIF memo is not part of it.
+2. **Decided operation by operation, never by bank** (*« tu ne sauras pas de
+   qui vient l'OFX »*): `ofx_import::compose` looks at what `NAME` and `MEMO`
+   hold — empty memo, empty name, memo starting with the name, name ending
+   with the memo, or two different texts. A statement without memo comes in
+   exactly as before; this is pinned by a test on the three forms of file.
+3. **The payment reference is shown, not edited, in the lists**: a column
+   after the label in the operations list (F02) and the import window (F17),
+   to see and filter; it is changed in the operation form, and in « Rapprocher
+   une transaction » (F18) before the line goes in. A column layout already
+   arranged by the user is kept; the new column slips in after its original
+   left neighbour.
+4. **Wider fields, no migration**: label 300 characters, reference 255, in
+   every form. The columns are `TEXT`: a 2.0.4 base opens in 3.1.0 unchanged.
+   The printed statement lets a long label wrap; an ordinary page is laid out
+   exactly as before.
+5. **In the exports the reference goes in the memo** (*« ça n'a rien à voir
+   avec un numéro de chèque »*): `<MEMO>` in OFX, the QIF `M` line after the
+   label. `CHECKNUM` (12 characters at most) and QIF `N` receive only a real
+   cheque number — before, the OFX export dropped the reference entirely.
+6. **Checked on the two real statements** (151 and 518 operations): read,
+   integrated into a fresh base, exported to OFX and read back — every amount,
+   label and reference identical. The test that does it takes the files from
+   `RADINUS_OFX` and is ignored by default: **a user's statement never enters
+   the repository**, and the BNP file was erased from the work space once
+   checked.
+7. **The same column in the Statistics windows** (20/10/2026): the detail of
+   the seven statistics, of the Bilan croisé and of the Analyse Évolution du
+   solde shows the payment reference after the label. Where a ventilation
+   stands in for its mother, **it shows its mother's reference** (*« A :
+   afficher la référence de la mère »*) — the same bank transaction, found by
+   the same filter; it is a display, nothing is written, and a daughter that
+   carries a reference of its own keeps it.
+
 ## How to add to this file
 
 One entry per ruling: an id, a date, what was decided in one sentence, and

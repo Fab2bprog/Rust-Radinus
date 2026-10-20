@@ -50,6 +50,10 @@ pub enum CellContent {
     Empty,
     Text(String),
     Number { value: f64, kind: NumberKind },
+    /// **Une vraie date** (19/10/2026, exportation de la base, P-74) : un
+    /// tableur la reçoit comme une date, qu'il sait trier et filtrer, et non
+    /// comme un texte. Les formats de texte l'écrivent `AAAA-MM-JJ`.
+    Date(crate::domain::NaiveDate),
 }
 
 /// Une cellule de la feuille : ce qu'elle porte, et comment elle se voit.
@@ -87,6 +91,15 @@ impl SheetCell {
                 value: amount as f64 / crate::money::UNIT as f64,
                 kind: NumberKind::Money,
             },
+            fill: None,
+            bold: false,
+        }
+    }
+
+    /// Une date, que le tableur reçoit comme une date.
+    pub fn date(date: crate::domain::NaiveDate) -> Self {
+        Self {
+            content: CellContent::Date(date),
             fill: None,
             bold: false,
         }
@@ -210,6 +223,16 @@ pub fn write_book(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
 /// donnerait un format que le tableur ne comprend pas.
 const MONEY_FORMAT: &str = "#,##0.00 \"€\"";
 
+/// Le format d'une date dans Excel : `2026-07-20`, le même sur tous les postes
+/// — un format qui dépendrait de la langue écrirait 07/20 à New York et 20/07
+/// à Paris.
+const DATE_FORMAT: &str = "yyyy-mm-dd";
+
+/// Une date écrite pour les formats de texte.
+fn iso(date: &crate::domain::NaiveDate) -> String {
+    date.format("%Y-%m-%d").to_string()
+}
+
 /// Un nom d'onglet qu'un tableur accepte.
 ///
 /// Excel refuse sept caractères et s'arrête à trente et un ; LibreOffice est à
@@ -222,6 +245,7 @@ fn tab_name(name: &str) -> String {
         .chars()
         .map(|character| match character {
             '\\' | '/' | '?' | '*' | '[' | ']' | ':' => ' ',
+            character if xml_forbids(character) => ' ',
             character => character,
         })
         .collect();
@@ -246,7 +270,7 @@ fn write_xlsx(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
         if !sheet.context.is_empty() {
             tab.rows.push(
                 Row::new().with_cell(Cell {
-                    value: office_toolkit::excel::CellValue::Text(sheet.context.clone()),
+                    value: office_toolkit::excel::CellValue::Text(xml_safe(&sheet.context)),
                     format: Some(CellFormat::new().with_bold(true)),
                 }),
             );
@@ -297,11 +321,19 @@ fn as_xlsx_cell(cell: &SheetCell, heading: bool) -> office_toolkit::excel::Cell 
         format = format.with_number_format(MONEY_FORMAT);
         styled = true;
     }
+    if let CellContent::Date(_) = cell.content {
+        format = format.with_number_format(DATE_FORMAT);
+        styled = true;
+    }
 
     let value = match &cell.content {
         CellContent::Empty => CellValue::Empty,
-        CellContent::Text(text) => CellValue::Text(text.clone()),
+        CellContent::Text(text) => CellValue::Text(excel_text(text)),
         CellContent::Number { value, .. } => CellValue::Number(*value),
+        CellContent::Date(date) => {
+            use time_compute::Datelike;
+            CellValue::Date(office_toolkit::excel::ExcelDateTime::date(date.year(), date.month(), date.day()))
+        }
     };
     Cell {
         value,
@@ -325,7 +357,7 @@ fn write_ods(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
     use spreadsheet_ods::color::Rgb;
     use spreadsheet_ods::defaultstyles::DefaultFormat;
     use spreadsheet_ods::style::{units::Length, CellStyle};
-    use spreadsheet_ods::{CellStyleRef, Sheet as OdsSheet, Value, ValueFormatCurrency, WorkBook};
+    use spreadsheet_ods::{CellStyleRef, Sheet as OdsSheet, Value, ValueFormatCurrency, ValueFormatDateTime, WorkBook};
     use std::collections::HashMap;
 
     // **Un classeur sans formats par défaut, et c'est voulu.** Les seuls
@@ -347,16 +379,25 @@ fn write_ods(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
     money_format.part_text(" ").build();
     money_format.part_currency().symbol("€").build();
     let money_format = book.add_currency_format(money_format);
+    // « 2026-07-20 », le même sur tous les postes, comme dans le `.xlsx`.
+    let mut date_format = ValueFormatDateTime::new_named("radinus-date");
+    date_format.part_year().long_style().build();
+    date_format.part_text("-").build();
+    date_format.part_month().long_style().build();
+    date_format.part_text("-").build();
+    date_format.part_day().long_style().build();
+    let date_format = book.add_datetime_format(date_format);
     let plain_format = DefaultFormat::default();
 
     // Un style par apparence rencontrée, et non un par cellule.
-    let mut styles: HashMap<(Option<String>, bool, bool), CellStyleRef> = HashMap::new();
+    let mut styles: HashMap<(Option<String>, bool, bool, bool), CellStyleRef> = HashMap::new();
     let mut style_of = |book: &mut WorkBook,
                         fill: &Option<String>,
                         bold: bool,
-                        money: bool|
+                        money: bool,
+                        date: bool|
      -> CellStyleRef {
-        let key = (fill.clone(), bold, money);
+        let key = (fill.clone(), bold, money, date);
         if let Some(found) = styles.get(&key) {
             return found.clone();
         }
@@ -365,6 +406,8 @@ fn write_ods(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
             name,
             if money {
                 &money_format
+            } else if date {
+                &date_format
             } else {
                 &plain_format
             },
@@ -389,8 +432,8 @@ fn write_ods(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
         // La ligne de contexte, puis une ligne vide : le tableau commence en
         // dessous, exactement comme dans le `.xlsx`.
         if !sheet.context.is_empty() {
-            let style = style_of(&mut book, &None, true, false);
-            tab.set_styled_value(0, 0, sheet.context.clone(), &style);
+            let style = style_of(&mut book, &None, true, false, false);
+            tab.set_styled_value(0, 0, xml_safe(&ods_line_breaks(&sheet.context)), &style);
             line_number = 2;
         }
 
@@ -406,7 +449,8 @@ fn write_ods(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
                         ..
                     }
                 );
-                let style = style_of(&mut book, &cell.fill, bold, money);
+                let date = matches!(cell.content, CellContent::Date(_));
+                let style = style_of(&mut book, &cell.fill, bold, money, date);
                 match &cell.content {
                     // Une case vide sans apparence n'est pas écrite du tout :
                     // en OpenDocument, une cellule absente *est* une cellule
@@ -416,8 +460,15 @@ fn write_ods(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
                             tab.set_styled_value(line_number, column, Value::Empty, &style);
                         }
                     }
+                    // **Un retour chariot devient un saut de ligne** (étape F
+                    // de P-74, 19/10/2026, trouvé sur une vraie base) :
+                    // OpenDocument range les lignes d'un texte en paragraphes,
+                    // et un `\r` laissé dans le XML est lu par LibreOffice
+                    // comme un saut de plus — « livre\r\n » revenait avec
+                    // deux sauts de ligne. Une fin de ligne Windows reste une
+                    // fin de ligne, rien de plus.
                     CellContent::Text(text) => {
-                        tab.set_styled_value(line_number, column, text.clone(), &style);
+                        tab.set_styled_value(line_number, column, xml_safe(&ods_line_breaks(text)), &style);
                     }
                     CellContent::Number { value, kind } => {
                         let written = match kind {
@@ -425,6 +476,16 @@ fn write_ods(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
                             NumberKind::Plain => Value::Number(*value),
                         };
                         tab.set_styled_value(line_number, column, written, &style);
+                    }
+                    CellContent::Date(date) => {
+                        use time_compute::Datelike;
+                        match chrono::NaiveDate::from_ymd_opt(date.year(), date.month(), date.day()) {
+                            Some(day) => tab.set_styled_value(line_number, column, Value::from(day), &style),
+                            // Hors du calendrier de `chrono` — impossible pour
+                            // une date de la base : on l'écrit en texte plutôt
+                            // que de la perdre.
+                            None => tab.set_styled_value(line_number, column, iso(date), &style),
+                        }
                     }
                 }
             }
@@ -442,6 +503,63 @@ fn write_ods(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
 
     spreadsheet_ods::write_ods(&mut book, path)
         .map_err(|error| std::io::Error::other(error.to_string()))
+}
+
+/// **Les caractères que le XML ne peut pas porter**, d'aucune façon : les
+/// caractères de contrôle (sauf tabulation et fins de ligne), `U+FFFE` et
+/// `U+FFFF`.
+///
+/// Le `.xlsx`, l'`.ods` et le `.docx` sont du XML zippé. Un seul de ces
+/// caractères — un copier-coller malheureux dans un libellé — rendait le
+/// classeur **entier** illisible : LibreOffice refusait l'`.ods`, et vidait
+/// toutes les cellules de texte du `.xlsx` qui venaient après (trouvé à
+/// l'étape F de P-74, 19/10/2026, en piégeant une vraie base).
+pub fn xml_forbids(character: char) -> bool {
+    ((character as u32) < 0x20 && !matches!(character, '\t' | '\n' | '\r'))
+        || character == '\u{FFFE}'
+        || character == '\u{FFFF}'
+}
+
+/// Remplace ce que le XML ne peut pas porter par « � » — visible, et compté
+/// par qui veut le dire.
+pub fn xml_safe(text: &str) -> String {
+    text.chars().map(|character| if xml_forbids(character) { '\u{FFFD}' } else { character }).collect()
+}
+
+/// **La limite d'Excel** : 32 767 caractères par cellule (comptés en unités
+/// UTF-16, comme Excel les compte). Au-delà, Excel déclare le classeur abîmé
+/// et le « répare » en jetant du contenu ; on coupe donc soi-même, et qui
+/// exporte le dit (`database_export::Outcome::excel_cut`).
+pub const EXCEL_TEXT_LIMIT: usize = 32_767;
+
+/// Le texte d'une cellule `.xlsx` : sans caractère interdit, et coupé à la
+/// limite d'Excel, sans jamais couper un caractère en deux.
+pub fn excel_text(text: &str) -> String {
+    let safe = xml_safe(text);
+    if safe.encode_utf16().count() <= EXCEL_TEXT_LIMIT {
+        return safe;
+    }
+    let mut kept = String::new();
+    let mut units = 0;
+    for character in safe.chars() {
+        units += character.len_utf16();
+        if units > EXCEL_TEXT_LIMIT {
+            break;
+        }
+        kept.push(character);
+    }
+    kept
+}
+
+/// Ce texte dépasse-t-il la limite d'Excel ?
+pub fn too_long_for_excel(text: &str) -> bool {
+    text.encode_utf16().count() > EXCEL_TEXT_LIMIT
+}
+
+/// Les fins de ligne d'un texte, pour OpenDocument : `\r\n` et `\r` seul
+/// deviennent `\n`, la seule que ses paragraphes connaissent.
+pub fn ods_line_breaks(text: &str) -> String {
+    text.replace("\r\n", "\n").replace('\r', "\n")
 }
 
 /// « FF9999 » ou « #FF9999 » vers ses trois composantes. Rien, si ce n'est pas
@@ -579,6 +697,7 @@ fn write_json(sheet: &Sheet, path: &Path) -> std::io::Result<()> {
                 None | Some(CellContent::Empty) => "null".to_string(),
                 Some(CellContent::Text(text)) => quoted(text),
                 Some(CellContent::Number { value, kind }) => as_exchange_number(*value, *kind),
+                Some(CellContent::Date(date)) => quoted(&iso(date)),
             };
             written.push_str(&format!("\n      {}: {}", quoted(name), value));
         }
@@ -613,6 +732,7 @@ fn write_xml(sheet: &Sheet, path: &Path) -> std::io::Result<()> {
             let (kind, value) = match line.get(column).map(|cell| &cell.content) {
                 None | Some(CellContent::Empty) => ("vide", String::new()),
                 Some(CellContent::Text(text)) => ("texte", escaped(text)),
+                Some(CellContent::Date(date)) => ("date", iso(date)),
                 Some(CellContent::Number { value, kind }) => (
                     match kind {
                         NumberKind::Money => "montant",
@@ -703,6 +823,7 @@ fn csv_value(cell: &SheetCell) -> String {
             let written = format!("{value:.2}");
             quoted(&written.replace('.', ","))
         }
+        CellContent::Date(date) => iso(date),
     }
 }
 
@@ -756,6 +877,7 @@ fn write_tsv(sheet: &Sheet, path: &Path) -> std::io::Result<()> {
                 CellContent::Empty => String::new(),
                 CellContent::Text(text) => flattened(text),
                 CellContent::Number { value, .. } => format!("{value:.2}").replace('.', ","),
+                CellContent::Date(date) => iso(date),
             })
             .collect();
         written.push_str(&cells.join("\t"));
@@ -825,6 +947,7 @@ fn write_ini(sheet: &Sheet, path: &Path) -> std::io::Result<()> {
                 None | Some(CellContent::Empty) => String::new(),
                 Some(CellContent::Text(text)) => flattened(text),
                 Some(CellContent::Number { value, kind }) => as_exchange_number(*value, *kind),
+                Some(CellContent::Date(date)) => iso(date),
             };
             written.push_str(&format!("{name} = {value}\n"));
         }
@@ -865,6 +988,7 @@ fn write_yaml(sheet: &Sheet, path: &Path) -> std::io::Result<()> {
                 None | Some(CellContent::Empty) => "null".to_string(),
                 Some(CellContent::Text(text)) => quoted_text(text),
                 Some(CellContent::Number { value, kind }) => as_exchange_number(*value, *kind),
+                Some(CellContent::Date(date)) => quoted_text(&iso(date)),
             };
             // Le tiret ne marque que la première clef de l'enregistrement ;
             // les suivantes s'alignent dessous.
@@ -905,6 +1029,7 @@ fn write_toml(sheet: &Sheet, path: &Path) -> std::io::Result<()> {
                 None | Some(CellContent::Empty) => continue,
                 Some(CellContent::Text(text)) => quoted_text(text),
                 Some(CellContent::Number { value, kind }) => as_exchange_number(*value, *kind),
+                Some(CellContent::Date(date)) => quoted_text(&iso(date)),
             };
             written.push_str(&format!("{} = {value}\n", quoted_key(name)));
         }
@@ -940,7 +1065,7 @@ fn write_docx(sheet: &Sheet, path: &Path) -> std::io::Result<()> {
 
     let mut title = Paragraph::default();
     title.runs.push({
-        let mut run = Run::new(sheet.name.clone());
+        let mut run = Run::new(xml_safe(&sheet.name));
         run.bold = true;
         run
     });
@@ -948,7 +1073,7 @@ fn write_docx(sheet: &Sheet, path: &Path) -> std::io::Result<()> {
     if !sheet.context.is_empty() {
         let mut line = Paragraph::default();
         line.runs.push({
-            let mut run = Run::new(sheet.context.clone());
+            let mut run = Run::new(xml_safe(&sheet.context));
             run.italic = true;
             run
         });
@@ -963,7 +1088,8 @@ fn write_docx(sheet: &Sheet, path: &Path) -> std::io::Result<()> {
         for cell in line {
             let (text, numeric) = match &cell.content {
                 CellContent::Empty => (String::new(), false),
-                CellContent::Text(text) => (text.clone(), false),
+                CellContent::Text(text) => (xml_safe(text), false),
+                CellContent::Date(date) => (iso(date), false),
                 CellContent::Number { value, kind } => (
                     match kind {
                         NumberKind::Money => format!("{value:.2}").replace('.', ","),
@@ -1274,6 +1400,61 @@ mod tests {
 
         // Une case vide sans apparence n'est pas écrite du tout.
         assert_eq!(tab.value(4, 1), &Value::Empty);
+    }
+
+    /// **Une fin de ligne Windows reste une fin de ligne** en OpenDocument
+    /// (étape F de P-74, trouvé sur une vraie base) : un paragraphe par
+    /// ligne, aucun `\r` dans le XML, et le paragraphe vide final gardé.
+    #[test]
+    fn une_fin_de_ligne_windows_devient_un_paragraphe_en_ods() {
+        let mut sheet = Sheet::new("Textes");
+        sheet.rows.push(vec![SheetCell::text("livre \r\n"), SheetCell::text("a\rb\nc")]);
+        let path = std::env::temp_dir().join(format!("radinus_ods_lignes_{}.ods", std::process::id()));
+        write_ods(&[sheet], &path).unwrap();
+        let mut archive = zip::ZipArchive::new(std::fs::File::open(&path).unwrap()).unwrap();
+        let mut content = String::new();
+        std::io::Read::read_to_string(&mut archive.by_name("content.xml").unwrap(), &mut content).unwrap();
+        assert!(!content.contains('\r'), "aucun retour chariot dans le XML");
+        assert!(content.contains("<text:p>livre </text:p><text:p></text:p>"), "{content}");
+        assert!(content.contains("<text:p>a</text:p><text:p>b</text:p><text:p>c</text:p>"), "{content}");
+        assert_eq!(ods_line_breaks("x\r\ny\rz\n"), "x\ny\nz\n");
+    }
+
+    /// **Un caractère interdit ne casse plus le classeur, un texte trop long
+    /// n'en fait plus « réparer » un par Excel** (étape F de P-74).
+    #[test]
+    fn un_texte_s_ecrit_sans_casser_le_classeur() {
+        assert_eq!(xml_safe("a\u{1}b\tc\nd"), "a\u{FFFD}b\tc\nd");
+        let exact = "x".repeat(EXCEL_TEXT_LIMIT);
+        assert_eq!(excel_text(&exact), exact);
+        assert!(!too_long_for_excel(&exact));
+        let over = format!("{exact}y");
+        assert!(too_long_for_excel(&over));
+        assert_eq!(excel_text(&over), exact);
+        // Un émoji compte deux unités : il n'est jamais coupé en deux.
+        let emoji = format!("{}👍", "x".repeat(EXCEL_TEXT_LIMIT - 1));
+        assert_eq!(excel_text(&emoji), "x".repeat(EXCEL_TEXT_LIMIT - 1));
+        assert_eq!(tab_name("a\u{1}b"), "a b");
+    }
+
+    /// **Une date reste une date** (19/10/2026) : dans les formats de texte,
+    /// elle s'écrit `AAAA-MM-JJ`, la même partout.
+    #[test]
+    fn une_date_s_ecrit_pareil_dans_chaque_format_de_texte() {
+        let mut sheet = Sheet::new("Dates");
+        sheet.header_rows = 1;
+        sheet.rows.push(vec![SheetCell::text("Jour")]);
+        sheet.rows.push(vec![SheetCell::date(crate::domain::NaiveDate::from_ymd_opt(2026, 7, 20).unwrap())]);
+        for (extension, expected) in [
+            ("csv", "2026-07-20"),
+            ("json", "\"2026-07-20\""),
+            ("xml", "type=\"date\">2026-07-20<"),
+            ("tsv", "2026-07-20"),
+            ("yaml", "\"2026-07-20\""),
+        ] {
+            let written = written_as(&sheet, "date", extension);
+            assert!(written.contains(expected), "{extension} : {written}");
+        }
     }
 
     /// Une couleur illisible n'empêche pas d'exporter : on écrit la cellule

@@ -103,6 +103,23 @@ pub struct SoftwareConfig {
     /// `both`, `payee` ou `memo`. `None`, ou inconnu : « tiers + mémo ».
     #[serde(default)]
     pub qif_label: Option<String>,
+
+    /// **Le libellé d'une opération OFX** (Fabrice, 20/10/2026, premier
+    /// menu) : `name`, `memo` ou `name-and-memo`. `None`, ou inconnu : le nom.
+    #[serde(default)]
+    pub ofx_label: Option<String>,
+    /// **Sa référence paiement** (second menu) : `memo`, `name`,
+    /// `name-and-memo` ou `empty`. `None`, ou inconnu : le mémo.
+    #[serde(default)]
+    pub ofx_reference: Option<String>,
+
+    /// Les deux cases du 19/10/2026, remplacées le lendemain par les menus :
+    /// encore lues, pour qu'un réglage déjà fait ne se perde pas, et effacées
+    /// au premier enregistrement des menus.
+    #[serde(default)]
+    pub ofx_memo_in_label: Option<bool>,
+    #[serde(default)]
+    pub ofx_memo_in_reference: Option<bool>,
 }
 
 /// Les bornes de la taille d'affichage, et le pas du curseur.
@@ -171,6 +188,40 @@ impl SoftwareConfig {
     /// valeur est illisible — rien n'est perdu.
     pub fn qif_label_choice(&self) -> crate::qif_import::LabelChoice {
         self.qif_label.as_deref().and_then(crate::qif_import::LabelChoice::from_key).unwrap_or_default()
+    }
+
+    /// Ce que l'import OFX fait du NAME et du MEMO. Un réglage absent prend
+    /// la valeur par défaut : le nom dans le libellé, le mémo dans la
+    /// référence paiement.
+    ///
+    /// Sans réglage des menus, les deux cases du 19/10/2026 se traduisent :
+    /// « Ajouter le mémo au libellé » coché, c'est « le nom suivi du mémo » ;
+    /// « Copier le mémo dans la référence » décoché, c'est « rien ».
+    pub fn ofx_memo_options(&self) -> crate::ofx_import::MemoOptions {
+        use crate::ofx_import::{LabelSource, MemoOptions, ReferenceSource};
+        let label = self.ofx_label.as_deref().and_then(LabelSource::from_key).unwrap_or(
+            if self.ofx_memo_in_label == Some(true) {
+                LabelSource::NameAndMemo
+            } else {
+                LabelSource::default()
+            },
+        );
+        let reference = self.ofx_reference.as_deref().and_then(ReferenceSource::from_key).unwrap_or(
+            if self.ofx_memo_in_reference == Some(false) {
+                ReferenceSource::Empty
+            } else {
+                ReferenceSource::default()
+            },
+        );
+        MemoOptions { label, reference }
+    }
+
+    /// Enregistre les deux menus OFX, et oublie les deux anciennes cases.
+    pub fn set_ofx_memo_options(&mut self, options: crate::ofx_import::MemoOptions) {
+        self.ofx_label = Some(options.label.key().to_string());
+        self.ofx_reference = Some(options.reference.key().to_string());
+        self.ofx_memo_in_label = None;
+        self.ofx_memo_in_reference = None;
     }
 }
 
@@ -849,6 +900,10 @@ mod tests {
             zoom: Some(1.2),
             qif_date_order: Some("day-month".to_string()),
             qif_label: Some("memo".to_string()),
+            ofx_label: Some("memo".to_string()),
+            ofx_reference: Some("name-and-memo".to_string()),
+            ofx_memo_in_label: Some(true),
+            ofx_memo_in_reference: Some(false),
         };
         write_config(&root, &config).unwrap();
 
@@ -1170,5 +1225,44 @@ mod tests {
         let edited: SoftwareConfig =
             serde_json::from_str(r#"{"qif_date_order":"jour-mois","qif_label":"???"}"#).unwrap();
         assert_eq!((edited.qif_order_choice(), edited.qif_label_choice()), (None, LabelChoice::Both));
+    }
+
+    /// **Les réglages OFX** (les deux menus, 20/10/2026) : gardés d'un
+    /// lancement à l'autre ; absents d'une configuration plus ancienne, ils
+    /// valent le défaut de Fabrice — le nom dans le libellé, le mémo dans la
+    /// référence ; les deux cases de la veille sont traduites, puis oubliées.
+    #[test]
+    fn the_ofx_settings_survive_and_default_to_the_reference() {
+        use crate::ofx_import::{LabelSource, MemoOptions, ReferenceSource};
+        let root = scratch_dir("ofx_aller_retour");
+        ensure_tree(&root).unwrap();
+
+        // Les deux cases de la veille : traduites dans les menus.
+        let cases = SoftwareConfig {
+            ofx_memo_in_label: Some(true),
+            ofx_memo_in_reference: Some(false),
+            ..SoftwareConfig::default()
+        };
+        assert_eq!(
+            cases.ofx_memo_options(),
+            MemoOptions { label: LabelSource::NameAndMemo, reference: ReferenceSource::Empty }
+        );
+
+        // Les menus enregistrés passent devant, et les cases s'effacent.
+        let mut config = cases;
+        let chosen = MemoOptions { label: LabelSource::Memo, reference: ReferenceSource::Name };
+        config.set_ofx_memo_options(chosen);
+        write_config(&root, &config).unwrap();
+        let back = read_config(&root).unwrap();
+        assert_eq!(back.ofx_memo_options(), chosen);
+        assert_eq!((back.ofx_memo_in_label, back.ofx_memo_in_reference), (None, None));
+
+        // Rien de réglé, ou un mot inconnu : le défaut.
+        let older: SoftwareConfig = serde_json::from_str(r#"{"language":"fr","zoom":1.0}"#).unwrap();
+        assert_eq!(older.ofx_memo_options(), MemoOptions::default());
+        let edited: SoftwareConfig =
+            serde_json::from_str(r#"{"ofx_label":"???","ofx_reference":"rien"}"#).unwrap();
+        assert_eq!(edited.ofx_memo_options(), MemoOptions::default());
+        fs::remove_dir_all(&root).ok();
     }
 }

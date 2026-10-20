@@ -1082,6 +1082,24 @@ pub fn password_form_window(language: Language) -> WindowSpec {
     }
 }
 
+/// **L'assistant d'exportation d'une base** (P-74, Fabrice, 19/10/2026).
+///
+/// Fille du sélecteur, comme la fiche du mot de passe : elle porte sur la
+/// ligne choisie dans son tableau, et son titre la nomme — « seule la base
+/// sélectionnée est exportée » se lit d'abord là.
+pub fn database_export_window(language: Language, base: &str) -> WindowSpec {
+    WindowSpec {
+        label: "database-export".to_string(),
+        url: "ui/windows/database-export.html".to_string(),
+        title: i18n::text_with(language, "window-database-export-title", "base", base),
+        width: 900.0,
+        height: 720.0,
+        closable: false,
+        resizable_chrome: false,
+        parent: Some("database-selector".to_string()),
+    }
+}
+
 /// F03 — « Opération Compte : `<compte>` ». The fiche of one operation, child
 /// of the list it was opened from, and titled with the account like the list
 /// itself: a fiche belongs to one account and there is no doubt about which.

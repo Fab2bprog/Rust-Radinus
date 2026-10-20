@@ -52,7 +52,9 @@ five nomenclatures, the status and, since 3.0.0, the verification — each as a
 tick box and a list in the banner, and as a column with its drop-down list in
 the table. Nothing reaches the database until the diskette is clicked.
 
-F02 is the window everything else orbits: eighteen columns, the tree of mothers
+F02 is the window everything else orbits: nineteen columns (« Référence
+paiement » joined on 19/10/2026, after the label, to see and filter only —
+it is changed in F03), the tree of mothers
 and daughters, the running balance, the three totals, the Période and Filtre
 menus, the export by right-click and the printing menu. Its columns are the
 user's own (P-49): a header is dragged to move its column, a right-click on
@@ -62,6 +64,10 @@ mechanism is the shared table's (`layoutName`, and an `id` per column). The
 detail at the bottom of the seven statistics and of the crossed balance asks
 for it too (P-50) — one layout per statistic, the table being named after its
 axis — and never the matrix above.
+
+A layout saved before a column was born keeps the user's order, widths and
+colours: the new column takes its place after its original left neighbour
+(`readLayout`), wherever the user has moved that one.
 
 ### Accounts
 
@@ -136,6 +142,17 @@ The same yellow folder opens an `.ofx` **or** a `.csv`. When it is a CSV, the
 cutting window steps in first; once validated, its lines fall into the
 integration window **as if they had been OFX**.
 
+Since 19/10/2026 (P-75) F17 shows a « Référence paiement » column after the
+label — the bank's `MEMO`, whole on hover — and F18 has a « Référence
+paiement » field under the label (255 characters, the label 300), changed
+like the other fields before the line goes in. What the `MEMO` becomes is set
+in Préférences › Importation › Relevés OFX: two drop-down menus since
+20/10/2026 — « Libellé de l'opération » (the name by default, the memo, or
+the name followed by the memo) and « Référence paiement » (the memo by
+default, the name, the name followed by the memo, or nothing) —, software
+settings that live without an open base and apply to the next statement
+opened.
+
 ### Statistics and analysis
 
 | F | Name | Label | Page |
@@ -158,6 +175,15 @@ interface, and it has no « Sans … » row — a value outside the list is coun
 under « À vérifier ». It did not take a number of its own: like the six, it is
 `statistics.html` with another axis. The detail under the matrix carries a
 « Vérification » column in all seven.
+
+**The detail tables show the payment reference** (20/10/2026, P-75): in the
+seven statistics, F39 and F40, a « Référence paiement » column follows the
+label — to see, sort and filter, whole on hover, edited in the form. The
+seven statistics and F39 show ventilations in place of their mothers; a
+ventilation has no reference of its own, so it **shows its mother's**
+(`operations::with_mothers_reference`) — on screen only, nothing is written.
+A layout saved before keeps its order, widths and hidden columns; the new
+column slips in after the label.
 
 **F40 is F25's chart with the reason under it** (3.0.0, 05/10/2026, P-54):
 one drags a zone on the chart, and the operations of that zone appear in a
@@ -319,10 +345,12 @@ the empty boxes, and the buttons « Reprendre les valeurs conseillées »,
 | Gestion de base de données | `database-selector` | `database-selector.html` |
 | Nouvelle base de données | `database-form` | `database-form.html` |
 | Protection par mot de passe | `password-form` | `password-form.html` |
+| Assistant d'exportation de la base | `database-export` | `database-export.html` |
 
-The last four have no F number: the original had nothing like them. The two
-fiches belong to the database window and open above it — one creates a database,
-the other sets, changes or removes its password (`Decisions.md`, P-34). The
+The last five have no F number: the original had nothing like them. The three
+windows belong to the database window and open above it — one creates a
+database, one sets, changes or removes its password (`Decisions.md`, P-34),
+one exports the selected base in four steps (P-74). The
 language window is the only page in the application that **uses no sentence at
 all** — each line is the name of a language written in that language, which is
 understood before anyone knows what the user speaks.

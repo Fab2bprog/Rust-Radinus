@@ -99,6 +99,8 @@ interface DetailRow {
   id: number;
   account: string;
   label: string;
+  /// La référence paiement de l'opération.
+  reference: string;
   date: string;
   clearing_date: string;
   /// Les deux mêmes dates en ISO : c'est sur elles que les colonnes se trient.
@@ -903,6 +905,20 @@ const detail = new Table<DetailRow>({
       cell: (row) => row.label,
       width: "2.4fr",
       minWidth: 180,
+    },
+    // La référence paiement (Fabrice, 20/10/2026), juste après le libellé,
+    // comme dans la liste du compte : on la voit, on la trie, on la filtre ;
+    // elle se modifie dans la fiche. Coupée à l'écran, entière au survol.
+    {
+      id: "reference",
+      title: () => t("operations-column-reference"),
+      cell: (row) => row.reference,
+      render: (row, cell) => {
+        cell.textContent = row.reference;
+        cell.title = row.reference;
+      },
+      width: "1.2fr",
+      minWidth: 100,
     },
     verificationColumn(),
     nomenclatureColumn(

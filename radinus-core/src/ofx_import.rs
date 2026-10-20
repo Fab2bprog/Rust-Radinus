@@ -88,6 +88,148 @@ pub struct Transaction {
     pub label: String,
     /// `FITID`, opaque : on ne l'interprète jamais, on le compare.
     pub fitid: String,
+    /// `MEMO` : le détail que certaines banques ajoutent au libellé — le
+    /// créancier d'un prélèvement, le bénéficiaire et le motif d'un virement,
+    /// le numéro d'un chèque (19/10/2026). Vide quand le fichier n'en porte
+    /// pas, ou n'y met que des espaces : La Banque Postale n'en met jamais, la
+    /// BNP en met partout. Ce qu'on en fait est décidé par [`compose`], selon
+    /// les réglages de l'utilisateur.
+    pub memo: String,
+}
+
+/// **Ce qui va dans le libellé** (Préférences › Relevés OFX, premier menu,
+/// Fabrice, 20/10/2026).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum LabelSource {
+    /// Le nom de l'opération (`NAME`) — le défaut, ce que la banque affiche.
+    #[default]
+    Name,
+    /// Le mémo de la banque (`MEMO`).
+    Memo,
+    /// Le nom suivi du mémo.
+    NameAndMemo,
+}
+
+/// **Ce qui va dans la référence paiement** (second menu, 20/10/2026).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum ReferenceSource {
+    /// Le mémo de la banque — le défaut.
+    #[default]
+    Memo,
+    /// Le nom de l'opération.
+    Name,
+    /// Le nom suivi du mémo.
+    NameAndMemo,
+    /// Rien : la référence reste vide.
+    Empty,
+}
+
+impl LabelSource {
+    /// Le mot qui le désigne dans le fichier de réglages et entre la fenêtre
+    /// et le noyau — comme le choix du libellé QIF.
+    pub fn key(self) -> &'static str {
+        match self {
+            LabelSource::Name => "name",
+            LabelSource::Memo => "memo",
+            LabelSource::NameAndMemo => "name-and-memo",
+        }
+    }
+
+    pub fn from_key(key: &str) -> Option<LabelSource> {
+        match key {
+            "name" => Some(LabelSource::Name),
+            "memo" => Some(LabelSource::Memo),
+            "name-and-memo" => Some(LabelSource::NameAndMemo),
+            _ => None,
+        }
+    }
+}
+
+impl ReferenceSource {
+    pub fn key(self) -> &'static str {
+        match self {
+            ReferenceSource::Memo => "memo",
+            ReferenceSource::Name => "name",
+            ReferenceSource::NameAndMemo => "name-and-memo",
+            ReferenceSource::Empty => "empty",
+        }
+    }
+
+    pub fn from_key(key: &str) -> Option<ReferenceSource> {
+        match key {
+            "memo" => Some(ReferenceSource::Memo),
+            "name" => Some(ReferenceSource::Name),
+            "name-and-memo" => Some(ReferenceSource::NameAndMemo),
+            "empty" => Some(ReferenceSource::Empty),
+            _ => None,
+        }
+    }
+}
+
+/// **Ce que l'utilisateur veut faire du NAME et du MEMO** : deux menus
+/// déroulants, l'un pour le libellé, l'autre pour la référence paiement
+/// (Fabrice, 20/10/2026 : deux cases « ne laissent pas assez de liberté »).
+/// Par défaut, le nom dans le libellé et le mémo dans la référence.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct MemoOptions {
+    pub label: LabelSource,
+    pub reference: ReferenceSource,
+}
+
+/// La référence paiement tient 255 caractères dans la fiche : « le nom suivi
+/// du mémo » est coupé là, par sécurité (le plus long vu, sur un vrai relevé
+/// BNP, en ferait environ 230).
+pub const REFERENCE_MAX: usize = 255;
+
+/// **Le nom suivi du mémo, sans rien écrire deux fois.** Certaines banques
+/// font du NAME le MEMO coupé à 32 caractères, d'autres répètent l'un dans
+/// l'autre : un MEMO qui commence par le NAME est pris seul, complet ; un NAME
+/// qui se termine par le MEMO est pris seul. Quand l'un des deux manque,
+/// l'autre suffit.
+fn name_and_memo(name: &str, memo: &str) -> String {
+    if memo.is_empty() || name.ends_with(memo) {
+        name.to_string()
+    } else if name.is_empty() || memo.starts_with(name) {
+        memo.to_string()
+    } else {
+        format!("{name} {memo}")
+    }
+}
+
+/// **Le libellé et la référence d'une opération**, à partir de son NAME et de
+/// son MEMO, selon les deux menus.
+///
+/// On ne cherche jamais à savoir de quelle banque vient le fichier (Fabrice :
+/// « tu ne sauras pas de qui vient l'OFX ») : la règle se décide **opération
+/// par opération**, sur ce qu'elle porte.
+///
+/// - **Le libellé n'est jamais vide** quand l'opération a un nom ou un mémo :
+///   « le mémo » sans mémo garde le nom (La Banque Postale, Fabrice), et « le
+///   nom » sans nom prend le mémo.
+/// - **La référence dit ce qu'on a choisi, et rien d'autre** : « le mémo »
+///   sans mémo la laisse vide, comme avant ; « le nom suivi du mémo » sans
+///   mémo n'a que le nom. Elle est coupée à [`REFERENCE_MAX`] caractères.
+///
+/// Avec les réglages par défaut, un relevé est lu exactement comme avant le
+/// 20/10/2026.
+pub fn compose(name: &str, memo: &str, options: MemoOptions) -> (String, String) {
+    let name = name.trim();
+    let memo = memo.trim();
+    let label = match options.label {
+        LabelSource::Name if name.is_empty() => memo.to_string(),
+        LabelSource::Name => name.to_string(),
+        LabelSource::Memo if memo.is_empty() => name.to_string(),
+        LabelSource::Memo => memo.to_string(),
+        LabelSource::NameAndMemo => name_and_memo(name, memo),
+    };
+    let reference = match options.reference {
+        ReferenceSource::Memo => memo.to_string(),
+        ReferenceSource::Name => name.to_string(),
+        ReferenceSource::NameAndMemo => name_and_memo(name, memo),
+        ReferenceSource::Empty => String::new(),
+    };
+    let reference = reference.chars().take(REFERENCE_MAX).collect::<String>().trim_end().to_string();
+    (label, reference)
 }
 
 /// Le relevé d'**un** compte, tel que la classe le tient après lecture.
@@ -502,6 +644,8 @@ pub fn read(source: &str, account_number: &str) -> Option<Statement> {
                 .unwrap_or_default()
                 .trim()
                 .to_string(),
+            // Le MEMO, à côté du libellé : le libellé lui-même ne change pas.
+            memo: unescaped(field(transaction, "MEMO").unwrap_or_default().trim()),
         });
     }
 
@@ -608,7 +752,9 @@ mod tests {
     }
 
     /// **Ce qu'on ne connaît pas ne fait pas échouer.** Une banque qui ajoute
-    /// des balises — et elles en ajoutent — ne doit rien changer.
+    /// des balises — et elles en ajoutent — ne doit rien changer. Le `MEMO`,
+    /// lu depuis le 19/10/2026, arrive dans son propre champ et ne touche à
+    /// rien d'autre.
     #[test]
     fn les_balises_inconnues_sont_ignorees_et_non_fatales() {
         let reference = read(SAMPLE, "123456A789").unwrap();
@@ -618,7 +764,12 @@ mod tests {
                 "<MEMO>Un commentaire de la banque<CHECKNUM>1234<CURRENCY>EUR<FITID>",
             )
             .replace("<CURDEF>EUR", "<CURDEF>EUR<INTRATE>0.5<MKTGINFO>Publicite");
-        assert_eq!(read(&noisy, "123456A789").unwrap(), reference);
+        let mut read_back = read(&noisy, "123456A789").unwrap();
+        for transaction in &mut read_back.transactions {
+            assert_eq!(transaction.memo, "Un commentaire de la banque");
+            transaction.memo.clear();
+        }
+        assert_eq!(read_back, reference);
     }
 
     /// **Un fichier à deux comptes ne mélange rien.**
@@ -769,5 +920,268 @@ mod tests {
 
         // Et le même texte en UTF-8 se lit comme de l'UTF-8.
         assert!(decode("<NAME>ACHAT CB CRÊPERIE".as_bytes()).contains("CRÊPERIE"));
+    }
+
+    // --- Les deux familles de relevés (étape A, 19/10/2026) ----------------
+    //
+    // Fabrice : « tu ne sauras pas de qui vient l'OFX ». Le lecteur ne cherche
+    // jamais à reconnaître la banque ; il lit ce que chaque opération porte.
+    // Ces échantillons reproduisent la **forme** des deux relevés réels
+    // reçus — La Banque Postale (sur une ligne, sans MEMO, montants au point)
+    // et la BNP (une balise par ligne, NAME générique, MEMO détaillé, DTUSER,
+    // montants à la virgule) —, avec des montants et des noms inventés. Les
+    // vrais relevés n'entrent jamais dans le projet (secret bancaire).
+
+    /// Forme BNP : une balise par ligne, `</STMTTRN>` fermé, `DTUSER`, montants
+    /// à la virgule, `NAME` court et générique, tout le détail dans `MEMO`.
+    const BNP_LIKE: &str = "OFXHEADER:100\r\nDATA:OFXSGML\r\nVERSION:102\r\nCHARSET:1252\r\n\r\n\
+<OFX>\r\n<SIGNONMSGSRSV1>\r\n<SONRS>\r\n<STATUS>\r\n<CODE>0\r\n<SEVERITY>INFO\r\n</STATUS>\r\n\
+<DTSERVER>20260917\r\n<LANGUAGE>FRA\r\n</SONRS>\r\n</SIGNONMSGSRSV1>\r\n<BANKMSGSRSV1>\r\n\
+<STMTTRNRS>\r\n<TRNUID>NOTPROVIDED\r\n<STMTRS>\r\n<CURDEF>EUR\r\n<BANKACCTFROM>\r\n\
+<BANKID>99999\r\n<BRANCHID>00100\r\n<ACCTID>00099988877\r\n<ACCTTYPE>CHECKING\r\n</BANKACCTFROM>\r\n\
+<BANKTRANLIST>\r\n<DTSTART>20260601\r\n<DTEND>20260916\r\n\
+<STMTTRN>\r\n<TRNTYPE>DEBIT\r\n<DTPOSTED>20260916\r\n<DTUSER>20260916\r\n<TRNAMT>-1234,50\r\n\
+<FITID>HST000000000000000001\r\n<NAME>PRLV SEPA\r\n\
+<MEMO>CAISSE INVENTEE ECH/160926 ID EMETTEUR/FR00ZZZ000000 MDT/ABC123 REF/XYZ789 LIB/COTISATION\r\n</STMTTRN>\r\n\
+<STMTTRN>\r\n<TRNTYPE>CREDIT\r\n<DTPOSTED>20260915\r\n<DTUSER>20260915\r\n<TRNAMT>838,49\r\n\
+<FITID>HST000000000000000002\r\n<NAME>VIRT SEPA RECU\r\n\
+<MEMO>/FRM SOCIETE IMAGINAIRE /EID 1D0750000 /RNF P 000000 BDR 000000\r\n</STMTTRN>\r\n\
+<STMTTRN>\r\n<TRNTYPE>CHECK\r\n<DTPOSTED>20260903\r\n<DTUSER>20260902\r\n<TRNAMT>-476,60\r\n\
+<FITID>HST000000000000000003\r\n<NAME>CHEQUE\r\n<MEMO>2256129\r\n</STMTTRN>\r\n\
+</BANKTRANLIST>\r\n<LEDGERBAL>\r\n<BALAMT>58909,56\r\n<DTASOF>20260917\r\n</LEDGERBAL>\r\n\
+<AVAILBAL>\r\n<BALAMT>58909,56\r\n<DTASOF>20260917\r\n</AVAILBAL>\r\n</STMTRS>\r\n</STMTTRNRS>\r\n\
+</BANKMSGSRSV1>\r\n</OFX>\r\n";
+
+    /// Les cas limites, sur une ligne : un MEMO qui répète le NAME, un MEMO
+    /// qui le prolonge (NAME = le MEMO coupé à 32 caractères), un MEMO sans
+    /// NAME, un MEMO vide, et une opération sans MEMO — dans un même fichier.
+    const MIXED: &str = "OFXHEADER:100\r\nDATA:OFXSGML\r\nVERSION:102\r\n\r\n\
+<OFX><BANKMSGSRSV1><STMTTRNRS><STMTRS><CURDEF>EUR<BANKACCTFROM><BANKID>11111\
+<ACCTID>MIX001<ACCTTYPE>CHECKING</BANKACCTFROM><BANKTRANLIST><DTSTART>20260101<DTEND>20260131\
+<STMTTRN><TRNTYPE>POS<DTPOSTED>20260105<TRNAMT>-10.00<FITID>M1<NAME>ACHAT CB BOULANGERIE<MEMO>ACHAT CB BOULANGERIE</STMTTRN>\
+<STMTTRN><TRNTYPE>PAYMENT<DTPOSTED>20260106<TRNAMT>-20.00<FITID>M2<NAME>PRELEVEMENT DE MUTUELLE INVENTE<MEMO>PRELEVEMENT DE MUTUELLE INVENTEE DU NORD REF 42</STMTTRN>\
+<STMTTRN><TRNTYPE>DEBIT<DTPOSTED>20260107<TRNAMT>-30.00<FITID>M3<MEMO>VIREMENT VERS EPARGNE</STMTTRN>\
+<STMTTRN><TRNTYPE>DEBIT<DTPOSTED>20260108<TRNAMT>-40.00<FITID>M4<NAME>FRAIS<MEMO>   </STMTTRN>\
+<STMTTRN><TRNTYPE>DEBIT<DTPOSTED>20260109<TRNAMT>-50.00<FITID>M5<NAME>RETRAIT DAB</STMTTRN>\
+</BANKTRANLIST><LEDGERBAL><BALAMT>100.00<DTASOF>20260131</LEDGERBAL></STMTRS></STMTTRNRS></BANKMSGSRSV1></OFX>";
+
+    /// Ce que le lecteur rend d'une opération, en une ligne comparable :
+    /// date, montant, type, libellé, FITID.
+    fn summary(transaction: &Transaction) -> String {
+        format!(
+            "{}|{}|{}|{}|{}",
+            transaction.date.map(|d| d.format("%Y-%m-%d").to_string()).unwrap_or_default(),
+            transaction.amount,
+            transaction.kind,
+            transaction.label,
+            transaction.fitid
+        )
+    }
+
+    /// **La référence d'aujourd'hui, figée** (étape A). Ce que le lecteur rend
+    /// des trois formes avant qu'il ne lise le MEMO. Les étapes suivantes
+    /// ajoutent le MEMO **à côté** : ces lignes-ci ne doivent jamais changer.
+    #[test]
+    fn les_trois_formes_se_lisent_comme_avant_le_memo() {
+        let lbp = read(SAMPLE, "123456A789").unwrap();
+        assert_eq!(
+            lbp.transactions.iter().map(summary).collect::<Vec<_>>(),
+            vec![
+                "2026-07-23|-50000000|ATM|CARTE X0000    22/07/26 A 19H23|P_GDYTLL29",
+                "2026-07-22|-120000000|POS|ACHAT CB COMMERCE TROIS       21.07.26|P_GDNTLLC@",
+            ]
+        );
+
+        assert_eq!(accounts_in(BNP_LIKE), vec!["00099988877".to_string()]);
+        let bnp = read(BNP_LIKE, "00099988877").unwrap();
+        assert_eq!(
+            bnp.transactions.iter().map(summary).collect::<Vec<_>>(),
+            vec![
+                "2026-09-16|-1234500000|DEBIT|PRLV SEPA|HST000000000000000001",
+                "2026-09-15|838490000|CREDIT|VIRT SEPA RECU|HST000000000000000002",
+                "2026-09-03|-476600000|CHECK|CHEQUE|HST000000000000000003",
+            ]
+        );
+        assert_eq!(bnp.ledger_balance, Some(58_909_560_000));
+        assert_eq!(bnp.from, Some(day("2026-06-01")));
+        assert_eq!(bnp.to, Some(day("2026-09-16")));
+
+        let mixed = read(MIXED, "MIX001").unwrap();
+        assert_eq!(
+            mixed.transactions.iter().map(summary).collect::<Vec<_>>(),
+            vec![
+                "2026-01-05|-10000000|POS|ACHAT CB BOULANGERIE|M1",
+                "2026-01-06|-20000000|PAYMENT|PRELEVEMENT DE MUTUELLE INVENTE|M2",
+                // Sans NAME, aujourd'hui, l'opération n'a pas de libellé.
+                "2026-01-07|-30000000|DEBIT||M3",
+                "2026-01-08|-40000000|DEBIT|FRAIS|M4",
+                "2026-01-09|-50000000|DEBIT|RETRAIT DAB|M5",
+            ]
+        );
+    }
+
+    /// **Sur de vrais relevés** (étape A, 19/10/2026) : chaque opération lue
+    /// est écrite, une par ligne, dans un fichier par relevé — la référence à
+    /// laquelle on comparera après chaque étape. Les relevés ne sont pas dans
+    /// le dépôt (secret bancaire).
+    ///
+    ///     RADINUS_OFX=/chemin/a.ofx:/chemin/b.ofx RADINUS_OFX_DUMP=/dossier \
+    ///       cargo test -p radinus-core --lib vrais_releves_ofx -- --ignored --nocapture
+    #[test]
+    #[ignore]
+    fn vrais_releves_ofx() {
+        let files = std::env::var("RADINUS_OFX").expect("RADINUS_OFX");
+        let dump = std::env::var("RADINUS_OFX_DUMP").ok().map(std::path::PathBuf::from);
+        for path in files.split(':').filter(|path| !path.is_empty()) {
+            let text = decode(&std::fs::read(path).unwrap());
+            let name = std::path::Path::new(path).file_name().unwrap().to_string_lossy().to_string();
+            let mut lines = Vec::new();
+            for account in accounts_in(&text) {
+                let statement = read(&text, &account).unwrap();
+                let total: i64 = statement.transactions.iter().map(|t| t.amount).sum();
+                let labels: std::collections::BTreeSet<&str> =
+                    statement.transactions.iter().map(|t| t.label.as_str()).collect();
+                println!(
+                    "{name} — compte {account} : {} opérations du {:?} au {:?}, total {}, solde {:?} au {:?}, {} libellés différents, {} vides, {} MEMO (le plus long : {} caractères)",
+                    statement.transactions.len(),
+                    statement.from,
+                    statement.to,
+                    total,
+                    statement.ledger_balance,
+                    statement.ledger_balance_date,
+                    labels.len(),
+                    statement.transactions.iter().filter(|t| t.label.is_empty()).count(),
+                    statement.transactions.iter().filter(|t| !t.memo.is_empty()).count(),
+                    statement.transactions.iter().map(|t| t.memo.chars().count()).max().unwrap_or(0),
+                );
+                lines.push(format!(
+                    "compte|{account}|{:?}|{:?}|{:?}|{:?}",
+                    statement.from, statement.to, statement.ledger_balance, statement.available_balance
+                ));
+                lines.extend(statement.transactions.iter().map(summary));
+            }
+            if let Some(folder) = &dump {
+                std::fs::create_dir_all(folder).unwrap();
+                std::fs::write(folder.join(format!("{name}.txt")), lines.join("\n") + "\n").unwrap();
+            }
+        }
+    }
+
+    /// **Le MEMO se lit à côté du libellé** (étape B) : le libellé reste le
+    /// NAME, intact ; le MEMO arrive dans son propre champ, vide quand le
+    /// fichier n'en porte pas.
+    #[test]
+    fn le_memo_se_lit_a_cote_du_libelle() {
+        let lbp = read(SAMPLE, "123456A789").unwrap();
+        assert!(lbp.transactions.iter().all(|t| t.memo.is_empty()), "La Banque Postale n'a pas de MEMO");
+
+        let bnp = read(BNP_LIKE, "00099988877").unwrap();
+        let memos: Vec<&str> = bnp.transactions.iter().map(|t| t.memo.as_str()).collect();
+        assert_eq!(
+            memos,
+            vec![
+                "CAISSE INVENTEE ECH/160926 ID EMETTEUR/FR00ZZZ000000 MDT/ABC123 REF/XYZ789 LIB/COTISATION",
+                "/FRM SOCIETE IMAGINAIRE /EID 1D0750000 /RNF P 000000 BDR 000000",
+                "2256129",
+            ]
+        );
+
+        let mixed = read(MIXED, "MIX001").unwrap();
+        let memos: Vec<&str> = mixed.transactions.iter().map(|t| t.memo.as_str()).collect();
+        assert_eq!(
+            memos,
+            vec![
+                "ACHAT CB BOULANGERIE",
+                "PRELEVEMENT DE MUTUELLE INVENTEE DU NORD REF 42",
+                "VIREMENT VERS EPARGNE",
+                "",
+                "",
+            ]
+        );
+        // Les entités du MEMO reviennent à leur caractère, comme celles du NAME.
+        let with = BNP_LIKE.replace("SOCIETE IMAGINAIRE", "DUPONT &amp; FILS");
+        assert!(read(&with, "00099988877").unwrap().transactions[1].memo.contains("DUPONT & FILS"));
+    }
+
+    /// **Le libellé et la référence, pour chaque forme et chaque réglage**
+    /// (les deux menus, 20/10/2026).
+    #[test]
+    fn le_libelle_et_la_reference_se_composent_operation_par_operation() {
+        use LabelSource as L;
+        use ReferenceSource as R;
+        let options = |label, reference| MemoOptions { label, reference };
+        let labels = [L::Name, L::Memo, L::NameAndMemo];
+        let references = [R::Memo, R::Name, R::NameAndMemo, R::Empty];
+        assert_eq!(MemoOptions::default(), options(L::Name, R::Memo));
+
+        // Les douze combinaisons, NAME générique et MEMO détaillé (BNP).
+        let (name, memo) = ("PRLV SEPA", "EDF REF/42");
+        let label_of = |label| match label {
+            L::Name => "PRLV SEPA",
+            L::Memo => "EDF REF/42",
+            L::NameAndMemo => "PRLV SEPA EDF REF/42",
+        };
+        let reference_of = |reference| match reference {
+            R::Memo => "EDF REF/42",
+            R::Name => "PRLV SEPA",
+            R::NameAndMemo => "PRLV SEPA EDF REF/42",
+            R::Empty => "",
+        };
+        for label in labels {
+            for reference in references {
+                assert_eq!(
+                    compose(name, memo, options(label, reference)),
+                    (label_of(label).to_string(), reference_of(reference).to_string()),
+                    "{label:?} / {reference:?}"
+                );
+            }
+        }
+
+        // Sans MEMO (La Banque Postale) : le libellé garde toujours le nom ;
+        // la référence n'a que ce qui existe.
+        for label in labels {
+            for reference in references {
+                let (got_label, got_reference) = compose("RETRAIT DAB", "   ", options(label, reference));
+                assert_eq!(got_label, "RETRAIT DAB", "{label:?}");
+                let expected = match reference {
+                    R::Name | R::NameAndMemo => "RETRAIT DAB",
+                    R::Memo | R::Empty => "",
+                };
+                assert_eq!(got_reference, expected, "{reference:?}");
+            }
+        }
+
+        // Sans NAME : le libellé prend le mémo, quel que soit le choix.
+        for label in labels {
+            assert_eq!(compose("", "VIREMENT VERS EPARGNE", options(label, R::Memo)).0, "VIREMENT VERS EPARGNE");
+        }
+        assert_eq!(compose("", "VIREMENT VERS EPARGNE", options(L::Name, R::Name)).1, "");
+
+        // Un MEMO qui répète le NAME, ou qui le prolonge : pas de doublon.
+        let twice = options(L::NameAndMemo, R::NameAndMemo);
+        assert_eq!(compose("ACHAT CB BOULANGERIE", "ACHAT CB BOULANGERIE", twice).0, "ACHAT CB BOULANGERIE");
+        assert_eq!(
+            compose("PRELEVEMENT DE MUTUELLE INVENTE", "PRELEVEMENT DE MUTUELLE INVENTEE DU NORD", twice),
+            (
+                "PRELEVEMENT DE MUTUELLE INVENTEE DU NORD".to_string(),
+                "PRELEVEMENT DE MUTUELLE INVENTEE DU NORD".to_string()
+            )
+        );
+        assert_eq!(compose("VIREMENT DE PAUL MARTIN", "PAUL MARTIN", twice).1, "VIREMENT DE PAUL MARTIN");
+
+        // Chaque choix a son mot, et le relit.
+        for label in labels {
+            assert_eq!(LabelSource::from_key(label.key()), Some(label));
+        }
+        for reference in references {
+            assert_eq!(ReferenceSource::from_key(reference.key()), Some(reference));
+        }
+        assert_eq!(LabelSource::from_key("autre"), None);
+
+        // La référence est coupée à 255 caractères ; le libellé, non.
+        let long = "X".repeat(250);
+        let (label, reference) = compose("PRLV SEPA", &long, twice);
+        assert_eq!(label.chars().count(), 260);
+        assert_eq!(reference.chars().count(), REFERENCE_MAX);
     }
 }

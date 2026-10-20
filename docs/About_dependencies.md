@@ -85,6 +85,15 @@ rest out.
 Export to OpenDocument, the format of LibreOffice Calc. A user without Excel
 must still be able to get his tables out.
 
+### `chrono`
+
+The date type `spreadsheet-ods` asks for when a cell holds a real date — and
+nothing else. It is used only to hand a date to the `.ods` writer of the
+database export (P-74), where the dates must stay dates, not text. It was
+already compiled into Radinus by `spreadsheet-ods` itself: same version, no
+default features, no new code. Every date calculation in Radinus stays with
+`time_compute`. Authorized by Fabrice on 19/10/2026.
+
 ### `typst`, `typst-layout`, `typst-pdf`
 
 Typesetting for printouts and reports. Typst is a typesetting engine written

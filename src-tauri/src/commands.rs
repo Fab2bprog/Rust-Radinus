@@ -1438,6 +1438,8 @@ pub fn accounts_list_may_close<R: Runtime>(
 pub struct OperationRowDto {
     pub id: i64,
     pub label: String,
+    /// La référence paiement : vue, triée, filtrée (19/10/2026).
+    pub reference: String,
     pub date: String,
     pub clearing_date: String,
     /// **Les deux dates en ISO, pour le tri, et rien d'autre.**
@@ -1565,6 +1567,7 @@ fn as_row(
     OperationRowDto {
         id: row.id,
         label: row.label.clone(),
+        reference: row.reference.clone(),
         date: date(row.date),
         clearing_date: date(row.clearing_date),
         date_value: sortable(row.date),
@@ -6457,6 +6460,9 @@ pub struct StatementLineDto {
     /// par jour du mois (défaut relevé par Fabrice le 04/08/2026).
     pub date_value: String,
     pub label: String,
+    /// La référence paiement que l'opération recevra : le MEMO de la banque,
+    /// selon les Préférences (19/10/2026).
+    pub reference: String,
     /// Débit et Crédit ne partagent jamais une colonne : le signe décide
     /// laquelle est écrite, comme dans la liste des opérations.
     pub debit: String,
@@ -6516,6 +6522,8 @@ pub struct StatementFormDto {
     pub rank: usize,
     pub date: String,
     pub label: String,
+    /// La référence paiement, modifiable dans la fiche (19/10/2026).
+    pub reference: String,
     /// `"D"` ou `"C"`, comme la fiche opération.
     pub direction: String,
     /// Le montant **en valeur absolue**, écrit : la fiche sépare le sens du
@@ -6563,6 +6571,7 @@ fn statement_view(
                 date: day(line.date),
                 date_value: line.date.map(|d| d.to_string()).unwrap_or_default(),
                 label: line.label.clone(),
+                reference: line.reference.clone(),
                 debit: if line.amount < 0 { money(line.amount) } else { String::new() },
                 credit: if line.amount >= 0 { money(line.amount) } else { String::new() },
                 amount: line.amount,
@@ -6673,8 +6682,13 @@ pub fn statement_load(
 
     let conn = state.database()?;
     let language = ui_language();
-    let import =
-        radinus_core::statements::prepare(&conn, account_id, &statement).map_err(to_ipc_error)?;
+    // Ce que l'utilisateur veut faire du MEMO de la banque (Préférences ›
+    // Relevés OFX) : réglage du logiciel, lu à chaque chargement.
+    let memo = radinus_core::location::read_config(&state.data_root)
+        .unwrap_or_default()
+        .ofx_memo_options();
+    let import = radinus_core::statements::prepare_with(&conn, account_id, &statement, memo)
+        .map_err(to_ipc_error)?;
     let said = radinus_core::statements::loaded_sentence(&import, language);
     let view = statement_view(&conn, language, &import, said, false)?;
     drop(conn);
@@ -6920,6 +6934,7 @@ pub fn statement_line(
             rank: line.rank,
             date: day(line.date),
             label: line.label.clone(),
+            reference: line.reference.clone(),
             direction: if line.amount < 0 { "D" } else { "C" }.to_string(),
             // Avec la devise, comme la capture le montre : ce champ se lit, il
             // ne se saisit pas.
@@ -6950,11 +6965,16 @@ pub fn statement_amend(
     rank: usize,
     date: String,
     label: String,
+    reference: Option<String>,
     amount: i64,
 ) -> Result<(), String> {
     let day = radinus_core::domain::NaiveDate::parse_from_str(&date, "%Y-%m-%d").ok();
     state.with_import(account_id, |import| {
-        radinus_core::statements::amend(import, rank, day, &label, amount);
+        // Sans référence envoyée, la ligne garde la sienne.
+        let kept = reference.unwrap_or_else(|| {
+            import.line(rank).map(|line| line.reference.clone()).unwrap_or_default()
+        });
+        radinus_core::statements::amend(import, rank, day, &label, &kept, amount);
     })
 }
 
@@ -11311,6 +11331,44 @@ pub fn database_needs_password(state: State<'_, AppState>, path: String) -> bool
     )
 }
 
+/// Les mots du menu Outils de la fenêtre des bases, **avec le nom de la base
+/// choisie** (Fabrice, 19/10/2026) : « Sauvegarder la base « Famille »… »
+/// plutôt que « Sauvegarde », que l'on pouvait croire valable pour toutes les
+/// bases. Sans base choisie, les mots disent « la base sélectionnée » et la
+/// fenêtre grise les entrées.
+#[derive(Serialize)]
+pub struct ToolLabelsDto {
+    pub header: String,
+    pub backup: String,
+    pub restore: String,
+    pub repair: String,
+}
+
+#[tauri::command]
+pub fn database_tool_labels(state: State<'_, AppState>, label: Option<String>) -> ToolLabelsDto {
+    let language = window_language(&state);
+    match label.filter(|label| !label.trim().is_empty()) {
+        Some(base) => {
+            let with = |key: &str| radinus_core::i18n::text_with(language, key, "base", &base);
+            ToolLabelsDto {
+                header: with("databases-tools-selected"),
+                backup: with("menu-tools-backup"),
+                restore: with("menu-tools-restore"),
+                repair: with("menu-tools-repair"),
+            }
+        }
+        None => {
+            let plain = |key: &str| radinus_core::i18n::text(language, key);
+            ToolLabelsDto {
+                header: plain("databases-tools-none"),
+                backup: plain("menu-tools-backup-none"),
+                restore: plain("menu-tools-restore-none"),
+                repair: plain("menu-tools-repair-none"),
+            }
+        }
+    }
+}
+
 /// Ouvre la fiche du mot de passe, au-dessus du sélecteur, sur une base.
 #[tauri::command]
 pub fn open_password_form<R: Runtime>(
@@ -11331,6 +11389,264 @@ pub fn open_password_form<R: Runtime>(
         Some(&query),
     )
     .map_err(to_ipc_error)
+}
+
+// --- L'assistant d'exportation d'une base (P-74, Fabrice, 19/10/2026) ---------
+//
+// **La portabilité des données** : que l'utilisateur puisse quitter Radinus un
+// jour sans rien perdre, et verser ses comptes dans un autre logiciel. Le
+// noyau sait tout écrire (`database_export`, `account_export`) ; ces commandes
+// ne font que relier l'assistant à lui. **Seule la base choisie dans la liste
+// est exportée**, et chaque phrase de l'assistant le redit.
+
+/// Ouvre l'assistant sur la base choisie dans le sélecteur.
+///
+/// La clé, si la base en a une, a été demandée par le sélecteur ; elle est
+/// gardée dans l'état et ne passe jamais par la fenêtre.
+#[tauri::command]
+pub fn open_database_export<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+    path: String,
+    label: String,
+    password: Option<String>,
+) -> Result<(), String> {
+    let language = window_language(&state);
+    state.set_export_access(path.clone(), password);
+    let query = format!("path={}&label={}", urlencode(&path), urlencode(&label));
+    crate::windows::open(
+        &app,
+        &crate::windows::database_export_window(language, &label),
+        Some(&query),
+    )
+    .map_err(to_ipc_error)
+}
+
+/// Ce que l'assistant affiche en tête : la phrase qui dit quelle base part —
+/// et elle seule —, et si cette base est protégée, pour prévenir que l'export
+/// ne le sera pas.
+#[derive(Serialize)]
+pub struct ExportIntroDto {
+    pub banner: String,
+    pub protected: bool,
+}
+
+#[tauri::command]
+pub fn database_export_intro(state: State<'_, AppState>, path: String, label: String) -> ExportIntroDto {
+    let language = window_language(&state);
+    let sqlite = state.data_root.join(&path);
+    let locked = sqlite.is_file()
+        && matches!(
+            radinus_core::database::open_existing_database(&sqlite, None),
+            Err(radinus_core::database::OpenError::Locked)
+        );
+    ExportIntroDto {
+        banner: radinus_core::i18n::text_with(language, "base-export-only-this", "base", &label),
+        protected: locked || state.export_password(&path).is_some_and(|password| !password.is_empty()),
+    }
+}
+
+/// L'emplacement choisi : le fichier, ou le dossier qui sera créé.
+#[derive(Serialize)]
+pub struct ExportPlaceDto {
+    pub destination: String,
+    /// L'export va-t-il dans un dossier (plusieurs fichiers) ?
+    pub folder: bool,
+    /// La question à poser avant de remplacer, s'il y a lieu — déjà écrite.
+    pub question: Option<String>,
+}
+
+fn export_layout(layout: &str) -> radinus_core::database_export::Layout {
+    if layout == "per-table" {
+        radinus_core::database_export::Layout::PerTable
+    } else {
+        radinus_core::database_export::Layout::OneFile
+    }
+}
+
+/// **Choisit où écrire l'export.** Un fichier unique se choisit avec le
+/// dialogue d'enregistrement, qui propose `<Base> - export <date>.<ext>` et
+/// demande lui-même avant de remplacer. Plusieurs fichiers vont dans un
+/// dossier `<Base> - export <date>` créé dans celui qu'on choisit ; s'il existe
+/// déjà, la question est rendue ici, et l'assistant la pose.
+#[tauri::command]
+pub async fn database_export_destination<R: Runtime>(
+    app: AppHandle<R>,
+    label: String,
+    format: String,
+    layout: String,
+) -> Result<Option<ExportPlaceDto>, String> {
+    use radinus_core::database_export::{export_stem, Format};
+    use tauri_plugin_dialog::DialogExt;
+    let language = ui_language();
+    let format = Format::from_key(&format)
+        .ok_or_else(|| radinus_core::i18n::text_with(language, "base-export-failed", "reason", &format))?;
+    let folder = format.writes_a_folder(export_layout(&layout));
+    let extension = format.extension();
+    let stem = export_stem(&label, time_compute::Local::now().date_naive());
+    let (answered, answer) = std::sync::mpsc::channel();
+    if folder {
+        app.dialog()
+            .file()
+            .set_title(radinus_core::i18n::text(language, "base-export-choose-folder"))
+            .pick_folder(move |chosen| {
+                let _ = answered.send(chosen);
+            });
+    } else {
+        app.dialog()
+            .file()
+            .set_file_name(format!("{stem}.{extension}"))
+            .add_filter(radinus_core::i18n::text(language, &format!("base-export-format-{extension}")), &[extension])
+            .save_file(move |chosen| {
+                let _ = answered.send(chosen);
+            });
+    }
+    let Ok(Some(chosen)) = answer.recv() else {
+        return Ok(None);
+    };
+    let chosen = chosen.into_path().map_err(to_ipc_error)?;
+    let destination = if folder {
+        chosen.join(&stem)
+    } else {
+        // Un nom tapé sans son extension la reçoit : un fichier que le
+        // tableur ne reconnaît pas est un export qu'on croit raté.
+        let has_extension = chosen
+            .extension()
+            .is_some_and(|found| found.to_string_lossy().eq_ignore_ascii_case(extension));
+        if has_extension {
+            chosen
+        } else {
+            let mut named = chosen.into_os_string();
+            named.push(format!(".{extension}"));
+            std::path::PathBuf::from(named)
+        }
+    };
+    let question = (folder && destination.exists())
+        .then(|| radinus_core::i18n::text_with(language, "base-export-folder-exists", "name", &stem));
+    Ok(Some(ExportPlaceDto {
+        destination: destination.to_string_lossy().to_string(),
+        folder,
+        question,
+    }))
+}
+
+/// Ce que l'utilisateur a choisi dans l'assistant.
+#[derive(serde::Deserialize)]
+pub struct ExportRequestDto {
+    pub format: String,
+    pub layout: String,
+    pub decimal_comma: bool,
+    pub quote_all: bool,
+    pub date_order: String,
+    pub destination: String,
+}
+
+/// **Fait l'export**, sur un fil de travail : une grosse base prend quelques
+/// secondes, et la fenêtre ne doit pas geler. Rend la phrase de fin, qui dit
+/// ce qui est parti et tout ce qui a été laissé de côté ou changé.
+#[tauri::command]
+pub async fn run_database_export<R: Runtime>(
+    app: AppHandle<R>,
+    path: String,
+    label: String,
+    request: ExportRequestDto,
+) -> Result<String, String> {
+    tauri::async_runtime::spawn_blocking(move || export_database_now(&app, &path, &label, &request))
+        .await
+        .map_err(to_ipc_error)?
+}
+
+fn export_database_now<R: Runtime>(
+    app: &AppHandle<R>,
+    path: &str,
+    label: &str,
+    request: &ExportRequestDto,
+) -> Result<String, String> {
+    use radinus_core::database_export as export;
+    use radinus_core::i18n;
+    let language = ui_language();
+    let failed = |reason: &str| i18n::text_with(language, "base-export-failed", "reason", reason);
+    let state = app
+        .try_state::<AppState>()
+        .ok_or_else(|| i18n::text(language, "backup-no-database"))?;
+    let format = export::Format::from_key(&request.format).ok_or_else(|| failed(&request.format))?;
+    let layout = export_layout(&request.layout);
+    let qif_order = radinus_core::qif_import::DateOrder::from_key(&request.date_order)
+        .unwrap_or(radinus_core::qif_import::DateOrder::DayMonth);
+    let today = time_compute::Local::now().date_naive();
+    let version = app.package_info().version.to_string();
+
+    let sqlite = state.data_root.join(path);
+    if !sqlite.is_file() {
+        return Err(failed(&sqlite.to_string_lossy()));
+    }
+    let read = |conn: &radinus_core::database::Connection| -> Result<(export::Info, export::Extract), String> {
+        let currency = radinus_core::preferences::currency(conn).map_err(|error| failed(&error.to_string()))?;
+        let info = export::Info {
+            version: version.clone(),
+            base: label.to_string(),
+            date: today,
+            currency: export::currency_label(&currency, &crate::system::currency_sign()),
+        };
+        let extract = export::read(conn, &info).map_err(|error| failed(&error.to_string()))?;
+        Ok((info, extract))
+    };
+    // **La base ouverte se lit par sa propre connexion**, jamais par une
+    // seconde — la règle des opérations techniques. Les autres s'ouvrent en
+    // lecture seule, le temps de la lecture : l'export n'écrit jamais dans la
+    // base qu'il copie.
+    let attachments = sqlite
+        .parent()
+        .map(|folder| folder.join("attachments"))
+        .unwrap_or_default();
+    let is_open = state.has_database() && state.attachments_dir() == attachments;
+    let (info, extract) = if is_open {
+        let guard = state.database()?;
+        read(&guard)?
+    } else {
+        let password = state.export_password(path);
+        let conn = export::open_read_only(&sqlite, password.as_deref()).map_err(|error| match error {
+            export::OpenError::Locked => i18n::text(language, "password-wrong"),
+            export::OpenError::NotARadinusDatabase => i18n::text(language, "base-export-not-radinus"),
+            export::OpenError::TooOld { .. } => i18n::text(language, "base-export-too-old"),
+            export::OpenError::TooRecent { .. } => i18n::text(language, "base-export-too-recent"),
+            export::OpenError::Sqlite(reason) => failed(&reason),
+        })?;
+        read(&conn)?
+    };
+
+    let destination = std::path::PathBuf::from(&request.destination);
+    let outcome = export::export(
+        &extract,
+        &info,
+        export::Request {
+            format,
+            layout,
+            csv: export::CsvOptions {
+                decimal_comma: request.decimal_comma,
+                quote_all: request.quote_all,
+            },
+            qif_order,
+        },
+        &destination,
+    )
+    .map_err(|error| failed(&error.to_string()))?;
+    // On montre où c'est : le dossier créé, ou celui qui tient le fichier.
+    let shown = if format.writes_a_folder(layout) {
+        Some(destination.as_path())
+    } else {
+        destination.parent()
+    };
+    if let Some(shown) = shown {
+        let _ = crate::system::open_with_desktop(shown);
+    }
+    Ok(export::outcome_sentence(&outcome, label, language))
+}
+
+/// L'assistant se ferme : la clé de la base est oubliée.
+#[tauri::command]
+pub fn forget_database_export(state: State<'_, AppState>) {
+    state.forget_export_access();
 }
 
 /// **Pose, change ou retire le mot de passe d'une base.**
@@ -11731,6 +12047,38 @@ pub fn save_preferences_qif(
     let mut config = radinus_core::location::read_config(&root).map_err(to_ipc_error)?;
     config.qif_date_order = date_order.map(|order| order.key().to_string());
     config.qif_label = Some(label.key().to_string());
+    radinus_core::location::write_config(&root, &config).map_err(to_ipc_error)
+}
+
+/// Les deux réglages des relevés OFX : ce qui va dans le libellé et ce qui va
+/// dans la référence paiement (Fabrice, 20/10/2026 — deux menus déroulants,
+/// qui remplacent les deux cases de la veille). **Du logiciel, pas de la
+/// base**, comme ceux du QIF. Chaque choix voyage par son mot : `name`,
+/// `memo`, `name-and-memo`, et `empty` pour la référence.
+#[derive(Serialize)]
+pub struct OfxPreferencesDto {
+    pub label: &'static str,
+    pub reference: &'static str,
+}
+
+#[tauri::command]
+pub fn preferences_ofx(state: State<'_, AppState>) -> OfxPreferencesDto {
+    let options = radinus_core::location::read_config(&state.data_root)
+        .unwrap_or_default()
+        .ofx_memo_options();
+    OfxPreferencesDto { label: options.label.key(), reference: options.reference.key() }
+}
+
+#[tauri::command]
+pub fn save_preferences_ofx(state: State<'_, AppState>, label: String, reference: String) -> Result<(), String> {
+    use radinus_core::ofx_import::{LabelSource, MemoOptions, ReferenceSource};
+    let options = MemoOptions {
+        label: LabelSource::from_key(&label).ok_or_else(|| format!("OFX : « {label} » ?"))?,
+        reference: ReferenceSource::from_key(&reference).ok_or_else(|| format!("OFX : « {reference} » ?"))?,
+    };
+    let root = state.data_root.clone();
+    let mut config = radinus_core::location::read_config(&root).map_err(to_ipc_error)?;
+    config.set_ofx_memo_options(options);
     radinus_core::location::write_config(&root, &config).map_err(to_ipc_error)
 }
 

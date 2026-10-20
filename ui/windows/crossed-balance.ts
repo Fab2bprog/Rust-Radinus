@@ -78,6 +78,8 @@ interface DetailRow {
   id: number;
   parent_id: number;
   label: string;
+  /// La référence paiement ; pour une ventilation, celle de sa mère.
+  reference: string;
   date: string;
   clearing_date: string;
   date_value: string;
@@ -324,6 +326,21 @@ const detail = new Table<DetailRow>({
       width: "2.4fr",
       // La colonne qu'on lit : elle a droit à la place des autres.
       minWidth: 180,
+    },
+    // La référence paiement (Fabrice, 20/10/2026), juste après le libellé,
+    // comme dans la liste du compte : on la voit, on la trie, on la filtre ;
+    // elle se modifie dans la fiche. Coupée à l'écran, entière au survol. Une
+    // ventilation montre celle de sa mère.
+    {
+      id: "reference",
+      title: () => t("operations-column-reference"),
+      cell: (row) => row.reference,
+      render: (row, cell) => {
+        cell.textContent = row.reference;
+        cell.title = row.reference;
+      },
+      width: "1.2fr",
+      minWidth: 100,
     },
     // Entre le libellé et la catégorie, comme dans les statistiques.
     verificationColumn(),

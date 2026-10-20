@@ -156,6 +156,16 @@ pub mod csv_statement;
 /// lecture OFX ne bouge pas d'une ligne. Rend le même `ofx_import::Statement`.
 pub mod qif_import;
 
+/// L'exportation d'une base entière vers d'autres formats (19/10/2026,
+/// P-74) : « que l'utilisateur ne perde rien » s'il quitte Radinus. Le socle —
+/// la lecture seule, le catalogue des tables, les conversions — que tous les
+/// formats de l'assistant partagent.
+pub mod database_export;
+
+/// L'exportation par compte, en QIF ou en OFX, pour passer dans un autre
+/// logiciel de comptes (19/10/2026, P-74).
+pub mod account_export;
+
 /// CSV and Excel import (Phase 13). Uses the author's `office-toolkit` crate
 /// for the Excel side once this module is implemented (see dependency
 /// registry, 08_ARCHITECTURE.md). Dossier reference:

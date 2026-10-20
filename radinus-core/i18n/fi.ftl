@@ -447,6 +447,7 @@ operation-verification-verified = Tarkistettu
 operation-verification-doubtful = Epäilyttävä
 operation-verification-disputed = Riitautettu
 operations-column-label = Kuvaus
+operations-column-reference = Maksun viite
 operations-column-category = Kategoria
 operations-column-assignment = Kohdistus
 operations-column-payment-mode = Maksutapa
@@ -907,12 +908,13 @@ statement-column-reconciled = Täsmäytetty
 statement-column-fitid = FITID
 statement-column-date = Päivä
 statement-column-label = Kuvaus
+statement-column-reference = Maksun viite
 statement-column-debit = Veloitus
 statement-column-credit = Hyvitys
 statement-account = Tili
 statement-file = Tiedosto
 statement-difference = Erotus
-statement-none = Yhtään tiliotetta ei ole avattu: valitse tiedosto napsauttamalla keltaista kansiota.
+statement-none = Yhtään tiliotetta ei ole avattu: valitse tiedosto (OFX, CSV, QIF) napsauttamalla keltaista kansiota.
 statement-empty = Tämä tiliote ei sisällä yhtään tapahtumaa.
 statement-no-match = Yksikään rivi ei vastaa suodatinta.
 statement-help = Info: Valitse taulukosta useita rivejä hiiren napsautuksella ja [{ $modifier }]-näppäimellä
@@ -994,6 +996,7 @@ statement-group-classification = Tapahtuman luokittelu tilastojen laskentaa vart
 statement-group-status = Tapahtuman tila
 statement-field-date = Päivä
 statement-field-label = Kuvaus
+statement-field-reference = Maksun viite
 statement-field-type = Tapahtumatyyppi
 statement-field-amount = Summa
 statement-field-mode = Tapahtumatapa
@@ -1577,14 +1580,14 @@ print-sent-default = Raportti lähetetty oletustulostimeesi.
 # --- Vaihe 17 — tietokantatoiminnot -------------------------------------
 backup-archive = Radinus-arkisto
 backup-no-database = Yhtään tietokantaa ei ole auki.
-backup-done = Varmuuskopio kirjoitettu tiedostoon ”{ $file }”.
+backup-done = Tietokanta ”{ $base }” on varmuuskopioitu tiedostoon ”{ $file }”. Muihin tietokantoihin tämä ei vaikuta.
 backup-failed = Varmuuskopiointi epäonnistui: { $reason }
 backup-not-started = Varmuuskopiointia ei voitu aloittaa:
 restore-unreadable = Tämä tiedosto ei ole luettava Radinus-arkisto: { $reason }
 # Kysymys kertoo, mitä menetetään, ennen kuin se menetetään. Arkisto on jo
 # tässä vaiheessa luettu: sen ilmoittama tieto on varmaa.
-restore-question = Palautetaanko ”{ $file }”? Tietokantasi koko nykyinen sisältö poistetaan ja korvataan, ja siinä oleva menetetään.
-restore-done = Palautus valmis: { $accounts } tiliä ja { $operations } tapahtumaa.
+restore-question = Palautetaanko ”{ $file }” tietokantaan ”{ $base }”? Tämän tietokannan koko nykyinen sisältö poistetaan ja korvataan, ja siinä oleva menetetään. Muihin tietokantoihin ei kosketa.
+restore-done = Tietokanta ”{ $base }” on palautettu: { $accounts } tiliä ja { $operations } tapahtumaa. Muihin tietokantoihin ei kosketa.
 restore-failed = Palautus epäonnistui: { $reason }
 restore-empty-fields = Tyhjiä kenttiä luettu nolla-arvona: { $count }.
 
@@ -1652,9 +1655,9 @@ journal-help = Loki säilyttää vain viimeisimmän teknisen toiminnon: varmuusk
 # --- Korjaus ------------------------------------------------------------
 menu-file-repair-running = Korjaus ja optimointi käynnissä…
 repair-done = { $anomalies ->
-    [0] Korjaus valmis: poikkeamia ei löytynyt. { $lines } vaihetta kirjattu lokiin.
-    [one] Korjaus valmis: yksi poikkeama korjattu. { $lines } vaihetta kirjattu lokiin.
-   *[other] Korjaus valmis: { $anomalies } poikkeamaa korjattu. { $lines } vaihetta kirjattu lokiin.
+    [0] Tietokannan ”{ $base }” korjaus valmis: poikkeamia ei löytynyt. { $lines } vaihetta kirjattu lokiin. Muihin tietokantoihin tämä ei vaikuta.
+    [one] Tietokannan ”{ $base }” korjaus valmis: yksi poikkeama korjattu. { $lines } vaihetta kirjattu lokiin. Muihin tietokantoihin tämä ei vaikuta.
+   *[other] Tietokannan ”{ $base }” korjaus valmis: { $anomalies } poikkeamaa korjattu. { $lines } vaihetta kirjattu lokiin. Muihin tietokantoihin tämä ei vaikuta.
 }
 repair-failed = Korjaus epäonnistui: { $reason }
 
@@ -1913,6 +1916,16 @@ preferences-branch-import = Tuonti
 preferences-leaf-verification = Tarkistus
 preferences-field-verification = Tuodut tapahtumat:
 preferences-verification-hint = ”Tarkistettu”: luotat pankkiisi, tuotu tapahtuma katsotaan oikeaksi. ”Tarkistettava”: jokainen tuotu tapahtuma odottaa tarkistustasi; sen jälkeen merkitset sen itse tilaan ”Tarkistettu” tapahtumaluettelossa. Asetus koskee vain tulevia tuonteja.
+preferences-leaf-ofx = OFX-tiliotteet
+preferences-field-ofx-label = Tapahtuman kuvaus:
+preferences-field-ofx-reference = Maksun viite:
+preferences-ofx-choice-name = Tapahtuman nimi
+preferences-ofx-choice-memo = Pankin muistio
+preferences-ofx-choice-name-and-memo = Nimi ja sen perässä muistio
+preferences-ofx-choice-empty = Ei mitään (jätä tyhjäksi)
+preferences-ofx-label-help = Mitä tuodun tapahtuman kuvaukseen tulee. Nimi on se, jonka pankki näyttää, esimerkiksi ”PRLV SEPA”; jotkin pankit lisäävät siihen yksityiskohtaisen muistion: suoraveloituksen velkoja, tilisiirron saaja ja aihe. Jos tapahtumalla ei ole muistiota, sen kuvaukseksi jää nimi.
+preferences-ofx-reference-help = Mitä tuodun tapahtuman maksun viitteeseen tulee; voit nähdä sen siellä ja suodattaa sen perusteella. Jos tapahtumalla ei ole muistiota, ”Pankin muistio” jättää viitteen tyhjäksi. Jos muistio jo toistaa nimen, sitä ei kirjoiteta kahdesti.
+preferences-ofx-hint = Nämä asetukset koskevat kaikkia OFX-tiliotteita riippumatta siitä, mikä tietokanta on auki. Ne otetaan käyttöön seuraavasta avattavasta tiliotteesta alkaen.
 preferences-leaf-qif = QIF-tiliotteet
 preferences-field-qif-order = Päivän ja kuukauden järjestys:
 preferences-qif-order-ask = Kysy minulta joka kerta
@@ -2965,3 +2978,121 @@ sharing-sheet-items = Erät
 sharing-sheet-result = Tulos
 sharing-sheet-payments = Maksut
 sharing-sheet-balances = Palautukset
+
+## Tietokannan vientiavustaja (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Tietokannan ”{ $base }” vientiavustaja
+menu-tools-export = Tietokannan vientiavustaja…
+base-export-only-this = Vain luettelosta valittu tietokanta ”{ $base }” viedään. Muihin tietokantoihin tämä ei vaikuta.
+base-export-purpose = Tämä avustaja kopioi tietokannan tiedot tiedostoihin, joita muut ohjelmat osaavat lukea: taulukkolaskentaohjelma, Accessin kaltainen tietokanta tai jokin muu talouden hallintaohjelma. Itse tietokantaa ei muuteta.
+base-export-step-format = 1. Muoto
+base-export-step-options = 2. Asetukset
+base-export-step-place = 3. Sijainti
+base-export-step-summary = 4. Yhteenveto
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = Työkirja, jossa on yksi taulukko kutakin taulua kohden. Sen voi avata Excelillä ja useimmilla taulukkolaskentaohjelmilla.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = LibreOfficen ja OpenOfficen avoin muoto, jossa on yksi taulukko kutakin taulua kohden.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = Yksi tekstitiedosto kutakin taulua kohden, arvot puolipisteillä erotettuina: muoto, jonka lähes kaikki ohjelmat osaavat tuoda, Access mukaan lukien.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = Ohjelmoijille ja sovelluksille: jokainen taulu omalla nimellään sekä otsake, joka kuvaa viennin.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = Sama sisältö kuin JSON-muodossa, mutta XML-muodossa kirjoitettuna.
+base-export-format-sql = SQL-komentosarja (.sql)
+base-export-format-sql-hint = Komennot, jotka luovat taulut ja niiden tiedot uudelleen toiseen tietokantaan (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = SQLite-tietokanta (.sqlite)
+base-export-format-sqlite-hint = Itsenäinen tietokanta ilman salasanaa. Monet työkalut avaavat sen suoraan.
+base-export-format-qif = QIF, yksi tiedosto tiliä kohden (.qif)
+base-export-format-qif-hint = Tiliesi siirtämiseen johonkin toiseen talouden hallintaohjelmaan (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, yksi tiedosto tiliä kohden (.ofx)
+base-export-format-ofx-hint = Tiliotteiden muoto, jonka useimmat talouden hallintaohjelmat osaavat tuoda.
+base-export-lossy = Huomio: QIF ja OFX eivät pysty välittämään kaikkea. Mukaan siirtyvät vain tilien tapahtumat vastapuolineen, luokkineen ja kommentteineen; siirto tileltä toiselle muuttuu tavalliseksi tapahtumaksi kummallakin puolella, ja kaikki muu (budjetit, toistuvat tapahtumat, projektit, kohdistukset…) jää pois. Jos haluat säilyttää kaiken, valitse jokin toinen muoto.
+base-export-planned-note = Suunniteltuja tapahtumia ja päivämäärättömiä tapahtumia ei viedä: ne eivät ole vielä kulkeneet pankin kautta. Niiden määrä kerrotaan lopuksi.
+base-export-dates-hint = Päivämäärät kirjoitetaan muodossa vuosi-kuukausi-päivä (2026-12-31) ja summat tietokannan valuutassa: mikään ohjelma ei voi tulkita niitä väärin.
+base-export-group-layout = Tiedostot
+base-export-layout-one = Kaikki yhteen tiedostoon
+base-export-layout-per-table = Yksi tiedosto kutakin taulua kohden, kansioon
+base-export-group-decimal = Summien desimaalierotin
+base-export-decimal-point = Piste (1234.56)
+base-export-decimal-comma = Pilkku (1234,56)
+base-export-group-quotes = Lainausmerkit
+base-export-quotes-all = Jokainen arvo lainausmerkeissä
+base-export-quotes-none = Ei lainausmerkkejä
+base-export-csv-replacements-hint = Jotta jokainen tiedosto voidaan lukea uudelleen virheettä, tekstissä oleva puolipiste muutetaan huutomerkiksi, rivinvaihto välilyönniksi ja, jos lainausmerkkejä ei käytetä, lainausmerkki heittomerkiksi. Korvausten määrä kerrotaan lopuksi.
+base-export-group-qif-order = Päivämäärän järjestys
+base-export-qif-day-month = Päivä ennen kuukautta (31/12/2026)
+base-export-qif-month-day = Kuukausi ennen päivää (12/31/2026)
+base-export-qif-order-hint = Valitse järjestys, jota tiedostot lukeva ohjelma odottaa: Euroopassa päivä ensin, Yhdysvalloissa kuukausi ensin.
+base-export-no-option = Tällä muodolla ei ole asetuksia.
+base-export-choose-file = Valitse tiedosto…
+base-export-choose-folder = Valitse kansio…
+base-export-place-file = Vienti kirjoitetaan tähän tiedostoon:
+base-export-place-folder = Vienti kirjoitetaan tähän kansioon, joka luodaan sitä varten:
+base-export-place-none = Sijaintia ei ole vielä valittu.
+base-export-place-needed = Valitse ensin, minne vienti tallennetaan.
+base-export-folder-exists = Kansio ”{ $name }” on jo olemassa. Sen sisältämät samannimiset tiedostot korvataan. Jatketaanko?
+base-export-summary-base = Tietokanta
+base-export-summary-format = Muoto
+base-export-summary-options = Asetukset
+base-export-summary-place = Sijainti
+base-export-unprotected = Tämä tietokanta on suojattu salasanalla, mutta vienti ei ole: kuka tahansa, jolla on nämä tiedostot, voi lukea tilisi. Säilytä ne turvallisessa paikassa.
+base-export-previous = Edellinen
+base-export-next = Seuraava
+base-export-run = Vie
+base-export-running = Viedään…
+base-export-done = Tietokanta ”{ $base }” on viety: { $tables ->
+        [one] yksi taulu
+       *[other] { $tables } taulua
+    }, { $rows ->
+        [one] yksi rivi
+       *[other] { $rows } riviä
+    }.
+base-export-done-accounts = Tietokanta ”{ $base }” on viety: { $accounts ->
+        [one] yksi tili
+       *[other] { $accounts } tiliä
+    }, { $operations ->
+        [one] yksi tapahtuma
+       *[other] { $operations } tapahtumaa
+    }.
+base-export-done-replacements = { $count ->
+        [one] CSV-tiedostoissa korvattiin yksi merkki.
+       *[other] CSV-tiedostoissa korvattiin { $count } merkkiä.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } ohjausmerkki, jota tämä tiedostomuoto ei voi sisältää, korvattiin merkillä ”�”.
+       *[other] { $count } ohjausmerkkiä, joita tämä tiedostomuoto ei voi sisältää, korvattiin merkillä ”�”.
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } teksti ylitti Excelin 32 767 merkin rajan: se katkaistiin työkirjassa. Muut tiedostomuodot säilyttävät sen kokonaisena.
+       *[other] { $count } tekstiä ylitti Excelin 32 767 merkin rajan: ne katkaistiin työkirjassa. Muut tiedostomuodot säilyttävät ne kokonaisina.
+    }
+base-export-done-anomalies = { $count ->
+        [one] Yksi lukukelvoton arvo kopioitiin sellaisenaan.
+       *[other] { $count } lukukelvotonta arvoa kopioitiin sellaisenaan.
+    }
+base-export-done-planned = { $count ->
+        [one] Yksi suunniteltu tapahtuma jätettiin pois.
+       *[other] { $count } suunniteltua tapahtumaa jätettiin pois.
+    }
+base-export-done-undated = { $count ->
+        [one] Yksi päivämäärätön tapahtuma jätettiin pois.
+       *[other] { $count } päivämäärätöntä tapahtumaa jätettiin pois.
+    }
+base-export-done-adjusted = { $count ->
+        [one] Yksi arvo mukautettiin muotoon sopivaksi.
+       *[other] { $count } arvoa mukautettiin muotoon sopiviksi.
+    }
+base-export-too-old = Tämä tietokanta on peräisin Radinuksen vanhemmasta versiosta. Avaa se ensin kerran Radinuksessa, joka päivittää sen, ja vie se sitten.
+base-export-too-recent = Tämä tietokanta on tallennettu Radinuksen uudemmalla versiolla. Päivitä Radinus, jotta voit viedä sen.
+base-export-not-radinus = Tämä tiedosto ei ole Radinus-tietokanta.
+base-export-failed = Vientiä ei voitu tehdä: { $reason }
+
+## Tietokantaikkunan Työkalut-valikko näyttää tietokannan nimen (Fabrice, 19/10/2026).
+databases-tools-selected = Valittu tietokanta: ”{ $base }”
+databases-tools-none = Tietokantaa ei ole valittu
+menu-tools-backup = Varmuuskopioi tietokanta ”{ $base }”…
+menu-tools-backup-none = Varmuuskopioi valittu tietokanta…
+menu-tools-restore = Palauta tietokanta ”{ $base }”…
+menu-tools-restore-none = Palauta valittu tietokanta…
+menu-tools-repair = Korjaa ja optimoi tietokanta ”{ $base }”…
+menu-tools-repair-none = Korjaa ja optimoi valittu tietokanta…

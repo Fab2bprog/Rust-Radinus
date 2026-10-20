@@ -609,12 +609,14 @@ pub fn behind_the_cell(
     parameters.extend(statuses);
 
     let mut statement = conn.prepare(&query)?;
-    let found = statement
+    let mut found: Vec<(crate::operations::OperationRow, i64)> = statement
         .query_map(rusqlite::params_from_iter(parameters), |row| {
             crate::operations::read_row(row)
         })?
-        .collect();
-    found
+        .collect::<Result<_>>()?;
+    // Une ventilation montre la référence de sa mère (20/10/2026).
+    crate::operations::with_mothers_reference(conn, &mut found)?;
+    Ok(found)
 }
 
 pub(crate) fn placeholders(count: usize) -> String {
@@ -895,6 +897,38 @@ mod tests {
         let detail = behind_the_cell(&conn, &[1], 2026, Switches::default(), Axis::Category, cell).expect("détail");
         let orphan = detail.iter().find(|(row, _)| row.id == 4).expect("l'opération 4");
         assert_eq!(orphan.1, 0);
+    }
+
+    /// **Une ventilation montre la référence paiement de sa mère** (Fabrice,
+    /// 20/10/2026) — à l'affichage seulement : la base n'est pas touchée.
+    #[test]
+    fn a_ventilation_shows_its_mothers_payment_reference() {
+        let conn = database();
+        add(&conn, 1, 1, "2026-02-10", -120 * EURO, 20, 1, 0);
+        add(&conn, 2, 1, "2026-02-10", -80 * EURO, 1, 1, 1);
+        add(&conn, 3, 1, "2026-02-10", -40 * EURO, 20, 1, 1);
+        add(&conn, 4, 1, "2026-02-11", -10 * EURO, 1, 1, 0);
+        conn.execute("UPDATE Operation SET ReferencePaiement = 'EDF REF/42' WHERE IDOperation = 1", [])
+            .expect("référence de la mère");
+        conn.execute("UPDATE Operation SET ReferencePaiement = 'CB 0105' WHERE IDOperation = 4", [])
+            .expect("référence d'une opération seule");
+
+        let cell = Cell::Axis { value: 1, month: Some(2) };
+        let detail = behind_the_cell(&conn, &[1], 2026, Switches::default(), Axis::Category, cell).expect("détail");
+        let reference = |id: i64| detail.iter().find(|(row, _)| row.id == id).expect("ligne").0.reference.clone();
+        assert_eq!(reference(2), "EDF REF/42", "la fille montre celle de sa mère");
+        assert_eq!(reference(4), "CB 0105", "une opération seule garde la sienne");
+
+        let stored: String = conn
+            .query_row("SELECT ReferencePaiement FROM Operation WHERE IDOperation = 2", [], |row| row.get(0))
+            .expect("fille");
+        assert_eq!(stored, "", "rien n'est écrit");
+
+        // Une fille qui porte sa propre référence la garde.
+        conn.execute("UPDATE Operation SET ReferencePaiement = 'A ELLE' WHERE IDOperation = 2", [])
+            .expect("référence de la fille");
+        let detail = behind_the_cell(&conn, &[1], 2026, Switches::default(), Axis::Category, cell).expect("détail");
+        assert_eq!(detail.iter().find(|(row, _)| row.id == 2).expect("fille").0.reference, "A ELLE");
     }
 
     #[test]

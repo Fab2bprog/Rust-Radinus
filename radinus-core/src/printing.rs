@@ -389,9 +389,15 @@ const TEMPLATE: &str = r##"
 #let tableau(largeurs, alignements, titres, lignes) = table(
   columns: largeurs,
   column-gutter: 0.5pt,
-  rows: 17.55pt,
+  // **Une ligne d'au moins 17,55 points, qui grandit si le texte passe à la
+  // ligne** (19/10/2026). La hauteur fixe de l'original faisait déborder un
+  // long libellé sur les lignes voisines, illisible ; le libellé peut
+  // désormais compter 300 caractères. Une ligne d'une seule ligne de texte
+  // garde exactement la hauteur de toujours : la marge verticale complète le
+  // texte jusqu'à 17,55 points.
+  rows: auto,
   stroke: none,
-  inset: (x: 3pt, y: 0pt),
+  inset: (x: 3pt, y: 6.27pt),
   align: horizon,
   fill: (x, y) => if y == 0 { gris-bande } else if calc.odd(y) { white } else { jaune },
   table.header(repeat: true, ..titres.map(t => align(center, t))),
@@ -1066,6 +1072,51 @@ mod tests {
         r.holder_address = "#pagebreak()\n[gras] *étoile*".into();
         let octets = rib_pdf(&r, Language::French).expect("composition");
         assert!(octets.starts_with(b"%PDF-"));
+    }
+
+    /// **Un libellé de 300 caractères** (19/10/2026 : le libellé passe de 100
+    /// à 300) : l'état se compose, la cellule passe à la ligne au lieu de
+    /// déborder sur ses voisines. Le PDF est laissé dans le dossier temporaire
+    /// pour qu'on puisse le regarder.
+    #[test]
+    fn un_libelle_de_trois_cents_caracteres_s_imprime() {
+        let long = "PRLV SEPA URSSAF MIDI PYRENEES ECH/160926 ID EMETTEUR/FR10ZZZ113417 ".repeat(5);
+        let long: String = long.chars().take(300).collect();
+        let columns = operation_columns(Language::French);
+        let mut row = vec![String::new(); columns.len()];
+        row[5] = long;
+        let report = Report {
+            title: "Essai".into(),
+            printed_on: "19/10/2026".into(),
+            grid: Grid { columns, rows: vec![row.clone(), row] },
+            closing: Vec::new(),
+            recap: None,
+            licence: String::new(),
+        };
+        let octets = pdf(&report, Language::French).expect("composition");
+        assert!(octets.starts_with(b"%PDF-"));
+        std::fs::write(std::env::temp_dir().join("radinus_libelle_long.pdf"), octets).unwrap();
+
+        // Et un état ordinaire, quarante lignes courtes : il doit rester
+        // exactement ce qu'il était.
+        let columns = operation_columns(Language::French);
+        let short: Vec<Vec<String>> = (0..40)
+            .map(|n| {
+                let mut row = vec![String::from("x"); columns.len()];
+                row[5] = format!("ACHAT CB COMMERCE {n}");
+                row
+            })
+            .collect();
+        let ordinary = Report {
+            title: "Essai".into(),
+            printed_on: "19/10/2026".into(),
+            grid: Grid { columns, rows: short },
+            closing: Vec::new(),
+            recap: None,
+            licence: String::new(),
+        };
+        let octets = pdf(&ordinary, Language::French).expect("composition");
+        std::fs::write(std::env::temp_dir().join("radinus_libelle_court.pdf"), octets).unwrap();
     }
 
     /// **La largeur utile ne se négocie pas.** Les colonnes plus les

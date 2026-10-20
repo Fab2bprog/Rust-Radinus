@@ -409,6 +409,7 @@ operation-verification-verified = Verified
 operation-verification-doubtful = Doubtful
 operation-verification-disputed = Disputed
 operations-column-label = Label
+operations-column-reference = Payment reference
 operations-column-category = Category
 operations-column-assignment = Assignment
 operations-column-payment-mode = Mode
@@ -818,12 +819,13 @@ statement-column-reconciled = Added
 statement-column-fitid = FITID
 statement-column-date = Date
 statement-column-label = Label
+statement-column-reference = Payment reference
 statement-column-debit = Debit
 statement-column-credit = Credit
 statement-account = Account
 statement-file = File
 statement-difference = Difference
-statement-none = No statement is open: click the yellow folder to choose a file.
+statement-none = No statement is open: click the yellow folder to choose a file (OFX, CSV, QIF).
 statement-empty = This statement holds no operation.
 statement-no-match = No line matches the filter.
 statement-help = Tip: mouse click + [{ $modifier }] on the table selects several lines
@@ -901,6 +903,7 @@ statement-group-classification = Classification, for the statistics
 statement-group-status = Status of the operation
 statement-field-date = Date
 statement-field-label = Label
+statement-field-reference = Payment reference
 statement-field-type = Operation type
 statement-field-amount = Amount
 statement-field-mode = Payment mode
@@ -1421,12 +1424,12 @@ print-sent-default = Report sent to your default printer.
 # --- Phase 17 — database operations ------------------------------------
 backup-archive = Radinus archive
 backup-no-database = No database is open.
-backup-done = Backup written to "{ $file }".
+backup-done = The database “{ $base }” has been backed up to “{ $file }”. The other databases are not affected.
 backup-failed = Backup failed: { $reason }
 backup-not-started = The backup could not be started:
 restore-unreadable = This file is not a readable Radinus archive: { $reason }
-restore-question = Restore "{ $file }"? Everything your database currently holds will be erased and replaced, and what is in it will be lost.
-restore-done = Restore complete: { $accounts } accounts and { $operations } operations.
+restore-question = Restore “{ $file }” into the database “{ $base }”? Everything this database currently holds will be erased and replaced, and what is in it will be lost. The other databases are not touched.
+restore-done = The database “{ $base }” has been restored: { $accounts } accounts and { $operations } operations. The other databases are not touched.
 restore-failed = Restore failed: { $reason }
 restore-empty-fields = Empty fields read as a neutral value: { $count }.
 
@@ -1493,9 +1496,9 @@ journal-help = The log only keeps the last technical operation: backup, restore,
 # --- Repair -------------------------------------------------------------
 menu-file-repair-running = Repairing and optimising…
 repair-done = { $anomalies ->
-    [0] Repair complete: no anomaly found. { $lines } steps logged.
-    [one] Repair complete: one anomaly repaired. { $lines } steps logged.
-   *[other] Repair complete: { $anomalies } anomalies repaired. { $lines } steps logged.
+    [0] Repair of the database “{ $base }” complete: no anomaly found. { $lines } steps logged. The other databases are not affected.
+    [one] Repair of the database “{ $base }” complete: one anomaly repaired. { $lines } steps logged. The other databases are not affected.
+   *[other] Repair of the database “{ $base }” complete: { $anomalies } anomalies repaired. { $lines } steps logged. The other databases are not affected.
 }
 repair-failed = Repair failed: { $reason }
 
@@ -1736,6 +1739,16 @@ preferences-branch-import = Import
 preferences-leaf-verification = Verification
 preferences-field-verification = Imported operations:
 preferences-verification-hint = “Verified”: you trust your bank, an imported operation is taken as correct. “To verify”: every imported operation waits for your check; you then set it to “Verified” yourself in the operations list. This setting only applies to future imports.
+preferences-leaf-ofx = OFX statements
+preferences-field-ofx-label = Transaction label:
+preferences-field-ofx-reference = Payment reference:
+preferences-ofx-choice-name = The transaction's name
+preferences-ofx-choice-memo = The bank's memo
+preferences-ofx-choice-name-and-memo = The name followed by the memo
+preferences-ofx-choice-empty = Nothing (leave empty)
+preferences-ofx-label-help = What the label of an imported transaction receives. The name is the one the bank shows, for example “PRLV SEPA”; some banks add a detailed memo: the creditor of a direct debit, the payee and purpose of a transfer. When a transaction has no memo, its label keeps the name.
+preferences-ofx-reference-help = What the payment reference of an imported transaction receives, where you can see it and filter on it. When a transaction has no memo, “The bank's memo” leaves the reference empty. If the memo already repeats the name, it is not written twice.
+preferences-ofx-hint = These settings apply to every OFX statement, whatever database is open. They take effect on the next statement opened.
 preferences-leaf-qif = QIF statements
 preferences-field-qif-order = Order of day and month:
 preferences-qif-order-ask = Ask me every time
@@ -2788,3 +2801,121 @@ sharing-sheet-items = Items
 sharing-sheet-result = Result
 sharing-sheet-payments = Payments
 sharing-sheet-balances = Repayments
+
+## The database export wizard (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Export wizard for the database “{ $base }”
+menu-tools-export = Database export wizard…
+base-export-only-this = Only the database “{ $base }”, selected in the list, will be exported. The other databases are not affected.
+base-export-purpose = This wizard copies the database's data into files that other software can read: a spreadsheet, a database such as Access, another personal finance program. The database itself is not changed.
+base-export-step-format = 1. Format
+base-export-step-options = 2. Options
+base-export-step-place = 3. Location
+base-export-step-summary = 4. Summary
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = A workbook with one sheet per table, readable by Excel and most spreadsheets.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = The open format of LibreOffice and OpenOffice, with one sheet per table.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = One text file per table, values separated by semicolons: the format almost every program can import, Access included.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = For programmers and applications: each table under its name, with a header describing the export.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = The same content as the JSON, written as XML.
+base-export-format-sql = SQL script (.sql)
+base-export-format-sql-hint = The statements that recreate the tables and their data in another database (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = SQLite database (.sqlite)
+base-export-format-sqlite-hint = A standalone database, without a password, that many tools open directly.
+base-export-format-qif = QIF, one file per account (.qif)
+base-export-format-qif-hint = To carry your accounts over to another personal finance program (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, one file per account (.ofx)
+base-export-format-ofx-hint = The bank statement format, which most personal finance programs can import.
+base-export-lossy = Beware: QIF and OFX cannot say everything. Only the accounts' transactions go across, with their payees, categories and comments; a transfer becomes an ordinary transaction on each side, and the rest (budgets, schedules, projects, assignments…) is left behind. To keep everything, choose another format.
+base-export-planned-note = Planned transactions and transactions without a date are not exported: they have not reached the bank yet. Their number will be given at the end.
+base-export-dates-hint = Dates are written year-month-day (2026-12-31) and amounts in the database's currency: no program can misread them.
+base-export-group-layout = Files
+base-export-layout-one = Everything in a single file
+base-export-layout-per-table = One file per table, in a folder
+base-export-group-decimal = Decimal separator for amounts
+base-export-decimal-point = Point (1234.56)
+base-export-decimal-comma = Comma (1234,56)
+base-export-group-quotes = Quotation marks
+base-export-quotes-all = Every value in quotation marks
+base-export-quotes-none = No quotation marks
+base-export-csv-replacements-hint = So that every file reads back without error, a semicolon in a text becomes an exclamation mark, a line break becomes a space and, without quotation marks, a quotation mark becomes an apostrophe. The number of replacements will be given at the end.
+base-export-group-qif-order = Date order
+base-export-qif-day-month = Day before month (31/12/2026)
+base-export-qif-month-day = Month before day (12/31/2026)
+base-export-qif-order-hint = Choose the order expected by the program that will read the files: day first in Europe, month first in the United States.
+base-export-no-option = This format has no options.
+base-export-choose-file = Choose the file…
+base-export-choose-folder = Choose the folder…
+base-export-place-file = The export will be written to this file:
+base-export-place-folder = The export will be written to this folder, created for it:
+base-export-place-none = No location chosen yet.
+base-export-place-needed = First choose where to write the export.
+base-export-folder-exists = The folder “{ $name }” already exists. Files of the same name inside it will be replaced. Continue?
+base-export-summary-base = Database
+base-export-summary-format = Format
+base-export-summary-options = Options
+base-export-summary-place = Location
+base-export-unprotected = This database is protected by a password, but the export will not be: anyone who has these files can read your accounts. Keep them somewhere safe.
+base-export-previous = Previous
+base-export-next = Next
+base-export-run = Export
+base-export-running = Exporting…
+base-export-done = The database “{ $base }” has been exported: { $tables ->
+        [one] one table
+       *[other] { $tables } tables
+    }, { $rows ->
+        [one] one row
+       *[other] { $rows } rows
+    }.
+base-export-done-accounts = The database “{ $base }” has been exported: { $accounts ->
+        [one] one account
+       *[other] { $accounts } accounts
+    }, { $operations ->
+        [one] one transaction
+       *[other] { $operations } transactions
+    }.
+base-export-done-replacements = { $count ->
+        [one] One character was replaced in the CSV files.
+       *[other] { $count } characters were replaced in the CSV files.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } control character, which this format cannot hold, was replaced by “�”.
+       *[other] { $count } control characters, which this format cannot hold, were replaced by “�”.
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } text was longer than 32,767 characters, Excel's limit: it was cut in the workbook. The other formats keep it whole.
+       *[other] { $count } texts were longer than 32,767 characters, Excel's limit: they were cut in the workbook. The other formats keep them whole.
+    }
+base-export-done-anomalies = { $count ->
+        [one] One unreadable value was copied as it was.
+       *[other] { $count } unreadable values were copied as they were.
+    }
+base-export-done-planned = { $count ->
+        [one] One planned transaction was left out.
+       *[other] { $count } planned transactions were left out.
+    }
+base-export-done-undated = { $count ->
+        [one] One transaction without a date was left out.
+       *[other] { $count } transactions without a date were left out.
+    }
+base-export-done-adjusted = { $count ->
+        [one] One value was adjusted for the format.
+       *[other] { $count } values were adjusted for the format.
+    }
+base-export-too-old = This database comes from an older version of Radinus. Open it once in Radinus first, which will update it, then export it.
+base-export-too-recent = This database was saved by a newer version of Radinus. Update Radinus to export it.
+base-export-not-radinus = This file is not a Radinus database.
+base-export-failed = The export could not be done: { $reason }
+
+## The Tools menu of the database window names the database (Fabrice, 19/10/2026).
+databases-tools-selected = Selected database: “{ $base }”
+databases-tools-none = No database selected
+menu-tools-backup = Back up the database “{ $base }”…
+menu-tools-backup-none = Back up the selected database…
+menu-tools-restore = Restore the database “{ $base }”…
+menu-tools-restore-none = Restore the selected database…
+menu-tools-repair = Repair and optimise the database “{ $base }”…
+menu-tools-repair-none = Repair and optimise the selected database…

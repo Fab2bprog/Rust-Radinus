@@ -35,6 +35,11 @@ zip = "8"
 time_compute = { version = "1.0.0", features = ["serde"] }
 office-toolkit = { version = "1.0.0", default-features = false, features = ["excel", "word"] }
 spreadsheet-ods = { version = "1.0.4", default-features = false }
+# Le type de date que `spreadsheet-ods` exige pour écrire une vraie date dans
+# un .ods (exportation de la base, P-74). Déjà compilée dans Radinus par
+# `spreadsheet-ods` lui-même : même version, sans fonction par défaut, aucun
+# code nouveau. Autorisée par Fabrice le 19/10/2026.
+chrono = { version = "0.4", default-features = false }
 # Composition typographique des impressions et états (phase 15). Typst est un
 # moteur de composition écrit en Rust, sous licence Apache-2.0 : il pagine,
 # réimprime les en-têtes de tableau, coupe les pages. Le PDF est fabriqué par

@@ -352,6 +352,56 @@ pub(crate) const EMPTY_ENTRY: &str = ".";
 /// before the last table file, which is `preferences`.
 const EMPTY_ENTRY_BEFORE_LAST: usize = 1;
 
+/// **Le nom d'une sauvegarde, qui dit de quelle base elle vient** (Fabrice,
+/// 19/10/2026) : `Famille_Sauvegarde_20261019163512345.zip` — le nom de la
+/// base, puis l'année, le mois, le jour, l'heure, les minutes, les secondes et
+/// les millisecondes, **à l'heure locale**.
+///
+/// L'ancien nom, `radinus_sauvegarde_…`, ne disait pas laquelle des bases on
+/// avait sauvegardée, et un utilisateur pouvait croire qu'elles l'étaient
+/// toutes. La restauration ne lit jamais le nom : elle reconnaît une archive à
+/// son contenu, quel que soit son nom.
+pub fn archive_file_name_for(base: &str) -> String {
+    use time_compute::{Datelike, Timelike};
+    let now = time_compute::Local::now();
+    archive_name(
+        base,
+        [
+            now.year() as u32,
+            now.month(),
+            now.day(),
+            now.hour(),
+            now.minute(),
+            now.second(),
+            now.timestamp_subsec_millis().min(999),
+        ],
+    )
+}
+
+/// Le nom, à partir des chiffres de l'instant. Valable sur macOS, Windows et
+/// Linux : espaces, `/ \ : * ? " < > |` et caractères de contrôle deviennent
+/// `_`, un point en tête (fichier caché sous macOS et Linux) est ôté, et le
+/// nom de la base est tenu à 100 caractères. Un nom qui ne peut pas servir
+/// donne `Sauvegarde_<chiffres>.zip`.
+pub fn archive_name(base: &str, [year, month, day, hour, minute, second, millis]: [u32; 7]) -> String {
+    let cleaned: String = base
+        .chars()
+        .map(|c| match c {
+            '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
+            c if c.is_whitespace() || c.is_control() => '_',
+            c => c,
+        })
+        .take(100)
+        .collect();
+    let cleaned = cleaned.trim_start_matches('.').trim_matches('_');
+    let stamp = format!("{year:04}{month:02}{day:02}{hour:02}{minute:02}{second:02}{millis:03}");
+    if cleaned.is_empty() {
+        format!("Sauvegarde_{stamp}.zip")
+    } else {
+        format!("{cleaned}_Sauvegarde_{stamp}.zip")
+    }
+}
+
 /// Builds the archive's file name from a timestamp:
 /// `radinus_sauvegarde_<AAAAMMJJHHMMSSmmm>.zip` (06 §1.1).
 pub fn archive_file_name(now: std::time::SystemTime) -> String {
@@ -954,6 +1004,27 @@ mod tests {
             "ces colonnes sont écrites dans l'archive et `backup::records` ne les \
              connaît pas : elles seront perdues à la restauration : {unread:?}"
         );
+    }
+
+    #[test]
+    fn le_nom_d_une_sauvegarde_dit_sa_base() {
+        let at = [2026, 10, 19, 16, 35, 12, 345];
+        assert_eq!(archive_name("Famille", at), "Famille_Sauvegarde_20261019163512345.zip");
+        assert_eq!(archive_name("Comptes famille", at), "Comptes_famille_Sauvegarde_20261019163512345.zip");
+        assert_eq!(archive_name("Perso: 2026/oct?", at), "Perso__2026_oct_Sauvegarde_20261019163512345.zip");
+        assert_eq!(archive_name("Comptes été", at), "Comptes_été_Sauvegarde_20261019163512345.zip");
+        assert_eq!(archive_name(".cachée", at), "cachée_Sauvegarde_20261019163512345.zip");
+        assert_eq!(archive_name("CON", at), "CON_Sauvegarde_20261019163512345.zip");
+        assert_eq!(archive_name("", at), "Sauvegarde_20261019163512345.zip");
+        assert_eq!(archive_name(" ? * ", at), "Sauvegarde_20261019163512345.zip");
+        assert_eq!(archive_name("a\u{1}b", at), "a_b_Sauvegarde_20261019163512345.zip");
+        let long = "x".repeat(300);
+        assert_eq!(archive_name(&long, at), format!("{}_Sauvegarde_20261019163512345.zip", "x".repeat(100)));
+        assert_eq!(archive_name("Famille", [2026, 1, 2, 3, 4, 5, 6]), "Famille_Sauvegarde_20260102030405006.zip");
+        // L'heure du nom est l'heure locale : le nom d'aujourd'hui commence
+        // par la date du jour, telle que l'horloge de l'ordinateur la donne.
+        let today = time_compute::Local::now().format("%Y%m%d").to_string();
+        assert!(archive_file_name_for("Famille").starts_with(&format!("Famille_Sauvegarde_{today}")));
     }
 
     #[test]

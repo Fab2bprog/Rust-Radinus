@@ -137,6 +137,14 @@ pub struct AppState {
     /// fenêtre montre, le noyau tient le carnet. `None` tant que la fenêtre
     /// n'a rien demandé ; la porte le remet à `None` — la fenêtre oublie.
     car: Mutex<Option<radinus_core::car::Logbook>>,
+    /// **La base que l'assistant d'exportation vise, et sa clé** (P-74,
+    /// Fabrice, 19/10/2026).
+    ///
+    /// Le mot de passe est demandé par le sélecteur, comme pour une
+    /// sauvegarde, et gardé ici le temps de l'assistant : la fenêtre ne le
+    /// voit jamais passer. La porte de l'assistant l'efface, et il ne sert
+    /// qu'à la base pour laquelle il a été tapé.
+    export_access: Mutex<Option<(String, Option<String>)>>,
 }
 
 impl AppState {
@@ -243,6 +251,30 @@ impl AppState {
 
     /// Une base est-elle ouverte ? Le sélecteur s'en sert pour savoir s'il
     /// peut brancher sur place ou s'il doit relancer.
+    /// Retient la base visée par l'assistant d'exportation, et sa clé.
+    pub fn set_export_access(&self, path: String, password: Option<String>) {
+        if let Ok(mut access) = self.export_access.lock() {
+            *access = Some((path, password));
+        }
+    }
+
+    /// La clé tapée pour cette base-là, et pour aucune autre.
+    pub fn export_password(&self, path: &str) -> Option<String> {
+        self.export_access
+            .lock()
+            .ok()
+            .and_then(|access| access.clone())
+            .filter(|(kept, _)| kept == path)
+            .and_then(|(_, password)| password)
+    }
+
+    /// L'assistant se ferme : la clé est oubliée.
+    pub fn forget_export_access(&self) {
+        if let Ok(mut access) = self.export_access.lock() {
+            *access = None;
+        }
+    }
+
     pub fn has_database(&self) -> bool {
         self.database
             .lock()
@@ -275,6 +307,7 @@ impl AppState {
             application_root,
             attachments_dir: Mutex::new(PathBuf::new()),
             car: Mutex::new(None),
+            export_access: Mutex::new(None),
         }
     }
 
@@ -296,6 +329,7 @@ impl AppState {
             application_root,
             attachments_dir: Mutex::new(PathBuf::new()),
             car: Mutex::new(None),
+            export_access: Mutex::new(None),
         }
     }
 

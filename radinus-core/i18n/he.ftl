@@ -450,6 +450,7 @@ operation-verification-verified = אומתה
 operation-verification-doubtful = מפוקפקת
 operation-verification-disputed = במחלוקת
 operations-column-label = תיאור
+operations-column-reference = אסמכתת תשלום
 operations-column-category = קטגוריה
 operations-column-assignment = הקצאה
 operations-column-payment-mode = אמצעי
@@ -916,12 +917,13 @@ statement-column-reconciled = הותאם
 statement-column-fitid = FITID
 statement-column-date = תאריך
 statement-column-label = תיאור
+statement-column-reference = אסמכתת תשלום
 statement-column-debit = חובה
 statement-column-credit = זכות
 statement-account = חשבון
 statement-file = קובץ
 statement-difference = הפרש
-statement-none = לא נפתח אף דף חשבון: יש ללחוץ על התיקייה הצהובה כדי לבחור קובץ.
+statement-none = לא נפתח אף דף חשבון: יש ללחוץ על התיקייה הצהובה כדי לבחור קובץ (OFX, CSV, QIF).
 statement-empty = דף חשבון זה אינו מכיל אף תנועה.
 statement-no-match = אף שורה אינה תואמת את הסינון.
 statement-help = מידע: יש להשתמש בלחיצת עכבר + מקש [{ $modifier }] בטבלה כדי לבחור כמה שורות
@@ -1009,6 +1011,7 @@ statement-group-classification = סיווג התנועה לצורך חישוב �
 statement-group-status = סטטוס התנועה
 statement-field-date = תאריך
 statement-field-label = תיאור
+statement-field-reference = אסמכתת תשלום
 statement-field-type = סוג תנועה
 statement-field-amount = סכום
 statement-field-mode = אופן התנועה
@@ -1599,14 +1602,14 @@ print-sent-default = הדוח נשלח למדפסת ברירת המחדל שלך
 # --- שלב 17 — הפעולות על מסד הנתונים -------------------
 backup-archive = ארכיון Radinus
 backup-no-database = אין מסד נתונים פתוח.
-backup-done = הגיבוי נכתב אל "{ $file }".
+backup-done = הגיבוי של מסד הנתונים "{ $base }" נכתב אל "{ $file }". מסדי הנתונים האחרים אינם מושפעים.
 backup-failed = הגיבוי נכשל: { $reason }
 backup-not-started = לא ניתן היה להתחיל את הגיבוי:
 restore-unreadable = קובץ זה אינו ארכיון Radinus קריא: { $reason }
 # השאלה אומרת מה יאבד לפני שהוא אובד. הארכיון כבר נקרא
 # ברגע הזה: מה שהוא מכריז הוא ודאי.
-restore-question = לשחזר את "{ $file }"? כל התוכן הנוכחי של מסד הנתונים שלך יימחק ויוחלף, ומה שנמצא בו יאבד.
-restore-done = השחזור הסתיים: { $accounts } חשבונות ו-{ $operations } תנועות.
+restore-question = לשחזר את "{ $file }" לתוך מסד הנתונים "{ $base }"? כל התוכן הנוכחי של מסד נתונים זה יימחק ויוחלף, ומה שנמצא בו יאבד. לא נוגעים במסדי הנתונים האחרים.
+restore-done = מסד הנתונים "{ $base }" שוחזר: { $accounts } חשבונות ו-{ $operations } תנועות. לא נוגעים במסדי הנתונים האחרים.
 restore-failed = השחזור נכשל: { $reason }
 restore-empty-fields = שדות ריקים שנקראו כערך אפס: { $count }.
 
@@ -1674,10 +1677,10 @@ journal-help = היומן שומר רק את הפעולה הטכנית האחר�
 # --- התיקון ------------------------------------------------------
 menu-file-repair-running = תיקון וייעול מתבצעים…
 repair-done = { $anomalies ->
-    [0] התיקון הסתיים: לא נמצאה אף תקלה. { $lines } שלבים נרשמו ביומן.
-    [one] התיקון הסתיים: תקלה אחת תוקנה. { $lines } שלבים נרשמו ביומן.
-    [two] התיקון הסתיים: שתי תקלות תוקנו. { $lines } שלבים נרשמו ביומן.
-   *[other] התיקון הסתיים: { $anomalies } תקלות תוקנו. { $lines } שלבים נרשמו ביומן.
+    [0] התיקון של מסד הנתונים "{ $base }" הסתיים: לא נמצאה אף תקלה. { $lines } שלבים נרשמו ביומן. מסדי הנתונים האחרים אינם מושפעים.
+    [one] התיקון של מסד הנתונים "{ $base }" הסתיים: תקלה אחת תוקנה. { $lines } שלבים נרשמו ביומן. מסדי הנתונים האחרים אינם מושפעים.
+    [two] התיקון של מסד הנתונים "{ $base }" הסתיים: שתי תקלות תוקנו. { $lines } שלבים נרשמו ביומן. מסדי הנתונים האחרים אינם מושפעים.
+   *[other] התיקון של מסד הנתונים "{ $base }" הסתיים: { $anomalies } תקלות תוקנו. { $lines } שלבים נרשמו ביומן. מסדי הנתונים האחרים אינם מושפעים.
 }
 repair-failed = התיקון נכשל: { $reason }
 
@@ -1935,6 +1938,16 @@ preferences-branch-import = ייבוא
 preferences-leaf-verification = אימות
 preferences-field-verification = תנועות מיובאות:
 preferences-verification-hint = «אומתה»: אתם סומכים על הבנק שלכם, תנועה מיובאת נחשבת תקינה. «לבדיקה»: כל תנועה מיובאת ממתינה לבדיקתכם; לאחר מכן אתם מעבירים אותה בעצמכם ל«אומתה» ברשימת התנועות. הגדרה זו חלה רק על ייבואים עתידיים.
+preferences-leaf-ofx = דפי חשבון OFX
+preferences-field-ofx-label = תיאור התנועה:
+preferences-field-ofx-reference = אסמכתת תשלום:
+preferences-ofx-choice-name = שם התנועה
+preferences-ofx-choice-memo = ההערה של הבנק
+preferences-ofx-choice-name-and-memo = השם ואחריו ההערה
+preferences-ofx-choice-empty = כלום (להשאיר ריק)
+preferences-ofx-label-help = מה מקבל התיאור של תנועה מיובאת. השם הוא זה שהבנק מציג, למשל «PRLV SEPA»; חלק מהבנקים מוסיפים הערה מפורטת: הגוף הגובה בהוראת קבע, המוטב ומטרת ההעברה בהעברה. כשלתנועה אין הערה, התיאור שלה שומר על השם.
+preferences-ofx-reference-help = מה מקבלת אסמכתת התשלום של תנועה מיובאת, שם תוכלו לראות אותה ולסנן לפיה. כשלתנועה אין הערה, האפשרות «ההערה של הבנק» משאירה את האסמכתה ריקה. אם ההערה כבר חוזרת על השם, היא אינה נכתבת פעמיים.
+preferences-ofx-hint = הגדרות אלה חלות על כל דפי החשבון בפורמט OFX, יהיה מסד הנתונים הפתוח אשר יהיה. הן ייכנסו לתוקף בדף החשבון הבא שייפתח.
 preferences-leaf-qif = דפי חשבון QIF
 preferences-field-qif-order = סדר היום והחודש:
 preferences-qif-order-ask = לשאול אותי בכל פעם
@@ -3011,3 +3024,132 @@ sharing-sheet-items = סעיפים
 sharing-sheet-result = תוצאה
 sharing-sheet-payments = תשלומים
 sharing-sheet-balances = החזרים
+
+## אשף הייצוא של מסד נתונים (P-74, Fabrice, 19/10/2026).
+window-database-export-title = אשף ייצוא של מסד הנתונים "{ $base }"
+menu-tools-export = אשף ייצוא של מסד הנתונים…
+base-export-only-this = רק מסד הנתונים "{ $base }", שנבחר ברשימה, ייוצא. מסדי הנתונים האחרים אינם מושפעים.
+base-export-purpose = אשף זה מעתיק את נתוני המסד לקבצים שתוכנות אחרות יודעות לקרוא: גיליון אלקטרוני, מסד נתונים כמו Access, תוכנה אחרת לניהול כספים אישיים. מסד הנתונים עצמו אינו משתנה.
+base-export-step-format = 1. הפורמט
+base-export-step-options = 2. האפשרויות
+base-export-step-place = 3. המיקום
+base-export-step-summary = 4. הסיכום
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = חוברת עבודה עם גיליון אחד לכל טבלה, שאפשר לפתוח ב-Excel וברוב תוכנות הגיליונות האלקטרוניים.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = הפורמט הפתוח של LibreOffice ו-OpenOffice, עם גיליון אחד לכל טבלה.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = קובץ טקסט אחד לכל טבלה, עם ערכים המופרדים בנקודה-פסיק (;): הפורמט שכמעט כל תוכנה יודעת לייבא, כולל Access.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = למתכנתים וליישומים: כל טבלה תחת שמה, עם כותרת שמתארת את הייצוא.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = אותו תוכן כמו ב-JSON, כתוב ב-XML.
+base-export-format-sql = סקריפט SQL (.sql)
+base-export-format-sql-hint = ההוראות שיוצרות מחדש את הטבלאות ואת הנתונים שלהן במסד נתונים אחר (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = מסד נתונים SQLite (.sqlite)
+base-export-format-sqlite-hint = מסד נתונים עצמאי, ללא סיסמה, שכלים רבים פותחים ישירות.
+base-export-format-qif = QIF, קובץ אחד לכל חשבון (.qif)
+base-export-format-qif-hint = כדי להעביר את החשבונות שלך לתוכנה אחרת לניהול כספים אישיים (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, קובץ אחד לכל חשבון (.ofx)
+base-export-format-ofx-hint = הפורמט של דפי חשבון בנק, שרוב התוכנות לניהול כספים אישיים יודעות לייבא.
+base-export-lossy = שים לב: QIF ו-OFX אינם יכולים לשמור הכול. עוברות רק התנועות של החשבונות, עם הצדדים הנגדיים, הקטגוריות וההערות שלהן; העברה הופכת לתנועה רגילה בכל צד, ושאר הנתונים (תקציבים, תנועות חוזרות, פרויקטים, הקצאות…) אינם עוברים. כדי לשמור הכול, בחר פורמט אחר.
+base-export-planned-note = תנועות מתוכננות ותנועות ללא תאריך אינן מיוצאות: הן עדיין לא עברו בבנק. מספרן יוצג בסוף.
+base-export-dates-hint = התאריכים נכתבים בסדר שנה-חודש-יום (2026-12-31) והסכומים במטבע של מסד הנתונים: אף תוכנה לא תטעה בקריאתם.
+base-export-group-layout = קבצים
+base-export-layout-one = הכול בקובץ אחד
+base-export-layout-per-table = קובץ אחד לכל טבלה, בתוך תיקייה
+base-export-group-decimal = מפריד עשרוני לסכומים
+base-export-decimal-point = נקודה (1234.56)
+base-export-decimal-comma = פסיק (1234,56)
+base-export-group-quotes = מירכאות
+base-export-quotes-all = כל ערך בתוך מירכאות
+base-export-quotes-none = ללא מירכאות
+base-export-csv-replacements-hint = כדי שכל קובץ ייקרא מחדש ללא שגיאה, נקודה-פסיק (;) בתוך טקסט הופכת לסימן קריאה (!), מעבר שורה הופך לרווח, וכשאין מירכאות, מירכאה הופכת לגרש. מספר ההחלפות יוצג בסוף.
+base-export-group-qif-order = סדר התאריך
+base-export-qif-day-month = היום לפני החודש (31/12/2026)
+base-export-qif-month-day = החודש לפני היום (12/31/2026)
+base-export-qif-order-hint = בחר את הסדר שמצפה לו התוכנה שתקרא את הקבצים: היום קודם באירופה, החודש קודם בארצות הברית.
+base-export-no-option = לפורמט זה אין אפשרויות.
+base-export-choose-file = בחירת הקובץ…
+base-export-choose-folder = בחירת התיקייה…
+base-export-place-file = הייצוא ייכתב לקובץ הזה:
+base-export-place-folder = הייצוא ייכתב לתיקייה הזאת, שתיווצר במיוחד לשם כך:
+base-export-place-none = עדיין לא נבחר מיקום.
+base-export-place-needed = בחר תחילה היכן לכתוב את הייצוא.
+base-export-folder-exists = התיקייה "{ $name }" כבר קיימת. קבצים בעלי אותו שם שנמצאים בה יוחלפו. להמשיך?
+base-export-summary-base = מסד נתונים
+base-export-summary-format = פורמט
+base-export-summary-options = אפשרויות
+base-export-summary-place = מיקום
+base-export-unprotected = מסד נתונים זה מוגן בסיסמה, אך הייצוא לא יהיה מוגן: כל מי שיחזיק בקבצים האלה יוכל לקרוא את החשבונות שלך. שמור אותם במקום בטוח.
+base-export-previous = הקודם
+base-export-next = הבא
+base-export-run = ייצוא
+base-export-running = הייצוא מתבצע…
+base-export-done = מסד הנתונים "{ $base }" יוצא: { $tables ->
+        [one] טבלה אחת
+        [two] שתי טבלאות
+       *[other] { $tables } טבלאות
+    }, { $rows ->
+        [one] שורה אחת
+        [two] שתי שורות
+       *[other] { $rows } שורות
+    }.
+base-export-done-accounts = מסד הנתונים "{ $base }" יוצא: { $accounts ->
+        [one] חשבון אחד
+        [two] שני חשבונות
+       *[other] { $accounts } חשבונות
+    }, { $operations ->
+        [one] תנועה אחת
+        [two] שתי תנועות
+       *[other] { $operations } תנועות
+    }.
+base-export-done-replacements = { $count ->
+        [one] תו אחד הוחלף בקובצי ה-CSV.
+        [two] שני תווים הוחלפו בקובצי ה-CSV.
+       *[other] { $count } תווים הוחלפו בקובצי ה-CSV.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } תו בקרה, שפורמט זה אינו יכול להכיל, הוחלף ב-"�".
+        [two] שני תווי בקרה, שפורמט זה אינו יכול להכיל, הוחלפו ב-"�".
+       *[other] { $count } תווי בקרה, שפורמט זה אינו יכול להכיל, הוחלפו ב-"�".
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } טקסט חרג מ-32,767 תווים, המגבלה של Excel: הוא נחתך בחוברת העבודה. שאר הפורמטים שומרים אותו במלואו.
+        [two] שני טקסטים חרגו מ-32,767 תווים, המגבלה של Excel: הם נחתכו בחוברת העבודה. שאר הפורמטים שומרים אותם במלואם.
+       *[other] { $count } טקסטים חרגו מ-32,767 תווים, המגבלה של Excel: הם נחתכו בחוברת העבודה. שאר הפורמטים שומרים אותם במלואם.
+    }
+base-export-done-anomalies = { $count ->
+        [one] ערך אחד שאינו קריא הועתק כפי שהוא.
+        [two] שני ערכים שאינם קריאים הועתקו כפי שהם.
+       *[other] { $count } ערכים שאינם קריאים הועתקו כפי שהם.
+    }
+base-export-done-planned = { $count ->
+        [one] תנועה מתוכננת אחת לא נכללה.
+        [two] שתי תנועות מתוכננות לא נכללו.
+       *[other] { $count } תנועות מתוכננות לא נכללו.
+    }
+base-export-done-undated = { $count ->
+        [one] תנועה אחת ללא תאריך לא נכללה.
+        [two] שתי תנועות ללא תאריך לא נכללו.
+       *[other] { $count } תנועות ללא תאריך לא נכללו.
+    }
+base-export-done-adjusted = { $count ->
+        [one] ערך אחד הותאם לפורמט.
+        [two] שני ערכים הותאמו לפורמט.
+       *[other] { $count } ערכים הותאמו לפורמט.
+    }
+base-export-too-old = מסד נתונים זה מגיע מגרסה ישנה יותר של Radinus. פתח אותו תחילה פעם אחת ב-Radinus, שיעדכן אותו, ולאחר מכן ייצא אותו.
+base-export-too-recent = מסד נתונים זה נשמר בגרסה חדשה יותר של Radinus. עדכן את Radinus כדי לייצא אותו.
+base-export-not-radinus = קובץ זה אינו מסד נתונים של Radinus.
+base-export-failed = לא ניתן היה לבצע את הייצוא: { $reason }
+
+## תפריט הכלים של חלון מסדי הנתונים מציג את שם המסד (Fabrice, 19/10/2026).
+databases-tools-selected = מסד הנתונים הנבחר: "{ $base }"
+databases-tools-none = לא נבחר מסד נתונים
+menu-tools-backup = גיבוי מסד הנתונים "{ $base }"…
+menu-tools-backup-none = גיבוי מסד הנתונים הנבחר…
+menu-tools-restore = שחזור מסד הנתונים "{ $base }"…
+menu-tools-restore-none = שחזור מסד הנתונים הנבחר…
+menu-tools-repair = תיקון ואופטימיזציה של מסד הנתונים "{ $base }"…
+menu-tools-repair-none = תיקון ואופטימיזציה של מסד הנתונים הנבחר…

@@ -464,6 +464,7 @@ operation-verification-verified = Перевірена
 operation-verification-doubtful = Сумнівна
 operation-verification-disputed = Оскаржена
 operations-column-label = Опис
+operations-column-reference = Референс платежу
 operations-column-category = Категорія
 operations-column-assignment = Призначення
 operations-column-payment-mode = СпосібОп
@@ -938,12 +939,13 @@ statement-column-reconciled = Звірено
 statement-column-fitid = FITID
 statement-column-date = Дата
 statement-column-label = Опис
+statement-column-reference = Референс платежу
 statement-column-debit = Витрата
 statement-column-credit = Надходження
 statement-account = Рахунок
 statement-file = Файл
 statement-difference = Різниця
-statement-none = Жодної виписки не відкрито: натисніть на жовту теку, щоб вибрати файл.
+statement-none = Жодної виписки не відкрито: натисніть на жовту теку, щоб вибрати файл (OFX, CSV, QIF).
 statement-empty = Ця виписка не містить жодної операції.
 statement-no-match = Жоден рядок не відповідає фільтру.
 statement-help = Інфо: використовуйте клацання мишею + клавішу [{ $modifier }] у таблиці, щоб вибрати кілька рядків
@@ -1037,6 +1039,7 @@ statement-group-classification = Класифікація операції дл�
 statement-group-status = Статус операції
 statement-field-date = Дата
 statement-field-label = Опис
+statement-field-reference = Референс платежу
 statement-field-type = Тип операції
 statement-field-amount = Сума
 statement-field-mode = Спосіб оплати
@@ -1635,14 +1638,14 @@ print-sent-default = Звіт надіслано на ваш типовий пр
 # --- Фаза 17 — операції з базою даних -----------------------------------
 backup-archive = Архів Radinus
 backup-no-database = Жодної бази даних не відкрито.
-backup-done = Резервну копію записано у «{ $file }».
+backup-done = Резервну копію бази «{ $base }» записано у «{ $file }». Інших баз це не стосується.
 backup-failed = Резервне копіювання неможливе: { $reason }
 backup-not-started = Не вдалося розпочати резервне копіювання:
 restore-unreadable = Цей файл не є придатним для читання архівом Radinus: { $reason }
 # Запитання каже, що буде втрачено, перш ніж це втратити. Архів на цей момент
 # уже прочитано: те, що воно повідомляє, є достеменним.
-restore-question = Відновити «{ $file }»? Увесь поточний вміст вашої бази буде стерто й замінено, а те, що в ній є, буде втрачено.
-restore-done = Відновлення завершено: { $accounts } рахунків і { $operations } операцій.
+restore-question = Відновити «{ $file }» у базу «{ $base }»? Увесь поточний вміст цієї бази буде стерто й замінено, а те, що в ній є, буде втрачено. Інші бази зачеплено не буде.
+restore-done = Базу «{ $base }» відновлено: { $accounts } рахунків і { $operations } операцій. Інші бази не зачеплено.
 restore-failed = Відновлення неможливе: { $reason }
 restore-empty-fields = Порожні поля, прочитані як нульове значення: { $count }.
 
@@ -1710,11 +1713,11 @@ journal-help = Журнал зберігає лише останню техні�
 # --- Відновлення цілісності ---------------------------------------------
 menu-file-repair-running = Триває відновлення цілісності та оптимізація…
 repair-done = { $anomalies ->
-    [0] Відновлення цілісності завершено: аномалій не знайдено. Записано етапів у журнал: { $lines }.
-    [one] Відновлення цілісності завершено: виправлено { $anomalies } аномалію. Записано етапів у журнал: { $lines }.
-    [few] Відновлення цілісності завершено: виправлено { $anomalies } аномалії. Записано етапів у журнал: { $lines }.
-    [many] Відновлення цілісності завершено: виправлено { $anomalies } аномалій. Записано етапів у журнал: { $lines }.
-   *[other] Відновлення цілісності завершено: виправлено { $anomalies } аномалії. Записано етапів у журнал: { $lines }.
+    [0] Відновлення цілісності бази «{ $base }» завершено: аномалій не знайдено. Записано етапів у журнал: { $lines }. Інших баз це не стосується.
+    [one] Відновлення цілісності бази «{ $base }» завершено: виправлено { $anomalies } аномалію. Записано етапів у журнал: { $lines }. Інших баз це не стосується.
+    [few] Відновлення цілісності бази «{ $base }» завершено: виправлено { $anomalies } аномалії. Записано етапів у журнал: { $lines }. Інших баз це не стосується.
+    [many] Відновлення цілісності бази «{ $base }» завершено: виправлено { $anomalies } аномалій. Записано етапів у журнал: { $lines }. Інших баз це не стосується.
+   *[other] Відновлення цілісності бази «{ $base }» завершено: виправлено { $anomalies } аномалії. Записано етапів у журнал: { $lines }. Інших баз це не стосується.
 }
 repair-failed = Відновлення цілісності неможливе: { $reason }
 
@@ -1977,6 +1980,16 @@ preferences-branch-import = Імпорт
 preferences-leaf-verification = Перевірка
 preferences-field-verification = Імпортовані операції:
 preferences-verification-hint = «Перевірена»: ви довіряєте своєму банку, імпортована операція вважається правильною. «До перевірки»: кожна імпортована операція чекає на вашу перевірку; потім ви самі переводите її в «Перевірена» у списку операцій. Це налаштування діє лише для майбутніх імпортів.
+preferences-leaf-ofx = Виписки OFX
+preferences-field-ofx-label = Опис операції:
+preferences-field-ofx-reference = Референс платежу:
+preferences-ofx-choice-name = Назва операції
+preferences-ofx-choice-memo = Примітка банку
+preferences-ofx-choice-name-and-memo = Назва, а за нею примітка
+preferences-ofx-choice-empty = Нічого (залишити порожнім)
+preferences-ofx-label-help = Що потрапляє до опису імпортованої операції. Назва — це те, що показує банк, наприклад «PRLV SEPA»; деякі банки додають до неї докладну примітку: кредитора прямого дебетування, отримувача та призначення переказу. Якщо операція не має примітки, її опис зберігає назву.
+preferences-ofx-reference-help = Що потрапляє до референсу платежу імпортованої операції, де ви можете його бачити й фільтрувати за ним. Якщо операція не має примітки, «Примітка банку» залишає референс порожнім. Якщо примітка вже повторює назву, вона не записується двічі.
+preferences-ofx-hint = Ці налаштування діють для всіх виписок OFX, незалежно від того, яку базу відкрито. Вони застосовуються до наступної відкритої виписки.
 preferences-leaf-qif = Виписки QIF
 preferences-field-qif-order = Порядок дня і місяця:
 preferences-qif-order-ask = Питати мене щоразу
@@ -3082,3 +3095,143 @@ sharing-sheet-items = Позиції
 sharing-sheet-result = Результат
 sharing-sheet-payments = Платежі
 sharing-sheet-balances = Повернення
+
+## Майстер експорту бази (P-74, Fabrice, 19/10/2026).
+window-database-export-title = Майстер експорту бази «{ $base }»
+menu-tools-export = Майстер експорту бази…
+base-export-only-this = Буде експортовано лише базу «{ $base }», вибрану у списку. Інших баз це не торкнеться.
+base-export-purpose = Цей майстер копіює дані бази у файли, які вміють читати інші програми: електронну таблицю, базу даних на кшталт Access, іншу програму обліку особистих фінансів. Сама база не змінюється.
+base-export-step-format = 1. Формат
+base-export-step-options = 2. Параметри
+base-export-step-place = 3. Розташування
+base-export-step-summary = 4. Підсумок
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = Книга з окремим аркушем для кожної таблиці, яку відкривають Excel і більшість табличних редакторів.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = Відкритий формат LibreOffice та OpenOffice, з окремим аркушем для кожної таблиці.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = Окремий текстовий файл для кожної таблиці, значення розділено крапкою з комою: формат, який уміють імпортувати майже всі програми, зокрема Access.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = Для програмістів і застосунків: кожна таблиця під своєю назвою, із заголовком, що описує експорт.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = Той самий вміст, що й у JSON, але записаний у XML.
+base-export-format-sql = SQL-скрипт (.sql)
+base-export-format-sql-hint = Команди, які відтворюють таблиці та їхні дані в іншій базі даних (MySQL, PostgreSQL, SQLite…).
+base-export-format-sqlite = База SQLite (.sqlite)
+base-export-format-sqlite-hint = Самостійна база даних без пароля, яку багато програм відкривають напряму.
+base-export-format-qif = QIF, окремий файл для кожного рахунку (.qif)
+base-export-format-qif-hint = Щоб перенести свої рахунки до іншої програми обліку фінансів (Money, Quicken, GnuCash, Grisbi…).
+base-export-format-ofx = OFX, окремий файл для кожного рахунку (.ofx)
+base-export-format-ofx-hint = Формат банківських виписок, який уміє імпортувати більшість програм обліку фінансів.
+base-export-lossy = Увага: QIF і OFX передають не все. Переносяться лише операції за рахунками, з контрагентами, категоріями та коментарями; переказ стає звичайною операцією з кожного боку, а все інше (бюджети, графіки платежів, проєкти, призначення…) не переноситься. Щоб зберегти все, виберіть інший формат.
+base-export-planned-note = Заплановані операції та операції без дати не експортуються: вони ще не пройшли через банк. Їхню кількість буде вказано наприкінці.
+base-export-dates-hint = Дати записуються в порядку рік-місяць-день (2026-12-31), а суми — у валюті бази: жодна програма не прочитає їх хибно.
+base-export-group-layout = Файли
+base-export-layout-one = Усе в одному файлі
+base-export-layout-per-table = Окремий файл для кожної таблиці, у теці
+base-export-group-decimal = Десятковий роздільник у сумах
+base-export-decimal-point = Крапка (1234.56)
+base-export-decimal-comma = Кома (1234,56)
+base-export-group-quotes = Лапки
+base-export-quotes-all = Кожне значення в лапках
+base-export-quotes-none = Без лапок
+base-export-csv-replacements-hint = Щоб кожен файл читався без помилок, крапка з комою в тексті замінюється знаком оклику, перенесення рядка — пробілом, а якщо лапки не використовуються, лапки замінюються апострофом. Кількість замін буде вказано наприкінці.
+base-export-group-qif-order = Порядок у датах
+base-export-qif-day-month = День перед місяцем (31/12/2026)
+base-export-qif-month-day = Місяць перед днем (12/31/2026)
+base-export-qif-order-hint = Виберіть порядок, на який очікує програма, що читатиме файли: у Європі спершу день, у США спершу місяць.
+base-export-no-option = Цей формат не має параметрів.
+base-export-choose-file = Вибрати файл…
+base-export-choose-folder = Вибрати теку…
+base-export-place-file = Експорт буде записано в цей файл:
+base-export-place-folder = Експорт буде записано в цю теку, створену спеціально для нього:
+base-export-place-none = Розташування ще не вибрано.
+base-export-place-needed = Спершу виберіть, куди записати експорт.
+base-export-folder-exists = Тека «{ $name }» уже існує. Файли з такими самими назвами в ній буде замінено. Продовжити?
+base-export-summary-base = База
+base-export-summary-format = Формат
+base-export-summary-options = Параметри
+base-export-summary-place = Розташування
+base-export-unprotected = Ця база захищена паролем, але експорт захищений не буде: будь-хто, у кого опиняться ці файли, зможе прочитати ваші рахунки. Зберігайте їх у надійному місці.
+base-export-previous = Назад
+base-export-next = Далі
+base-export-run = Експортувати
+base-export-running = Триває експорт…
+base-export-done = Базу «{ $base }» експортовано: { $tables ->
+        [one] { $tables } таблиця
+        [few] { $tables } таблиці
+        [many] { $tables } таблиць
+       *[other] { $tables } таблиці
+    }, { $rows ->
+        [one] { $rows } рядок
+        [few] { $rows } рядки
+        [many] { $rows } рядків
+       *[other] { $rows } рядка
+    }.
+base-export-done-accounts = Базу «{ $base }» експортовано: { $accounts ->
+        [one] { $accounts } рахунок
+        [few] { $accounts } рахунки
+        [many] { $accounts } рахунків
+       *[other] { $accounts } рахунку
+    }, { $operations ->
+        [one] { $operations } операція
+        [few] { $operations } операції
+        [many] { $operations } операцій
+       *[other] { $operations } операції
+    }.
+base-export-done-replacements = { $count ->
+        [one] У файлах CSV замінено { $count } символ.
+        [few] У файлах CSV замінено { $count } символи.
+        [many] У файлах CSV замінено { $count } символів.
+       *[other] У файлах CSV замінено { $count } символу.
+    }
+base-export-done-controls = { $count ->
+        [one] { $count } керівний символ, який цей формат не може містити, замінено на «�».
+        [few] { $count } керівні символи, які цей формат не може містити, замінено на «�».
+        [many] { $count } керівних символів, які цей формат не може містити, замінено на «�».
+       *[other] { $count } керівного символу, які цей формат не може містити, замінено на «�».
+    }
+base-export-done-excel-cut = { $count ->
+        [one] { $count } текст, довший за 32 767 символів (межа Excel), обрізано в книзі. Інші формати зберігають його повністю.
+        [few] { $count } тексти, довші за 32 767 символів (межа Excel), обрізано в книзі. Інші формати зберігають їх повністю.
+        [many] { $count } текстів, довших за 32 767 символів (межа Excel), обрізано в книзі. Інші формати зберігають їх повністю.
+       *[other] { $count } тексту, довшого за 32 767 символів (межа Excel), обрізано в книзі. Інші формати зберігають його повністю.
+    }
+base-export-done-anomalies = { $count ->
+        [one] { $count } нечитабельне значення скопійовано як є.
+        [few] { $count } нечитабельні значення скопійовано як є.
+        [many] { $count } нечитабельних значень скопійовано як є.
+       *[other] { $count } нечитабельного значення скопійовано як є.
+    }
+base-export-done-planned = { $count ->
+        [one] Пропущено { $count } заплановану операцію.
+        [few] Пропущено { $count } заплановані операції.
+        [many] Пропущено { $count } запланованих операцій.
+       *[other] Пропущено { $count } запланованої операції.
+    }
+base-export-done-undated = { $count ->
+        [one] Пропущено { $count } операцію без дати.
+        [few] Пропущено { $count } операції без дати.
+        [many] Пропущено { $count } операцій без дати.
+       *[other] Пропущено { $count } операції без дати.
+    }
+base-export-done-adjusted = { $count ->
+        [one] { $count } значення скориговано під формат.
+        [few] { $count } значення скориговано під формат.
+        [many] { $count } значень скориговано під формат.
+       *[other] { $count } значення скориговано під формат.
+    }
+base-export-too-old = Ця база походить зі старішої версії Radinus. Спершу відкрийте її один раз у Radinus — він її оновить, — а потім експортуйте.
+base-export-too-recent = Цю базу збережено новішою версією Radinus. Оновіть Radinus, щоб її експортувати.
+base-export-not-radinus = Цей файл не є базою Radinus.
+base-export-failed = Не вдалося виконати експорт: { $reason }
+
+## Меню «Інструменти» вікна баз називає базу (Fabrice, 19/10/2026).
+databases-tools-selected = Вибрана база: «{ $base }»
+databases-tools-none = Базу не вибрано
+menu-tools-backup = Створити резервну копію бази «{ $base }»…
+menu-tools-backup-none = Створити резервну копію вибраної бази…
+menu-tools-restore = Відновити базу «{ $base }»…
+menu-tools-restore-none = Відновити вибрану базу…
+menu-tools-repair = Відновити цілісність та оптимізувати базу «{ $base }»…
+menu-tools-repair-none = Відновити цілісність та оптимізувати вибрану базу…

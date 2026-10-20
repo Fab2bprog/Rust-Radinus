@@ -141,6 +141,60 @@ reliable: the same file imported twice is recognised rather than duplicated.
 `statements.rs` does the matching against what the database already knows, and
 F18 reconciles a line by hand when the automatic match is not enough.
 
+### `NAME` and `MEMO` — composed line by line (19/10/2026, P-75)
+
+Banks do not agree on where the detail goes, and the file never says which bank
+wrote it:
+
+- **La Banque Postale** puts everything in `NAME`, cut by the bank at 32
+  characters, and writes no `MEMO`;
+- **BNP Paribas** puts a generic `NAME` (`PRLV SEPA`, `FACTURE CARTE`) and the
+  whole detail in `MEMO` — creditor, reference, mandate, up to ~200
+  characters. Radinus used to ignore it, and every direct debit came in as
+  « PRLV SEPA ».
+
+So the reader takes `MEMO` beside `NAME`, and the user chooses what each
+field receives — two drop-down menus in Préférences › Importation › Relevés
+OFX (20/10/2026; two tick boxes the day before):
+
+| Menu | Choices | Default |
+|---|---|---|
+| Libellé de l'opération | the name · the memo · the name followed by the memo | the name |
+| Référence paiement | the memo · the name · the name followed by the memo · nothing | the memo |
+
+`ofx_import::compose` applies them **operation by operation**, from what the
+two fields contain:
+
+- **the label is never empty**: « the memo » without a memo keeps the name
+  (La Banque Postale), « the name » without a name takes the memo;
+- **the reference says what was chosen and nothing else**: « the memo »
+  without a memo leaves it empty, as before; it is cut at 255 characters;
+- **« the name followed by the memo » never writes the same thing twice**:
+
+| `NAME` | `MEMO` | Name followed by the memo |
+|---|---|---|
+| any | empty | `NAME` |
+| empty | text | `MEMO` |
+| `PRLV SEPA` | `PRLV SEPA EDF …` (starts with NAME) | the whole `MEMO` |
+| `… ECH 22/07` | `ECH 22/07` (NAME ends with it) | `NAME` |
+| `PRLV SEPA` | `EDF REF/42` | `PRLV SEPA EDF REF/42` |
+
+With the defaults a statement reads exactly as before. The choices are
+software settings (`radinus_config.json`: `ofx_label`, `ofx_reference`), not
+settings of a base; the two tick boxes of 19/10/2026, if set, are translated
+until the menus are first saved, then forgotten.
+
+The label holds 300 characters on screen, the reference 255; the columns are
+`TEXT`, so no base is migrated. A duplicate is looked for on the composed
+label.
+
+Checked on the two real statements (151 and 518 operations): every amount,
+label and reference stored is the one expected, and the OFX export of the
+resulting base reads back identical — on 20/10/2026 for each of the twelve
+combinations of the two menus, on the La Banque Postale statement and on a
+BNP-like one made of invented data. The statements themselves are never kept
+in the repository.
+
 ---
 
 ## 3. CSV bank statements — a window, not a guess
@@ -285,9 +339,45 @@ Three rules, given on 30/07/2026:
 - **as displayed** — the same rule as the right-click export;
 - **the FITID stays empty** when the bank never gave one. Nothing is invented.
 
+And one given on 19/10/2026 (P-75): **the payment reference goes in the memo**
+— `<MEMO>` in OFX, after the label in the QIF `M` line (`label - reference`).
+`CHECKNUM` (OFX, 12 characters) and the QIF `N` line receive **only a real
+cheque number**: a reference has nothing to do with a cheque. The whole-base
+export follows the same rule.
+
 The QIF has no original on the export side: the author's `Qif_Import` class
 only reads. The file produced must therefore be **valid QIF for other
 software**, not for his own importer.
+
+### The whole base, for another software
+
+`radinus-core/src/database_export.rs`, `account_export.rs` · Decisions P-74
+
+The export wizard (Outils of the database window) copies **one base, the one
+selected**, into files another program can take in. It does not go through a
+`Sheet` built from a window: it reads the tables themselves, read-only.
+
+| Format | Files | Notes |
+|---|---|---|
+| Excel `.xlsx`, Calc `.ods` | one workbook, or one per table | one sheet per table, named after it; real numbers and date cells |
+| CSV | one per table, always | `;`, UTF-8 with BOM, CRLF; decimal and quotes by choice |
+| JSON, XML | one, or one per table | a header (software, version, base, date, currency, schema) then the tables by name |
+| SQL script | one, or one per table | `CREATE TABLE` + `INSERT`, no foreign keys, `BEGIN`/`COMMIT`; SQLite, PostgreSQL, MySQL/MariaDB |
+| SQLite | one | a plain database, no password |
+| QIF, OFX | one per account | operations only; planned and undated left out and counted |
+
+Rules common to all:
+
+- **first row = field names**, rows in key order, so the same base gives the
+  same files;
+- **money** in real currency, exact (`-57.62`, `1.234567`); **dates** as
+  date cells in workbooks, `yyyy-mm-dd` everywhere else;
+- a value that cannot be read (a date such as `20/07/2026`, or before
+  1 March 1900) leaves **as it is, in text**, its SQL column typed `TEXT`, and
+  is counted;
+- whatever a format cannot hold is replaced and **counted in the closing
+  sentence**: `;` and line breaks in CSV, control characters in XML-based
+  files, texts over 32,767 characters in `.xlsx` only.
 
 ---
 

@@ -36,6 +36,9 @@ interface Row {
   /// mois (défaut relevé par Fabrice le 04/08/2026).
   date_value: string;
   label: string;
+  /// La référence paiement que l'opération recevra : le MEMO de la banque,
+  /// selon les Préférences (19/10/2026). Vide quand la banque n'en donne pas.
+  reference: string;
   debit: string;
   credit: string;
   amount: number;
@@ -154,6 +157,18 @@ const table = new Table<Row>({
       width: "110px",
     },
     { title: () => t("statement-column-label"), cell: (row) => row.label, width: "3fr" },
+    {
+      // **La référence paiement** (Fabrice, 19/10/2026) : le détail que la
+      // banque met dans son MEMO — créancier, bénéficiaire, motif. Coupée
+      // proprement à l'écran, entière au survol.
+      title: () => t("statement-column-reference"),
+      cell: (row) => row.reference,
+      render: (row, cell) => {
+        cell.textContent = row.reference;
+        cell.title = row.reference;
+      },
+      width: "3fr",
+    },
     {
       title: () => t("statement-column-debit"),
       cell: (row) => row.debit,

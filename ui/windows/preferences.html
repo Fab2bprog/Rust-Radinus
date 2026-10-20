@@ -123,6 +123,35 @@
           <p class="pane__hint" id="comfort-hint"></p>
         </section>
 
+        <!-- La feuille « Relevés OFX », sous la branche « Importation »
+             (Fabrice, 19/10/2026). Que faire du nom (NAME) et du mémo (MEMO)
+             que la banque donne à chaque opération. Deux menus déroulants
+             depuis le 20/10/2026 — deux cases « ne laissaient pas assez de
+             liberté » : l'un pour le libellé, l'autre pour la référence
+             paiement. Par défaut, le nom dans le libellé et le mémo dans la
+             référence. Réglages du logiciel, comme ceux du QIF ; chaque menu
+             a sa bulle. -->
+        <section class="pane" id="pane-ofx" hidden>
+          <h2 class="pane__title" id="ofx-title"></h2>
+          <div class="form">
+            <label class="form__label" for="ofx-label" id="ofx-label-label"></label>
+            <select class="form__field" id="ofx-label">
+              <option value="name" id="ofx-label-name"></option>
+              <option value="memo" id="ofx-label-memo"></option>
+              <option value="name-and-memo" id="ofx-label-name-and-memo"></option>
+            </select>
+
+            <label class="form__label" for="ofx-reference" id="ofx-reference-label"></label>
+            <select class="form__field" id="ofx-reference">
+              <option value="memo" id="ofx-reference-memo"></option>
+              <option value="name" id="ofx-reference-name"></option>
+              <option value="name-and-memo" id="ofx-reference-name-and-memo"></option>
+              <option value="empty" id="ofx-reference-empty"></option>
+            </select>
+          </div>
+          <p class="pane__hint" id="ofx-hint"></p>
+        </section>
+
         <!-- La feuille « Relevés QIF », sous la branche « Importation »
              (Fabrice, 15/10/2026, P-73 : « tu crées dans les Préférences une
              petite section destinée à l'import de fichiers QIF, pour permettre

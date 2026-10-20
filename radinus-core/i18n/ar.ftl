@@ -480,6 +480,7 @@ operation-verification-verified = تم التحقق
 operation-verification-doubtful = مشكوك فيها
 operation-verification-disputed = معترض عليها
 operations-column-label = الوصف
+operations-column-reference = مرجع الدفع
 operations-column-category = الفئة
 operations-column-assignment = التخصيص
 operations-column-payment-mode = الطريقة
@@ -958,12 +959,13 @@ statement-column-reconciled = مطابق
 statement-column-fitid = FITID
 statement-column-date = التاريخ
 statement-column-label = الوصف
+statement-column-reference = مرجع الدفع
 statement-column-debit = مدين
 statement-column-credit = دائن
 statement-account = الحساب
 statement-file = الملف
 statement-difference = الفارق
-statement-none = لم يتم فتح أي كشف حساب: انقر على المجلد الأصفر لاختيار ملف.
+statement-none = لم يتم فتح أي كشف حساب: انقر على المجلد الأصفر لاختيار ملف (OFX, CSV, QIF).
 statement-empty = لا يحتوي كشف الحساب هذا على أي عملية.
 statement-no-match = لا يوجد صف يطابق التصفية.
 statement-help = معلومة: استخدم نقرة الفأرة + مفتاح [{ $modifier }] على الجدول لتحديد عدة صفوف
@@ -1062,6 +1064,7 @@ statement-group-classification = تصنيف العملية لحساب الإحص
 statement-group-status = حالة العملية
 statement-field-date = التاريخ
 statement-field-label = الوصف
+statement-field-reference = مرجع الدفع
 statement-field-type = نوع العملية
 statement-field-amount = المبلغ
 statement-field-mode = طريقة العملية
@@ -1676,14 +1679,14 @@ print-sent-default = تم إرسال التقرير إلى طابعتك الاف
 # --- المرحلة 17 — العمليات على قاعدة البيانات -------------------
 backup-archive = أرشيف Radinus
 backup-no-database = لا توجد قاعدة بيانات مفتوحة.
-backup-done = تمت كتابة النسخة الاحتياطية في "{ $file }".
+backup-done = تمت كتابة النسخة الاحتياطية لقاعدة البيانات "{ $base }" في "{ $file }". لا تتأثر قواعد البيانات الأخرى.
 backup-failed = النسخ الاحتياطي غير ممكن: { $reason }
 backup-not-started = تعذّر بدء النسخ الاحتياطي:
 restore-unreadable = هذا الملف ليس أرشيف Radinus قابلاً للقراءة: { $reason }
 # يقول السؤال ما الذي سيُفقد قبل أن يُفقد. وقد قُرئ الأرشيف في تلك
 # اللحظة: ما يعلنه أمر مؤكد.
-restore-question = استعادة "{ $file }"؟ سيُمحى كل المحتوى الحالي لقاعدتك ويُستبدل، وسيُفقد كل ما فيها.
-restore-done = انتهت الاستعادة: { $accounts } حسابات و{ $operations } عملية.
+restore-question = استعادة "{ $file }" في قاعدة البيانات "{ $base }"؟ سيُمحى كل المحتوى الحالي لهذه القاعدة ويُستبدل، وسيُفقد كل ما فيها. لا تُمَسّ قواعد البيانات الأخرى.
+restore-done = تمت استعادة قاعدة البيانات "{ $base }": { $accounts } حسابات و{ $operations } عملية. لا تُمَسّ قواعد البيانات الأخرى.
 restore-failed = الاستعادة غير ممكنة: { $reason }
 restore-empty-fields = الحقول الفارغة التي قُرئت كقيمة صفرية: { $count }.
 
@@ -1751,12 +1754,12 @@ journal-help = لا يحتفظ السجل إلا بآخر عملية تقنية:
 # --- الإصلاح ------------------------------------------------------
 menu-file-repair-running = جارٍ الإصلاح والتحسين…
 repair-done = { $anomalies ->
-    [0] انتهى الإصلاح: لم يُعثر على أي اختلال. عدد الخطوات المسجلة: { $lines }.
-    [one] انتهى الإصلاح: تم إصلاح اختلال واحد. عدد الخطوات المسجلة: { $lines }.
-    [two] انتهى الإصلاح: تم إصلاح اختلالين. عدد الخطوات المسجلة: { $lines }.
-    [few] انتهى الإصلاح: تم إصلاح { $anomalies } اختلالات. عدد الخطوات المسجلة: { $lines }.
-    [many] انتهى الإصلاح: تم إصلاح { $anomalies } اختلالاً. عدد الخطوات المسجلة: { $lines }.
-   *[other] انتهى الإصلاح: تم إصلاح { $anomalies } اختلال. عدد الخطوات المسجلة: { $lines }.
+    [0] انتهى إصلاح قاعدة البيانات "{ $base }": لم يُعثر على أي اختلال. عدد الخطوات المسجلة: { $lines }. لا تتأثر قواعد البيانات الأخرى.
+    [one] انتهى إصلاح قاعدة البيانات "{ $base }": تم إصلاح اختلال واحد. عدد الخطوات المسجلة: { $lines }. لا تتأثر قواعد البيانات الأخرى.
+    [two] انتهى إصلاح قاعدة البيانات "{ $base }": تم إصلاح اختلالين. عدد الخطوات المسجلة: { $lines }. لا تتأثر قواعد البيانات الأخرى.
+    [few] انتهى إصلاح قاعدة البيانات "{ $base }": تم إصلاح { $anomalies } اختلالات. عدد الخطوات المسجلة: { $lines }. لا تتأثر قواعد البيانات الأخرى.
+    [many] انتهى إصلاح قاعدة البيانات "{ $base }": تم إصلاح { $anomalies } اختلالاً. عدد الخطوات المسجلة: { $lines }. لا تتأثر قواعد البيانات الأخرى.
+   *[other] انتهى إصلاح قاعدة البيانات "{ $base }": تم إصلاح { $anomalies } اختلال. عدد الخطوات المسجلة: { $lines }. لا تتأثر قواعد البيانات الأخرى.
 }
 repair-failed = الإصلاح غير ممكن: { $reason }
 
@@ -2014,6 +2017,16 @@ preferences-branch-import = الاستيراد
 preferences-leaf-verification = التحقق
 preferences-field-verification = العمليات المستوردة:
 preferences-verification-hint = «تم التحقق»: أنت تثق في مصرفك، وتُعدّ العملية المستوردة صحيحة. «للتحقق»: كل عملية مستوردة تنتظر مراجعتك؛ ثم تغيّرها بنفسك إلى «تم التحقق» في قائمة العمليات. هذا الإعداد يسري على عمليات الاستيراد القادمة فقط.
+preferences-leaf-ofx = كشوف حساب OFX
+preferences-field-ofx-label = وصف العملية:
+preferences-field-ofx-reference = مرجع الدفع:
+preferences-ofx-choice-name = اسم العملية
+preferences-ofx-choice-memo = مذكرة المصرف
+preferences-ofx-choice-name-and-memo = الاسم متبوعًا بالمذكرة
+preferences-ofx-choice-empty = لا شيء (يُترك فارغًا)
+preferences-ofx-label-help = ما يتلقاه وصف العملية المستوردة. الاسم هو الذي يعرضه المصرف، مثل «PRLV SEPA»؛ وتضيف بعض المصارف مذكرة مفصّلة: الجهة الدائنة في الخصم المباشر، والمستفيد من التحويل وسببه. وعندما لا تكون للعملية مذكرة، يحتفظ وصفها بالاسم.
+preferences-ofx-reference-help = ما يتلقاه مرجع الدفع الخاص بالعملية المستوردة، حيث يمكنك رؤيته والتصفية بحسبه. وعندما لا تكون للعملية مذكرة، يترك خيار «مذكرة المصرف» المرجع فارغًا. وإذا كانت المذكرة تكرر الاسم من قبل، فلا تُكتب مرتين.
+preferences-ofx-hint = تسري هذه الإعدادات على كل كشوف حساب OFX، أيًا كانت قاعدة البيانات المفتوحة. وتُطبَّق على كشف الحساب التالي الذي يُفتح.
 preferences-leaf-qif = كشوف حساب QIF
 preferences-field-qif-order = ترتيب اليوم والشهر:
 preferences-qif-order-ask = اسألني في كل مرة
@@ -3158,3 +3171,165 @@ sharing-sheet-items = البنود
 sharing-sheet-result = النتيجة
 sharing-sheet-payments = المدفوعات
 sharing-sheet-balances = المبالغ المستردة
+
+## مساعد تصدير قاعدة بيانات (P-74، Fabrice، 19/10/2026).
+window-database-export-title = مساعد تصدير قاعدة البيانات "{ $base }"
+menu-tools-export = مساعد تصدير قاعدة البيانات…
+base-export-only-this = ستُصدَّر قاعدة البيانات "{ $base }" المحددة في القائمة فقط. لن تتأثر قواعد البيانات الأخرى.
+base-export-purpose = ينسخ هذا المساعد بيانات القاعدة إلى ملفات تستطيع برامج أخرى قراءتها: جدول بيانات، أو قاعدة بيانات مثل Access، أو برنامج آخر لإدارة الحسابات الشخصية. أما القاعدة نفسها فلا تتغير.
+base-export-step-format = 1. الصيغة
+base-export-step-options = 2. الخيارات
+base-export-step-place = 3. المكان
+base-export-step-summary = 4. الملخص
+base-export-format-xlsx = Excel (.xlsx)
+base-export-format-xlsx-hint = مصنف يضم ورقة لكل جدول، يمكن قراءته في Excel وفي معظم برامج جداول البيانات.
+base-export-format-ods = Calc (.ods)
+base-export-format-ods-hint = الصيغة المفتوحة لبرنامجي LibreOffice وOpenOffice، مع ورقة لكل جدول.
+base-export-format-csv = CSV (.csv)
+base-export-format-csv-hint = ملف نصي لكل جدول، والقيم مفصولة بفواصل منقوطة (;): الصيغة التي تستطيع كل البرامج تقريبًا استيرادها، بما فيها Access.
+base-export-format-json = JSON (.json)
+base-export-format-json-hint = للمبرمجين والتطبيقات: كل جدول تحت اسمه، مع ترويسة تصف التصدير.
+base-export-format-xml = XML (.xml)
+base-export-format-xml-hint = المحتوى نفسه الموجود في JSON، مكتوبًا بصيغة XML.
+base-export-format-sql = سكريبت SQL (.sql)
+base-export-format-sql-hint = التعليمات التي تعيد إنشاء الجداول وبياناتها في قاعدة بيانات أخرى (MySQL، PostgreSQL، SQLite…).
+base-export-format-sqlite = قاعدة بيانات SQLite (.sqlite)
+base-export-format-sqlite-hint = قاعدة بيانات مستقلة، بلا كلمة مرور، تفتحها أدوات كثيرة مباشرة.
+base-export-format-qif = QIF، ملف لكل حساب (.qif)
+base-export-format-qif-hint = لنقل حساباتك إلى برنامج آخر لإدارة الحسابات الشخصية (Money، Quicken، GnuCash، Grisbi…).
+base-export-format-ofx = OFX، ملف لكل حساب (.ofx)
+base-export-format-ofx-hint = صيغة كشوف الحسابات البنكية، التي تستطيع معظم برامج إدارة الحسابات الشخصية استيرادها.
+base-export-lossy = انتبه: لا تستطيع صيغتا QIF وOFX نقل كل شيء. تنتقل عمليات الحسابات فقط، مع أطرافها المقابلة وفئاتها وتعليقاتها؛ ويصبح التحويل عملية عادية في كل طرف، أما الباقي (الميزانيات، والعمليات المتكررة، والمشاريع، والتخصيصات…) فلا ينتقل. للاحتفاظ بكل شيء، اختر صيغة أخرى.
+base-export-planned-note = لا تُصدَّر العمليات المخططة والعمليات التي بلا تاريخ: فهي لم تمر بالبنك بعد. سيُذكر عددها في النهاية.
+base-export-dates-hint = تُكتب التواريخ بترتيب السنة-الشهر-اليوم (2026-12-31) والمبالغ بعملة قاعدة البيانات: لا يمكن لأي برنامج أن يخطئ في قراءتها.
+base-export-group-layout = الملفات
+base-export-layout-one = كل شيء في ملف واحد
+base-export-layout-per-table = ملف لكل جدول، داخل مجلد
+base-export-group-decimal = الفاصلة العشرية للمبالغ
+base-export-decimal-point = النقطة (1234.56)
+base-export-decimal-comma = الفاصلة (1234,56)
+base-export-group-quotes = علامات الاقتباس
+base-export-quotes-all = كل قيمة بين علامتي اقتباس
+base-export-quotes-none = بلا علامات اقتباس
+base-export-csv-replacements-hint = لكي يُقرأ كل ملف من جديد دون أخطاء، تصبح الفاصلة المنقوطة (;) داخل النص علامة تعجب (!)، ويصبح السطر الجديد مسافة، وعند عدم استخدام علامات الاقتباس تصبح علامة الاقتباس فاصلة عليا ('). سيُذكر عدد الاستبدالات في النهاية.
+base-export-group-qif-order = ترتيب التاريخ
+base-export-qif-day-month = اليوم قبل الشهر (31/12/2026)
+base-export-qif-month-day = الشهر قبل اليوم (12/31/2026)
+base-export-qif-order-hint = اختر الترتيب الذي يتوقعه البرنامج الذي سيقرأ الملفات: اليوم أولًا في أوروبا، والشهر أولًا في الولايات المتحدة.
+base-export-no-option = لا توجد خيارات لهذه الصيغة.
+base-export-choose-file = اختيار الملف…
+base-export-choose-folder = اختيار المجلد…
+base-export-place-file = سيُكتب التصدير في هذا الملف:
+base-export-place-folder = سيُكتب التصدير في هذا المجلد، الذي سيُنشأ لهذا الغرض:
+base-export-place-none = لم يتم اختيار أي مكان بعد.
+base-export-place-needed = اختر أولًا مكان كتابة التصدير.
+base-export-folder-exists = المجلد "{ $name }" موجود بالفعل. ستُستبدل الملفات التي تحمل الاسم نفسه داخله. هل تريد المتابعة؟
+base-export-summary-base = قاعدة البيانات
+base-export-summary-format = الصيغة
+base-export-summary-options = الخيارات
+base-export-summary-place = المكان
+base-export-unprotected = قاعدة البيانات هذه محمية بكلمة مرور، لكن التصدير لن يكون محميًا: أي شخص يحصل على هذه الملفات يستطيع قراءة حساباتك. احفظها في مكان آمن.
+base-export-previous = السابق
+base-export-next = التالي
+base-export-run = تصدير
+base-export-running = جارٍ التصدير…
+base-export-done = تم تصدير قاعدة البيانات "{ $base }": { $tables ->
+        [zero] لا جداول
+        [one] جدول واحد
+        [two] جدولان
+        [few] { $tables } جداول
+        [many] { $tables } جدولًا
+       *[other] { $tables } جدول
+    }، { $rows ->
+        [zero] لا صفوف
+        [one] صف واحد
+        [two] صفان
+        [few] { $rows } صفوف
+        [many] { $rows } صفًا
+       *[other] { $rows } صف
+    }.
+base-export-done-accounts = تم تصدير قاعدة البيانات "{ $base }": { $accounts ->
+        [zero] لا حسابات
+        [one] حساب واحد
+        [two] حسابان
+        [few] { $accounts } حسابات
+        [many] { $accounts } حسابًا
+       *[other] { $accounts } حساب
+    }، { $operations ->
+        [zero] لا عمليات
+        [one] عملية واحدة
+        [two] عمليتان
+        [few] { $operations } عمليات
+        [many] { $operations } عملية
+       *[other] { $operations } عملية
+    }.
+base-export-done-replacements = { $count ->
+        [zero] لم يتم استبدال أي حرف في ملفات CSV.
+        [one] تم استبدال حرف واحد في ملفات CSV.
+        [two] تم استبدال حرفين في ملفات CSV.
+        [few] تم استبدال { $count } أحرف في ملفات CSV.
+        [many] تم استبدال { $count } حرفًا في ملفات CSV.
+       *[other] تم استبدال { $count } حرف في ملفات CSV.
+    }
+base-export-done-controls = { $count ->
+        [zero] لم يتم استبدال أي حرف تحكم بـ "�".
+        [one] تم استبدال { $count } حرف تحكم لا يمكن لهذه الصيغة احتواؤه بـ "�".
+        [two] تم استبدال حرفَي تحكم لا يمكن لهذه الصيغة احتواؤهما بـ "�".
+        [few] تم استبدال { $count } أحرف تحكم لا يمكن لهذه الصيغة احتواؤها بـ "�".
+        [many] تم استبدال { $count } حرفَ تحكم لا يمكن لهذه الصيغة احتواؤها بـ "�".
+       *[other] تم استبدال { $count } حرف تحكم لا يمكن لهذه الصيغة احتواؤها بـ "�".
+    }
+base-export-done-excel-cut = { $count ->
+        [zero] لم يتم قطع أي نص يتجاوز 32,767 حرفًا، وهو حد Excel، في المصنف.
+        [one] تم قطع { $count } نص في المصنف لأنه تجاوز 32,767 حرفًا، وهو حد Excel. تحتفظ به الصيغ الأخرى كاملًا.
+        [two] تم قطع نصَّين في المصنف لأنهما تجاوزا 32,767 حرفًا، وهو حد Excel. تحتفظ بهما الصيغ الأخرى كاملَين.
+        [few] تم قطع { $count } نصوص في المصنف لأنها تجاوزت 32,767 حرفًا، وهو حد Excel. تحتفظ بها الصيغ الأخرى كاملة.
+        [many] تم قطع { $count } نصًّا في المصنف لأنها تجاوزت 32,767 حرفًا، وهو حد Excel. تحتفظ بها الصيغ الأخرى كاملة.
+       *[other] تم قطع { $count } نص في المصنف لأنها تجاوزت 32,767 حرفًا، وهو حد Excel. تحتفظ بها الصيغ الأخرى كاملة.
+    }
+base-export-done-anomalies = { $count ->
+        [zero] لم يتم نسخ أي قيمة غير مقروءة كما هي.
+        [one] تم نسخ قيمة واحدة غير مقروءة كما هي.
+        [two] تم نسخ قيمتين غير مقروءتين كما هما.
+        [few] تم نسخ { $count } قيم غير مقروءة كما هي.
+        [many] تم نسخ { $count } قيمةً غير مقروءة كما هي.
+       *[other] تم نسخ { $count } قيمة غير مقروءة كما هي.
+    }
+base-export-done-planned = { $count ->
+        [zero] لم يتم استبعاد أي عملية مخططة.
+        [one] تم استبعاد عملية مخططة واحدة.
+        [two] تم استبعاد عمليتين مخططتين.
+        [few] تم استبعاد { $count } عمليات مخططة.
+        [many] تم استبعاد { $count } عملية مخططة.
+       *[other] تم استبعاد { $count } عملية مخططة.
+    }
+base-export-done-undated = { $count ->
+        [zero] لم يتم استبعاد أي عملية بلا تاريخ.
+        [one] تم استبعاد عملية واحدة بلا تاريخ.
+        [two] تم استبعاد عمليتين بلا تاريخ.
+        [few] تم استبعاد { $count } عمليات بلا تاريخ.
+        [many] تم استبعاد { $count } عملية بلا تاريخ.
+       *[other] تم استبعاد { $count } عملية بلا تاريخ.
+    }
+base-export-done-adjusted = { $count ->
+        [zero] لم يتم تعديل أي قيمة لملاءمة الصيغة.
+        [one] تم تعديل قيمة واحدة لملاءمة الصيغة.
+        [two] تم تعديل قيمتين لملاءمة الصيغة.
+        [few] تم تعديل { $count } قيم لملاءمة الصيغة.
+        [many] تم تعديل { $count } قيمةً لملاءمة الصيغة.
+       *[other] تم تعديل { $count } قيمة لملاءمة الصيغة.
+    }
+base-export-too-old = قاعدة البيانات هذه من إصدار أقدم من Radinus. افتحها أولًا مرة واحدة في Radinus، الذي سيحدّثها، ثم صدّرها.
+base-export-too-recent = حُفظت قاعدة البيانات هذه بإصدار أحدث من Radinus. حدِّث Radinus لتصديرها.
+base-export-not-radinus = هذا الملف ليس قاعدة بيانات Radinus.
+base-export-failed = تعذّر إجراء التصدير: { $reason }
+
+## قائمة الأدوات في نافذة قواعد البيانات تذكر اسم القاعدة (Fabrice، 19/10/2026).
+databases-tools-selected = قاعدة البيانات المحددة: "{ $base }"
+databases-tools-none = لم تُحدَّد أي قاعدة بيانات
+menu-tools-backup = نسخ احتياطي لقاعدة البيانات "{ $base }"…
+menu-tools-backup-none = نسخ احتياطي لقاعدة البيانات المحددة…
+menu-tools-restore = استعادة قاعدة البيانات "{ $base }"…
+menu-tools-restore-none = استعادة قاعدة البيانات المحددة…
+menu-tools-repair = إصلاح قاعدة البيانات "{ $base }" وتحسينها…
+menu-tools-repair-none = إصلاح قاعدة البيانات المحددة وتحسينها…

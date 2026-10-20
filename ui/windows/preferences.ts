@@ -80,6 +80,7 @@ const LEAVES: [string, string, string][] = [
   ["zoom", "preferences-leaf-zoom", "preferences-branch-display"],
   ["columns", "preferences-leaf-columns", "preferences-branch-display"],
   ["verification", "preferences-leaf-verification", "preferences-branch-import"],
+  ["ofx", "preferences-leaf-ofx", "preferences-branch-import"],
   ["qif", "preferences-leaf-qif", "preferences-branch-import"],
   ["electricity", "preferences-leaf-electricity", "preferences-branch-tools"],
   ["comfort", "preferences-leaf-comfort", "preferences-branch-reset"],
@@ -119,7 +120,13 @@ let reserve = {
   electricity: "",
   qifOrder: "",
   qifLabel: "",
+  ofxLabel: "",
+  ofxReference: "",
 };
+
+/// Les deux réglages des relevés OFX (19/10/2026).
+const ofxLabelField = element<HTMLSelectElement>("ofx-label");
+const ofxReferenceField = element<HTMLSelectElement>("ofx-reference");
 
 /// Les deux réglages des relevés QIF (P-73).
 const qifOrderField = element<HTMLSelectElement>("qif-order");
@@ -134,6 +141,8 @@ function current(): {
   electricity: string;
   qifOrder: string;
   qifLabel: string;
+  ofxLabel: string;
+  ofxReference: string;
 } {
   return {
     choice: currencyField.value,
@@ -146,6 +155,8 @@ function current(): {
     electricity: JSON.stringify(electricityFields()),
     qifOrder: qifOrderField.value,
     qifLabel: qifLabelField.value,
+    ofxLabel: ofxLabelField.value,
+    ofxReference: ofxReferenceField.value,
   };
 }
 
@@ -213,6 +224,8 @@ function modified(): boolean {
     now.electricity !== reserve.electricity ||
     now.qifOrder !== reserve.qifOrder ||
     now.qifLabel !== reserve.qifLabel ||
+    now.ofxLabel !== reserve.ofxLabel ||
+    now.ofxReference !== reserve.ofxReference ||
     // Le signe personnalisé ne compte que si c'est lui qu'on emploie : l'avoir
     // tapé puis avoir choisi « Euros » ne modifie rien.
     (now.choice === "perso" && now.custom !== reserve.custom)
@@ -443,6 +456,10 @@ async function load(): Promise<void> {
     const qif = await invoke<{ order: string; label: string }>("preferences_qif");
     qifOrderField.value = qif.order;
     qifLabelField.value = qif.label;
+    // Les relevés OFX : réglages du logiciel aussi.
+    const ofx = await invoke<{ label: string; reference: string }>("preferences_ofx");
+    ofxLabelField.value = ofx.label;
+    ofxReferenceField.value = ofx.reference;
 
     reserve = current();
     showCustomIfNeeded();
@@ -483,6 +500,9 @@ async function save(): Promise<void> {
     // configuration du logiciel.
     if (now.qifOrder !== reserve.qifOrder || now.qifLabel !== reserve.qifLabel) {
       await invoke("save_preferences_qif", { order: now.qifOrder, label: now.qifLabel });
+    }
+    if (now.ofxLabel !== reserve.ofxLabel || now.ofxReference !== reserve.ofxReference) {
+      await invoke("save_preferences_ofx", { label: now.ofxLabel, reference: now.ofxReference });
     }
     if (databaseOpen && now.verification !== reserve.verification) {
       await invoke("save_preferences_import_verification", {
@@ -627,6 +647,17 @@ async function dress(): Promise<void> {
     ["electricity-hours-unit", "appliance-unit-hours"],
     ["electricity-blue", "preferences-electricity-blue"],
     ["electricity-hint", "preferences-electricity-hint"],
+    ["ofx-title", "preferences-leaf-ofx"],
+    ["ofx-label-label", "preferences-field-ofx-label"],
+    ["ofx-label-name", "preferences-ofx-choice-name"],
+    ["ofx-label-memo", "preferences-ofx-choice-memo"],
+    ["ofx-label-name-and-memo", "preferences-ofx-choice-name-and-memo"],
+    ["ofx-reference-label", "preferences-field-ofx-reference"],
+    ["ofx-reference-memo", "preferences-ofx-choice-memo"],
+    ["ofx-reference-name", "preferences-ofx-choice-name"],
+    ["ofx-reference-name-and-memo", "preferences-ofx-choice-name-and-memo"],
+    ["ofx-reference-empty", "preferences-ofx-choice-empty"],
+    ["ofx-hint", "preferences-ofx-hint"],
     ["qif-title", "preferences-leaf-qif"],
     ["qif-order-label", "preferences-field-qif-order"],
     ["qif-order-ask", "preferences-qif-order-ask"],
@@ -645,6 +676,8 @@ async function dress(): Promise<void> {
   }
   // **Chaque réglage QIF a sa bulle**, sur l'étiquette et sur la liste.
   for (const [ids, key] of [
+    [["ofx-label-label", "ofx-label"], "preferences-ofx-label-help"],
+    [["ofx-reference-label", "ofx-reference"], "preferences-ofx-reference-help"],
     [["qif-order-label", "qif-order"], "preferences-qif-order-help"],
     [["qif-label-label", "qif-label"], "preferences-qif-label-help"],
   ] as const) {

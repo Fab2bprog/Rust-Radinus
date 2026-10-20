@@ -1382,6 +1382,31 @@ body.moving-column .list__title {
   background-color: #dde5ea;
 }
 
+/* La ligne de titre du menu Outils de la fenêtre des bases (19/10/2026) :
+   elle nomme la base sur laquelle les entrées vont agir. Non cliquable. */
+.window-menu__heading {
+  padding: 6px 12px 4px calc(12px + 1.2em);
+  font-weight: 700;
+  color: #1f3b4d;
+  border-bottom: 1px solid #c9d3da;
+  white-space: nowrap;
+}
+
+/* Le trait qui sépare ce qui vise la base choisie de ce qui ne vise rien. */
+.window-menu__separator {
+  margin: 4px 0;
+  border-top: 1px solid #c9d3da;
+}
+
+/* Un choix de menu grisé (l'assistant d'exportation sans ligne choisie,
+   19/10/2026) : visible, pour qu'on sache qu'il existe, mais inerte. */
+.window-menu__choice:disabled,
+.window-menu__choice:disabled:hover {
+  background: transparent;
+  color: #a0a8ae;
+  cursor: default;
+}
+
 /* The tick in front of the chosen entry. The slot is always there, so the
    labels line up whether they are ticked or not. */
 .window-menu__choice::before {
@@ -5060,4 +5085,105 @@ input[type="text"].form__field--locked {
 .loan--stale .appliance__result {
   opacity: 0.3;
   transition: opacity 0.15s;
+}
+
+/* --- L'assistant d'exportation d'une base (P-74, Fabrice, 19/10/2026) ------
+   La phrase de tête dit quelle base part, et elle seule : elle est en gras et
+   ne quitte jamais l'écran. Les quatre étapes sont nommées en haut, celle où
+   l'on est soulignée. */
+.export-banner {
+  margin: 0 0 6px;
+  font-weight: 700;
+  color: #1f3b4d;
+}
+
+.export-purpose {
+  margin-top: 0;
+}
+
+.export-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #8a98a3;
+}
+
+.export-steps li[aria-current="step"] {
+  color: #1f3b4d;
+  font-weight: 700;
+  border-bottom: 2px solid #4f6675;
+}
+
+.export-choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 8px;
+  align-items: baseline;
+  padding: 3px 0;
+}
+
+.export-choice__name {
+  font-weight: 600;
+}
+
+.export-choice__hint {
+  grid-column: 2;
+  color: #4a5a66;
+  font-style: italic;
+}
+
+.export-group {
+  margin: 0 0 12px;
+}
+
+.export-group__title {
+  margin: 0 0 4px;
+  font-weight: 700;
+  color: #1f3b4d;
+}
+
+/* Une mise en garde se lit avant d'agir : elle a sa couleur. */
+.export-warning {
+  margin: 10px 0 0;
+  padding: 6px 10px;
+  border-left: 4px solid #b03a2e;
+  background-color: #fbeeee;
+  color: #5a1d16;
+}
+
+.export-path {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.export-summary {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  margin: 0;
+}
+
+.export-summary dt {
+  font-weight: 700;
+}
+
+.export-summary dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.export-done {
+  margin: 12px 0 0;
+  font-weight: 700;
+  color: #1d5a2c;
+}
+
+.export-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 10px 10px;
 }

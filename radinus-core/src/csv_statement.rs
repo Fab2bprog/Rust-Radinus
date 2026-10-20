@@ -294,6 +294,9 @@ pub fn into_statement(rows: &[Row], account_number: &str) -> ofx_import::Stateme
             kind: String::new(),
             label: row.label.clone(),
             fitid: String::new(),
+            // Le QIF et le CSV n'ont pas de MEMO à part : le QIF range déjà le
+            // sien selon ses propres réglages (P-73), le CSV n'en a pas.
+            memo: String::new(),
         })
         .collect();
     ofx_import::Statement {
