@@ -1,0 +1,209 @@
+/* Le thème Sombre (P-80, 30/10/2026).
+
+   Une valeur pour chaque couleur de tokens.css, posée quand la page porte
+   data-theme="dark". Écrit par une règle — un fond clair devient un gris
+   sombre de même teinte, un texte sombre devient clair, un filet clair
+   devient un filet sombre — sauf les couleurs qui ont un sens (montants
+   négatifs, statistiques, doublons, alertes, en-têtes), choisies une à une.
+   Les voiles et les ombres gardent leur valeur ; la bannière, son bois. */
+:root[data-theme="dark"] {
+  /* Les champs, les listes déroulantes, les calendriers et les ascenseurs
+     du système passent en sombre eux aussi. */
+  color-scheme: dark;
+  color: #e6e9ec;
+  --radinus-main-bg: #15181b;
+  --radinus-menubar-bg: #202326;
+  --radinus-window-bg: #1c1f22;
+  --radinus-section-bg: #2a2e33;
+  --radinus-panel-bg: #2f3f4a;
+  --radinus-table-header-bg: #34505f;
+  --radinus-table-header-fg: #ffffff;
+  --radinus-row-odd-bg: #1e2124;
+  --radinus-row-even-bg: #25292d;
+  --radinus-row-selected-bg: #3d5a6c;
+  --radinus-group-bg: #2c3b46;
+  --radinus-duplicate-kept-bg: #1f4026;
+  --radinus-duplicate-doomed-bg: #4d2225;
+  --radinus-cell-negative-bg: #5c2b2b;
+  --radinus-cell-positive-bg: #2e2e66;
+  --radinus-cell-cancelling-bg: #24502a;
+  --radinus-negative-amount-fg: #ff8a80;
+  --radinus-total-somme-fg: #9db4ff;
+  --radinus-total-cumul-fg: #ff8a80;
+  --radinus-info-bar-help-fg: #8fb4ff;
+  --radinus-info-bar-alert-fg: #ff6b6b;
+  --radinus-bg-1b405a: #12232e;
+  --radinus-bg-6f95ae: #3d5260;
+  --radinus-bg-b3bcc3: #5d6871;
+  --radinus-bg-b9c9d4: #353c41;
+  --radinus-bg-c8c8c8: #3a3a3a;
+  --radinus-bg-d4e5f7: #1d2a37;
+  --radinus-bg-d6d6d6: #333333;
+  --radinus-bg-dcdcdc: #2f2f2f;
+  --radinus-bg-dde5ea: #272c30;
+  --radinus-bg-dfe6ea: #272c2f;
+  --radinus-bg-e8eef2: #21272b;
+  --radinus-bg-e8f1fb: #18232f;
+  --radinus-bg-e9eef2: #21262a;
+  --radinus-bg-eef1f4: #202427;
+  --radinus-bg-eef2f5: #1f2428;
+  --radinus-bg-eef3f6: #1e2428;
+  --radinus-bg-eef3f7: #1d2429;
+  --radinus-bg-efefef: #252525;
+  --radinus-bg-f0f0f0: #242424;
+  --radinus-bg-f1f1f1: #242424;
+  --radinus-bg-f2a900: #78580d;
+  --radinus-bg-f2f2f2: #232323;
+  --radinus-bg-f7f7f7: #202020;
+  --radinus-bg-fbeaea: #2e1818;
+  --radinus-bg-fbeeee: #2b1818;
+  --radinus-bg-fbf4e4: #312918;
+  --radinus-bg-fdeceb: #2f1716;
+  --radinus-bg-fdf3e6: #312516;
+  --radinus-bg-fff6e0: #352b14;
+  --radinus-bg-ffffff: #1c1c1c;
+  --radinus-chart-total: #c9d6e2;
+  --radinus-chart-grid: #3a4248;
+  --radinus-fg-000000: #ebebeb;
+  --radinus-fg-0f0f0f: #ebebeb;
+  --radinus-fg-124a17: #cbeece;
+  --radinus-fg-1a1a1a: #ebebeb;
+  --radinus-fg-1a2b3c: #d4dfea;
+  --radinus-fg-1a6b2a: #b3e7be;
+  --radinus-fg-1c3f5a: #bfd5e7;
+  --radinus-fg-1c3f8f: #9ab1e4;
+  --radinus-fg-1c4e80: #a5c4e4;
+  --radinus-fg-1d2b34: #d9e2e8;
+  --radinus-fg-1d5a2c: #bfe6c8;
+  --radinus-fg-1e6b24: #b3e4b7;
+  --radinus-fg-1f3550: #c6d4e5;
+  --radinus-fg-1f3b4d: #c8dae5;
+  --radinus-fg-2a2a2a: #e0e0e0;
+  --radinus-fg-2b82c9: #71a9d6;
+  --radinus-fg-2c6e2f: #b0dab2;
+  --radinus-fg-2d2d2d: #dddddd;
+  --radinus-fg-333f48: #cad2d8;
+  --radinus-fg-33424e: #c6d0d7;
+  --radinus-fg-3a3a3a: #d3d3d3;
+  --radinus-fg-4a5a66: #b4bec6;
+  --radinus-fg-4a7a99: #91afc3;
+  --radinus-fg-555555: #bfbfbf;
+  --radinus-fg-5a1d16: #ebc4bf;
+  --radinus-fg-5b6b78: #a7b1b9;
+  --radinus-fg-6a6a6a: #b0b0b0;
+  --radinus-fg-6b7a85: #9da6ad;
+  --radinus-fg-6b7a88: #9ba4ad;
+  --radinus-fg-7a3d00: #f8d1aa;
+  --radinus-fg-7a7a7a: #a3a3a3;
+  --radinus-fg-7a8fa6: #8192a5;
+  --radinus-fg-808080: #9f9f9f;
+  --radinus-fg-8a5a12: #ebcc9e;
+  --radinus-fg-8a8a8a: #989898;
+  --radinus-fg-8a949c: #899299;
+  --radinus-fg-8a98a3: #83909a;
+  --radinus-fg-8b0000: #f79f9f;
+  --radinus-fg-8b1a1a: #e59d9d;
+  --radinus-fg-8fa9c4: #6e8caa;
+  --radinus-fg-909090: #939393;
+  --radinus-fg-9a9a9a: #8c8c8c;
+  --radinus-fg-9aa4ac: #838d96;
+  --radinus-fg-9e2a2b: #d98f90;
+  --radinus-fg-a0a8ae: #848d94;
+  --radinus-fg-b00020: #f58599;
+  --radinus-fg-b31414: #e78282;
+  --radinus-fg-b35c00: #f5bd83;
+  --radinus-fg-c00000: #f47a7a;
+  --radinus-fg-d08a92: #b6636c;
+  --radinus-fg-ffffff: #ffffff;
+  --radinus-line-3a6ea5: #4c79aa;
+  --radinus-line-4f6675: #647b89;
+  --radinus-line-7f8f9b: #778590;
+  --radinus-line-8a99a4: #7b8893;
+  --radinus-line-8f9ea8: #5a6166;
+  --radinus-line-9aa6ae: #565c60;
+  --radinus-line-9aa7b1: #555b60;
+  --radinus-line-9aa8b2: #545b60;
+  --radinus-line-a0a8ae: #565a5d;
+  --radinus-line-b03a2e: #b44c41;
+  --radinus-line-b0b0b0: #555555;
+  --radinus-line-b4b4b4: #535353;
+  --radinus-line-b6c2cb: #474e54;
+  --radinus-line-b9c2c9: #484e52;
+  --radinus-line-b9c6d0: #444c53;
+  --radinus-line-c0c0c0: #4d4d4d;
+  --radinus-line-c2c2c2: #4c4c4c;
+  --radinus-line-c8c8c8: #494949;
+  --radinus-line-c8d0d6: #41474b;
+  --radinus-line-c9d2d8: #40464b;
+  --radinus-line-c9d3da: #3e464b;
+  --radinus-line-cfcfcf: #464646;
+  --radinus-line-d0d0d0: #454545;
+  --radinus-line-d6dce1: #3b4045;
+  --radinus-line-d8dee3: #3a3f44;
+  --radinus-line-d9a441: #c59742;
+  --radinus-line-e2e2e2: #3c3c3c;
+  --radinus-line-e2e6ea: #363a3f;
+  --radinus-line-e2e8ec: #343b40;
+  --radinus-line-ececec: #373737;
+  --radinus-line-f1d4a6: #624e2e;
+  --radinus-line-f2f2f2: #343434;
+  --radinus-line-ffffff: #ffffff;
+  --radinus-ink-1f3550: #c6d4e5;
+  --radinus-ink-6b7a88: #9ba4ad;
+  --radinus-ink-8fa3b4: #798ea0;
+  --radinus-ink-b9c6d0: #798f9f;
+  --radinus-ink-d98200: #f3bb68;
+  --radinus-ink-e6ebef: #23282b;
+  --radinus-ink-e9edf1: #22262a;
+  --radinus-ink-ffffff: #ffffff;
+  --radinus-chart-separator: #1c1c1c;
+}
+
+/* Le bouton des interrupteurs (statistiques, budget) : sa couleur est celle
+   du panneau, qui en sombre se confond avec le rail ; il s'éclaircit. */
+:root[data-theme="dark"] .switch__knob::after {
+  background-color: #9fb6c6;
+}
+
+/* Les fenêtres-outils et leurs graphiques (étape D). */
+:root[data-theme="dark"] .window--loan {
+  --loan-navy: #7fb0d4;
+  --loan-ink: #e0e6eb;
+  --loan-muted: #97a5b1;
+  --loan-line: #353d45;
+  --loan-gold: #cfa74e;
+  --loan-paper: #22272c;
+  --loan-soft: #2a3036;
+  --loan-green: #4cc08a;
+  --loan-orange: #f0a04b;
+  --loan-red: #ef6a5c;
+}
+:root[data-theme="dark"] .window--loan svg [fill="#1d2b34"] {
+  fill: #e0e6eb;
+}
+:root[data-theme="dark"] .window--loan svg [fill="#6b7a88"] {
+  fill: #97a5b1;
+}
+:root[data-theme="dark"] .window--loan svg [fill="#e3e8ed"] {
+  fill: #353d45;
+}
+:root[data-theme="dark"] .window--loan svg [stroke="#e3e8ed"] {
+  stroke: #353d45;
+}
+:root[data-theme="dark"] .window--loan svg [fill="#ffffff"] {
+  fill: #22272c;
+}
+:root[data-theme="dark"] .window--loan svg [stroke="#ffffff"] {
+  stroke: #22272c;
+}
+:root[data-theme="dark"] .window--loan svg [fill="#24506e"] {
+  fill: #5f93b8;
+}
+:root[data-theme="dark"] .window--loan svg [stroke="#24506e"] {
+  stroke: #5f93b8;
+}
+
+/* Le bouton du rapport PDF garde un fond sombre sous son texte blanc. */
+:root[data-theme="dark"] .loan__pdf {
+  background: #2c5a7a;
+}

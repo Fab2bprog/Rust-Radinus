@@ -1975,6 +1975,15 @@ preferences-leaf-zoom = Stærð birtingar
 preferences-field-zoom = Stækkun:
 preferences-zoom-reset = Sjálfgefið gildi
 preferences-zoom-hint = Allt stækkar saman: textinn, táknmyndirnar, dálkarnir. Undir 100 % kemst meira fyrir á skjánum. Valmyndastika kerfisins og valgluggar þess fylgja hins vegar stillingum tölvunnar þinnar en ekki þessum.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Útlit
+preferences-field-appearance = Þema:
+preferences-appearance-system = Fylgja kerfinu
+preferences-appearance-light = Ljóst
+preferences-appearance-sepia = Sepía
+preferences-appearance-dark = Dökkt
+preferences-appearance-hint = Gildir um alla glugga um leið og það er vistað. „Fylgja kerfinu“ tekur ljósa eða dökka stillingu tölvunnar og breytist með henni. Útprentanir og PDF-skjöl haldast ljós.
 preferences-branch-import = Innflutningur
 preferences-leaf-verification = Yfirferð
 preferences-field-verification = Innfluttar færslur:
@@ -2114,8 +2123,8 @@ preferences-columns-hint = Hver tafla man röð dálka sinna, þá sem þú felu
 preferences-branch-reset = Endurstilling
 preferences-leaf-comfort = Þægindastillingar
 preferences-comfort-reset = Endurstilla þægindastillingar
-preferences-comfort-hint = Endurstillir dálka allra taflna, röð og gátreiti reikninganna í upphafsglugganum og stærð birtingar. Tungumál, gjaldmiðill og yfirferð innfluttra færslna er látið ósnert.
-preferences-comfort-question = Endurstilla þægindastillingar? Dálkar taflna, upphafsglugginn og stærð birtingar fara aftur í upprunalegt horf.
+preferences-comfort-hint = Endurstillir dálka allra taflna, röð og gátreiti reikninganna í upphafsglugganum, stærð birtingar og þemað. Tungumál, gjaldmiðill og yfirferð innfluttra færslna er látið ósnert.
+preferences-comfort-question = Endurstilla þægindastillingar? Dálkar taflna, upphafsglugginn, stærð birtingar og þemað fara aftur í upprunalegt horf.
 preferences-comfort-done = Þægindastillingar hafa verið endurstilltar.
 
 # --- Borðinn á velkomstsíðunni -------------------------------------------

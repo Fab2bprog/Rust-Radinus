@@ -120,6 +120,8 @@ fn bootstrap_data_location() -> Startup {
     // trop petit pour qui avait justement réglé le contraire. Les deux
     // premières fenêtres qu'il voit sont maintenant à sa taille.
     crate::windows::set_zoom_factor(config.zoom_factor());
+    // L'apparence aussi (P-80) : la première fenêtre naît dans ses couleurs.
+    crate::windows::set_appearance(config.appearance());
 
     match config.language.as_deref() {
         None => Startup::NeedsLanguage { root, beside },
@@ -189,6 +191,9 @@ pub fn run() {
             // règle que Radinus suit partout ailleurs depuis le 25/07/2026,
             // et je l'avais enfreinte ici.
             let handle = app.handle();
+            // La barre de titre de la fenêtre principale, déclarée dans
+            // `tauri.conf.json`, prend l'apparence choisie comme les autres.
+            windows::apply_appearance_everywhere(handle);
             let main = tauri::Manager::get_webview_window(app, "main");
             match first {
                 FirstScreen::Home => {
@@ -499,6 +504,8 @@ pub fn run() {
             commands::save_preferences_qif,
             commands::preferences_ofx,
             commands::save_preferences_ofx,
+            commands::preferences_appearance,
+            commands::save_preferences_appearance,
             commands::preferences_duplicates,
             commands::save_preferences_duplicates,
             commands::duplicates_levels,

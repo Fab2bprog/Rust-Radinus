@@ -20,6 +20,8 @@
 // tromper sur le total, qui est écrit en toutes lettres au bout.
 
 /// Un point de la courbe, tel que le noyau le rend.
+import { live } from "./theme";
+
 export interface CurvePoint {
   /// La date en ISO. Elle se montre au survol ; **la fenêtre n'en tire aucun
   /// mot et ne calcule aucune date**.
@@ -157,7 +159,7 @@ export function drawCurve(
       y1: String(HEIGHT - BOTTOM),
       x2: String(x(points.length - 1)),
       y2: String(HEIGHT - BOTTOM),
-      stroke: "#d8dee3",
+      style: `stroke: ${live("--radinus-chart-grid", "#d8dee3")}`,
       "stroke-width": "1",
     }),
   );

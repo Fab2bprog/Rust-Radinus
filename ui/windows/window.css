@@ -24,7 +24,7 @@ body {
   margin: 0;
   font-family: var(--radinus-font-family);
   font-size: var(--radinus-font-size-base);
-  color: #0f0f0f;
+  color: var(--radinus-fg-0f0f0f);
   background-color: var(--radinus-window-bg);
   /* A window is a frame, never a scrolling page: the table scrolls inside. */
   overflow: hidden;
@@ -72,20 +72,20 @@ body {
   width: 200px;
   height: auto;
   aspect-ratio: 480 / 288;
-  border: 1px solid #c8d0d6;
+  border: 1px solid var(--radinus-line-c8d0d6);
 }
 
 .about__name {
   margin: 0;
   font-size: 26px;
   font-weight: 700;
-  color: #1a2b3c;
+  color: var(--radinus-fg-1a2b3c);
 }
 
 .about__place {
   margin: 0;
   font-size: 15px;
-  color: #4a5a66;
+  color: var(--radinus-fg-4a5a66);
 }
 
 /* Les deux logos des technologies, côte à côte et à la même hauteur d'œil.
@@ -108,7 +108,7 @@ body {
 .about__built {
   margin: 0;
   max-width: 34em;
-  color: #4a5a66;
+  color: var(--radinus-fg-4a5a66);
   line-height: 1.5;
 }
 
@@ -121,7 +121,7 @@ body {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #1a2b3c;
+  color: var(--radinus-fg-1a2b3c);
   text-align: center;
 }
 
@@ -143,7 +143,7 @@ body {
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: #1a2b3c;
+  color: var(--radinus-fg-1a2b3c);
 }
 
 /* What the licence grants: a sentence, the line that announces the four
@@ -160,7 +160,7 @@ body {
 
 .about__freedoms-title {
   margin: 0;
-  color: #4a5a66;
+  color: var(--radinus-fg-4a5a66);
   line-height: 1.5;
 }
 
@@ -171,7 +171,7 @@ body {
   margin: 0;
   padding-left: 22px;
   list-style: disc;
-  color: #4a5a66;
+  color: var(--radinus-fg-4a5a66);
   line-height: 1.6;
 }
 
@@ -182,7 +182,7 @@ body {
 .about__licence-notice {
   margin: 0;
   font-weight: 700;
-  color: #4a5a66;
+  color: var(--radinus-fg-4a5a66);
   line-height: 1.5;
 }
 
@@ -205,15 +205,15 @@ body {
   grid-column: 1;
   width: 210px;
   padding: 8px 0;
-  background-color: #ffffff;
-  border-right: 1px solid #c8d0d6;
+  background-color: var(--radinus-bg-ffffff);
+  border-right: 1px solid var(--radinus-line-c8d0d6);
   overflow: auto;
 }
 
 .tree__branch {
   padding: 5px 10px;
   font-weight: 700;
-  color: #1a2b3c;
+  color: var(--radinus-fg-1a2b3c);
   user-select: none;
 }
 
@@ -232,7 +232,7 @@ body {
 }
 
 .tree__leaf:hover {
-  background-color: #e8eef2;
+  background-color: var(--radinus-bg-e8eef2);
 }
 
 /* La feuille choisie porte le gris-bleu de la ligne sélectionnée des tableaux
@@ -242,7 +242,7 @@ body {
    (04/08/2026). Grise et non absente : un arbre qui perd une branche selon
    d'où l'on vient se cherche. */
 .tree__leaf--off {
-  color: #9aa4ac;
+  color: var(--radinus-fg-9aa4ac);
   cursor: default;
 }
 
@@ -261,7 +261,7 @@ body {
   font-size: 1em;
   font-style: italic;
   font-weight: 700;
-  color: #1a2b3c;
+  color: var(--radinus-fg-1a2b3c);
   background-color: var(--radinus-section-bg);
 }
 
@@ -333,13 +333,13 @@ body {
 }
 
 .electricity__unit {
-  color: #4a5a66;
+  color: var(--radinus-fg-4a5a66);
   white-space: nowrap;
 }
 
 .pane__hint {
   margin: 12px 0 0;
-  color: #4a5a66;
+  color: var(--radinus-fg-4a5a66);
   font-style: italic;
 }
 
@@ -411,15 +411,15 @@ body {
   height: 100%;
   object-fit: contain;
   /* The original buttons sit on a faint raised plate. */
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 1px 1px var(--radinus-shadow-rgba-0-0-0-35));
 }
 
 .panel__button:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.14);
+  background-color: var(--radinus-bg-rgba-255-255-255-14);
 }
 
 .panel__button:active:not(:disabled) {
-  background-color: rgba(0, 0, 0, 0.14);
+  background-color: var(--radinus-bg-rgba-0-0-0-14);
 }
 
 .panel__button:disabled {
@@ -447,7 +447,7 @@ body {
   font-size: 1.05em;
   color: var(--radinus-info-bar-help-fg);
   background-color: var(--radinus-window-bg);
-  border-top: 1px solid #c8c8c8;
+  border-top: 1px solid var(--radinus-line-c8c8c8);
   min-height: 2em;
 }
 
@@ -464,7 +464,7 @@ body {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border: 1px solid #b4b4b4;
+  border: 1px solid var(--radinus-line-b4b4b4);
   background-color: var(--radinus-row-odd-bg);
 }
 
@@ -486,7 +486,7 @@ body {
   letter-spacing: 0.02em;
   overflow: hidden;
   height: 100%;
-  border-right: 1px solid rgba(255, 255, 255, 0.25);
+  border-right: 1px solid var(--radinus-line-rgba-255-255-255-25);
 }
 
 .list__title:last-child {
@@ -530,7 +530,7 @@ body {
 }
 
 .list__filter-toggle[aria-pressed="true"] {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--radinus-bg-rgba-255-255-255-2);
 }
 
 /* One search field per column, each nailed to its own column so that it
@@ -545,8 +545,8 @@ body {
   padding: 0;
   height: 0;
   overflow: hidden;
-  background-color: #e9eef2;
-  border-bottom: 0 solid #b4b4b4;
+  background-color: var(--radinus-bg-e9eef2);
+  border-bottom: 0 solid var(--radinus-line-b4b4b4);
 }
 
 .list__filter--open {
@@ -565,8 +565,8 @@ body {
   margin: 0 2px;
   min-width: 0;
   padding: 4px 6px;
-  border: 1px solid #9aa8b2;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa8b2);
+  background-color: var(--radinus-bg-ffffff);
   font: inherit;
 }
 
@@ -626,7 +626,7 @@ body {
    seulement qu'elle ne veut rien dire pour cette ligne-là. Le même langage que
    le compte clôturé, qui est montré mais grisé. */
 .list__cell--faded {
-  color: #6b7a85;
+  color: var(--radinus-fg-6b7a85);
   font-style: italic;
 }
 
@@ -640,7 +640,7 @@ body {
 /* A closed account is still shown, but greyed: it is history, not a place to
    put an operation. */
 .list__row--closed .list__cell {
-  color: #8a8a8a;
+  color: var(--radinus-fg-8a8a8a);
   font-style: italic;
 }
 
@@ -693,7 +693,7 @@ body {
 .list__empty {
   padding: 14px;
   font-style: italic;
-  color: #555;
+  color: var(--radinus-fg-555555);
 }
 
 /* The question a list in choosing mode asks above its table (F06). */
@@ -701,7 +701,7 @@ body {
   margin: 0 0 10px;
   font-size: 1.25em;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--radinus-fg-1a1a1a);
 }
 
 .window__question[hidden] {
@@ -723,11 +723,11 @@ body {
 
 .form__label {
   justify-self: start;
-  color: #3a3a3a;
+  color: var(--radinus-fg-3a3a3a);
 }
 
 .form__label--readonly {
-  color: #9a9a9a;
+  color: var(--radinus-fg-9a9a9a);
 }
 
 /* A field the fiche does not have must really disappear, label included.
@@ -742,27 +742,27 @@ body {
 .form__field {
   width: 100%;
   padding: 4px 6px;
-  border: 1px solid #9aa8b2;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa8b2);
+  background-color: var(--radinus-bg-ffffff);
   font: inherit;
 }
 
 .form__field:focus {
   outline: none;
-  border-color: #3a6ea5;
-  box-shadow: 0 0 0 1px #3a6ea5;
+  border-color: var(--radinus-line-3a6ea5);
+  box-shadow: 0 0 0 1px var(--radinus-shadow-3a6ea5);
 }
 
 .form__field[readonly] {
-  background-color: #f7f7f7;
-  color: #6a6a6a;
+  background-color: var(--radinus-bg-f7f7f7);
+  color: var(--radinus-fg-6a6a6a);
   text-align: right;
-  border-color: #cfcfcf;
+  border-color: var(--radinus-line-cfcfcf);
 }
 
 .form__field:disabled {
-  background-color: #efefef;
-  color: #6a6a6a;
+  background-color: var(--radinus-bg-efefef);
+  color: var(--radinus-fg-6a6a6a);
 }
 
 /* Combo: white field with the charter's blue-gray drop-down arrow. */
@@ -787,7 +787,7 @@ select.form__field {
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.35);
+  background-color: var(--radinus-bg-rgba-0-0-0-35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -796,8 +796,8 @@ select.form__field {
 
 .dialog {
   background-color: var(--radinus-window-bg);
-  border: 1px solid #8f9ea8;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--radinus-line-8f9ea8);
+  box-shadow: 0 6px 24px var(--radinus-shadow-rgba-0-0-0-3);
   max-width: 520px;
   min-width: 320px;
   padding: 0;
@@ -823,14 +823,14 @@ select.form__field {
 .dialog__button {
   min-width: 92px;
   padding: 6px 14px;
-  border: 1px solid #8f9ea8;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-8f9ea8);
+  background-color: var(--radinus-bg-ffffff);
   font: inherit;
   cursor: pointer;
 }
 
 .dialog__button:hover {
-  background-color: #eef3f6;
+  background-color: var(--radinus-bg-eef3f6);
 }
 
 .dialog__button--primary {
@@ -844,7 +844,7 @@ select.form__field {
 }
 
 .dialog__button:focus-visible {
-  outline: 2px solid #3a6ea5;
+  outline: 2px solid var(--radinus-line-3a6ea5);
   outline-offset: 1px;
 }
 
@@ -860,7 +860,7 @@ select.form__field {
 }
 
 .group {
-  border: 1px solid #b9c2c9;
+  border: 1px solid var(--radinus-line-b9c2c9);
   border-radius: 3px;
   margin: 0;
   padding: 4px 12px 12px;
@@ -869,7 +869,7 @@ select.form__field {
 
 .group > legend {
   padding: 0 6px;
-  color: #4a5a66;
+  color: var(--radinus-fg-4a5a66);
 }
 
 /* « Activité » and « Soldes » sit side by side at the foot of the fiche. */
@@ -895,7 +895,7 @@ select.form__field {
 }
 
 .rib__label {
-  color: #3a3a3a;
+  color: var(--radinus-fg-3a3a3a);
 }
 
 .iban {
@@ -914,7 +914,7 @@ select.form__field {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #3a3a3a;
+  color: var(--radinus-fg-3a3a3a);
 }
 
 textarea.form__field {
@@ -1051,8 +1051,8 @@ textarea.form__field {
 .duplicates__recap-title {
   margin: 0;
   padding: 3px 8px;
-  background-color: #dcdcdc;
-  border: 1px solid #c0c0c0;
+  background-color: var(--radinus-bg-dcdcdc);
+  border: 1px solid var(--radinus-line-c0c0c0);
   font-size: var(--radinus-font-size-base);
   font-style: italic;
   font-weight: 700;
@@ -1062,8 +1062,8 @@ textarea.form__field {
   max-height: 22%;
   overflow-y: auto;
   padding: 4px 8px;
-  border: 1px solid #d9a441;
-  background-color: #fff6e0;
+  border: 1px solid var(--radinus-line-d9a441);
+  background-color: var(--radinus-bg-fff6e0);
 }
 
 .duplicates__warnings-title {
@@ -1078,7 +1078,7 @@ textarea.form__field {
 .duplicates__heading {
   font-weight: 600;
   text-align: right;
-  color: #555;
+  color: var(--radinus-fg-555555);
 }
 
 /* F08 gagne une barre de menus (« Outils »), donc une rangée de plus que les
@@ -1108,8 +1108,8 @@ textarea.form__field {
   display: flex;
   gap: 2px;
   padding: 2px 6px;
-  background-color: #f0f0f0;
-  border-bottom: 1px solid #c8c8c8;
+  background-color: var(--radinus-bg-f0f0f0);
+  border-bottom: 1px solid var(--radinus-line-c8c8c8);
 }
 
 .window-menu__entry {
@@ -1121,7 +1121,7 @@ textarea.form__field {
 }
 
 .window-menu__entry:hover {
-  background-color: #dde5ea;
+  background-color: var(--radinus-bg-dde5ea);
 }
 
 .period {
@@ -1135,16 +1135,16 @@ textarea.form__field {
 
 .period input {
   padding: 3px 6px;
-  border: 1px solid #9aa8b2;
+  border: 1px solid var(--radinus-line-9aa8b2);
   font: inherit;
 }
 
 /* The « + » that unfolds an operation. Small, and its click never reaches the
    row underneath: unfolding is not selecting. */
 .list__fold {
-  border: 1px solid #9aa8b2;
+  border: 1px solid var(--radinus-line-9aa8b2);
   flex-shrink: 0;
-  background-color: #ffffff;
+  background-color: var(--radinus-bg-ffffff);
   width: 16px;
   height: 16px;
   line-height: 1;
@@ -1155,12 +1155,12 @@ textarea.form__field {
 
 /* A child is set in from its mother, so the tree can be read at a glance. */
 .list__cell--child {
-  border-left: 3px solid #b9c2c9;
+  border-left: 3px solid var(--radinus-line-b9c2c9);
   margin-left: 12px;
 }
 
 .list__row--sub .list__cell {
-  color: #33424e;
+  color: var(--radinus-fg-33424e);
   font-style: italic;
 }
 
@@ -1169,16 +1169,16 @@ textarea.form__field {
    request, 25/07/2026). Written with the container in front so it wins over
    the plain odd/even of the table. */
 .list__rows .list__row--sub-even {
-  background-color: #e8f1fb;
+  background-color: var(--radinus-bg-e8f1fb);
 }
 
 .list__rows .list__row--sub-odd {
-  background-color: #d4e5f7;
+  background-color: var(--radinus-bg-d4e5f7);
 }
 
 /* The Complément is written by Radinus, not by the user. */
 .list__row--complement .list__cell {
-  color: #5b6b78;
+  color: var(--radinus-fg-5b6b78);
 }
 
 /* **La date grisée reste lisible sur une ligne sélectionnée** (Fabrice,
@@ -1189,23 +1189,23 @@ textarea.form__field {
    couleur et porte le sens dans tous les cas. Placé après le Complément, dont
    la règle de cellule est aussi spécifique que celle-ci. */
 .list__row[aria-selected="true"] .list__cell--faded {
-  color: #333f48;
+  color: var(--radinus-fg-333f48);
 }
 
 .list__tick {
-  color: #2c6e2f;
+  color: var(--radinus-fg-2c6e2f);
 }
 
 /* Debits are red — the original's own rule (03_CHARTE_GRAPHIQUE.md). */
 .list__cell--numeric:nth-child(11) {
-  color: var(--radinus-info-bar-alert-fg, #b00020);
+  color: var(--radinus-info-bar-alert-fg, var(--radinus-fg-b00020));
 }
 
 /* **La liste des opérations nomme sa colonne Débit** au lieu de la compter :
    depuis qu'elle porte « Statut opération » et « Vérification », le débit
    n'est plus la onzième cellule, et la règle ci-dessus ne le trouvait plus. */
 .list__row .list__cell--debit {
-  color: var(--radinus-info-bar-alert-fg, #b00020);
+  color: var(--radinus-info-bar-alert-fg, var(--radinus-fg-b00020));
 }
 
 /* **La vérification se lit à sa couleur** (Fabrice, 03/10/2026) : à vérifier
@@ -1221,54 +1221,54 @@ textarea.form__field {
 .list__row .list__cell--verification[data-verification="2"],
 .matrix__label[data-verification="2"],
 select[data-verification="2"] {
-  color: #1e6b24;
+  color: var(--radinus-fg-1e6b24);
 }
 
 .list__row .list__cell--verification[data-verification="3"],
 .matrix__label[data-verification="3"],
 select[data-verification="3"] {
-  color: #b35c00;
+  color: var(--radinus-fg-b35c00);
 }
 
 .list__row .list__cell--verification[data-verification="4"],
 .matrix__label[data-verification="4"],
 select[data-verification="4"] {
-  color: #c00000;
+  color: var(--radinus-fg-c00000);
   font-weight: 600;
 }
 
 /* Sur le fond bleu-gris d'une ligne choisie — une sous-opération, qui montre
    le mot et non la liste — les trois teintes se foncent pour rester lisibles. */
 .list__row[aria-selected="true"] .list__cell--verification[data-verification="2"] {
-  color: #124a17;
+  color: var(--radinus-fg-124a17);
 }
 
 .list__row[aria-selected="true"] .list__cell--verification[data-verification="3"] {
-  color: #7a3d00;
+  color: var(--radinus-fg-7a3d00);
 }
 
 .list__row[aria-selected="true"] .list__cell--verification[data-verification="4"] {
-  color: #8b0000;
+  color: var(--radinus-fg-8b0000);
 }
 
 /* La liste ouverte : chaque choix dans sa couleur, là où le système accepte
    d'en tenir compte (Windows, Linux). Sur macOS le menu est dessiné par le
    système et reste noir — la liste fermée, elle, est teinte partout. */
 select[data-verification] option {
-  color: #000000;
+  color: var(--radinus-fg-000000);
   font-weight: 400;
 }
 
 select[data-verification] option[value="2"] {
-  color: #1e6b24;
+  color: var(--radinus-fg-1e6b24);
 }
 
 select[data-verification] option[value="3"] {
-  color: #b35c00;
+  color: var(--radinus-fg-b35c00);
 }
 
 select[data-verification] option[value="4"] {
-  color: #c00000;
+  color: var(--radinus-fg-c00000);
 }
 
 /* The two lines of totals under the table. */
@@ -1285,7 +1285,7 @@ select[data-verification] option[value="4"] {
 }
 
 .totals__value--debit {
-  color: var(--radinus-info-bar-alert-fg, #b00020);
+  color: var(--radinus-info-bar-alert-fg, var(--radinus-fg-b00020));
 }
 
 /* A nomenclature is picked, never typed: on the selected row, the five
@@ -1296,8 +1296,8 @@ select[data-verification] option[value="4"] {
   font: inherit;
   font-size: 0.95em;
   padding: 0 2px;
-  border: 1px solid #9aa8b2;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa8b2);
+  background-color: var(--radinus-bg-ffffff);
   /* It must fit inside the row rather than push it open — see .list__row. */
   height: calc(var(--radinus-row-height, 24px) - 4px);
   line-height: 1;
@@ -1317,7 +1317,7 @@ select[data-verification] option[value="4"] {
 }
 
 .list__resizer:hover {
-  background-color: rgba(255, 255, 255, 0.45);
+  background-color: var(--radinus-bg-rgba-255-255-255-45);
 }
 
 .list__title {
@@ -1339,8 +1339,8 @@ body.resizing-column {
   position: fixed;
   z-index: 30;
   width: 3px;
-  background-color: #f2a900;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+  background-color: var(--radinus-bg-f2a900);
+  box-shadow: 0 0 0 1px var(--radinus-shadow-rgba-255-255-255-7);
   pointer-events: none;
 }
 
@@ -1427,8 +1427,8 @@ body.moving-column .list__title {
   height: 14px;
   margin-right: 8px;
   vertical-align: -2px;
-  border: 1px solid #9aa6ae;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa6ae);
+  background-color: var(--radinus-bg-ffffff);
   background-image: linear-gradient(var(--radinus-tint), var(--radinus-tint));
 }
 
@@ -1455,9 +1455,9 @@ body.moving-column .list__title {
   display: flex;
   flex-direction: column;
   min-width: 180px;
-  background-color: #ffffff;
-  border: 1px solid #b4b4b4;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  background-color: var(--radinus-bg-ffffff);
+  border: 1px solid var(--radinus-line-b4b4b4);
+  box-shadow: 0 2px 6px var(--radinus-shadow-rgba-0-0-0-2);
 }
 
 .window-menu__choices[hidden] {
@@ -1474,7 +1474,7 @@ body.moving-column .list__title {
 }
 
 .window-menu__choice:hover {
-  background-color: #dde5ea;
+  background-color: var(--radinus-bg-dde5ea);
 }
 
 /* The tick in front of the chosen entry. The slot is always there, so the
@@ -1504,9 +1504,9 @@ body.moving-column .list__title {
   display: flex;
   flex-direction: column;
   min-width: 200px;
-  background-color: #ffffff;
-  border: 1px solid #b4b4b4;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  background-color: var(--radinus-bg-ffffff);
+  border: 1px solid var(--radinus-line-b4b4b4);
+  box-shadow: 0 2px 8px var(--radinus-shadow-rgba-0-0-0-25);
 }
 
 .window-menu__choices[hidden] {
@@ -1534,7 +1534,7 @@ body.moving-column .list__title {
 }
 
 .window-menu__choice:hover {
-  background-color: #dde5ea;
+  background-color: var(--radinus-bg-dde5ea);
 }
 
 /* La ligne de titre du menu Outils de la fenêtre des bases (19/10/2026) :
@@ -1542,15 +1542,15 @@ body.moving-column .list__title {
 .window-menu__heading {
   padding: 6px 12px 4px calc(12px + 1.2em);
   font-weight: 700;
-  color: #1f3b4d;
-  border-bottom: 1px solid #c9d3da;
+  color: var(--radinus-fg-1f3b4d);
+  border-bottom: 1px solid var(--radinus-line-c9d3da);
   white-space: nowrap;
 }
 
 /* Le trait qui sépare ce qui vise la base choisie de ce qui ne vise rien. */
 .window-menu__separator {
   margin: 4px 0;
-  border-top: 1px solid #c9d3da;
+  border-top: 1px solid var(--radinus-line-c9d3da);
 }
 
 /* Un choix de menu grisé (l'assistant d'exportation sans ligne choisie,
@@ -1558,7 +1558,7 @@ body.moving-column .list__title {
 .window-menu__choice:disabled,
 .window-menu__choice:disabled:hover {
   background: transparent;
-  color: #a0a8ae;
+  color: var(--radinus-fg-a0a8ae);
   cursor: default;
 }
 
@@ -1595,9 +1595,9 @@ body.moving-column .list__title {
   top: 0;
   left: 100%;
   min-width: 170px;
-  background-color: #ffffff;
-  border: 1px solid #b4b4b4;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  background-color: var(--radinus-bg-ffffff);
+  border: 1px solid var(--radinus-line-b4b4b4);
+  box-shadow: 0 2px 8px var(--radinus-shadow-rgba-0-0-0-25);
   flex-direction: column;
 }
 
@@ -1610,15 +1610,15 @@ body.moving-column .list__title {
 /* Les quatre vérifications du menu Filtre, dans leur couleur — les mêmes que
    dans la colonne et dans le menu du clic droit. */
 .window-menu__submenu .window-menu__choice[data-verification="2"] {
-  color: #1e6b24;
+  color: var(--radinus-fg-1e6b24);
 }
 
 .window-menu__submenu .window-menu__choice[data-verification="3"] {
-  color: #b35c00;
+  color: var(--radinus-fg-b35c00);
 }
 
 .window-menu__submenu .window-menu__choice[data-verification="4"] {
-  color: #c00000;
+  color: var(--radinus-fg-c00000);
   font-weight: 600;
 }
 
@@ -1679,7 +1679,7 @@ body.moving-column .list__title {
   font-size: inherit;
   font-weight: 700;
   font-style: italic;
-  color: #2a2a2a;
+  color: var(--radinus-fg-2a2a2a);
 }
 
 /* Every section of this fiche is a grid of its own, so the label column is
@@ -1723,9 +1723,9 @@ body.moving-column .list__title {
 
 .text-button {
   padding: 4px 10px;
-  border: 1px solid #4f6675;
+  border: 1px solid var(--radinus-line-4f6675);
   background-color: var(--radinus-panel-bg);
-  color: #ffffff;
+  color: var(--radinus-fg-ffffff);
   font: inherit;
   cursor: pointer;
 }
@@ -1735,8 +1735,8 @@ body.moving-column .list__title {
 }
 
 .text-button:disabled {
-  background-color: #b3bcc3;
-  border-color: #a0a8ae;
+  background-color: var(--radinus-bg-b3bcc3);
+  border-color: var(--radinus-line-a0a8ae);
   cursor: default;
 }
 
@@ -1753,7 +1753,7 @@ body.moving-column .list__title {
    et non cachée : une entrée qui va et vient ferait douter de ce que la
    fenêtre sait faire. */
 .window-menu__entry:disabled {
-  color: #8a949c;
+  color: var(--radinus-fg-8a949c);
   cursor: default;
 }
 
@@ -1778,8 +1778,8 @@ body.moving-column .list__title {
   width: 100%;
   margin: 14px 0 4px;
   padding: 6px 8px;
-  border: 1px solid #9aa8b2;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa8b2);
+  background-color: var(--radinus-bg-ffffff);
   font: inherit;
   font-size: 15px;
   text-align: center;
@@ -1787,8 +1787,8 @@ body.moving-column .list__title {
 
 .dialog__field:focus {
   outline: none;
-  border-color: #3a6ea5;
-  box-shadow: 0 0 0 1px #3a6ea5;
+  border-color: var(--radinus-line-3a6ea5);
+  box-shadow: 0 0 0 1px var(--radinus-shadow-3a6ea5);
 }
 
 /* ------------------------------------------------------------------ */
@@ -1833,7 +1833,7 @@ body.moving-column .list__title {
   flex: 1 1 68%;
   min-height: 120px;
   overflow: auto;
-  background-color: #ffffff;
+  background-color: var(--radinus-bg-ffffff);
 }
 
 .list--detail {
@@ -1844,9 +1844,9 @@ body.moving-column .list__title {
 .splitter {
   height: 6px;
   flex: 0 0 6px;
-  background-color: #c8c8c8;
-  border-top: 1px solid #b0b0b0;
-  border-bottom: 1px solid #b0b0b0;
+  background-color: var(--radinus-bg-c8c8c8);
+  border-top: 1px solid var(--radinus-line-b0b0b0);
+  border-bottom: 1px solid var(--radinus-line-b0b0b0);
   cursor: row-resize;
 }
 
@@ -1869,8 +1869,8 @@ body.splitting {
   flex-wrap: wrap;
   gap: 4px 22px;
   padding: 8px 12px;
-  background-color: #f0f0f0;
-  border-bottom: 1px solid #c8c8c8;
+  background-color: var(--radinus-bg-f0f0f0);
+  border-bottom: 1px solid var(--radinus-line-c8c8c8);
 }
 
 .switch {
@@ -1881,7 +1881,7 @@ body.splitting {
   background: none;
   padding: 2px 4px;
   font: inherit;
-  color: #1a1a1a;
+  color: var(--radinus-fg-1a1a1a);
   cursor: pointer;
 }
 
@@ -1890,8 +1890,8 @@ body.splitting {
   width: 42px;
   height: 21px;
   border-radius: 11px;
-  background-color: #d6d6d6;
-  border: 1px solid #b4b4b4;
+  background-color: var(--radinus-bg-d6d6d6);
+  border: 1px solid var(--radinus-line-b4b4b4);
   transition: background-color 120ms;
 }
 
@@ -1908,7 +1908,7 @@ body.splitting {
 }
 
 .switch[aria-pressed="true"] .switch__knob {
-  background-color: #b9c9d4;
+  background-color: var(--radinus-bg-b9c9d4);
 }
 
 .switch[aria-pressed="true"] .switch__knob::after {
@@ -1916,7 +1916,7 @@ body.splitting {
 }
 
 .switch[aria-pressed="false"] .switch__label {
-  color: #7a7a7a;
+  color: var(--radinus-fg-7a7a7a);
 }
 
 /* La matrice : l'axe, douze mois, le total. Une grille et non un tableau —
@@ -1958,7 +1958,7 @@ body.splitting {
   background-color: var(--radinus-table-header-bg);
   color: var(--radinus-table-header-fg);
   text-align: center;
-  border-right: 1px solid rgba(255, 255, 255, 0.25);
+  border-right: 1px solid var(--radinus-line-rgba-255-255-255-25);
   white-space: nowrap;
 }
 
@@ -1978,8 +1978,8 @@ body.splitting {
   background-color: transparent;
   text-align: right;
   font-variant-numeric: tabular-nums;
-  border-right: 1px solid #ececec;
-  border-bottom: 1px solid #f2f2f2;
+  border-right: 1px solid var(--radinus-line-ececec);
+  border-bottom: 1px solid var(--radinus-line-f2f2f2);
   white-space: nowrap;
 }
 
@@ -2008,7 +2008,7 @@ body.splitting {
 }
 
 .matrix__cell--total {
-  border-left: 1px solid #d0d0d0;
+  border-left: 1px solid var(--radinus-line-d0d0d0);
 }
 
 /* Les deux lignes de synthèse, dans les couleurs mesurées sur l'original. */
@@ -2017,13 +2017,13 @@ body.splitting {
 .matrix__row--sum,
 .matrix__row--cumulative {
   position: sticky;
-  background-color: #ffffff;
+  background-color: var(--radinus-bg-ffffff);
   z-index: 1;
 }
 
 .matrix__row--sum {
   bottom: 22px;
-  box-shadow: 0 -1px 0 #c8c8c8;
+  box-shadow: 0 -1px 0 var(--radinus-shadow-c8c8c8);
 }
 
 .matrix__row--cumulative {
@@ -2085,7 +2085,7 @@ body.splitting {
   font-family: inherit;
   font-size: 30px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--radinus-fg-ffffff);
   letter-spacing: 1px;
   cursor: pointer;
 }
@@ -2118,7 +2118,7 @@ body.splitting {
   font-family: inherit;
   font-size: 22px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--radinus-fg-ffffff);
   letter-spacing: 1px;
   cursor: pointer;
 }
@@ -2130,11 +2130,11 @@ body.splitting {
 .panel__period-slash {
   font-size: 22px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--radinus-fg-ffffff);
 }
 
 .panel__year:focus-visible {
-  outline: 2px solid #ffffff;
+  outline: 2px solid var(--radinus-line-ffffff);
   outline-offset: -2px;
 }
 
@@ -2155,9 +2155,9 @@ body.splitting {
   z-index: 40;
   min-width: 210px;
   padding: 3px 0;
-  background-color: #ffffff;
-  border: 1px solid #b9c2c9;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+  background-color: var(--radinus-bg-ffffff);
+  border: 1px solid var(--radinus-line-b9c2c9);
+  box-shadow: 0 3px 10px var(--radinus-shadow-rgba-0-0-0-22);
 }
 
 .context-menu__entry {
@@ -2168,7 +2168,7 @@ body.splitting {
   background: none;
   font: inherit;
   text-align: left;
-  color: #1a1a1a;
+  color: var(--radinus-fg-1a1a1a);
   cursor: pointer;
   white-space: nowrap;
 }
@@ -2184,7 +2184,7 @@ body.splitting {
 .context-menu__rule {
   margin: 3px 0;
   border: none;
-  border-top: 1px solid #d6dce1;
+  border-top: 1px solid var(--radinus-line-d6dce1);
 }
 
 /* **Une entrée qui ouvre un sous-menu** (Fabrice, 03/10/2026) : ce qu'une
@@ -2205,7 +2205,7 @@ body.splitting {
    lignes. Ni survol ni curseur. */
 .context-menu__entry:disabled,
 .context-menu__entry:disabled:hover {
-  color: #a0a8ae;
+  color: var(--radinus-fg-a0a8ae);
   background: none;
   cursor: default;
 }
@@ -2217,9 +2217,9 @@ body.splitting {
   left: 100%;
   min-width: 170px;
   padding: 3px 0;
-  background-color: #ffffff;
-  border: 1px solid #b9c2c9;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+  background-color: var(--radinus-bg-ffffff);
+  border: 1px solid var(--radinus-line-b9c2c9);
+  box-shadow: 0 3px 10px var(--radinus-shadow-rgba-0-0-0-22);
 }
 
 /* Près du bord droit de la fenêtre, il s'ouvre de l'autre côté. */
@@ -2244,15 +2244,15 @@ body.splitting {
 /* Les quatre vérifications, dans leur couleur — les mêmes que dans la
    colonne. Survolé, le choix reprend le blanc sur bleu de tout le menu. */
 .context-menu__submenu .context-menu__entry[data-verification="2"]:not(:hover) {
-  color: #1e6b24;
+  color: var(--radinus-fg-1e6b24);
 }
 
 .context-menu__submenu .context-menu__entry[data-verification="3"]:not(:hover) {
-  color: #b35c00;
+  color: var(--radinus-fg-b35c00);
 }
 
 .context-menu__submenu .context-menu__entry[data-verification="4"]:not(:hover) {
-  color: #c00000;
+  color: var(--radinus-fg-c00000);
   font-weight: 600;
 }
 
@@ -2271,8 +2271,8 @@ body.splitting {
   grid-row: 2;
   grid-column: 1 / 3;
   padding: 8px 12px;
-  background-color: #f0f0f0;
-  border-bottom: 1px solid #c8c8c8;
+  background-color: var(--radinus-bg-f0f0f0);
+  border-bottom: 1px solid var(--radinus-line-c8c8c8);
 }
 
 .dashboard-bar__dates {
@@ -2284,7 +2284,7 @@ body.splitting {
 
 .dashboard-bar__dates input {
   padding: 3px 6px;
-  border: 1px solid #9aa8b2;
+  border: 1px solid var(--radinus-line-9aa8b2);
   font: inherit;
 }
 
@@ -2362,7 +2362,7 @@ body.splitting {
   text-align: center;
   font-size: 20px;
   font-weight: 400;
-  color: #1f3550;
+  color: var(--radinus-fg-1f3550);
 }
 
 .chart__legend {
@@ -2371,15 +2371,15 @@ body.splitting {
   flex-wrap: wrap;
   gap: 18px;
   padding: 6px 12px;
-  border: 1px solid #d8dee3;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-d8dee3);
+  background-color: var(--radinus-bg-ffffff);
 }
 
 .chart__legend-entry {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #1f3550;
+  color: var(--radinus-fg-1f3550);
 }
 
 .chart__legend-dash {
@@ -2397,15 +2397,15 @@ body.splitting {
   display: flex;
   justify-content: center;
   gap: 8px;
-  color: #4a7a99;
+  color: var(--radinus-fg-4a7a99);
 }
 
 .chart__plot {
   position: relative;
   flex: 1;
   min-height: 0;
-  background-color: #ffffff;
-  border: 1px solid #d8dee3;
+  background-color: var(--radinus-bg-ffffff);
+  border: 1px solid var(--radinus-line-d8dee3);
 }
 
 .chart {
@@ -2415,25 +2415,25 @@ body.splitting {
 }
 
 .chart__grid {
-  stroke: #e6ebef;
+  stroke: var(--radinus-ink-e6ebef);
   stroke-width: 1;
 }
 
 /* Le zéro se distingue des autres graduations : c'est la seule qui veut dire
    quelque chose par elle-même sur un solde. */
 .chart__zero {
-  stroke: #b9c6d0;
+  stroke: var(--radinus-ink-b9c6d0);
   stroke-width: 1.5;
 }
 
 .chart__tick {
   font-size: 12px;
-  fill: #6b7a88;
+  fill: var(--radinus-ink-6b7a88);
   text-anchor: end;
 }
 
 .chart__crosshair {
-  stroke: #8fa3b4;
+  stroke: var(--radinus-ink-8fa3b4);
   stroke-width: 1;
   stroke-dasharray: 3 3;
   pointer-events: none;
@@ -2441,7 +2441,7 @@ body.splitting {
 
 .chart__empty {
   padding: 24px;
-  color: #6b7a88;
+  color: var(--radinus-fg-6b7a88);
   font-style: italic;
 }
 
@@ -2451,13 +2451,13 @@ body.splitting {
   position: absolute;
   z-index: 20;
   padding: 7px 10px;
-  background-color: #ffffff;
-  border: 1px solid #b9c6d0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  background-color: var(--radinus-bg-ffffff);
+  border: 1px solid var(--radinus-line-b9c6d0);
+  box-shadow: 0 2px 8px var(--radinus-shadow-rgba-0-0-0-18);
   pointer-events: none;
   white-space: nowrap;
   font-size: 13px;
-  color: #1f3550;
+  color: var(--radinus-fg-1f3550);
   line-height: 1.45;
 }
 
@@ -2484,7 +2484,7 @@ body.splitting {
 
 .chart__axis-name {
   font-size: 13px;
-  fill: #6b7a88;
+  fill: var(--radinus-ink-6b7a88);
   text-anchor: middle;
 }
 
@@ -2511,12 +2511,12 @@ body.splitting {
 /* **La zone** : un voile léger, et un trait franc à chaque bord. Le voile ne
    doit rien cacher des courbes — c'est elles qu'on est en train de lire. */
 .chart__zone {
-  fill: rgba(245, 170, 0, 0.18);
+  fill: var(--radinus-ink-rgba-245-170-0-18);
   pointer-events: none;
 }
 
 .chart__zone-edge {
-  stroke: #d98200;
+  stroke: var(--radinus-ink-d98200);
   stroke-width: 1.6;
   pointer-events: none;
 }
@@ -2529,14 +2529,14 @@ body.splitting {
   gap: 4px 22px;
   min-height: 24px;
   padding: 5px 12px;
-  border: 1px solid #d8dee3;
-  background-color: #ffffff;
-  color: #1f3550;
+  border: 1px solid var(--radinus-line-d8dee3);
+  background-color: var(--radinus-bg-ffffff);
+  color: var(--radinus-fg-1f3550);
 }
 
 .analysis__hint {
   margin: 0;
-  color: #6b7a88;
+  color: var(--radinus-fg-6b7a88);
   font-style: italic;
 }
 
@@ -2546,7 +2546,7 @@ body.splitting {
 }
 
 .analysis__debit {
-  color: var(--radinus-info-bar-alert-fg, #b00020);
+  color: var(--radinus-info-bar-alert-fg, var(--radinus-fg-b00020));
 }
 
 /* Rien de tracé : la phrase seule. En cours de tracé : les dates. Tracée :
@@ -2603,8 +2603,8 @@ body.splitting {
 .window--quick .band__title {
   margin: 0 0 6px;
   padding: 3px 8px;
-  background-color: #dcdcdc;
-  border: 1px solid #c0c0c0;
+  background-color: var(--radinus-bg-dcdcdc);
+  border: 1px solid var(--radinus-line-c0c0c0);
   font-size: var(--radinus-font-size-base);
   font-style: italic;
   font-weight: 700;
@@ -2619,7 +2619,7 @@ body.splitting {
 
 .window--quick .band__line input {
   padding: 3px 6px;
-  border: 1px solid #9aa8b2;
+  border: 1px solid var(--radinus-line-9aa8b2);
   font: inherit;
 }
 
@@ -2667,25 +2667,25 @@ body.splitting {
    exactement comme dans la capture. Elle dit ainsi d'elle-même qu'on ne lui a
    rien demandé. */
 .characteristic__label {
-  color: #808080;
+  color: var(--radinus-fg-808080);
 }
 
 .characteristic--armed .characteristic__label {
-  color: var(--radinus-text-fg, #000000);
+  color: var(--radinus-text-fg, var(--radinus-fg-000000));
   font-weight: 600;
 }
 
 .characteristic__menu {
   font: inherit;
   padding: 2px 4px;
-  border: 1px solid #9aa8b2;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa8b2);
+  background-color: var(--radinus-bg-ffffff);
   min-width: 0;
 }
 
 .characteristic__menu:disabled {
-  color: #909090;
-  background-color: #f2f2f2;
+  color: var(--radinus-fg-909090);
+  background-color: var(--radinus-bg-f2f2f2);
 }
 
 /* --- F17 — Importation de relevés de comptes bancaires -----------------
@@ -2720,25 +2720,25 @@ body.splitting {
    ligne rapprochée pendant la séance passe au GrisClair : elle est faite, et
    son sens n'a plus d'importance. */
 .list__row--debit .list__cell {
-  color: #9e2a2b;
+  color: var(--radinus-fg-9e2a2b);
 }
 
 .list__row--credit .list__cell {
-  color: #1c4e80;
+  color: var(--radinus-fg-1c4e80);
 }
 
 .list__row--debit.list__row--alike .list__cell {
-  color: #d08a92;
+  color: var(--radinus-fg-d08a92);
   font-style: italic;
 }
 
 .list__row--credit.list__row--alike .list__cell {
-  color: #8fa9c4;
+  color: var(--radinus-fg-8fa9c4);
   font-style: italic;
 }
 
 .list__row--done .list__cell {
-  color: #9a9a9a;
+  color: var(--radinus-fg-9a9a9a);
   font-style: normal;
 }
 
@@ -2758,11 +2758,11 @@ body.splitting {
   justify-content: center;
   width: 15px;
   height: 15px;
-  border: 1px solid #8a99a4;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-8a99a4);
+  background-color: var(--radinus-bg-ffffff);
   font-size: 0.85em;
   line-height: 1;
-  color: #2a2a2a;
+  color: var(--radinus-fg-2a2a2a);
 }
 
 .list__cell:has(> .list__box) {
@@ -2786,8 +2786,8 @@ body.splitting {
 .dialog__field {
   font: inherit;
   padding: 5px 6px;
-  border: 1px solid #9aa8b2;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa8b2);
+  background-color: var(--radinus-bg-ffffff);
   width: 100%;
 }
 
@@ -2804,7 +2804,7 @@ body.splitting {
   margin: 0;
   padding: 4px 10px;
   background-color: transparent;
-  color: #1c3f5a;
+  color: var(--radinus-fg-1c3f5a);
   font-size: 1.05em;
   font-style: normal;
   font-weight: 700;
@@ -2836,8 +2836,8 @@ body.splitting {
 .csv-settings__field {
   font: inherit;
   padding: 3px 6px;
-  border: 1px solid #9aa8b2;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa8b2);
+  background-color: var(--radinus-bg-ffffff);
   text-align: right;
 }
 
@@ -2860,20 +2860,20 @@ body.splitting {
 .csv-test {
   font: inherit;
   padding: 5px 14px;
-  border: 1px solid #7f8f9b;
-  background-color: #eef2f5;
+  border: 1px solid var(--radinus-line-7f8f9b);
+  background-color: var(--radinus-bg-eef2f5);
   cursor: pointer;
 }
 
 .csv-test:hover {
-  background-color: #dde5ea;
+  background-color: var(--radinus-bg-dde5ea);
 }
 
 /* Une ligne que le découpage ne rendra pas importable : elle est montrée —
    c'est ainsi qu'on voit son erreur — mais elle se distingue au premier coup
    d'œil de ce qui entrera vraiment. */
 .list__row--dropped .list__cell {
-  color: #9a9a9a;
+  color: var(--radinus-fg-9a9a9a);
   font-style: italic;
 }
 
@@ -2887,9 +2887,9 @@ body.splitting {
    « 07328 » se lit à gauche, comme sur la capture « Parametres chequiers
    verouillés.png ». */
 .form__field.form__field--locked {
-  background-color: #f7f7f7;
-  color: #6a6a6a;
-  border-color: #cfcfcf;
+  background-color: var(--radinus-bg-f7f7f7);
+  color: var(--radinus-fg-6a6a6a);
+  border-color: var(--radinus-line-cfcfcf);
 }
 
 input[type="text"].form__field--locked {
@@ -2906,7 +2906,7 @@ input[type="text"].form__field--locked {
 /* Le menu « Filtre » de la fenêtre d'association : présent, nommé, inactif.
    Il ne se déguise pas en menu vivant — désactivé, il se voit comme tel. */
 .window-menu__entry:disabled {
-  color: #8a8a8a;
+  color: var(--radinus-fg-8a8a8a);
   cursor: default;
 }
 
@@ -2959,8 +2959,8 @@ input[type="text"].form__field--locked {
 
 .matrix__input:focus {
   outline: none;
-  border-color: #3a6ea5;
-  background-color: #ffffff;
+  border-color: var(--radinus-line-3a6ea5);
+  background-color: var(--radinus-bg-ffffff);
 }
 
 /* Les deux couleurs du contrôle, et **elles ne dépendent pas du mode
@@ -2969,11 +2969,11 @@ input[type="text"].form__field--locked {
    la fenêtre — vert quand on fait au moins aussi bien que prévu, rouge quand
    on fait moins bien (règle de Fabrice, 29/07/2026). */
 .matrix__cell--kept {
-  color: #1a6b2a;
+  color: var(--radinus-fg-1a6b2a);
 }
 
 .matrix__cell--overrun {
-  color: #b31414;
+  color: var(--radinus-fg-b31414);
   font-weight: 600;
 }
 
@@ -3019,7 +3019,7 @@ input[type="text"].form__field--locked {
 .excel-path {
   margin: 6px 0;
   font-style: italic;
-  color: #3a3a3a;
+  color: var(--radinus-fg-3a3a3a);
   min-height: 1.2em;
 }
 
@@ -3045,8 +3045,8 @@ input[type="text"].form__field--locked {
 .excel-settings__field {
   font: inherit;
   padding: 3px 6px;
-  border: 1px solid #9aa7b1;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa7b1);
+  background-color: var(--radinus-bg-ffffff);
   width: 140px;
   text-align: right;
 }
@@ -3076,13 +3076,13 @@ input[type="text"].form__field--locked {
 .excel-note {
   margin: 4px 0;
   font-style: italic;
-  color: #3a3a3a;
+  color: var(--radinus-fg-3a3a3a);
 }
 
 /* Un groupe éteint faute de colonne mise en concordance : son code refuse de
    s'appliquer (`SI nNumCol < 1 ALORS RETOUR`), la fenêtre le montre. */
 .excel-group {
-  border: 1px solid #b6c2cb;
+  border: 1px solid var(--radinus-line-b6c2cb);
   margin: 0 10px 12px;
   padding: 6px 12px 10px;
 }
@@ -3094,7 +3094,7 @@ input[type="text"].form__field--locked {
 .excel-group legend {
   font-weight: 700;
   font-style: italic;
-  color: #2a2a2a;
+  color: var(--radinus-fg-2a2a2a);
   padding: 0 6px;
 }
 
@@ -3112,15 +3112,15 @@ input[type="text"].form__field--locked {
 .excel-tab {
   font: inherit;
   padding: 5px 16px;
-  border: 1px solid #7f8f9b;
+  border: 1px solid var(--radinus-line-7f8f9b);
   border-bottom: none;
-  background-color: #dfe6ea;
+  background-color: var(--radinus-bg-dfe6ea);
   cursor: pointer;
 }
 
 .excel-tab[aria-pressed="true"] {
-  background-color: #6f95ae;
-  color: #ffffff;
+  background-color: var(--radinus-bg-6f95ae);
+  color: var(--radinus-fg-ffffff);
   font-weight: 700;
 }
 
@@ -3129,7 +3129,7 @@ input[type="text"].form__field--locked {
 }
 
 .excel-page {
-  border-top: 1px solid #7f8f9b;
+  border-top: 1px solid var(--radinus-line-7f8f9b);
   padding: 8px 10px 0;
 }
 
@@ -3146,7 +3146,7 @@ input[type="text"].form__field--locked {
    les tableurs en texte, les formats bancaires, les formats d'échange. */
 .window-menu__rule {
   border: none;
-  border-top: 1px solid #c9d2d8;
+  border-top: 1px solid var(--radinus-line-c9d2d8);
   margin: 3px 0;
 }
 
@@ -3226,9 +3226,9 @@ input[type="text"].form__field--locked {
 .rib-field {
   font: inherit;
   padding: 3px 6px;
-  border: 1px solid #9aa7b1;
-  background-color: #f0f0f0;
-  color: #2d2d2d;
+  border: 1px solid var(--radinus-line-9aa7b1);
+  background-color: var(--radinus-bg-f0f0f0);
+  color: var(--radinus-fg-2d2d2d);
   width: 100%;
   box-sizing: border-box;
 }
@@ -3288,7 +3288,7 @@ input[type="text"].form__field--locked {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #1c3f8f;
+  color: var(--radinus-fg-1c3f8f);
   font-weight: bold;
 }
 
@@ -3296,7 +3296,7 @@ input[type="text"].form__field--locked {
    avertissement, pas un paragraphe de confort. */
 .rib-declaration__text {
   margin: 10px 0 0 24px;
-  color: #1c3f8f;
+  color: var(--radinus-fg-1c3f8f);
   line-height: 1.35;
 }
 
@@ -3344,8 +3344,8 @@ input[type="text"].form__field--locked {
   flex-direction: column;
   width: 100%;
   max-width: 320px;
-  border: 1px solid #9aa8b2;
-  background-color: #ffffff;
+  border: 1px solid var(--radinus-line-9aa8b2);
+  background-color: var(--radinus-bg-ffffff);
   /* Ce que Fabrice a demandé le 03/08/2026 : la liste défile. Elle est le
      seul endroit de Radinus qui grandisse tout seul avec le temps — une
      langue de plus est une ligne de plus, et personne ne pense à rouvrir
@@ -3356,7 +3356,7 @@ input[type="text"].form__field--locked {
 
 .language-choice__entry {
   border: 0;
-  border-bottom: 1px solid #e2e2e2;
+  border-bottom: 1px solid var(--radinus-line-e2e2e2);
   background-color: transparent;
   font: inherit;
   font-size: 15px;
@@ -3412,7 +3412,7 @@ input[type="text"].form__field--locked {
   --loan-green: #2e9a6a;
   --loan-orange: #e48f2e;
   --loan-red: #cf4436;
-  background-color: #eef1f4;
+  background-color: var(--radinus-bg-eef1f4);
 }
 
 .loan {
@@ -3429,7 +3429,7 @@ input[type="text"].form__field--locked {
   border: 1px solid var(--loan-line);
   border-radius: 10px;
   padding: 12px 16px 10px;
-  box-shadow: 0 1px 2px rgba(29, 43, 52, 0.06);
+  box-shadow: 0 1px 2px var(--radinus-shadow-rgba-29-43-52-06);
 }
 
 .loan__row {
@@ -3488,7 +3488,7 @@ input[type="text"].form__field--locked {
 
 .form__field.form__field--invalid {
   border-color: var(--loan-red);
-  background-color: #fdeceb;
+  background-color: var(--radinus-bg-fdeceb);
 }
 
 /* Le bouton du rapport : le seul geste qui sort de la fenêtre. */
@@ -3505,26 +3505,26 @@ input[type="text"].form__field--locked {
   gap: 8px;
   font: inherit;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--radinus-fg-ffffff);
   background: var(--loan-navy);
   border: none;
   border-radius: 8px;
   padding: 7px 14px 7px 10px;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(36, 80, 110, 0.35);
+  box-shadow: 0 1px 3px var(--radinus-shadow-rgba-36-80-110-35);
 }
 
 .loan__pdf img {
   width: 22px;
   height: 22px;
   object-fit: contain;
-  background: #ffffff;
+  background: var(--radinus-bg-ffffff);
   border-radius: 4px;
   padding: 1px;
 }
 
 .loan__pdf:hover {
-  background: #1b405a;
+  background: var(--radinus-bg-1b405a);
 }
 
 .loan__monthly {
@@ -3655,7 +3655,7 @@ input[type="text"].form__field--locked {
 /* Un chiffre qui vient de changer s'éclaire un instant. */
 @keyframes loan-glow {
   from {
-    background-color: rgba(195, 154, 60, 0.28);
+    background-color: var(--radinus-bg-rgba-195-154-60-28);
   }
   to {
     background-color: transparent;
@@ -3690,7 +3690,7 @@ input[type="text"].form__field--locked {
   border: 1px solid var(--loan-line);
   border-radius: 10px;
   padding: 12px 16px;
-  box-shadow: 0 1px 2px rgba(29, 43, 52, 0.05);
+  box-shadow: 0 1px 2px var(--radinus-shadow-rgba-29-43-52-05);
   min-width: 0;
 }
 
@@ -3937,7 +3937,7 @@ input[type="text"].form__field--locked {
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--radinus-fg-ffffff);
   background: var(--loan-green);
 }
 
@@ -3951,7 +3951,7 @@ input[type="text"].form__field--locked {
 
 /* La colonne retenue se détache : un fond doré très léger et un filet d'or. */
 .loan__rules .loan__rules-chosen {
-  background: rgba(195, 154, 60, 0.09);
+  background: var(--radinus-bg-rgba-195-154-60-09);
 }
 
 .loan__rules th.loan__rules-chosen {
@@ -4021,9 +4021,9 @@ input[type="text"].form__field--locked {
   margin: 0;
   padding: 10px 14px;
   border-radius: 10px;
-  background: #fdf3e6;
-  border: 1px solid #f1d4a6;
-  color: #8a5a12;
+  background: var(--radinus-bg-fdf3e6);
+  border: 1px solid var(--radinus-line-f1d4a6);
+  color: var(--radinus-fg-8a5a12);
   font-size: 13px;
 }
 
@@ -4624,7 +4624,7 @@ input[type="text"].form__field--locked {
 }
 
 .cut__row--reduced td {
-  background: #fbf4e4;
+  background: var(--radinus-bg-fbf4e4);
 }
 
 .cut__row--reduced .cut__name {
@@ -4889,7 +4889,7 @@ input[type="text"].form__field--locked {
 }
 
 .car__row--editing td {
-  background: #fbf4e4;
+  background: var(--radinus-bg-fbf4e4);
 }
 
 .car__note {
@@ -5180,7 +5180,7 @@ input[type="text"].form__field--locked {
 
 .sharing__row--invalid td,
 .sharing__row--invalid {
-  background: #fbeaea;
+  background: var(--radinus-bg-fbeaea);
 }
 
 .sharing__warning {
@@ -5256,7 +5256,7 @@ input[type="text"].form__field--locked {
 .export-banner {
   margin: 0 0 6px;
   font-weight: 700;
-  color: #1f3b4d;
+  color: var(--radinus-fg-1f3b4d);
 }
 
 .export-purpose {
@@ -5270,13 +5270,13 @@ input[type="text"].form__field--locked {
   margin: 10px 0 0;
   padding: 0;
   list-style: none;
-  color: #8a98a3;
+  color: var(--radinus-fg-8a98a3);
 }
 
 .export-steps li[aria-current="step"] {
-  color: #1f3b4d;
+  color: var(--radinus-fg-1f3b4d);
   font-weight: 700;
-  border-bottom: 2px solid #4f6675;
+  border-bottom: 2px solid var(--radinus-line-4f6675);
 }
 
 .export-choice {
@@ -5293,7 +5293,7 @@ input[type="text"].form__field--locked {
 
 .export-choice__hint {
   grid-column: 2;
-  color: #4a5a66;
+  color: var(--radinus-fg-4a5a66);
   font-style: italic;
 }
 
@@ -5304,16 +5304,16 @@ input[type="text"].form__field--locked {
 .export-group__title {
   margin: 0 0 4px;
   font-weight: 700;
-  color: #1f3b4d;
+  color: var(--radinus-fg-1f3b4d);
 }
 
 /* Une mise en garde se lit avant d'agir : elle a sa couleur. */
 .export-warning {
   margin: 10px 0 0;
   padding: 6px 10px;
-  border-left: 4px solid #b03a2e;
-  background-color: #fbeeee;
-  color: #5a1d16;
+  border-left: 4px solid var(--radinus-line-b03a2e);
+  background-color: var(--radinus-bg-fbeeee);
+  color: var(--radinus-fg-5a1d16);
 }
 
 .export-path {
@@ -5340,7 +5340,7 @@ input[type="text"].form__field--locked {
 .export-done {
   margin: 12px 0 0;
   font-weight: 700;
-  color: #1d5a2c;
+  color: var(--radinus-fg-1d5a2c);
 }
 
 .export-nav {

@@ -2043,6 +2043,15 @@ preferences-leaf-zoom = Размер отображения
 preferences-field-zoom = Увеличение:
 preferences-zoom-reset = Значение по умолчанию
 preferences-zoom-hint = Всё увеличивается вместе: текст, значки, столбцы. Ниже 100 % на экране помещается больше. А строка меню системы и её диалоговые окна следуют настройкам вашего компьютера, а не этим.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Оформление
+preferences-field-appearance = Тема:
+preferences-appearance-system = Как в системе
+preferences-appearance-light = Светлая
+preferences-appearance-sepia = Сепия
+preferences-appearance-dark = Тёмная
+preferences-appearance-hint = Применяется ко всем окнам сразу после сохранения. «Как в системе» берёт светлый или тёмный режим вашего компьютера и меняется вместе с ним. Печать и PDF остаются светлыми.
 preferences-branch-import = Импорт
 preferences-leaf-verification = Проверка
 preferences-field-verification = Импортированные операции:
@@ -2182,8 +2191,8 @@ preferences-columns-hint = Каждая таблица запоминает по
 preferences-branch-reset = Сброс
 preferences-leaf-comfort = Настройки удобства
 preferences-comfort-reset = Сбросить настройки удобства
-preferences-comfort-hint = Возвращает к исходному виду столбцы всех таблиц, порядок и флажки счетов в начальном окне и размер отображения. Язык, валюта и проверка импортированных операций не затрагиваются.
-preferences-comfort-question = Сбросить настройки удобства? Столбцы таблиц, начальное окно и размер отображения вернутся к исходному состоянию.
+preferences-comfort-hint = Возвращает к исходному виду столбцы всех таблиц, порядок и флажки счетов в начальном окне, размер отображения и тему. Язык, валюта и проверка импортированных операций не затрагиваются.
+preferences-comfort-question = Сбросить настройки удобства? Столбцы таблиц, начальное окно, размер отображения и тема вернутся к исходному состоянию.
 preferences-comfort-done = Настройки удобства сброшены.
 
 # --- Баннер окна приветствия ---------------------------------------------

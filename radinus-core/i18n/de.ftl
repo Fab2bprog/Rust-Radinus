@@ -1985,6 +1985,15 @@ preferences-leaf-zoom = Größe der Anzeige
 preferences-field-zoom = Vergrößerung:
 preferences-zoom-reset = Standardwert
 preferences-zoom-hint = Alles wird zusammen größer: der Text, die Symbole, die Spalten. Unter 100 % passt mehr auf den Bildschirm. Die Menüleiste des Systems und seine Dialogfenster dagegen folgen den Einstellungen Ihres Rechners und nicht diesen hier.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Erscheinungsbild
+preferences-field-appearance = Design:
+preferences-appearance-system = Dem System folgen
+preferences-appearance-light = Hell
+preferences-appearance-sepia = Sepia
+preferences-appearance-dark = Dunkel
+preferences-appearance-hint = Gilt für alle Fenster, sobald es gespeichert ist. „Dem System folgen“ übernimmt den hellen oder dunklen Modus Ihres Rechners und wechselt mit ihm. Ausdrucke und PDFs bleiben hell.
 preferences-branch-import = Import
 preferences-leaf-verification = Prüfung
 preferences-field-verification = Importierte Buchungen:
@@ -2124,8 +2133,8 @@ preferences-columns-hint = Jede Tabelle merkt sich die Reihenfolge ihrer Spalten
 preferences-branch-reset = Zurücksetzen
 preferences-leaf-comfort = Komforteinstellungen
 preferences-comfort-reset = Komforteinstellungen zurücksetzen
-preferences-comfort-hint = Stellt die Spalten aller Tabellen, die Reihenfolge und die Kontrollkästchen der Konten im Startfenster sowie die Größe der Anzeige wieder her. Sprache, Währung und die Prüfung importierter Buchungen bleiben unverändert.
-preferences-comfort-question = Komforteinstellungen zurücksetzen? Die Tabellenspalten, das Startfenster und die Größe der Anzeige kehren in ihren ursprünglichen Zustand zurück.
+preferences-comfort-hint = Stellt die Spalten aller Tabellen, die Reihenfolge und die Kontrollkästchen der Konten im Startfenster, die Größe der Anzeige sowie das Design wieder her. Sprache, Währung und die Prüfung importierter Buchungen bleiben unverändert.
+preferences-comfort-question = Komforteinstellungen zurücksetzen? Die Tabellenspalten, das Startfenster, die Größe der Anzeige und das Design kehren in ihren ursprünglichen Zustand zurück.
 preferences-comfort-done = Die Komforteinstellungen wurden zurückgesetzt.
 
 # --- Das Banner des Startfensters ----------------------------------------

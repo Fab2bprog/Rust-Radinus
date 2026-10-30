@@ -28,6 +28,8 @@
 // couleur du fond entre deux voisins, et la légende qui nomme chaque poste.
 
 /// Une part de l'anneau, telle que le noyau la rend.
+import { live } from "./theme";
+
 export interface RingSlice {
   /// La clef du poste ou de la catégorie — `0` pour la part « sans ».
   id: number;
@@ -352,7 +354,7 @@ export function drawRing(
       fill: colourOf(sector.rank),
       // Le filet de la couleur du fond sépare deux secteurs voisins : sans lui,
       // deux teintes proches se touchent et ne font plus qu'une tache.
-      stroke: "#FFFFFF",
+      style: `stroke: ${live("--radinus-chart-separator", "#FFFFFF")}`,
       "stroke-width": "2",
       // **La face d'un secteur se nomme**, pour qu'on puisse la compter sans
       // compter les parois (04/08/2026). En relief un secteur porte deux ou

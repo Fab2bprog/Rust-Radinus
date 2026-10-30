@@ -1797,6 +1797,15 @@ preferences-leaf-zoom = Tamaño de la presentación
 preferences-field-zoom = Ampliación:
 preferences-zoom-reset = Valor por defecto
 preferences-zoom-hint = Todo crece a la vez: el texto, los iconos, las columnas. Por debajo del 100 %, cabe más en la pantalla. La barra de menús del sistema y sus diálogos siguen los ajustes de su ordenador, no estos.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Apariencia
+preferences-field-appearance = Tema:
+preferences-appearance-system = Seguir el sistema
+preferences-appearance-light = Claro
+preferences-appearance-sepia = Sepia
+preferences-appearance-dark = Oscuro
+preferences-appearance-hint = Se aplica a todas las ventanas en cuanto se guarda. «Seguir el sistema» toma el modo claro u oscuro de su ordenador y cambia con él. Las impresiones y los PDF siguen claros.
 preferences-branch-import = Importación
 preferences-leaf-verification = Verificación
 preferences-field-verification = Operaciones importadas:
@@ -1936,8 +1945,8 @@ preferences-columns-hint = Cada tabla recuerda el orden de sus columnas, las que
 preferences-branch-reset = Restablecimiento
 preferences-leaf-comfort = Ajustes de comodidad
 preferences-comfort-reset = Restablecer los ajustes de comodidad
-preferences-comfort-hint = Devuelve a su estado original las columnas de todas las tablas, el orden y las casillas de las cuentas de la ventana de inicio, y el tamaño de la presentación. El idioma, la moneda y la verificación de las operaciones importadas no se tocan.
-preferences-comfort-question = ¿Restablecer los ajustes de comodidad? Las columnas de las tablas, la ventana de inicio y el tamaño de la presentación volverán a su estado original.
+preferences-comfort-hint = Devuelve a su estado original las columnas de todas las tablas, el orden y las casillas de las cuentas de la ventana de inicio, el tamaño de la presentación y el tema. El idioma, la moneda y la verificación de las operaciones importadas no se tocan.
+preferences-comfort-question = ¿Restablecer los ajustes de comodidad? Las columnas de las tablas, la ventana de inicio, el tamaño de la presentación y el tema volverán a su estado original.
 preferences-comfort-done = Se han restablecido los ajustes de comodidad.
 
 # --- Le bandeau de l'accueil ---------------------------------------------

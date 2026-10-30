@@ -2018,6 +2018,15 @@ preferences-leaf-zoom = Mărimea afișării
 preferences-field-zoom = Mărire:
 preferences-zoom-reset = Valoare implicită
 preferences-zoom-hint = Totul se mărește împreună: textul, pictogramele, coloanele. Sub 100 %, încape mai mult pe ecran. Bara de meniuri a sistemului și casetele lui de dialog, în schimb, urmează reglajele calculatorului dumneavoastră și nu pe acestea.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Aspect
+preferences-field-appearance = Temă:
+preferences-appearance-system = Urmează sistemul
+preferences-appearance-light = Luminos
+preferences-appearance-sepia = Sepia
+preferences-appearance-dark = Întunecat
+preferences-appearance-hint = Se aplică tuturor ferestrelor imediat după salvare. „Urmează sistemul” preia modul luminos sau întunecat al calculatorului dumneavoastră și se schimbă odată cu el. Tipăriturile și fișierele PDF rămân luminoase.
 preferences-branch-import = Import
 preferences-leaf-verification = Verificare
 preferences-field-verification = Operațiuni importate:
@@ -2157,8 +2166,8 @@ preferences-columns-hint = Fiecare tabel reține ordinea coloanelor, pe cele pe 
 preferences-branch-reset = Reinițializare
 preferences-leaf-comfort = Setări de confort
 preferences-comfort-reset = Reinițializează setările de confort
-preferences-comfort-hint = Readuce la starea inițială coloanele tuturor tabelelor, ordinea și casetele conturilor din fereastra de pornire și mărimea afișării. Limba, moneda și verificarea operațiunilor importate nu sunt modificate.
-preferences-comfort-question = Reinițializați setările de confort? Coloanele tabelelor, fereastra de pornire și mărimea afișării vor reveni la starea inițială.
+preferences-comfort-hint = Readuce la starea inițială coloanele tuturor tabelelor, ordinea și casetele conturilor din fereastra de pornire, mărimea afișării și tema. Limba, moneda și verificarea operațiunilor importate nu sunt modificate.
+preferences-comfort-question = Reinițializați setările de confort? Coloanele tabelelor, fereastra de pornire, mărimea afișării și tema vor reveni la starea inițială.
 preferences-comfort-done = Setările de confort au fost reinițializate.
 
 # --- Bannerul ferestrei de întâmpinare ------------------------------------

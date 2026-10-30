@@ -1979,6 +1979,15 @@ preferences-leaf-zoom = Näytön koko
 preferences-field-zoom = Suurennus:
 preferences-zoom-reset = Oletusarvo
 preferences-zoom-hint = Kaikki suurenee yhdessä: teksti, kuvakkeet ja sarakkeet. Alle 100 %:n koossa näytölle mahtuu enemmän. Järjestelmän valikkorivi ja sen valintaikkunat sen sijaan noudattavat tietokoneesi asetuksia eivätkä näitä.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Ulkoasu
+preferences-field-appearance = Teema:
+preferences-appearance-system = Seuraa järjestelmää
+preferences-appearance-light = Vaalea
+preferences-appearance-sepia = Seepia
+preferences-appearance-dark = Tumma
+preferences-appearance-hint = Koskee kaikkia ikkunoita heti tallennuksen jälkeen. ”Seuraa järjestelmää” käyttää tietokoneesi vaaleaa tai tummaa tilaa ja vaihtuu sen mukana. Tulosteet ja PDF-tiedostot pysyvät vaaleina.
 preferences-branch-import = Tuonti
 preferences-leaf-verification = Tarkistus
 preferences-field-verification = Tuodut tapahtumat:
@@ -2118,8 +2127,8 @@ preferences-columns-hint = Jokainen taulukko muistaa sarakkeidensa järjestyksen
 preferences-branch-reset = Palautus
 preferences-leaf-comfort = Mukavuusasetukset
 preferences-comfort-reset = Palauta mukavuusasetukset
-preferences-comfort-hint = Palauttaa kaikkien taulukoiden sarakkeet, aloitusikkunan tilien järjestyksen ja valintaruudut sekä näytön koon. Kieleen, valuuttaan ja tuotujen tapahtumien tarkistukseen ei kosketa.
-preferences-comfort-question = Palautetaanko mukavuusasetukset? Taulukoiden sarakkeet, aloitusikkuna ja näytön koko palaavat alkuperäiseen tilaansa.
+preferences-comfort-hint = Palauttaa kaikkien taulukoiden sarakkeet, aloitusikkunan tilien järjestyksen ja valintaruudut, näytön koon sekä teeman. Kieleen, valuuttaan ja tuotujen tapahtumien tarkistukseen ei kosketa.
+preferences-comfort-question = Palautetaanko mukavuusasetukset? Taulukoiden sarakkeet, aloitusikkuna, näytön koko ja teema palaavat alkuperäiseen tilaansa.
 preferences-comfort-done = Mukavuusasetukset on palautettu.
 
 # --- Aloitusnäytön banneri -----------------------------------------------

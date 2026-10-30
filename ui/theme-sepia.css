@@ -1,0 +1,186 @@
+/* Le thème Sépia (P-80, 30/10/2026).
+
+   Une valeur pour chaque couleur de tokens.css, posée quand la page porte
+   data-theme="sepia". Un thème clair et chaud, de papier ancien. Écrit
+   par une règle — un gris ou un bleu-gris devient le crème ou le brun de
+   même clarté, une couleur franche garde sa teinte, à peine réchauffée —
+   sauf les couleurs qui ont un sens (montants négatifs, statistiques,
+   doublons, alertes, en-têtes), choisies une à une. Les voiles et les
+   ombres gardent leur valeur ; la bannière, son bois. */
+:root[data-theme="sepia"] {
+  color-scheme: light;
+  color: #3b2f22;
+  --radinus-main-bg: #d8ccb4;
+  --radinus-menubar-bg: #d2c4a8;
+  --radinus-window-bg: #f4ecd8;
+  --radinus-section-bg: #e4d8bf;
+  --radinus-panel-bg: #8a7356;
+  --radinus-table-header-bg: #9a7b55;
+  --radinus-table-header-fg: #fffaf0;
+  --radinus-row-odd-bg: #f4ecd8;
+  --radinus-row-even-bg: #ebe0c8;
+  --radinus-row-selected-bg: #cdb48e;
+  --radinus-group-bg: #e6d6b8;
+  --radinus-duplicate-kept-bg: #d6e4bf;
+  --radinus-duplicate-doomed-bg: #efc7b8;
+  --radinus-cell-negative-bg: #eaa08f;
+  --radinus-cell-positive-bg: #b3aee0;
+  --radinus-cell-cancelling-bg: #b8dca0;
+  --radinus-negative-amount-fg: #8b1a00;
+  --radinus-total-somme-fg: #2a3a80;
+  --radinus-total-cumul-fg: #8b1a00;
+  --radinus-info-bar-help-fg: #2c3f9a;
+  --radinus-info-bar-alert-fg: #b3200a;
+  --radinus-bg-1b405a: #2a4453;
+  --radinus-bg-6f95ae: #b59b6f;
+  --radinus-bg-b3bcc3: #cdbb9d;
+  --radinus-bg-b9c9d4: #d3c4a9;
+  --radinus-bg-c8c8c8: #d4c5ab;
+  --radinus-bg-d4e5f7: #d9e3ec;
+  --radinus-bg-d6d6d6: #dbcfb9;
+  --radinus-bg-dcdcdc: #e9d6b5;
+  --radinus-bg-dde5ea: #ecdbbe;
+  --radinus-bg-dfe6ea: #ecdcbf;
+  --radinus-bg-e8eef2: #efe1c9;
+  --radinus-bg-e8f1fb: #f1e4cf;
+  --radinus-bg-e9eef2: #f0e2ca;
+  --radinus-bg-eef1f4: #f1e4ce;
+  --radinus-bg-eef2f5: #f1e4cf;
+  --radinus-bg-eef3f6: #f1e5cf;
+  --radinus-bg-eef3f7: #f1e5d0;
+  --radinus-bg-efefef: #f0e3cc;
+  --radinus-bg-f0f0f0: #f0e3cd;
+  --radinus-bg-f1f1f1: #f1e4ce;
+  --radinus-bg-f2a900: #e3a312;
+  --radinus-bg-f2f2f2: #f1e5cf;
+  --radinus-bg-f7f7f7: #f3e8d6;
+  --radinus-bg-fbeaea: #f1e5d0;
+  --radinus-bg-fbeeee: #f2e7d3;
+  --radinus-bg-fbf4e4: #f0e3cc;
+  --radinus-bg-fdeceb: #f2e6d2;
+  --radinus-bg-fdf3e6: #f1e4cf;
+  --radinus-bg-fff6e0: #f0e3cc;
+  --radinus-bg-ffffff: #f6eedf;
+  --radinus-chart-total: #4a3826;
+  --radinus-chart-grid: #d9cbb0;
+  --radinus-fg-000000: #2a2418;
+  --radinus-fg-0f0f0f: #3a3020;
+  --radinus-fg-124a17: #204a1c;
+  --radinus-fg-1a1a1a: #453a27;
+  --radinus-fg-1a2b3c: #26313a;
+  --radinus-fg-1a6b2a: #2b682e;
+  --radinus-fg-1c3f5a: #2b4453;
+  --radinus-fg-1c3f8f: #304881;
+  --radinus-fg-1c4e80: #2f5374;
+  --radinus-fg-1d2b34: #53462f;
+  --radinus-fg-1d5a2c: #2c592f;
+  --radinus-fg-1e6b24: #2e6829;
+  --radinus-fg-1f3550: #2d3b4b;
+  --radinus-fg-1f3b4d: #2c3f49;
+  --radinus-fg-2a2a2a: #554730;
+  --radinus-fg-2b82c9: #4484b3;
+  --radinus-fg-2c6e2f: #3b6c33;
+  --radinus-fg-2d2d2d: #584a31;
+  --radinus-fg-333f48: #69583b;
+  --radinus-fg-33424e: #6c5a3d;
+  --radinus-fg-3a3a3a: #655539;
+  --radinus-fg-4a5a66: #836e4a;
+  --radinus-fg-4a7a99: #a28554;
+  --radinus-fg-555555: #806c48;
+  --radinus-fg-5a1d16: #5c281d;
+  --radinus-fg-5b6b78: #9a7e4f;
+  --radinus-fg-6a6a6a: #9a7f4f;
+  --radinus-fg-6b7a85: #a98b57;
+  --radinus-fg-6b7a88: #a98c59;
+  --radinus-fg-7a3d00: #76420c;
+  --radinus-fg-7a7a7a: #aa8c59;
+  --radinus-fg-7a8fa6: #b59c70;
+  --radinus-fg-808080: #ad9160;
+  --radinus-fg-8a5a12: #875c1c;
+  --radinus-fg-8a8a8a: #b2986a;
+  --radinus-fg-8a949c: #b79e73;
+  --radinus-fg-8a98a3: #b9a177;
+  --radinus-fg-8b0000: #86130d;
+  --radinus-fg-8b1a1a: #882a23;
+  --radinus-fg-8fa9c4: #c3af8b;
+  --radinus-fg-909090: #b59c70;
+  --radinus-fg-9a9a9a: #bba37b;
+  --radinus-fg-9aa4ac: #c0aa84;
+  --radinus-fg-9e2a2b: #9b3a33;
+  --radinus-fg-a0a8ae: #c2ad88;
+  --radinus-fg-b00020: #a71628;
+  --radinus-fg-b31414: #ac2820;
+  --radinus-fg-b35c00: #aa600f;
+  --radinus-fg-c00000: #b61710;
+  --radinus-fg-d08a92: #ce9291;
+  --radinus-fg-ffffff: #fffaf0;
+  --radinus-line-3a6ea5: #4e7294;
+  --radinus-line-4f6675: #8e7750;
+  --radinus-line-7f8f9b: #b49a6d;
+  --radinus-line-8a99a4: #b9a178;
+  --radinus-line-8f9ea8: #bca47c;
+  --radinus-line-9aa6ae: #c0ab85;
+  --radinus-line-9aa7b1: #c1ac87;
+  --radinus-line-9aa8b2: #c1ac87;
+  --radinus-line-a0a8ae: #c2ad88;
+  --radinus-line-b03a2e: #ad4935;
+  --radinus-line-b0b0b0: #c7b392;
+  --radinus-line-b4b4b4: #c9b696;
+  --radinus-line-b6c2cb: #d0bfa3;
+  --radinus-line-b9c2c9: #d0c0a3;
+  --radinus-line-b9c6d0: #d2c2a7;
+  --radinus-line-c0c0c0: #cfbfa2;
+  --radinus-line-c2c2c2: #d0c0a4;
+  --radinus-line-c8c8c8: #d4c5ab;
+  --radinus-line-c8d0d6: #d7cab2;
+  --radinus-line-c9d2d8: #d8cbb4;
+  --radinus-line-c9d3da: #d9cbb5;
+  --radinus-line-cfcfcf: #d7cab2;
+  --radinus-line-d0d0d0: #d8cab3;
+  --radinus-line-d6dce1: #e9d6b4;
+  --radinus-line-d8dee3: #ead7b6;
+  --radinus-line-d9a441: #d2a24a;
+  --radinus-line-e2e2e2: #ecdabc;
+  --radinus-line-e2e6ea: #edddc1;
+  --radinus-line-e2e8ec: #edddc2;
+  --radinus-line-ececec: #efe1c8;
+  --radinus-line-f1d4a6: #ebd1a8;
+  --radinus-line-f2f2f2: #f1e5cf;
+  --radinus-line-ffffff: #f6eedf;
+  --radinus-ink-1f3550: #2d3b4b;
+  --radinus-ink-6b7a88: #a98c59;
+  --radinus-ink-8fa3b4: #bfa983;
+  --radinus-ink-b9c6d0: #d2c2a7;
+  --radinus-ink-d98200: #cd8210;
+  --radinus-ink-e6ebef: #efe0c6;
+  --radinus-ink-e9edf1: #efe1c9;
+  --radinus-ink-ffffff: #fffaf0;
+  --radinus-chart-separator: #f6eedf;
+}
+
+/* Les fenêtres-outils et leurs graphiques (étape D). */
+:root[data-theme="sepia"] .window--loan {
+  --loan-ink: #3b2f22;
+  --loan-muted: #7d6b55;
+  --loan-line: #e2d4b8;
+  --loan-paper: #fbf5e6;
+  --loan-soft: #f1e7d0;
+}
+:root[data-theme="sepia"] .window--loan svg [fill="#1d2b34"] {
+  fill: #3b2f22;
+}
+:root[data-theme="sepia"] .window--loan svg [fill="#6b7a88"] {
+  fill: #7d6b55;
+}
+:root[data-theme="sepia"] .window--loan svg [fill="#e3e8ed"] {
+  fill: #e2d4b8;
+}
+:root[data-theme="sepia"] .window--loan svg [stroke="#e3e8ed"] {
+  stroke: #e2d4b8;
+}
+:root[data-theme="sepia"] .window--loan svg [fill="#ffffff"] {
+  fill: #fbf5e6;
+}
+:root[data-theme="sepia"] .window--loan svg [stroke="#ffffff"] {
+  stroke: #fbf5e6;
+}

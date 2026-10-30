@@ -1802,6 +1802,15 @@ preferences-leaf-zoom = Display size
 preferences-field-zoom = Magnification:
 preferences-zoom-reset = Default value
 preferences-zoom-hint = Everything grows together: text, icons, columns. Below 100%, more fits on screen. The system's own menu bar and dialogs follow your computer's settings, not these.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Appearance
+preferences-field-appearance = Theme:
+preferences-appearance-system = Follow the system
+preferences-appearance-light = Light
+preferences-appearance-sepia = Sepia
+preferences-appearance-dark = Dark
+preferences-appearance-hint = Applies to every window as soon as it is saved. “Follow the system” takes your computer's light or dark mode, and changes with it. Prints and PDFs stay light.
 preferences-branch-import = Import
 preferences-leaf-verification = Verification
 preferences-field-verification = Imported operations:
@@ -1941,8 +1950,8 @@ preferences-columns-hint = Each table remembers the order of its columns, the on
 preferences-branch-reset = Reset
 preferences-leaf-comfort = Comfort settings
 preferences-comfort-reset = Reset the comfort settings
-preferences-comfort-hint = Puts back the columns of every table, the order and the tick boxes of the accounts on the home window, and the display size. The language, the currency and the verification of imported operations are not touched.
-preferences-comfort-question = Reset the comfort settings? The table columns, the home window and the display size will go back to their original state.
+preferences-comfort-hint = Puts back the columns of every table, the order and the tick boxes of the accounts on the home window, the display size and the theme. The language, the currency and the verification of imported operations are not touched.
+preferences-comfort-question = Reset the comfort settings? The table columns, the home window, the display size and the theme will go back to their original state.
 preferences-comfort-done = The comfort settings have been reset.
 
 # --- Le bandeau de l'accueil ---------------------------------------------

@@ -127,6 +127,50 @@ pub struct SoftwareConfig {
     /// ce réglage-là, et jamais toute la configuration.
     #[serde(default)]
     pub duplicates: Option<serde_json::Value>,
+
+    /// **L'apparence** (Fabrice, 30/10/2026, P-80) : `system`, `light`,
+    /// `sepia` ou `dark`. `None`, ou un mot inconnu : « Suivre le système »
+    /// (Fabrice, 31/10/2026 : « les utilisateurs pas heureux changeront le
+    /// mode manuellement, leur choix sera mémorisé »). Un réglage du logiciel, comme la
+    /// taille de l'affichage : il dit l'écran et les yeux, pas les comptes.
+    #[serde(default)]
+    pub appearance: Option<String>,
+}
+
+/// Les quatre apparences de Radinus (P-80).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Appearance {
+    /// Clair ou sombre, selon le réglage du système, suivi en direct — le
+    /// défaut (31/10/2026).
+    #[default]
+    System,
+    /// L'aspect de Radinus tel qu'il a toujours été.
+    Light,
+    Sepia,
+    Dark,
+}
+
+impl Appearance {
+    pub const ALL: [Appearance; 4] = [
+        Appearance::System,
+        Appearance::Light,
+        Appearance::Sepia,
+        Appearance::Dark,
+    ];
+
+    /// Le mot qui voyage vers les fenêtres et dans la configuration.
+    pub fn key(self) -> &'static str {
+        match self {
+            Appearance::System => "system",
+            Appearance::Light => "light",
+            Appearance::Sepia => "sepia",
+            Appearance::Dark => "dark",
+        }
+    }
+
+    pub fn from_key(key: &str) -> Option<Appearance> {
+        Appearance::ALL.into_iter().find(|one| one.key() == key)
+    }
 }
 
 /// Les bornes de la taille d'affichage, et le pas du curseur.
@@ -221,6 +265,15 @@ impl SoftwareConfig {
             },
         );
         MemoOptions { label, reference }
+    }
+
+    /// L'apparence choisie ; « Suivre le système » si rien n'est choisi ou si
+    /// le mot est illisible.
+    pub fn appearance(&self) -> Appearance {
+        self.appearance
+            .as_deref()
+            .and_then(Appearance::from_key)
+            .unwrap_or_default()
     }
 
     /// Les préférences de la recherche des doublons ; les valeurs par défaut
@@ -922,6 +975,7 @@ mod tests {
             ofx_memo_in_label: Some(true),
             ofx_memo_in_reference: Some(false),
             duplicates: Some(serde_json::json!({ "max_days": 3, "likeness": "strict" })),
+            appearance: Some("sepia".to_string()),
         };
         write_config(&root, &config).unwrap();
 
@@ -1282,6 +1336,22 @@ mod tests {
             serde_json::from_str(r#"{"ofx_label":"???","ofx_reference":"rien"}"#).unwrap();
         assert_eq!(edited.ofx_memo_options(), MemoOptions::default());
         fs::remove_dir_all(&root).ok();
+    }
+
+    /// **L'apparence** (30/10/2026) : « Suivre le système » par défaut
+    /// (31/10/2026), et pour un mot inconnu ; les quatre choix se relisent.
+    #[test]
+    fn the_appearance_defaults_to_the_system_and_survives() {
+        assert_eq!(SoftwareConfig::default().appearance(), Appearance::System);
+        for choice in Appearance::ALL {
+            let config = SoftwareConfig {
+                appearance: Some(choice.key().to_string()),
+                ..SoftwareConfig::default()
+            };
+            assert_eq!(config.appearance(), choice);
+        }
+        let edited: SoftwareConfig = serde_json::from_str(r#"{"appearance":"rose"}"#).unwrap();
+        assert_eq!(edited.appearance(), Appearance::System);
     }
 
     /// **Les préférences des doublons** (29/10/2026) : gardées d'un lancement

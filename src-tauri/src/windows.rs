@@ -1264,6 +1264,63 @@ pub fn zoom_factor() -> f64 {
     ZOOM.read().map(|held| *held).unwrap_or(1.0)
 }
 
+/// **L'apparence choisie** (P-80, 30/10/2026), comme le zoom : une propriété
+/// du logiciel qui tourne, tenue ici pour que `open` la connaisse sans lire la
+/// configuration ni la base.
+static APPEARANCE: std::sync::RwLock<radinus_core::location::Appearance> =
+    std::sync::RwLock::new(radinus_core::location::Appearance::System);
+
+/// L'événement qui dit à toutes les fenêtres l'apparence à prendre.
+pub const APPEARANCE_CHANGED: &str = "appearance-changed";
+
+pub fn set_appearance(appearance: radinus_core::location::Appearance) {
+    if let Ok(mut held) = APPEARANCE.write() {
+        *held = appearance;
+    }
+}
+
+pub fn appearance() -> radinus_core::location::Appearance {
+    APPEARANCE
+        .read()
+        .map(|held| *held)
+        .unwrap_or_default()
+}
+
+/// Le thème de la barre de titre : celui du système pour « Suivre le
+/// système », clair pour Clair et Sépia, sombre pour Sombre.
+fn native_theme() -> Option<tauri::Theme> {
+    use radinus_core::location::Appearance;
+    match appearance() {
+        Appearance::System => None,
+        Appearance::Light | Appearance::Sepia => Some(tauri::Theme::Light),
+        Appearance::Dark => Some(tauri::Theme::Dark),
+    }
+}
+
+/// **Le thème est posé avant le premier dessin de la page** : sans cela, une
+/// fenêtre ouverte en sombre se montrerait un instant en clair. « Suivre le
+/// système » se résout ici, au réglage du système à cet instant ; la page le
+/// suit ensuite elle-même (`theme.ts`).
+fn appearance_script() -> String {
+    format!(
+        "(() => {{ const chosen = '{}'; const dark = window.matchMedia && \
+         window.matchMedia('(prefers-color-scheme: dark)').matches; \
+         document.documentElement.dataset.theme = chosen === 'system' ? \
+         (dark ? 'dark' : 'light') : chosen; }})();",
+        appearance().key()
+    )
+}
+
+/// Pose l'apparence sur toutes les fenêtres ouvertes : la barre de titre, et
+/// l'événement que chaque page écoute pour changer de couleurs.
+pub fn apply_appearance_everywhere<R: Runtime>(app: &AppHandle<R>) {
+    let theme = native_theme();
+    for (_, window) in app.webview_windows() {
+        let _ = window.set_theme(theme);
+    }
+    let _ = app.emit(APPEARANCE_CHANGED, appearance().key());
+}
+
 /// Applique le zoom courant à toutes les fenêtres ouvertes.
 ///
 /// Une fenêtre qui refuse le zoom n'est pas une raison d'arrêter les autres :
@@ -1459,7 +1516,9 @@ fn build_the_window<R: Runtime>(
         .resizable(spec.resizable_chrome)
         .maximizable(spec.resizable_chrome)
         .minimizable(spec.resizable_chrome)
-        .closable(spec.closable);
+        .closable(spec.closable)
+        .theme(native_theme())
+        .initialization_script(appearance_script());
 
     if let Some(parent) = spec
         .parent

@@ -2001,6 +2001,15 @@ preferences-leaf-zoom = גודל התצוגה
 preferences-field-zoom = הגדלה:
 preferences-zoom-reset = ערך ברירת המחדל
 preferences-zoom-hint = הכול גדל יחד: הטקסט, הסמלים, העמודות. מתחת ל-100%, נכנס יותר אל המסך. שורת התפריטים של המערכת ותיבות הדו-שיח שלה, לעומת זאת, הולכות אחר ההגדרות של המחשב שלך ולא אחר אלה.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = מראה
+preferences-field-appearance = ערכת נושא:
+preferences-appearance-system = לפי המערכת
+preferences-appearance-light = בהיר
+preferences-appearance-sepia = ספיה
+preferences-appearance-dark = כהה
+preferences-appearance-hint = חל על כל החלונות מיד עם השמירה. „לפי המערכת” לוקח את המצב הבהיר או הכהה של המחשב שלך ומשתנה יחד איתו. הדפסות וקובצי PDF נשארים בהירים.
 preferences-branch-import = ייבוא
 preferences-leaf-verification = אימות
 preferences-field-verification = תנועות מיובאות:
@@ -2140,8 +2149,8 @@ preferences-columns-hint = כל טבלה זוכרת את סדר העמודות �
 preferences-branch-reset = איפוס
 preferences-leaf-comfort = הגדרות נוחות
 preferences-comfort-reset = איפוס הגדרות הנוחות
-preferences-comfort-hint = מחזיר למצב המקורי את העמודות של כל הטבלאות, את הסדר ואת תיבות הסימון של החשבונות בחלון הפתיחה ואת גודל התצוגה. השפה, המטבע ואימות התנועות המיובאות אינם משתנים.
-preferences-comfort-question = לאפס את הגדרות הנוחות? עמודות הטבלאות, חלון הפתיחה וגודל התצוגה יחזרו למצבם המקורי.
+preferences-comfort-hint = מחזיר למצב המקורי את העמודות של כל הטבלאות, את הסדר ואת תיבות הסימון של החשבונות בחלון הפתיחה, את גודל התצוגה ואת ערכת הנושא. השפה, המטבע ואימות התנועות המיובאות אינם משתנים.
+preferences-comfort-question = לאפס את הגדרות הנוחות? עמודות הטבלאות, חלון הפתיחה, גודל התצוגה וערכת הנושא יחזרו למצבם המקורי.
 preferences-comfort-done = הגדרות הנוחות אופסו.
 
 # --- כרזת הפתיחה ---------------------------------------------------------

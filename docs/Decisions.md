@@ -3350,6 +3350,77 @@ suppression ».
     as is a decision the database no longer matches. The journal (P-6) tells
     the treatment: EN COURS, one SUCCES line per deleted operation, TERMINE.
 
+## P-80 — Themes: Suivre le système, Clair, Sépia, Sombre (30/10/2026)
+
+Asked by Fabrice: « je suis très heureux de l'aspect graphique de Radinus,
+cependant je me demande s'il serait possible de faire un dark mode ? », then
+« un réglage avec 4 options : suivre le système, clair, sépia, dark mode ».
+
+1. **A software setting**, in Préférences › Affichage, sheet « Apparence »:
+   it belongs to the screen and the eyes, like the display size, not to the
+   accounts. Applied at once to every open window. « Suivre le système » gives
+   Clair or Sombre and follows the system live; no system offers sepia, so
+   Sépia is only ever chosen. « Réinitialiser les réglages de confort » brings
+   back the default.
+2. **Clair is Radinus as it was** (Fabrice: « clair c'est le mode normal tel
+   qu'il est maintenant »). **The default is « Suivre le système »** — revised
+   on 31/10/2026; it was Clair, so that a user whose computer is dark would
+   not see Radinus change after an update without having asked. Fabrice:
+   « je préfère Suivre le système par défaut, les utilisateurs pas heureux
+   changeront le mode manuellement, leur choix sera mémorisé ». Unknown or
+   absent, the setting follows the system too.
+3. **Prints and PDF stay light**: they go on paper.
+4. **Step A, a tidying nobody can see.** Every colour written in a
+   stylesheet — 318 places in window.css, cards.css and styles.css — became a
+   token of tokens.css with the same value, named after its role and the
+   light value it was born with (`--radinus-bg-f0f0f0`,
+   `--radinus-fg-3a3a3a`…): a background and a text of the same colour are two
+   tokens, which the dark and sepia themes can pull apart. The neutral colours
+   of the drawing code (the total of the curves, the floor line, the
+   separator of the rings) are read from tokens.css when drawing
+   (`ui/windows/theme.ts`); the series colours are data and stay. **Proof**:
+   the whole interface suite was run three times with a screenshot of every
+   open page at every check — 1 710 images. A first count announced them all
+   identical; it compared the transparency only. Counted again on the
+   colours (30/10/2026): two runs before the change already differ on 35
+   images, and the run after differs from the first on those plus 9 more —
+   a fade caught half-way, a caret, a slider thumb, never more than a few
+   pixels outside the fade. No colour moved.
+5. **Step B, the setting and the dark theme.** The choice lives in
+   `radinus_config.json`, key `appearance` (`system`, `light`, `sepia`,
+   `dark`; absent or unknown means `system`, point 2). Each page carries its theme on
+   the root of the document, `data-theme`; tokens.css holds the light values
+   and `ui/theme-dark.css` the dark ones. Rust sets the theme before the first
+   paint of every window it builds, and also the native theme of the window
+   (title bar, system menus); saving it repaints every open window without
+   reloading it (`appearance-changed`). The dark values follow a rule — a
+   light background becomes a dark grey of the same hue, a dark text a light
+   one — except the colours that mean something (negative amounts, the
+   statistics cells, the duplicates, the alerts, the table headers), chosen
+   one by one. The banner keeps its wood. **Proof**: the light theme,
+   counted on the colours, differs from before only by the new leaf of the
+   preferences tree and the sentence of « Réglages de confort ».
+6. **Step C, the sepia theme** (`ui/theme-sepia.css`). A light, warm theme,
+   old paper: a grey or a blue-grey becomes the cream or the brown of the same
+   lightness, a frank colour keeps its hue with a fifth of paper mixed in,
+   and the colours that mean something are chosen one by one, as for Sombre:
+   a negative amount stays red, a credit cell blue, a kept duplicate green.
+   The window keeps light system controls (`color-scheme: light`) and a light
+   title bar. Its rules apply only under `data-theme="sepia"`: Clair cannot
+   move.
+7. **Step D, the special cases.** The neutral colours of the drawings (the
+   total of the curves, the floor line, the separator of the rings) are set
+   in style as `var(--…)` rather than read when drawing: a drawing changes
+   colour with the theme without being drawn again. The tool windows
+   (loan, appliance, car, holiday, cushion, goal, sharing, cut-back) have
+   their own palette, `--loan-*`, given a dark and a sepia value; their
+   charts are drawn by the core with the colours of the PDF report, written
+   as attributes, and a theme rule overrides the neutral ones (text, grid,
+   separator) on screen only — the report stays light. Column tints are
+   translucent and need nothing. **Proof**: the light theme, counted on the
+   colours, differs from before only by the preferences leaf, the comfort
+   sentence, and the dates of the day (the run crossed midnight).
+
 ## How to add to this file
 
 One entry per ruling: an id, a date, what was decided in one sentence, and

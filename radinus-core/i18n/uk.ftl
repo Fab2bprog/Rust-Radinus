@@ -2043,6 +2043,15 @@ preferences-leaf-zoom = Розмір відображення
 preferences-field-zoom = Збільшення:
 preferences-zoom-reset = Значення за замовчуванням
 preferences-zoom-hint = Усе збільшується разом: текст, піктограми, стовпці. Нижче 100 % на екрані вміщується більше. А рядок меню системи та його діалогові вікна підпорядковуються налаштуванням вашого комп'ютера, а не цим.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Вигляд
+preferences-field-appearance = Тема:
+preferences-appearance-system = Як у системі
+preferences-appearance-light = Світла
+preferences-appearance-sepia = Сепія
+preferences-appearance-dark = Темна
+preferences-appearance-hint = Застосовується до всіх вікон одразу після збереження. «Як у системі» бере світлий або темний режим вашого комп'ютера і змінюється разом із ним. Друк і PDF залишаються світлими.
 preferences-branch-import = Імпорт
 preferences-leaf-verification = Перевірка
 preferences-field-verification = Імпортовані операції:
@@ -2182,8 +2191,8 @@ preferences-columns-hint = Кожна таблиця запам'ятовує п�
 preferences-branch-reset = Скидання
 preferences-leaf-comfort = Налаштування зручності
 preferences-comfort-reset = Скинути налаштування зручності
-preferences-comfort-hint = Повертає до початкового стану стовпці всіх таблиць, порядок і прапорці рахунків у початковому вікні та розмір відображення. Мова, валюта й перевірка імпортованих операцій не змінюються.
-preferences-comfort-question = Скинути налаштування зручності? Стовпці таблиць, початкове вікно та розмір відображення повернуться до початкового стану.
+preferences-comfort-hint = Повертає до початкового стану стовпці всіх таблиць, порядок і прапорці рахунків у початковому вікні, розмір відображення та тему. Мова, валюта й перевірка імпортованих операцій не змінюються.
+preferences-comfort-question = Скинути налаштування зручності? Стовпці таблиць, початкове вікно, розмір відображення та тема повернуться до початкового стану.
 preferences-comfort-done = Налаштування зручності скинуто.
 
 # --- Шапка вікна привітання ----------------------------------------------

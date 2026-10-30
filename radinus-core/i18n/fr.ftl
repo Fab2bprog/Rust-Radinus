@@ -1989,6 +1989,15 @@ preferences-leaf-zoom = Taille de l'affichage
 preferences-field-zoom = Agrandissement :
 preferences-zoom-reset = Valeur par défaut
 preferences-zoom-hint = Tout grossit ensemble : le texte, les icônes, les colonnes. En dessous de 100 %, il en tient davantage à l'écran. La barre de menus du système et ses boîtes de dialogue, elles, suivent les réglages de votre ordinateur et non ceux-ci.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Apparence
+preferences-field-appearance = Thème :
+preferences-appearance-system = Suivre le système
+preferences-appearance-light = Clair
+preferences-appearance-sepia = Sépia
+preferences-appearance-dark = Sombre
+preferences-appearance-hint = S'applique à toutes les fenêtres dès l'enregistrement. « Suivre le système » prend le clair ou le sombre de votre ordinateur, et change avec lui. Les impressions et les PDF restent clairs.
 preferences-branch-import = Importation
 preferences-leaf-verification = Vérification
 preferences-field-verification = Opérations importées :
@@ -2128,8 +2137,8 @@ preferences-columns-hint = Chaque tableau retient l'ordre de ses colonnes, celle
 preferences-branch-reset = Réinitialisation
 preferences-leaf-comfort = Réglages de confort
 preferences-comfort-reset = Réinitialiser les réglages de confort
-preferences-comfort-hint = Remet d'origine les colonnes de tous les tableaux, l'ordre et les cases des comptes de l'accueil, et la taille de l'affichage. La langue, la devise et la vérification des opérations importées ne sont pas touchées.
-preferences-comfort-question = Réinitialiser les réglages de confort ? Les colonnes des tableaux, l'accueil et la taille de l'affichage reviendront à leur état d'origine.
+preferences-comfort-hint = Remet d'origine les colonnes de tous les tableaux, l'ordre et les cases des comptes de l'accueil, la taille de l'affichage et le thème. La langue, la devise et la vérification des opérations importées ne sont pas touchées.
+preferences-comfort-question = Réinitialiser les réglages de confort ? Les colonnes des tableaux, l'accueil, la taille de l'affichage et le thème reviendront à leur état d'origine.
 preferences-comfort-done = Les réglages de confort ont été réinitialisés.
 
 # --- Le bandeau de l'accueil ---------------------------------------------

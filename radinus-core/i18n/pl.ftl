@@ -2042,6 +2042,15 @@ preferences-leaf-zoom = Rozmiar wyświetlania
 preferences-field-zoom = Powiększenie:
 preferences-zoom-reset = Wartość domyślna
 preferences-zoom-hint = Wszystko powiększa się razem: tekst, ikony, kolumny. Poniżej 100 % więcej mieści się na ekranie. Pasek menu systemu i jego okna dialogowe idą natomiast za ustawieniami twojego komputera, a nie za tymi.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Wygląd
+preferences-field-appearance = Motyw:
+preferences-appearance-system = Zgodnie z systemem
+preferences-appearance-light = Jasny
+preferences-appearance-sepia = Sepia
+preferences-appearance-dark = Ciemny
+preferences-appearance-hint = Obowiązuje we wszystkich oknach zaraz po zapisaniu. „Zgodnie z systemem” przyjmuje jasny lub ciemny tryb twojego komputera i zmienia się razem z nim. Wydruki i pliki PDF pozostają jasne.
 preferences-branch-import = Import
 preferences-leaf-verification = Weryfikacja
 preferences-field-verification = Operacje importowane:
@@ -2181,8 +2190,8 @@ preferences-columns-hint = Każda tabela zapamiętuje kolejność kolumn, te, kt
 preferences-branch-reset = Przywracanie
 preferences-leaf-comfort = Ustawienia wygody
 preferences-comfort-reset = Przywróć ustawienia wygody
-preferences-comfort-hint = Przywraca kolumny wszystkich tabel, kolejność i pola wyboru kont w oknie startowym oraz rozmiar wyświetlania. Język, waluta i weryfikacja importowanych operacji pozostają bez zmian.
-preferences-comfort-question = Przywrócić ustawienia wygody? Kolumny tabel, okno startowe i rozmiar wyświetlania wrócą do pierwotnego stanu.
+preferences-comfort-hint = Przywraca kolumny wszystkich tabel, kolejność i pola wyboru kont w oknie startowym, rozmiar wyświetlania oraz motyw. Język, waluta i weryfikacja importowanych operacji pozostają bez zmian.
+preferences-comfort-question = Przywrócić ustawienia wygody? Kolumny tabel, okno startowe, rozmiar wyświetlania i motyw wrócą do pierwotnego stanu.
 preferences-comfort-done = Ustawienia wygody zostały przywrócone.
 
 # --- Baner strony powitalnej ---------------------------------------------

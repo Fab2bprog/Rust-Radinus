@@ -191,6 +191,11 @@ The duplicate search keeps its preferences there too (29/10/2026, P-79), under
 (`take-over` or `warn`). Each setting is read on its own: an unreadable value
 takes its default and costs nothing else.
 
+The theme is a software setting too (30/10/2026, P-80), under `appearance`:
+`system`, `light`, `sepia` or `dark`. Absent or unknown, it is `system`: the
+light or dark of the computer (31/10/2026). « Réinitialiser les réglages de
+confort » removes it.
+
 The label holds 300 characters on screen, the reference 255; the columns are
 `TEXT`, so no base is migrated. A duplicate is looked for on the composed
 label.

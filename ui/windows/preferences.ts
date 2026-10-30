@@ -46,6 +46,8 @@ const currencyField = element<HTMLSelectElement>("currency");
 const customField = element<HTMLInputElement>("custom");
 const languageField = element<HTMLSelectElement>("language");
 const zoomField = element<HTMLInputElement>("zoom");
+/// Le thème (30/10/2026) : « system », « light », « sepia » ou « dark ».
+const appearanceField = element<HTMLSelectElement>("appearance");
 const verificationField = element<HTMLSelectElement>("verification");
 
 /// Le zoom que la base porte. Les bornes viennent du noyau : la fenêtre ne
@@ -78,6 +80,7 @@ const LEAVES: [string, string, string][] = [
   ["language", "preferences-leaf-language", "preferences-branch-display"],
   ["currency", "preferences-leaf-currency", "preferences-branch-display"],
   ["zoom", "preferences-leaf-zoom", "preferences-branch-display"],
+  ["appearance", "preferences-leaf-appearance", "preferences-branch-display"],
   ["columns", "preferences-leaf-columns", "preferences-branch-display"],
   ["verification", "preferences-leaf-verification", "preferences-branch-import"],
   ["ofx", "preferences-leaf-ofx", "preferences-branch-import"],
@@ -119,6 +122,7 @@ let reserve = {
   custom: "",
   language: "",
   zoom: "",
+  appearance: "",
   verification: "",
   electricity: "",
   qifOrder: "",
@@ -141,6 +145,7 @@ function current(): {
   custom: string;
   language: string;
   zoom: string;
+  appearance: string;
   verification: string;
   electricity: string;
   qifOrder: string;
@@ -154,6 +159,7 @@ function current(): {
     custom: customField.value.trim(),
     language: languageField.value,
     zoom: zoomField.value,
+    appearance: appearanceField.value,
     verification: verificationField.value,
     // Les cinq champs du tarif, en un seul texte : la fenêtre se sait
     // modifiée en comparant, comme pour les autres feuilles.
@@ -281,6 +287,7 @@ function modified(): boolean {
     now.choice !== reserve.choice ||
     now.language !== reserve.language ||
     now.zoom !== reserve.zoom ||
+    now.appearance !== reserve.appearance ||
     now.verification !== reserve.verification ||
     now.electricity !== reserve.electricity ||
     now.qifOrder !== reserve.qifOrder ||
@@ -482,6 +489,8 @@ async function load(): Promise<void> {
     zoomField.value = String(currency.zoom);
     zoomDefault = currency.zoom_default;
     showZoom();
+    // Le thème : un réglage du logiciel, lu même sans base.
+    appearanceField.value = await invoke<string>("preferences_appearance");
 
     const languages = await invoke<LanguageRow[]>("available_languages");
     // Le même ordre qu'au premier lancement : c'est la même liste, elle se
@@ -602,6 +611,10 @@ async function save(): Promise<void> {
         custom: now.custom,
       });
     }
+    // Le thème repeint toutes les fenêtres d'un coup, sans les recharger.
+    if (now.appearance !== reserve.appearance) {
+      await invoke("save_preferences_appearance", { choice: now.appearance });
+    }
     if (now.zoom !== reserve.zoom) {
       // **Le zoom part en dernier.** Il repeint toutes les fenêtres, celle-ci
       // comprise : ce qui se passe après serait vu au travers d'un écran qui
@@ -652,12 +665,12 @@ element<HTMLButtonElement>("columns-reset-all").addEventListener("click", () => 
 /// **« Réinitialiser les réglages de confort »** (Fabrice, 07/10/2026).
 ///
 /// Le seul bouton de réinitialisation qui pose une question : il défait d'un
-/// coup les colonnes de tous les tableaux, l'accueil et la taille — ce que
-/// l'utilisateur a mis des semaines à ajuster — et rien ne le rend.
+/// coup les colonnes de tous les tableaux, l'accueil, la taille et le thème
+/// — ce que l'utilisateur a mis des semaines à ajuster — et rien ne le rend.
 ///
 /// **Il agit tout de suite**, comme ceux des colonnes, sans passer par la
 /// disquette. Et il ne touche à aucun champ en cours de saisie, sauf la
-/// taille, qu'il vient de remettre lui-même : une langue ou une devise
+/// taille et le thème, qu'il vient de remettre lui-même : une langue ou une devise
 /// choisies mais pas encore enregistrées restent choisies.
 async function resetComfort(): Promise<void> {
   if (!(await askYesNo(t("preferences-comfort-question"), t("ui-yes"), t("ui-no")))) {
@@ -668,6 +681,10 @@ async function resetComfort(): Promise<void> {
     zoomField.value = String(zoomDefault);
     reserve.zoom = zoomField.value;
     showZoom();
+    // Le thème revient au défaut, « Suivre le système », déjà appliqué
+    // partout par le contrôleur.
+    appearanceField.value = "system";
+    reserve.appearance = appearanceField.value;
     say(t("preferences-comfort-done"));
   } catch (error) {
     say(tError("ui-save-failed", error), true);
@@ -716,6 +733,13 @@ async function dress(): Promise<void> {
     ["zoom-label", "preferences-field-zoom"],
     ["zoom-hint", "preferences-zoom-hint"],
     ["zoom-reset", "preferences-zoom-reset"],
+    ["appearance-title", "preferences-leaf-appearance"],
+    ["appearance-label", "preferences-field-appearance"],
+    ["appearance-system", "preferences-appearance-system"],
+    ["appearance-light", "preferences-appearance-light"],
+    ["appearance-sepia", "preferences-appearance-sepia"],
+    ["appearance-dark", "preferences-appearance-dark"],
+    ["appearance-hint", "preferences-appearance-hint"],
     ["verification-title", "preferences-leaf-verification"],
     ["verification-label", "preferences-field-verification"],
     ["verification-hint", "preferences-verification-hint"],

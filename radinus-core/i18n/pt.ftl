@@ -1798,6 +1798,15 @@ preferences-leaf-zoom = Tamanho da visualização
 preferences-field-zoom = Ampliação:
 preferences-zoom-reset = Valor por omissão
 preferences-zoom-hint = Tudo aumenta em conjunto: o texto, os ícones, as colunas. Abaixo de 100 %, cabe mais no ecrã. A barra de menus do sistema e as suas caixas de diálogo, essas, seguem as definições do seu computador e não estas.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Aparência
+preferences-field-appearance = Tema:
+preferences-appearance-system = Seguir o sistema
+preferences-appearance-light = Claro
+preferences-appearance-sepia = Sépia
+preferences-appearance-dark = Escuro
+preferences-appearance-hint = Aplica-se a todas as janelas assim que é guardado. «Seguir o sistema» adota o modo claro ou escuro do seu computador e muda com ele. As impressões e os PDF continuam claros.
 preferences-branch-import = Importação
 preferences-leaf-verification = Verificação
 preferences-field-verification = Operações importadas:
@@ -1937,8 +1946,8 @@ preferences-columns-hint = Cada tabela memoriza a ordem das suas colunas, as que
 preferences-branch-reset = Reposição
 preferences-leaf-comfort = Definições de conforto
 preferences-comfort-reset = Repor as definições de conforto
-preferences-comfort-hint = Repõe as colunas de todas as tabelas, a ordem e as caixas das contas da janela inicial e o tamanho da visualização. O idioma, a moeda e a verificação das operações importadas não são alterados.
-preferences-comfort-question = Repor as definições de conforto? As colunas das tabelas, a janela inicial e o tamanho da visualização voltarão ao estado original.
+preferences-comfort-hint = Repõe as colunas de todas as tabelas, a ordem e as caixas das contas da janela inicial, o tamanho da visualização e o tema. O idioma, a moeda e a verificação das operações importadas não são alterados.
+preferences-comfort-question = Repor as definições de conforto? As colunas das tabelas, a janela inicial, o tamanho da visualização e o tema voltarão ao estado original.
 preferences-comfort-done = As definições de conforto foram repostas.
 
 

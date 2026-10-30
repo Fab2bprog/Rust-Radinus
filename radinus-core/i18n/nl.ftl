@@ -1991,6 +1991,15 @@ preferences-leaf-zoom = Grootte van de weergave
 preferences-field-zoom = Vergroting:
 preferences-zoom-reset = Standaardwaarde
 preferences-zoom-hint = Alles wordt samen groter: de tekst, de pictogrammen, de kolommen. Onder 100 % past er meer op het scherm. De menubalk van het systeem en zijn dialoogvensters volgen daarentegen de instellingen van uw computer en niet deze hier.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Weergavestijl
+preferences-field-appearance = Thema:
+preferences-appearance-system = Systeem volgen
+preferences-appearance-light = Licht
+preferences-appearance-sepia = Sepia
+preferences-appearance-dark = Donker
+preferences-appearance-hint = Geldt voor alle vensters zodra het is opgeslagen. „Systeem volgen” neemt de lichte of donkere modus van uw computer over en wisselt mee. Afdrukken en pdf's blijven licht.
 preferences-branch-import = Import
 preferences-leaf-verification = Controle
 preferences-field-verification = Geïmporteerde boekingen:
@@ -2130,8 +2139,8 @@ preferences-columns-hint = Elke tabel onthoudt de volgorde van zijn kolommen, de
 preferences-branch-reset = Herstellen
 preferences-leaf-comfort = Comfortinstellingen
 preferences-comfort-reset = Comfortinstellingen herstellen
-preferences-comfort-hint = Herstelt de kolommen van alle tabellen, de volgorde en de selectievakjes van de rekeningen in het startvenster, en de grootte van de weergave. De taal, de valuta en de controle van geïmporteerde boekingen blijven ongemoeid.
-preferences-comfort-question = Comfortinstellingen herstellen? De tabelkolommen, het startvenster en de grootte van de weergave keren terug naar hun oorspronkelijke staat.
+preferences-comfort-hint = Herstelt de kolommen van alle tabellen, de volgorde en de selectievakjes van de rekeningen in het startvenster, de grootte van de weergave en het thema. De taal, de valuta en de controle van geïmporteerde boekingen blijven ongemoeid.
+preferences-comfort-question = Comfortinstellingen herstellen? De tabelkolommen, het startvenster, de grootte van de weergave en het thema keren terug naar hun oorspronkelijke staat.
 preferences-comfort-done = De comfortinstellingen zijn hersteld.
 
 # --- De banner van het startvenster ---------------------------------------

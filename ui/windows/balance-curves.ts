@@ -16,6 +16,7 @@
 // choisies à l'œil — elles restent distinctes pour un daltonien, ce qui n'est
 // pas vrai de n'importe quelle suite de teintes.
 
+import { live } from "./theme";
 import "./shortcuts";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -88,10 +89,10 @@ const COLOURS = [
 /// Le total n'est pas un compte de plus : c'est leur somme. Il porte donc un
 /// gris ardoise et un trait plus épais, et non une neuvième teinte qui le
 /// ferait passer pour un compte parmi les autres.
-const TOTAL_COLOUR = "#33475B";
+// La couleur du total vient de tokens.css (`--radinus-chart-total`).
 
 function colourOf(curve: Curve, rank: number): string {
-  return curve.is_total ? TOTAL_COLOUR : COLOURS[rank % COLOURS.length];
+  return curve.is_total ? live("--radinus-chart-total", "#33475B") : COLOURS[rank % COLOURS.length];
 }
 
 // --- Le tracé -------------------------------------------------------------
@@ -330,7 +331,7 @@ function draw(): void {
     const path = make("path");
     path.setAttribute("d", stepPath(curve, scale));
     path.setAttribute("fill", "none");
-    path.setAttribute("stroke", colourOf(curve, rank));
+    path.style.stroke = colourOf(curve, rank);
     path.setAttribute("stroke-width", curve.is_total ? "3" : "2");
     path.setAttribute("stroke-linejoin", "round");
     path.dataset.account = String(curve.account_id);

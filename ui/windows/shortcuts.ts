@@ -25,6 +25,9 @@
 // qui pose l'écouteur.
 
 import { invoke } from "@tauri-apps/api/core";
+// Le thème de la page (P-80) : toutes les pages importent ce module, donc
+// toutes prennent l'apparence choisie et la suivent.
+import "./theme";
 
 interface Shortcut {
   /// L'entrée de menu à déclencher.

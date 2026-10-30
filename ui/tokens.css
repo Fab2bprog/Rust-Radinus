@@ -1,3 +1,8 @@
+/* Les thèmes (P-80) : leurs valeurs passent devant celles de :root quand la
+   page porte data-theme. */
+@import "./theme-dark.css";
+@import "./theme-sepia.css";
+
 /* Design tokens — colors measured on the original Radinus 1.9.3 screenshots.
  * Source: 03_CHARTE_GRAPHIQUE.md §1. Do not hand-tune these values; if a
  * color looks wrong, re-check the dossier and correct it there first. */
@@ -59,4 +64,171 @@
   --radinus-font-family: -apple-system, "San Francisco", "Segoe UI",
     sans-serif;
   --radinus-font-size-base: 13px;
+
+  /* --- Les couleurs des feuilles de style (thèmes, étape A, 30/10/2026) ---
+     Chaque couleur qui était écrite en dur dans window.css, cards.css et
+     styles.css est ici, avec sa valeur d'origine : le thème Clair est
+     exactement l'aspect d'avant. Le nom dit le rôle — fond, texte, trait,
+     ombre, dessin — et la valeur claire dont il est né ; un fond et un
+     texte de même couleur sont deux jetons, que les thèmes Sombre et Sépia
+     pourront séparer. */
+
+  /* Fonds */
+  --radinus-bg-1b405a: #1b405a;
+  --radinus-bg-6f95ae: #6f95ae;
+  --radinus-bg-b3bcc3: #b3bcc3;
+  --radinus-bg-b9c9d4: #b9c9d4;
+  --radinus-bg-c8c8c8: #c8c8c8;
+  --radinus-bg-d4e5f7: #d4e5f7;
+  --radinus-bg-d6d6d6: #d6d6d6;
+  --radinus-bg-dcdcdc: #dcdcdc;
+  --radinus-bg-dde5ea: #dde5ea;
+  --radinus-bg-dfe6ea: #dfe6ea;
+  --radinus-bg-e8eef2: #e8eef2;
+  --radinus-bg-e8f1fb: #e8f1fb;
+  --radinus-bg-e9eef2: #e9eef2;
+  --radinus-bg-eef1f4: #eef1f4;
+  --radinus-bg-eef2f5: #eef2f5;
+  --radinus-bg-eef3f6: #eef3f6;
+  --radinus-bg-eef3f7: #eef3f7;
+  --radinus-bg-efefef: #efefef;
+  --radinus-bg-f0f0f0: #f0f0f0;
+  --radinus-bg-f1f1f1: #f1f1f1;
+  --radinus-bg-f2a900: #f2a900;
+  --radinus-bg-f2f2f2: #f2f2f2;
+  --radinus-bg-f7f7f7: #f7f7f7;
+  --radinus-bg-fbeaea: #fbeaea;
+  --radinus-bg-fbeeee: #fbeeee;
+  --radinus-bg-fbf4e4: #fbf4e4;
+  --radinus-bg-fdeceb: #fdeceb;
+  --radinus-bg-fdf3e6: #fdf3e6;
+  --radinus-bg-fff6e0: #fff6e0;
+  --radinus-bg-ffffff: #ffffff;
+  --radinus-bg-rgba-0-0-0-14: rgba(0, 0, 0, 0.14);
+  --radinus-bg-rgba-0-0-0-35: rgba(0, 0, 0, 0.35);
+  --radinus-bg-rgba-195-154-60-09: rgba(195, 154, 60, 0.09);
+  --radinus-bg-rgba-195-154-60-28: rgba(195, 154, 60, 0.28);
+  --radinus-bg-rgba-255-255-255-14: rgba(255, 255, 255, 0.14);
+  --radinus-bg-rgba-255-255-255-2: rgba(255, 255, 255, 0.2);
+  --radinus-bg-rgba-255-255-255-45: rgba(255, 255, 255, 0.45);
+
+  /* Graphiques : ce que le code qui dessine lit par `token()` (theme.ts) */
+  --radinus-chart-total: #33475B;
+  --radinus-chart-grid: #d8dee3;
+  --radinus-chart-separator: #FFFFFF;
+
+  /* Textes */
+  --radinus-fg-000000: #000000;
+  --radinus-fg-0f0f0f: #0f0f0f;
+  --radinus-fg-124a17: #124a17;
+  --radinus-fg-1a1a1a: #1a1a1a;
+  --radinus-fg-1a2b3c: #1a2b3c;
+  --radinus-fg-1a6b2a: #1a6b2a;
+  --radinus-fg-1c3f5a: #1c3f5a;
+  --radinus-fg-1c3f8f: #1c3f8f;
+  --radinus-fg-1c4e80: #1c4e80;
+  --radinus-fg-1d2b34: #1d2b34;
+  --radinus-fg-1d5a2c: #1d5a2c;
+  --radinus-fg-1e6b24: #1e6b24;
+  --radinus-fg-1f3550: #1f3550;
+  --radinus-fg-1f3b4d: #1f3b4d;
+  --radinus-fg-2a2a2a: #2a2a2a;
+  --radinus-fg-2b82c9: #2b82c9;
+  --radinus-fg-2c6e2f: #2c6e2f;
+  --radinus-fg-2d2d2d: #2d2d2d;
+  --radinus-fg-333f48: #333f48;
+  --radinus-fg-33424e: #33424e;
+  --radinus-fg-3a3a3a: #3a3a3a;
+  --radinus-fg-4a5a66: #4a5a66;
+  --radinus-fg-4a7a99: #4a7a99;
+  --radinus-fg-555555: #555;
+  --radinus-fg-5a1d16: #5a1d16;
+  --radinus-fg-5b6b78: #5b6b78;
+  --radinus-fg-6a6a6a: #6a6a6a;
+  --radinus-fg-6b7a85: #6b7a85;
+  --radinus-fg-6b7a88: #6b7a88;
+  --radinus-fg-7a3d00: #7a3d00;
+  --radinus-fg-7a7a7a: #7a7a7a;
+  --radinus-fg-7a8fa6: #7a8fa6;
+  --radinus-fg-808080: #808080;
+  --radinus-fg-8a5a12: #8a5a12;
+  --radinus-fg-8a8a8a: #8a8a8a;
+  --radinus-fg-8a949c: #8a949c;
+  --radinus-fg-8a98a3: #8a98a3;
+  --radinus-fg-8b0000: #8b0000;
+  --radinus-fg-8b1a1a: #8b1a1a;
+  --radinus-fg-8fa9c4: #8fa9c4;
+  --radinus-fg-909090: #909090;
+  --radinus-fg-9a9a9a: #9a9a9a;
+  --radinus-fg-9aa4ac: #9aa4ac;
+  --radinus-fg-9e2a2b: #9e2a2b;
+  --radinus-fg-a0a8ae: #a0a8ae;
+  --radinus-fg-b00020: #b00020;
+  --radinus-fg-b31414: #b31414;
+  --radinus-fg-b35c00: #b35c00;
+  --radinus-fg-c00000: #c00000;
+  --radinus-fg-d08a92: #d08a92;
+  --radinus-fg-ffffff: #ffffff;
+
+  /* Traits et bordures */
+  --radinus-line-3a6ea5: #3a6ea5;
+  --radinus-line-4f6675: #4f6675;
+  --radinus-line-7f8f9b: #7f8f9b;
+  --radinus-line-8a99a4: #8a99a4;
+  --radinus-line-8f9ea8: #8f9ea8;
+  --radinus-line-9aa6ae: #9aa6ae;
+  --radinus-line-9aa7b1: #9aa7b1;
+  --radinus-line-9aa8b2: #9aa8b2;
+  --radinus-line-a0a8ae: #a0a8ae;
+  --radinus-line-b03a2e: #b03a2e;
+  --radinus-line-b0b0b0: #b0b0b0;
+  --radinus-line-b4b4b4: #b4b4b4;
+  --radinus-line-b6c2cb: #b6c2cb;
+  --radinus-line-b9c2c9: #b9c2c9;
+  --radinus-line-b9c6d0: #b9c6d0;
+  --radinus-line-c0c0c0: #c0c0c0;
+  --radinus-line-c2c2c2: #c2c2c2;
+  --radinus-line-c8c8c8: #c8c8c8;
+  --radinus-line-c8d0d6: #c8d0d6;
+  --radinus-line-c9d2d8: #c9d2d8;
+  --radinus-line-c9d3da: #c9d3da;
+  --radinus-line-cfcfcf: #cfcfcf;
+  --radinus-line-d0d0d0: #d0d0d0;
+  --radinus-line-d6dce1: #d6dce1;
+  --radinus-line-d8dee3: #d8dee3;
+  --radinus-line-d9a441: #d9a441;
+  --radinus-line-e2e2e2: #e2e2e2;
+  --radinus-line-e2e6ea: #e2e6ea;
+  --radinus-line-e2e8ec: #e2e8ec;
+  --radinus-line-ececec: #ececec;
+  --radinus-line-f1d4a6: #f1d4a6;
+  --radinus-line-f2f2f2: #f2f2f2;
+  --radinus-line-ffffff: #ffffff;
+  --radinus-line-rgba-255-255-255-25: rgba(255, 255, 255, 0.25);
+
+  /* Ombres */
+  --radinus-shadow-3a6ea5: #3a6ea5;
+  --radinus-shadow-c8c8c8: #c8c8c8;
+  --radinus-shadow-rgba-0-0-0-18: rgba(0, 0, 0, 0.18);
+  --radinus-shadow-rgba-0-0-0-2: rgba(0, 0, 0, 0.2);
+  --radinus-shadow-rgba-0-0-0-22: rgba(0, 0, 0, 0.22);
+  --radinus-shadow-rgba-0-0-0-25: rgba(0, 0, 0, 0.25);
+  --radinus-shadow-rgba-0-0-0-3: rgba(0, 0, 0, 0.3);
+  --radinus-shadow-rgba-0-0-0-35: rgba(0, 0, 0, 0.35);
+  --radinus-shadow-rgba-255-255-255-7: rgba(255, 255, 255, 0.7);
+  --radinus-shadow-rgba-29-43-52-05: rgba(29, 43, 52, 0.05);
+  --radinus-shadow-rgba-29-43-52-06: rgba(29, 43, 52, 0.06);
+  --radinus-shadow-rgba-36-80-110-35: rgba(36, 80, 110, 0.35);
+
+  /* Dessins (SVG) */
+  --radinus-ink-1f3550: #1f3550;
+  --radinus-ink-6b7a88: #6b7a88;
+  --radinus-ink-8fa3b4: #8fa3b4;
+  --radinus-ink-b9c6d0: #b9c6d0;
+  --radinus-ink-d98200: #d98200;
+  --radinus-ink-e6ebef: #e6ebef;
+  --radinus-ink-e9edf1: #e9edf1;
+  --radinus-ink-ffffff: #ffffff;
+  --radinus-ink-rgba-0-0-0-45: rgba(0, 0, 0, 0.45);
+  --radinus-ink-rgba-245-170-0-18: rgba(245, 170, 0, 0.18);
 }

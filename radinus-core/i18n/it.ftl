@@ -1980,6 +1980,15 @@ preferences-leaf-zoom = Dimensione della visualizzazione
 preferences-field-zoom = Ingrandimento:
 preferences-zoom-reset = Valore predefinito
 preferences-zoom-hint = Tutto si ingrandisce insieme: il testo, le icone, le colonne. Al di sotto del 100 %, ne sta di più sullo schermo. La barra dei menu del sistema e le sue finestre di dialogo, invece, seguono le impostazioni del suo computer e non queste.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Aspetto
+preferences-field-appearance = Tema:
+preferences-appearance-system = Segui il sistema
+preferences-appearance-light = Chiaro
+preferences-appearance-sepia = Seppia
+preferences-appearance-dark = Scuro
+preferences-appearance-hint = Si applica a tutte le finestre non appena viene salvato. «Segui il sistema» prende la modalità chiara o scura del suo computer e cambia con essa. Le stampe e i PDF restano chiari.
 preferences-branch-import = Importazione
 preferences-leaf-verification = Verifica
 preferences-field-verification = Operazioni importate:
@@ -2119,8 +2128,8 @@ preferences-columns-hint = Ogni tabella ricorda l'ordine delle sue colonne, quel
 preferences-branch-reset = Ripristino
 preferences-leaf-comfort = Impostazioni di comodità
 preferences-comfort-reset = Ripristina le impostazioni di comodità
-preferences-comfort-hint = Riporta allo stato originale le colonne di tutte le tabelle, l'ordine e le caselle dei conti della finestra iniziale e la dimensione della visualizzazione. La lingua, la valuta e la verifica delle operazioni importate non vengono toccate.
-preferences-comfort-question = Ripristinare le impostazioni di comodità? Le colonne delle tabelle, la finestra iniziale e la dimensione della visualizzazione torneranno allo stato originale.
+preferences-comfort-hint = Riporta allo stato originale le colonne di tutte le tabelle, l'ordine e le caselle dei conti della finestra iniziale, la dimensione della visualizzazione e il tema. La lingua, la valuta e la verifica delle operazioni importate non vengono toccate.
+preferences-comfort-question = Ripristinare le impostazioni di comodità? Le colonne delle tabelle, la finestra iniziale, la dimensione della visualizzazione e il tema torneranno allo stato originale.
 preferences-comfort-done = Le impostazioni di comodità sono state ripristinate.
 
 # --- Lo striscione della pagina di benvenuto ------------------------------

@@ -1581,7 +1581,14 @@ const UI_TEXTS = {
   "preferences-branch-reset": "Réinitialisation",
   "preferences-leaf-comfort": "Réglages de confort",
   "preferences-comfort-reset": "Réinitialiser les réglages de confort",
-  "preferences-comfort-hint": "Remet d'origine les colonnes, l'accueil et la taille.",
+  "preferences-comfort-hint": "Remet d'origine les colonnes, l'accueil, la taille et le thème.",
+  "preferences-leaf-appearance": "Apparence",
+  "preferences-field-appearance": "Thème :",
+  "preferences-appearance-system": "Suivre le système",
+  "preferences-appearance-light": "Clair",
+  "preferences-appearance-sepia": "Sépia",
+  "preferences-appearance-dark": "Sombre",
+  "preferences-appearance-hint": "S'applique à toutes les fenêtres dès l'enregistrement.",
   "menu-accounts": "Comptes",
   "menu-accounts-duplicates": "Recherche des doublons",
   "duplicates-levels": "Niveaux :",
@@ -2763,6 +2770,17 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
           // tenue par la page.
           case "preferences_qif":
             return Promise.resolve(window.__qifPreferences ?? { order: "ask", label: "both" });
+          // Le thème (30/10/2026) : la configuration du logiciel, tenue par
+          // la page ; l'enregistrer prévient la page, comme le contrôleur
+          // prévient toutes les fenêtres.
+          case "preferences_appearance":
+            return Promise.resolve(window.__appearance ?? "system");
+          case "save_preferences_appearance": {
+            window.__appearance = args.choice;
+            const changed = window.__listeners && window.__listeners["appearance-changed"];
+            if (changed) changed({ event: "appearance-changed", id: 1, payload: args.choice });
+            return Promise.resolve(null);
+          }
           case "preferences_ofx":
             return Promise.resolve(window.__ofxPreferences ?? { label: "name", reference: "memo" });
           case "save_preferences_ofx":
@@ -2866,6 +2884,10 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
             window.__layout = null;
             window.__welcomeStored = { order: [], excluded: [] };
             window.__zoom = 1;
+            window.__appearance = "system";
+            if (window.__listeners && window.__listeners["appearance-changed"]) {
+              window.__listeners["appearance-changed"]({ event: "appearance-changed", id: 1, payload: "system" });
+            }
             return Promise.resolve(null);
           case "save_welcome_accounts":
             window.__welcomeStored = { order: args.order, excluded: args.excluded };
@@ -10988,7 +11010,7 @@ async function openWindow(page, url, options) {
     "préférences : la feuille « Colonnes des tableaux » est sous « Affichage »",
     (await page.locator(".tree > *").evaluateAll((all) =>
       all.map((piece) => piece.dataset.leaf ?? piece.textContent).join("|"),
-    )) === "Affichage|language|currency|zoom|columns|Importation|verification|ofx|qif|Comptes|duplicates|Outils|electricity|Réinitialisation|comfort" &&
+    )) === "Affichage|language|currency|zoom|appearance|columns|Importation|verification|ofx|qif|Comptes|duplicates|Outils|electricity|Réinitialisation|comfort" &&
       (await page.locator('.tree__leaf[data-leaf="columns"]').textContent()) === "Colonnes des tableaux",
   );
   await page.click('.tree__leaf[data-leaf="columns"]');
@@ -15685,6 +15707,195 @@ async function openWindow(page, url, options) {
     !(await closed.locator('.tree__leaf[data-leaf="comfort"]').isDisabled()),
   );
   await closed.close();
+}
+
+// --- Préférences : « Apparence », le thème (30/10/2026) -------------------
+{
+  // Fabrice, 30/10/2026 : « un reglage avec 4 options : Suivre le systeme,
+  // clair, sepia, dark mode ». Le 31/10/2026 : « je prefere Suivre le
+  // systeme par defaut, les utilisateur pas heureux ils changeront le mode
+  // manuellement, leur choix sera memorisé ».
+  const page = await browser.newPage({ colorScheme: "light" });
+  await openWindow(page, "http://localhost:4173/ui/windows/preferences.html");
+  const theme = () => page.evaluate(() => document.documentElement.dataset.theme);
+  const windowBg = () =>
+    page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue("--radinus-window-bg").trim(),
+    );
+  check(
+    "thème : rien de choisi, une page suit le système — clair sur un système clair",
+    (await theme()) === "light",
+    await theme(),
+  );
+  const lightBg = await windowBg();
+  await page.click('.tree__leaf[data-leaf="appearance"]');
+  check(
+    "thème : la feuille « Apparence » est sous « Affichage », après la taille",
+    (await page.locator('.tree__leaf[data-leaf="appearance"]').textContent()) === "Apparence" &&
+      (await page.textContent("#appearance-title")) === "Apparence" &&
+      (await page.textContent("#appearance-label")) === "Thème :",
+  );
+  check(
+    "thème : quatre choix, dans l'ordre dicté, « Suivre le système » choisi",
+    (await page.locator("#appearance option").evaluateAll((all) =>
+      all.map((option) => option.value + "=" + option.textContent).join("|"),
+    )) === "system=Suivre le système|light=Clair|sepia=Sépia|dark=Sombre" &&
+      (await page.inputValue("#appearance")) === "system",
+  );
+
+  await page.selectOption("#appearance", "dark");
+  check(
+    "thème : choisir ne change rien avant la disquette",
+    (await theme()) === "light" &&
+      (await page.evaluate(() => window.__calls.every(([c]) => c !== "save_preferences_appearance"))),
+  );
+  await page.click("#save");
+  await page.waitForTimeout(200);
+  check(
+    "thème : la disquette enregistre « dark », d'une seule commande",
+    await page.evaluate(
+      () =>
+        JSON.stringify(window.__calls.filter(([c]) => c === "save_preferences_appearance")) ===
+        JSON.stringify([["save_preferences_appearance", { choice: "dark" }]]),
+    ),
+  );
+  check(
+    "thème : la page passe en sombre aussitôt, ses couleurs avec elle",
+    (await theme()) === "dark" && (await windowBg()) === "#1c1f22" && lightBg !== "#1c1f22",
+    `${await theme()} ${await windowBg()}`,
+  );
+  check(
+    "thème : les champs du système passent en sombre",
+    (await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)) === "dark",
+  );
+
+  // Sépia : un thème clair, chaud, choisi seulement — aucun système ne l'offre.
+  await page.selectOption("#appearance", "sepia");
+  await page.click("#save");
+  await page.waitForTimeout(200);
+  check(
+    "thème : « Sépia » pose le papier et garde les champs du système en clair",
+    (await theme()) === "sepia" &&
+      (await windowBg()) === "#f4ecd8" &&
+      (await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)) === "light",
+    `${await theme()} ${await windowBg()}`,
+  );
+
+  // « Suivre le système » : le système décide, et la page le suit en direct.
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.selectOption("#appearance", "system");
+  await page.click("#save");
+  await page.waitForTimeout(200);
+  check("thème : « Suivre le système » sur un système clair donne clair", (await theme()) === "light");
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.waitForTimeout(100);
+  check("thème : le système passe en sombre, la page suit sans rien enregistrer", (await theme()) === "dark");
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.waitForTimeout(100);
+  check("thème : et revient au clair avec lui", (await theme()) === "light");
+
+  // Un thème choisi, puis la réinitialisation des réglages de confort.
+  await page.selectOption("#appearance", "dark");
+  await page.click("#save");
+  await page.waitForTimeout(200);
+  await page.click('.tree__leaf[data-leaf="comfort"]');
+  await page.click("#comfort-reset");
+  await page.waitForTimeout(100);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(200);
+  check(
+    "thème : les réglages de confort le remettent à « Suivre le système », sans le marquer modifié",
+    (await page.inputValue("#appearance")) === "system" &&
+      (await page.evaluate(() => window.__appearance)) === "system" &&
+      (await theme()) === "light",
+  );
+  await page.click("#close");
+  await page.waitForTimeout(150);
+  check(
+    "thème : après la réinitialisation, la fenêtre se ferme sans question",
+    await page.evaluate(() => window.__calls.some(([c]) => c === "close_preferences")),
+  );
+  await page.close();
+
+  // Rien de choisi, un système sombre : la fenêtre s'ouvre en sombre.
+  const night = await browser.newPage({ colorScheme: "dark" });
+  await openWindow(night, "http://localhost:4173/ui/windows/accounts-list.html");
+  check(
+    "thème : rien de choisi, une fenêtre s'ouvre en sombre sur un système sombre",
+    (await night.evaluate(() => document.documentElement.dataset.theme)) === "dark",
+  );
+  await night.close();
+
+  // Une autre fenêtre s'ouvre dans le thème enregistré.
+  const other = await browser.newPage();
+  await other.addInitScript(() => {
+    window.__appearance = "dark";
+  });
+  await openWindow(other, "http://localhost:4173/ui/windows/accounts-list.html");
+  check(
+    "thème : une fenêtre ouverte ensuite prend le thème enregistré",
+    (await other.evaluate(() => document.documentElement.dataset.theme)) === "dark",
+  );
+  await other.close();
+}
+
+// --- Thèmes, étape D : les dessins suivent le thème sans être redessinés ---
+{
+  // Le trait du total des courbes, posé en `var()` : changer de thème le
+  // recolore sur place, comme toute la page.
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/balance-curves.html?accounts=1,2");
+  await page.waitForTimeout(200);
+  const total = () =>
+    page.evaluate(() => {
+      const path = [...document.querySelectorAll("path")].find((one) =>
+        one.style.stroke.includes("--radinus-chart-total"),
+      );
+      return path ? getComputedStyle(path).stroke : "absent";
+    });
+  const before = await total();
+  await page.evaluate(() => {
+    document.documentElement.dataset.theme = "dark";
+  });
+  const dark = await total();
+  await page.evaluate(() => {
+    document.documentElement.dataset.theme = "sepia";
+  });
+  const sepia = await total();
+  check(
+    "thème : le total des courbes change de couleur avec le thème, sans redessin",
+    before === "rgb(51, 71, 91)" && dark === "rgb(201, 214, 226)" && sepia === "rgb(74, 56, 38)",
+    `${before} ${dark} ${sepia}`,
+  );
+  await page.close();
+
+  // Les graphiques des fenêtres-outils viennent du noyau, aux couleurs du PDF
+  // écrites en attribut : la feuille du thème passe devant, le PDF ne bouge pas.
+  const tool = await browser.newPage();
+  await openWindow(tool, "http://localhost:4173/ui/windows/loan-simulation.html");
+  const fills = await tool.evaluate(() => {
+    const holder = document.querySelector(".window--loan");
+    const box = document.createElement("div");
+    box.innerHTML =
+      '<svg><text id="probe-ink" fill="#1d2b34">x</text><line id="probe-grid" stroke="#e3e8ed"/></svg>';
+    holder.append(box);
+    const read = () => [
+      getComputedStyle(document.getElementById("probe-ink")).fill,
+      getComputedStyle(document.getElementById("probe-grid")).stroke,
+    ];
+    const light = read();
+    document.documentElement.dataset.theme = "dark";
+    const dark = read();
+    document.documentElement.dataset.theme = "light";
+    return { light, dark };
+  });
+  check(
+    "thème : en sombre, le texte et la grille des graphiques du noyau s'éclairent ou s'effacent ; en clair, rien ne change",
+    fills.light.join() === "rgb(29, 43, 52),rgb(227, 232, 237)" &&
+      fills.dark.join() === "rgb(224, 230, 235),rgb(53, 61, 69)",
+    JSON.stringify(fills),
+  );
+  await tool.close();
 }
 
 // --- F41 : la simulation de crédit (08/10/2026) ---------------------------

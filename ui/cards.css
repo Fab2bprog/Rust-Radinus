@@ -13,8 +13,8 @@
 @import "./tokens.css";
 
 .card {
-  background-color: #ffffff;
-  border: 1px solid #d8dee3;
+  background-color: var(--radinus-bg-ffffff);
+  border: 1px solid var(--radinus-line-d8dee3);
   padding: 10px 14px;
 }
 
@@ -35,8 +35,8 @@
   justify-content: space-between;
   font-size: 17px;
   font-weight: 700;
-  color: #1a2b3c;
-  border-bottom: 1px solid #e2e8ec;
+  color: var(--radinus-fg-1a2b3c);
+  border-bottom: 1px solid var(--radinus-line-e2e8ec);
   padding-bottom: 6px;
 }
 
@@ -45,7 +45,7 @@
   background: none;
   font: inherit;
   font-size: 18px;
-  color: #6b7a88;
+  color: var(--radinus-fg-6b7a88);
   cursor: pointer;
 }
 
@@ -79,7 +79,7 @@
 }
 
 .card__empty {
-  color: #6b7a88;
+  color: var(--radinus-fg-6b7a88);
   font-style: italic;
 }
 
@@ -88,7 +88,7 @@
   font-size: 17px;
   font-weight: 400;
   text-align: center;
-  color: #4a7a99;
+  color: var(--radinus-fg-4a7a99);
 }
 
 /* Le gros chiffre : ~48 pt gris-bleu (charte §2), rouge foncé quand la
@@ -97,11 +97,11 @@
   margin: 10px 0 0;
   text-align: center;
   font-size: 48px;
-  color: #7a8fa6;
+  color: var(--radinus-fg-7a8fa6);
 }
 
 .card__figure--negative {
-  color: #8b1a1a;
+  color: var(--radinus-fg-8b1a1a);
 }
 
 /* L'anneau garde sa taille tant qu'il y a la place, et **se réduit plutôt que
@@ -122,9 +122,9 @@
   font-weight: 700;
   text-anchor: middle;
   dominant-baseline: central;
-  fill: #ffffff;
+  fill: var(--radinus-ink-ffffff);
   paint-order: stroke;
-  stroke: rgba(0, 0, 0, 0.45);
+  stroke: var(--radinus-ink-rgba-0-0-0-45);
   stroke-width: 3px;
   stroke-linejoin: round;
 }
@@ -133,7 +133,7 @@
   list-style: none;
   margin: 0;
   padding: 8px 10px;
-  border: 1px solid #d8dee3;
+  border: 1px solid var(--radinus-line-d8dee3);
   min-width: 230px;
 }
 
@@ -143,10 +143,10 @@
    pour décorer. */
 .legend__title {
   font-weight: 600;
-  color: #1f3550;
+  color: var(--radinus-fg-1f3550);
   padding: 0 0 4px;
   margin-bottom: 4px;
-  border-bottom: 1px solid #e2e6ea;
+  border-bottom: 1px solid var(--radinus-line-e2e6ea);
 }
 
 .legend__entry {
@@ -167,7 +167,7 @@
 
 .legend__entry.is-pickable:hover,
 .legend__entry.is-pickable:focus-visible {
-  background-color: #eef3f7;
+  background-color: var(--radinus-bg-eef3f7);
 }
 
 .ring .is-pickable:hover,
@@ -210,7 +210,7 @@
 .card__subject {
   margin: 0 0 6px;
   font-weight: 600;
-  color: #1f3550;
+  color: var(--radinus-fg-1f3550);
 }
 
 /* Le lien de l'accueil vide (04/08/2026) : « Créez-en un en cliquant ici ».
@@ -224,7 +224,7 @@
   border: 0;
   background: none;
   font: inherit;
-  color: #2b82c9;
+  color: var(--radinus-fg-2b82c9);
   cursor: pointer;
 }
 
@@ -242,7 +242,7 @@
   border: 0;
   background: none;
   font: inherit;
-  color: #2b82c9;
+  color: var(--radinus-fg-2b82c9);
   cursor: pointer;
 }
 
@@ -268,7 +268,7 @@
 .curve__day {
   font-size: 11px;
   text-anchor: middle;
-  fill: #6b7a88;
+  fill: var(--radinus-ink-6b7a88);
   font-variant-numeric: tabular-nums;
 }
 
@@ -286,7 +286,7 @@
   font-size: 14px;
   font-weight: 700;
   text-anchor: end;
-  fill: #1f3550;
+  fill: var(--radinus-ink-1f3550);
   font-variant-numeric: tabular-nums;
 }
 
@@ -295,7 +295,7 @@
    cliquable, ce qui est la seule façon de sortir d'un poste creusé dont le
    mois regardé ne contient rien (décision de Fabrice, 03/08/2026). */
 .ring--empty path {
-  fill: #e9edf1;
+  fill: var(--radinus-ink-e9edf1);
 }
 
 .legend__square {
@@ -306,10 +306,10 @@
 
 .legend__label {
   flex: 1 1 auto;
-  color: #1f3550;
+  color: var(--radinus-fg-1f3550);
 }
 
 .legend__amount {
-  color: #6b7a88;
+  color: var(--radinus-fg-6b7a88);
   font-variant-numeric: tabular-nums;
 }

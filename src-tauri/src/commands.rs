@@ -12797,9 +12797,14 @@ pub fn reset_comfort_settings<R: Runtime>(
     let root = state.data_root.clone();
     let mut config = radinus_core::location::read_config(&root).map_err(to_ipc_error)?;
     config.zoom = None;
+    // L'apparence est un réglage de confort elle aussi (P-80) : retour au
+    // défaut, « Suivre le système ».
+    config.appearance = None;
     radinus_core::location::write_config(&root, &config).map_err(to_ipc_error)?;
     crate::windows::set_zoom_factor(config.zoom_factor());
     crate::windows::apply_zoom_everywhere(&app);
+    crate::windows::set_appearance(config.appearance());
+    crate::windows::apply_appearance_everywhere(&app);
 
     if state.has_database() {
         {
@@ -12965,6 +12970,32 @@ pub fn save_preferences_duplicates(
     let mut config = radinus_core::location::read_config(&root).map_err(to_ipc_error)?;
     config.set_duplicates_preferences(&chosen);
     radinus_core::location::write_config(&root, &config).map_err(to_ipc_error)
+}
+
+/// L'apparence choisie (P-80) : `system`, `light`, `sepia` ou `dark`. Chaque
+/// page la demande en s'ouvrant, et l'écoute ensuite (`theme.ts`).
+#[tauri::command]
+pub fn preferences_appearance() -> &'static str {
+    crate::windows::appearance().key()
+}
+
+/// Enregistre l'apparence dans la configuration du logiciel, et la pose tout
+/// de suite sur toutes les fenêtres ouvertes, comme la taille de l'affichage.
+#[tauri::command]
+pub fn save_preferences_appearance<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+    choice: String,
+) -> Result<(), String> {
+    let appearance = radinus_core::location::Appearance::from_key(&choice)
+        .ok_or_else(|| format!("Apparence : « {choice} » ?"))?;
+    let root = state.data_root.clone();
+    let mut config = radinus_core::location::read_config(&root).map_err(to_ipc_error)?;
+    config.appearance = Some(appearance.key().to_string());
+    radinus_core::location::write_config(&root, &config).map_err(to_ipc_error)?;
+    crate::windows::set_appearance(appearance);
+    crate::windows::apply_appearance_everywhere(&app);
+    Ok(())
 }
 
 /// Enregistre le zoom d'affichage, et le pose sur toutes les fenêtres ouvertes.

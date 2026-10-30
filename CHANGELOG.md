@@ -11,6 +11,30 @@ Two version numbers live in this project and they do not move together:
   the line Radinus 1.x walked from 0 to 9 and is at 11 today. A database is
   migrated forward when it is opened, never backward.
 
+## [3.2.1] — 30/10/2026
+
+### Added
+
+- **« Assistant de recherche des doublons »** (Fabrice, 29/10/2026, P-79),
+  in the Comptes menu. On one account and a period — the current month when it
+  opens, with the Période menu of the operations list — it groups the
+  operations that look like the same one — same amount, close dates, a label or
+  a payment reference alike — in four levels, from « identique » to « à
+  vérifier ». Tick « Garder celle-ci » on the line or lines to keep: the others
+  of the group turn red and struck through, and the foot shows the three
+  balances before and after. Two steps, named in the title: the search, then a
+  summary in the same window — every line kept or deleted, what each kept line
+  takes over, the warnings — with an arrow to go back and the floppy disk to
+  save. The kept line takes over what it lacked (category, comment,
+  attachments, FitID…), and the journal tells the treatment. Its five settings
+  are in the preferences, sheet « Détection des doublons ».
+- **Themes** (Fabrice, 30/10/2026, P-80): Préférences › Affichage ›
+  « Apparence » offers « Suivre le système », Clair, Sépia and Sombre.
+  « Suivre le système », the default, takes the light or dark of the computer
+  and follows it live; Clair is Radinus as it always looked. The choice is
+  remembered, applies at once to every open window, and « Réinitialiser les
+  réglages de confort » brings back the default. Prints and PDF stay light. Sépia is a warm, paper-like light theme; Sombre a dark one.
+
 ## [3.2.0] — 27/10/2026
 
 ### Added
@@ -33,17 +57,6 @@ Two version numbers live in this project and they do not move together:
   Analyse Évolution du solde show it after the label; a ventilation shows its
   mother's reference. So does the quick classification window (26/10/2026).
 
-- **« Assistant de recherche des doublons »** (Fabrice, 29/10/2026, P-79),
-  in the Comptes menu. On one account and a period, it groups the operations that look like
-  the same one — same amount, close dates, a label or a payment reference
-  alike — in four levels, from « identique » to « à vérifier ». Tick « Garder
-  celle-ci » on the line or lines to keep: the others of the group turn red
-  and struck through, and the foot shows the three balances before and after.
-  Two steps, named in the title: the search, then a summary in the same
-  window — every line kept or deleted, what each kept line takes over, the
-  warnings — with an arrow to go back and the floppy disk to save; the kept line takes over what it lacked (category,
-  comment, attachments, FitID…), and the journal tells the treatment. Its five settings are in the
-  preferences, sheet « Détection des doublons ».
 - **« Importation de fichier JSON / XML »** (Fabrice, 28/10/2026, P-78), in
   the Radinus menu under the Excel import, for files exported by other
   software. Same wizard as Excel: step 1 offers the lists the file contains,

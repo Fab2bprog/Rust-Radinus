@@ -70,6 +70,23 @@
           <p class="pane__hint" id="zoom-hint"></p>
         </section>
 
+        <!-- Feuille « Apparence » (Fabrice, 30/10/2026). Un réglage du
+             logiciel : il vaut pour toutes les fenêtres, et pour toutes les
+             bases. « Clair » est l'aspect de toujours, le défaut. -->
+        <section class="pane" id="pane-appearance" hidden>
+          <h2 class="pane__title" id="appearance-title"></h2>
+          <div class="form">
+            <label class="form__label" for="appearance" id="appearance-label"></label>
+            <select class="form__field" id="appearance">
+              <option value="system" id="appearance-system"></option>
+              <option value="light" id="appearance-light"></option>
+              <option value="sepia" id="appearance-sepia"></option>
+              <option value="dark" id="appearance-dark"></option>
+            </select>
+          </div>
+          <p class="pane__hint" id="appearance-hint"></p>
+        </section>
+
         <!-- Feuille « Vérification », sous la branche « Importation » (Fabrice,
              03/10/2026). Ce que vaut la colonne « Vérification » sur une
              opération qui arrive d'un relevé ou d'un tableau : « Vérifiée »

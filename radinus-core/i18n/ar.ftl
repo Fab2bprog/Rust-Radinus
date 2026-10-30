@@ -2080,6 +2080,15 @@ preferences-leaf-zoom = حجم العرض
 preferences-field-zoom = التكبير:
 preferences-zoom-reset = القيمة الافتراضية
 preferences-zoom-hint = كل شيء يكبر معًا: النص والأيقونات والأعمدة. دون 100 %، يتسع على الشاشة أكثر. أما شريط قوائم النظام وصناديق حواره فتتبع إعدادات حاسوبك لا هذه الإعدادات.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = المظهر
+preferences-field-appearance = السمة:
+preferences-appearance-system = اتباع النظام
+preferences-appearance-light = فاتح
+preferences-appearance-sepia = بني داكن
+preferences-appearance-dark = داكن
+preferences-appearance-hint = تُطبَّق على جميع النوافذ فور الحفظ. «اتباع النظام» يأخذ الوضع الفاتح أو الداكن لحاسوبك ويتغير معه. تبقى المطبوعات وملفات PDF فاتحة.
 preferences-branch-import = الاستيراد
 preferences-leaf-verification = التحقق
 preferences-field-verification = العمليات المستوردة:
@@ -2219,8 +2228,8 @@ preferences-columns-hint = يحتفظ كل جدول بترتيب أعمدته و
 preferences-branch-reset = إعادة التعيين
 preferences-leaf-comfort = إعدادات الراحة
 preferences-comfort-reset = إعادة تعيين إعدادات الراحة
-preferences-comfort-hint = يعيد إلى الحالة الأصلية أعمدة جميع الجداول، وترتيب الحسابات وخانات اختيارها في نافذة البداية، وحجم العرض. لا تتغير اللغة ولا العملة ولا التحقق من العمليات المستوردة.
-preferences-comfort-question = هل تريد إعادة تعيين إعدادات الراحة؟ ستعود أعمدة الجداول ونافذة البداية وحجم العرض إلى حالتها الأصلية.
+preferences-comfort-hint = يعيد إلى الحالة الأصلية أعمدة جميع الجداول، وترتيب الحسابات وخانات اختيارها في نافذة البداية، وحجم العرض، والسمة. لا تتغير اللغة ولا العملة ولا التحقق من العمليات المستوردة.
+preferences-comfort-question = هل تريد إعادة تعيين إعدادات الراحة؟ ستعود أعمدة الجداول ونافذة البداية وحجم العرض والسمة إلى حالتها الأصلية.
 preferences-comfort-done = تمت إعادة تعيين إعدادات الراحة.
 
 # --- شريط الاستقبال ---------------------------------------------

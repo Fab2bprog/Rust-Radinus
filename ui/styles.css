@@ -9,7 +9,7 @@
 :root {
   font-family: var(--radinus-font-family);
   font-size: var(--radinus-font-size-base);
-  color: #0f0f0f;
+  color: var(--radinus-fg-0f0f0f);
 }
 
 /* La fenêtre d'accueil est une colonne : le bandeau, les trois bandes qui
@@ -169,7 +169,7 @@ body {
    qu'il additionne. */
 .welcome__detail {
   margin: 2px 0 0;
-  color: #6b7a88;
+  color: var(--radinus-fg-6b7a88);
   font-size: 0.85em;
 }
 
@@ -212,7 +212,7 @@ body {
   font: inherit;
   color: inherit;
   background-color: var(--radinus-window-bg);
-  border: 1px solid #c2c2c2;
+  border: 1px solid var(--radinus-line-c2c2c2);
   padding: 7px 10px 8px;
   cursor: pointer;
   /* Prendre une tuile ne doit pas sélectionner son texte. */
@@ -222,7 +222,7 @@ body {
 
 .tile:hover,
 .tile:focus-visible {
-  background-color: #e8eef2;
+  background-color: var(--radinus-bg-e8eef2);
   border-color: var(--radinus-table-header-bg);
 }
 
@@ -230,7 +230,7 @@ body {
    totaux ni dans les anneaux ; il s'ouvre toujours d'un clic, et sa case reste
    nette pour qu'on voie où le recocher. */
 .tile--excluded {
-  background-color: #f1f1f1;
+  background-color: var(--radinus-bg-f1f1f1);
   border-style: dashed;
 }
 
@@ -255,8 +255,8 @@ body.moving-tile .tile {
   position: fixed;
   z-index: 30;
   width: 3px;
-  background-color: #f2a900;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+  background-color: var(--radinus-bg-f2a900);
+  box-shadow: 0 0 0 1px var(--radinus-shadow-rgba-255-255-255-7);
   pointer-events: none;
 }
 
@@ -276,14 +276,14 @@ body.moving-tile .tile {
 .tile__name {
   font-weight: 700;
   font-size: 1.02em;
-  color: #1d2b34;
+  color: var(--radinus-fg-1d2b34);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .tile__bank {
-  color: #6a6a6a;
+  color: var(--radinus-fg-6a6a6a);
   margin-bottom: 5px;
   white-space: nowrap;
   overflow: hidden;
@@ -299,7 +299,7 @@ body.moving-tile .tile {
 }
 
 .tile__row > span:first-child {
-  color: #6a6a6a;
+  color: var(--radinus-fg-6a6a6a);
 }
 
 .tile__row--strong {
@@ -328,13 +328,13 @@ body.moving-tile .tile {
   font-size: 1.25em;
   line-height: 1;
   padding: 0 0.35em;
-  color: #4a7a99;
+  color: var(--radinus-fg-4a7a99);
   cursor: pointer;
 }
 
 .card__action:hover:not(:disabled),
 .card__action:focus-visible:not(:disabled) {
-  color: #1a2b3c;
+  color: var(--radinus-fg-1a2b3c);
 }
 
 .card__action:disabled {

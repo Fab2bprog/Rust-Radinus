@@ -1976,6 +1976,15 @@ preferences-leaf-zoom = Visningens storlek
 preferences-field-zoom = Förstoring:
 preferences-zoom-reset = Standardvärde
 preferences-zoom-hint = Allt växer tillsammans: texten, ikonerna, kolumnerna. Under 100 % får mer plats på skärmen. Systemets menyrad och dess dialogrutor följer däremot inställningarna i din dator och inte de här.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Utseende
+preferences-field-appearance = Tema:
+preferences-appearance-system = Följ systemet
+preferences-appearance-light = Ljust
+preferences-appearance-sepia = Sepia
+preferences-appearance-dark = Mörkt
+preferences-appearance-hint = Gäller alla fönster så snart det har sparats. ”Följ systemet” tar datorns ljusa eller mörka läge och växlar med det. Utskrifter och PDF-filer förblir ljusa.
 preferences-branch-import = Import
 preferences-leaf-verification = Kontroll
 preferences-field-verification = Importerade transaktioner:
@@ -2115,8 +2124,8 @@ preferences-columns-hint = Varje tabell minns kolumnernas ordning, vilka du döl
 preferences-branch-reset = Återställning
 preferences-leaf-comfort = Bekvämlighetsinställningar
 preferences-comfort-reset = Återställ bekvämlighetsinställningarna
-preferences-comfort-hint = Återställer kolumnerna i alla tabeller, ordningen och kryssrutorna för kontona i startfönstret samt visningens storlek. Språket, valutan och kontrollen av importerade transaktioner rörs inte.
-preferences-comfort-question = Återställa bekvämlighetsinställningarna? Tabellkolumnerna, startfönstret och visningens storlek återgår till sitt ursprungliga läge.
+preferences-comfort-hint = Återställer kolumnerna i alla tabeller, ordningen och kryssrutorna för kontona i startfönstret, visningens storlek samt temat. Språket, valutan och kontrollen av importerade transaktioner rörs inte.
+preferences-comfort-question = Återställa bekvämlighetsinställningarna? Tabellkolumnerna, startfönstret, visningens storlek och temat återgår till sitt ursprungliga läge.
 preferences-comfort-done = Bekvämlighetsinställningarna har återställts.
 
 # --- Välkomstsidans banderoll --------------------------------------------

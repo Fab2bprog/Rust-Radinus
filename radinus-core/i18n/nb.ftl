@@ -1973,6 +1973,15 @@ preferences-leaf-zoom = Visningsstørrelse
 preferences-field-zoom = Forstørrelse:
 preferences-zoom-reset = Standardverdi
 preferences-zoom-hint = Alt vokser sammen: teksten, ikonene, kolonnene. Under 100 % er det plass til mer på skjermen. Systemets menylinje og dialogboksene dens følger derimot innstillingene på datamaskinen din og ikke disse.
+
+# The appearance sheet (Fabrice, 30/10/2026): light is the default.
+preferences-leaf-appearance = Utseende
+preferences-field-appearance = Tema:
+preferences-appearance-system = Følg systemet
+preferences-appearance-light = Lyst
+preferences-appearance-sepia = Sepia
+preferences-appearance-dark = Mørkt
+preferences-appearance-hint = Gjelder alle vinduer så snart det er lagret. «Følg systemet» bruker datamaskinens lyse eller mørke modus og skifter med den. Utskrifter og PDF-filer forblir lyse.
 preferences-branch-import = Import
 preferences-leaf-verification = Kontroll
 preferences-field-verification = Importerte transaksjoner:
@@ -2112,8 +2121,8 @@ preferences-columns-hint = Hver tabell husker rekkefølgen på kolonnene, hvilke
 preferences-branch-reset = Tilbakestilling
 preferences-leaf-comfort = Komfortinnstillinger
 preferences-comfort-reset = Tilbakestill komfortinnstillingene
-preferences-comfort-hint = Tilbakestiller kolonnene i alle tabeller, rekkefølgen og avmerkingsboksene for kontoene i startvinduet og visningsstørrelsen. Språket, valutaen og kontrollen av importerte transaksjoner berøres ikke.
-preferences-comfort-question = Tilbakestille komfortinnstillingene? Tabellkolonnene, startvinduet og visningsstørrelsen går tilbake til sin opprinnelige tilstand.
+preferences-comfort-hint = Tilbakestiller kolonnene i alle tabeller, rekkefølgen og avmerkingsboksene for kontoene i startvinduet, visningsstørrelsen og temaet. Språket, valutaen og kontrollen av importerte transaksjoner berøres ikke.
+preferences-comfort-question = Tilbakestille komfortinnstillingene? Tabellkolonnene, startvinduet, visningsstørrelsen og temaet går tilbake til sin opprinnelige tilstand.
 preferences-comfort-done = Komfortinnstillingene er tilbakestilt.
 
 # --- Banneret på velkomstsiden -------------------------------------------
