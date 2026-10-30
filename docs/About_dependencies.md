@@ -106,6 +106,15 @@ documents on Windows, macOS and Linux, because the three engines do not
 paginate alike. **Radinus builds its own PDF**, and the same statement comes
 out identical everywhere.
 
+### `roxmltree`
+
+Reading the XML files of « Importation de fichier JSON / XML » (P-78). Small,
+pure Rust, read-only — it cannot write or fetch anything. It was already built
+into Radinus through Typst, so declaring it adds nothing to what is shipped,
+and it behaves the same on Windows, macOS and Linux. Authorized by Fabrice on
+28/10/2026 (« du moment que l'on pourra l'utiliser sous Windows, macOS et
+Linux »).
+
 ---
 
 ## The controller — `src-tauri`

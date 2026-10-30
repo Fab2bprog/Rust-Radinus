@@ -36,6 +36,11 @@
   --radinus-row-odd-bg: #f3f3f3;
   --radinus-row-even-bg: #e5e5e5;
   --radinus-row-selected-bg: #9eafba;
+  /* The head line of a group, in the « vision par groupe » of F02 */
+  --radinus-group-bg: #cbd9e3;
+  /* « Recherche des doublons » : la ligne gardée, et celles qui partiront */
+  --radinus-duplicate-kept-bg: #cdeccd;
+  --radinus-duplicate-doomed-bg: #f6c9c9;
 
   /* Statistics matrix cells */
   --radinus-cell-negative-bg: #ff9999;

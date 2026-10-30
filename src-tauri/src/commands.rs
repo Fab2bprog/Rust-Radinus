@@ -1850,6 +1850,24 @@ pub fn operations_selection_total(
     ))
 }
 
+/// **Les montants d'une vision par groupe, mis en forme par le noyau** (F02,
+/// 27/10/2026). Une tête de groupe dit « Pointé −300,00 € » : la fenêtre
+/// additionne, mais ne compose jamais un montant elle-même — l'espace, la
+/// virgule, la place du symbole dépendent de la langue, et c'est le noyau qui
+/// les tient. Un seul appel pour tous les montants dont la fenêtre a besoin.
+#[tauri::command]
+pub fn format_amounts(
+    state: State<'_, AppState>,
+    amounts: Vec<i64>,
+) -> Result<Vec<String>, String> {
+    let _conn = state.database()?;
+    let language = ui_language();
+    Ok(amounts
+        .iter()
+        .map(|amount| radinus_core::money::format(*amount, language))
+        .collect())
+}
+
 /// Leaves F02, **taking its fiche with it** — emptied first, so nothing it
 /// held comes back to life on the next visit. Hidden, never destroyed, like
 /// every Radinus window.
@@ -6101,6 +6119,8 @@ pub struct QuickLineDto {
     /// par jour du mois (défaut relevé par Fabrice le 04/08/2026).
     pub date_value: String,
     pub label: String,
+    /// La référence paiement : à voir et à filtrer, jamais modifiée ici.
+    pub reference: String,
     /// Le montant écrit avec les séparateurs de l'interface, signe compris.
     pub amount_text: String,
     /// Et le montant brut, en micro-unités : c'est lui qui trie et qui
@@ -6282,6 +6302,7 @@ pub fn quick_classification_lines(
                     .unwrap_or_default(),
                 date_value: line.date.map(|date| date.to_string()).unwrap_or_default(),
                 label: line.label.clone(),
+                reference: line.reference.clone(),
                 amount_text: radinus_core::money::format(line.amount, language),
                 amount: line.amount,
                 category: named(Characteristic::Category, line.current.category_id),
@@ -6432,6 +6453,527 @@ pub fn close_quick_classification<R: Runtime>(
 ) -> Result<(), String> {
     state.drop_workbench()?;
     if let Some(window) = app.get_webview_window("quick-classification") {
+        window.hide().map_err(to_ipc_error)?;
+    }
+    Ok(())
+}
+
+// --- « Recherche des doublons » (menu Comptes, 29/10/2026) ----------------
+//
+// Conception arrêtée avec Fabrice le 29/10/2026. Le moteur est dans le noyau
+// (`duplicates`) ; ce contrôleur lui passe les préférences, ne garde que les
+// niveaux cochés, et écrit tout ce que la fenêtre montre — montants, mots du
+// niveau, phrase de la barre d'information — dans la langue de l'interface.
+
+/// Une opération soupçonnée, telle que la fenêtre la montre.
+#[derive(Serialize)]
+pub struct DuplicateRowDto {
+    pub id: i64,
+    /// Le numéro du groupe, dans l'ordre où la fenêtre les montre.
+    pub group: usize,
+    pub date: String,
+    /// La même date en ISO : la colonne se trie là-dessus.
+    pub date_value: String,
+    pub label: String,
+    pub reference: String,
+    pub debit: String,
+    pub credit: String,
+    pub amount: i64,
+    pub status: String,
+    /// 1 pointée, 2 engagée, 3 prévue : ce qui dit quels soldes une
+    /// suppression déplace.
+    pub status_id: i64,
+    pub category: String,
+    pub payee: String,
+    /// Elle porte des sous-opérations.
+    pub ventilated: bool,
+}
+
+/// La tête d'un groupe : son niveau et sa nature. Ses montants — le total, et
+/// ce qui restera selon les lignes gardées — la fenêtre les additionne à
+/// chaque coche ; le noyau les écrit (`format_amounts`).
+#[derive(Serialize)]
+pub struct DuplicateGroupDto {
+    pub level: &'static str,
+    pub title: String,
+}
+
+#[derive(Serialize)]
+pub struct DuplicatesDto {
+    pub rows: Vec<DuplicateRowDto>,
+    pub groups: Vec<DuplicateGroupDto>,
+    /// Ce que dit la barre d'information.
+    pub said: String,
+    /// Les trois soldes du compte, avant tout traitement (micro-unités).
+    pub balance_bank: i64,
+    pub balance_real: i64,
+    pub balance_final: i64,
+}
+
+/// Les niveaux que les préférences cochent à l'ouverture de la fenêtre.
+#[tauri::command]
+pub fn duplicates_levels(state: State<'_, AppState>) -> Vec<&'static str> {
+    radinus_core::location::read_config(&state.data_root)
+        .unwrap_or_default()
+        .duplicates_preferences()
+        .levels
+        .into_iter()
+        .map(|level| level.key())
+        .collect()
+}
+
+/// Cherche les doublons d'un compte sur une période, **avec les préférences
+/// du moment**, et ne rend que les groupes des niveaux cochés dans la fenêtre.
+#[tauri::command]
+pub fn duplicates_search(
+    state: State<'_, AppState>,
+    account_id: i64,
+    from: String,
+    to: String,
+    levels: Vec<String>,
+) -> Result<DuplicatesDto, String> {
+    use radinus_core::duplicates::Level;
+    let conn = state.database()?;
+    let language = ui_language();
+    let bounds = |text: &str| -> Result<radinus_core::domain::NaiveDate, String> {
+        a_date(text).ok_or_else(|| radinus_core::i18n::text(language, "operations-bad-period"))
+    };
+    let (start, end) = (bounds(&from)?, bounds(&to)?);
+    let settings = radinus_core::location::read_config(&state.data_root)
+        .unwrap_or_default()
+        .duplicates_preferences()
+        .settings;
+    let found = radinus_core::duplicates::search(&conn, account_id, start, end, &settings)
+        .map_err(to_ipc_error)?;
+    let account = radinus_core::accounts::get(&conn, account_id).map_err(to_ipc_error)?;
+    drop(conn);
+
+    let wanted: Vec<Level> = Level::ALL
+        .into_iter()
+        .filter(|level| levels.iter().any(|key| key == level.key()))
+        .collect();
+    let hidden = found.iter().filter(|group| !wanted.contains(&group.level)).count();
+    let money = |amount: i64| radinus_core::money::format(amount, language);
+    let date = |value: Option<radinus_core::domain::NaiveDate>| {
+        value.map(|d| d.format("%d/%m/%Y").to_string()).unwrap_or_default()
+    };
+
+    let mut rows = Vec::new();
+    let mut groups = Vec::new();
+    for group in found.iter().filter(|group| wanted.contains(&group.level)) {
+        let number = groups.len();
+        let count = group.members.len();
+        let nature = match count {
+            2 => radinus_core::i18n::text(language, "duplicates-nature-double"),
+            3 => radinus_core::i18n::text(language, "duplicates-nature-triple"),
+            _ => radinus_core::i18n::message_of(
+                language,
+                "duplicates-nature-more",
+                &[],
+                &[("count", count as i64)],
+            ),
+        };
+        let level_word = radinus_core::i18n::text(
+            language,
+            &format!("duplicates-level-{}", group.level.key()),
+        );
+        groups.push(DuplicateGroupDto {
+            level: group.level.key(),
+            title: radinus_core::i18n::text_with_all(
+                language,
+                "duplicates-group-title",
+                &[("level", &level_word), ("nature", &nature)],
+            ),
+        });
+        for member in &group.members {
+            let row = &member.operation;
+            rows.push(DuplicateRowDto {
+                id: row.id,
+                group: number,
+                date: date(row.date),
+                date_value: row.date.map(|d| d.to_string()).unwrap_or_default(),
+                label: row.label.clone(),
+                reference: row.reference.clone(),
+                debit: if row.amount < 0 { money(row.amount) } else { String::new() },
+                credit: if row.amount > 0 { money(row.amount) } else { String::new() },
+                amount: row.amount,
+                status: radinus_core::i18n::status_label(language, row.status_id)
+                    .unwrap_or_default(),
+                status_id: row.status_id,
+                category: row.category.clone(),
+                payee: row.payee.clone(),
+                ventilated: member.ventilated,
+            });
+        }
+    }
+
+    let said = if groups.is_empty() && hidden == 0 {
+        radinus_core::i18n::text(language, "duplicates-none")
+    } else {
+        let mut said = radinus_core::i18n::message_of(
+            language,
+            "duplicates-found",
+            &[],
+            &[("groups", groups.len() as i64), ("operations", rows.len() as i64)],
+        );
+        if hidden > 0 {
+            said.push(' ');
+            said.push_str(&radinus_core::i18n::message_of(
+                language,
+                "duplicates-hidden",
+                &[],
+                &[("count", hidden as i64)],
+            ));
+        }
+        said
+    };
+    Ok(DuplicatesDto {
+        rows,
+        groups,
+        said,
+        balance_bank: account.as_ref().map_or(0, |a| a.balance_bank),
+        balance_real: account.as_ref().map_or(0, |a| a.balance_real),
+        balance_final: account.as_ref().map_or(0, |a| a.balance_final),
+    })
+}
+
+/// Ce que la fenêtre a décidé pour un groupe : les lignes gardées, et celles
+/// qui partent.
+#[derive(serde::Deserialize, Debug, Clone)]
+pub struct DuplicateDecisionDto {
+    pub kept: Vec<i64>,
+    pub doomed: Vec<i64>,
+}
+
+/// Ce que dit le traitement : la raison d'un refus, ou ce qui a été fait.
+#[derive(Serialize)]
+pub struct DuplicatesConfirmationDto {
+    pub refused: bool,
+    pub text: String,
+}
+
+/// Ce qu'une ligne gardée reprend, dit en mots.
+#[derive(Serialize)]
+pub struct DuplicateTakeDto {
+    pub id: i64,
+    pub what: String,
+}
+
+/// **L'étape 2 de l'assistant** (Fabrice, 29/10/2026) : ce que le tableau du
+/// récapitulatif ne sait pas de lui-même — ce que chaque ligne gardée reprend,
+/// et les avertissements. Les lignes, les couleurs et les soldes, la fenêtre
+/// les a déjà.
+#[derive(Serialize)]
+pub struct DuplicatesRecapDto {
+    pub refused: bool,
+    /// La raison du refus.
+    pub text: String,
+    pub takes: Vec<DuplicateTakeDto>,
+    pub warnings: Vec<String>,
+}
+
+/// Le traitement préparé, ou la phrase qui le refuse.
+enum DuplicatesPrepared {
+    Refused(String),
+    Ready {
+        plans: Vec<radinus_core::duplicates::GroupPlan>,
+        rows: std::collections::HashMap<i64, (radinus_core::operations::OperationRow, i64)>,
+    },
+}
+
+/// Vérifie et prépare, **sans rien écrire** : une fiche ouverte sur l'une des
+/// lignes, ou une décision qui ne correspond plus à la base, et l'on refuse.
+fn duplicates_prepare(
+    conn: &radinus_core::database::Connection,
+    state: &AppState,
+    account_id: i64,
+    decisions: &[DuplicateDecisionDto],
+) -> Result<DuplicatesPrepared, String> {
+    let language = ui_language();
+    let decisions: Vec<radinus_core::duplicates::Decision> = decisions
+        .iter()
+        .filter(|decision| !decision.doomed.is_empty())
+        .map(|decision| radinus_core::duplicates::Decision {
+            kept: decision.kept.clone(),
+            doomed: decision.doomed.clone(),
+        })
+        .collect();
+    if decisions.is_empty() {
+        return Ok(DuplicatesPrepared::Refused(radinus_core::i18n::text(
+            language,
+            "duplicates-nothing",
+        )));
+    }
+    let ids: Vec<i64> = decisions
+        .iter()
+        .flat_map(|decision| decision.kept.iter().chain(&decision.doomed).copied())
+        .collect();
+    let rows = radinus_core::operations::read_by_ids(conn, &ids).map_err(to_ipc_error)?;
+
+    // Rien ne se supprime ni ne se modifie sous sa propre fiche ouverte
+    // (règle du 25/07/2026).
+    if let Some(held) = state.operation_form_record().filter(|held| ids.contains(held)) {
+        let label = rows.get(&held).map(|(row, _)| row.label.clone()).unwrap_or_default();
+        return Ok(DuplicatesPrepared::Refused(radinus_core::i18n::text_with(
+            language,
+            "operation-delete-form-open",
+            "label",
+            &label,
+        )));
+    }
+
+    let ventilation = radinus_core::location::read_config(&state.data_root)
+        .unwrap_or_default()
+        .duplicates_preferences()
+        .ventilation;
+    match radinus_core::duplicates::plan(conn, account_id, &decisions, ventilation)
+        .map_err(to_ipc_error)?
+    {
+        Some(plans) => Ok(DuplicatesPrepared::Ready { plans, rows }),
+        None => Ok(DuplicatesPrepared::Refused(radinus_core::i18n::text(
+            language,
+            "duplicates-stale",
+        ))),
+    }
+}
+
+/// Une opération dite en une ligne : sa date, son libellé, son montant.
+fn duplicate_line(row: &radinus_core::operations::OperationRow, language: Language) -> String {
+    let date = row
+        .date
+        .map(|d| d.format("%d/%m/%Y").to_string())
+        .unwrap_or_default();
+    format!(
+        "{date}  {}  {}",
+        row.label,
+        radinus_core::money::format(row.amount, language)
+    )
+}
+
+/// Les mots de ce qu'une ligne gardée reprend : « catégorie, commentaire… ».
+fn duplicates_takes(plan: &radinus_core::duplicates::GroupPlan, language: Language) -> String {
+    plan.takes
+        .iter()
+        .map(|(field, _)| radinus_core::i18n::text(language, field.key()))
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+/// **Le récapitulatif** — l'étape 2 de l'assistant, avant de supprimer :
+/// vérifie et prépare sans rien écrire, et dit ce que chaque ligne gardée
+/// reprend et ce qu'il faut savoir. Un refus — une fiche ouverte, une
+/// décision que la base ne reconnaît plus, rien à supprimer — reste à
+/// l'étape 1.
+#[tauri::command]
+pub fn duplicates_recap(
+    state: State<'_, AppState>,
+    account_id: i64,
+    decisions: Vec<DuplicateDecisionDto>,
+) -> Result<DuplicatesRecapDto, String> {
+    use radinus_core::duplicates::Warning;
+    let conn = state.database()?;
+    let language = ui_language();
+    let (plans, rows) = match duplicates_prepare(&conn, &state, account_id, &decisions)? {
+        DuplicatesPrepared::Refused(text) => {
+            return Ok(DuplicatesRecapDto {
+                refused: true,
+                text,
+                takes: Vec::new(),
+                warnings: Vec::new(),
+            })
+        }
+        DuplicatesPrepared::Ready { plans, rows } => (plans, rows),
+    };
+    drop(conn);
+
+    let label_of = |id: &i64| rows.get(id).map(|(row, _)| row.label.clone()).unwrap_or_default();
+    let takes = plans
+        .iter()
+        .filter(|plan| !plan.takes.is_empty())
+        .filter_map(|plan| {
+            plan.taker.map(|id| DuplicateTakeDto {
+                id,
+                what: duplicates_takes(plan, language),
+            })
+        })
+        .collect();
+    let warnings = plans
+        .iter()
+        .flat_map(|plan| plan.warnings.iter())
+        .map(|(warning, id)| {
+            let key = match warning {
+                Warning::SeveralKept => "duplicates-warning-several",
+                Warning::BothVentilated => "duplicates-warning-both-ventilated",
+                Warning::VentilationLost => "duplicates-warning-ventilation-lost",
+            };
+            radinus_core::i18n::text_with(language, key, "label", &label_of(id))
+        })
+        .collect();
+    Ok(DuplicatesRecapDto {
+        refused: false,
+        text: String::new(),
+        takes,
+        warnings,
+    })
+}
+
+/// **Supprime les doublons**, après la confirmation : la reprise, les
+/// suppressions et les soldes d'un seul bloc, puis le journal du traitement
+/// (P-6 : le dernier traitement seul, en mémoire).
+#[tauri::command]
+pub fn duplicates_apply<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+    account_id: i64,
+    from: String,
+    to: String,
+    decisions: Vec<DuplicateDecisionDto>,
+) -> Result<DuplicatesConfirmationDto, String> {
+    use radinus_core::journal::{Journal, Status};
+    let mut conn = state.database()?;
+    let language = ui_language();
+    let (plans, rows) = match duplicates_prepare(&conn, &state, account_id, &decisions)? {
+        DuplicatesPrepared::Refused(text) => {
+            return Ok(DuplicatesConfirmationDto { refused: true, text })
+        }
+        DuplicatesPrepared::Ready { plans, rows } => (plans, rows),
+    };
+    let account_label = radinus_core::accounts::get(&conn, account_id)
+        .map_err(to_ipc_error)?
+        .map(|account| account.label)
+        .unwrap_or_default();
+    let money = |amount: i64| radinus_core::money::format(amount, language);
+    let day = |text: &str| {
+        a_date(text)
+            .map(|d| d.format("%d/%m/%Y").to_string())
+            .unwrap_or_else(|| text.to_string())
+    };
+
+    let mut journal = Journal::new(language);
+    journal.add(
+        "journal-step-duplicates-begin",
+        "",
+        Status::Started,
+        "",
+        &format!("{account_label} — {} — {}", day(&from), day(&to)),
+    );
+    let outcome = radinus_core::duplicates::apply(&mut conn, account_id, &plans);
+    drop(conn);
+
+    let doomed: Vec<i64> = plans.iter().flat_map(|plan| plan.doomed.clone()).collect();
+    let said = match outcome {
+        Ok(_) => {
+            for plan in &plans {
+                let kept: Vec<String> = plan
+                    .kept
+                    .iter()
+                    .filter_map(|id| rows.get(id).map(|(row, _)| duplicate_line(row, language)))
+                    .collect();
+                for id in &plan.doomed {
+                    let Some((row, _)) = rows.get(id) else { continue };
+                    let mut comments = duplicate_line(row, language);
+                    if !row.reference.trim().is_empty() {
+                        comments.push_str(&format!("  {}", row.reference));
+                    }
+                    comments.push_str(" — ");
+                    comments.push_str(&radinus_core::i18n::text_with(
+                        language,
+                        "duplicates-journal-kept",
+                        "operation",
+                        &kept.join(" / "),
+                    ));
+                    if !plan.takes.is_empty() {
+                        comments.push_str(" ; ");
+                        comments.push_str(&radinus_core::i18n::text_with(
+                            language,
+                            "duplicates-confirm-takes",
+                            "what",
+                            &duplicates_takes(plan, language),
+                        ));
+                    }
+                    journal.add(
+                        "journal-step-duplicates-delete",
+                        "Operation",
+                        Status::Success,
+                        "",
+                        &comments,
+                    );
+                }
+            }
+            let total: i64 = doomed
+                .iter()
+                .filter_map(|id| rows.get(id).map(|(row, _)| row.amount))
+                .sum();
+            journal.add(
+                "journal-step-duplicates-end",
+                "",
+                Status::Finished,
+                "",
+                &radinus_core::i18n::message_of(
+                    language,
+                    "duplicates-journal-total",
+                    &[("amount", &money(total))],
+                    &[("count", doomed.len() as i64)],
+                ),
+            );
+            DuplicatesConfirmationDto {
+                refused: false,
+                text: radinus_core::i18n::message_of(
+                    language,
+                    "duplicates-done",
+                    &[],
+                    &[("count", doomed.len() as i64)],
+                ),
+            }
+        }
+        Err(error) => {
+            // Rien n'a été écrit : la transaction est défaite.
+            journal.add(
+                "journal-step-duplicates-delete",
+                "Operation",
+                Status::Failure,
+                &error.to_string(),
+                "",
+            );
+            journal.add("journal-step-duplicates-end", "", Status::Finished, "", "");
+            state.set_journal(journal.into_entries());
+            let _ = app.emit("data-changed:journal", ());
+            return Err(to_ipc_error(error));
+        }
+    };
+    state.set_journal(journal.into_entries());
+    let _ = app.emit("data-changed:journal", ());
+    operations_changed(&app);
+    Ok(said)
+}
+
+/// Ouvre « Recherche des doublons » sur un compte, son nom dans le titre —
+/// on ne cherche jamais « quelque part », on cherche dans un compte.
+#[tauri::command]
+pub fn open_duplicates<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+    account_id: i64,
+) -> Result<(), String> {
+    let conn = state.database()?;
+    let language = ui_language();
+    let label = radinus_core::accounts::get(&conn, account_id)
+        .map_err(to_ipc_error)?
+        .map(|account| account.label)
+        .unwrap_or_default();
+    drop(conn);
+
+    crate::windows::open(
+        &app,
+        &crate::windows::duplicates_window(language, &label),
+        Some(&format!("account={account_id}")),
+    )
+    .map_err(to_ipc_error)
+}
+
+#[tauri::command]
+pub fn close_duplicates<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
+    if let Some(window) = app.get_webview_window("duplicates") {
         window.hide().map_err(to_ipc_error)?;
     }
     Ok(())
@@ -8831,6 +9373,8 @@ pub async fn excel_pick_file<R: Runtime>(
         grid: excel::Grid::default(),
         links: Vec::new(),
         policies: excel::Policies::default(),
+        reading: radinus_core::structured_import::Reading::Tolerant,
+        structured: None,
     })?;
     Ok(Some(ExcelFileDto {
         path: path.to_string_lossy().to_string(),
@@ -8928,6 +9472,20 @@ pub struct ExcelLinksDto {
     /// plus offerte.
     pub fields: Vec<String>,
     pub links: Vec<ExcelLinkDto>,
+    /// Un import JSON / XML : la fenêtre parle alors du fichier, pas de la
+    /// feuille.
+    pub structured: bool,
+}
+
+/// **Le mot d'un refus, selon le fichier** (Fabrice, 28/10/2026 : « il s'agit
+/// d'un fichier json ou xml »). Les refus de la concordance parlent de
+/// « colonnes excel » ; pendant un import JSON / XML, ils ont leur pendant
+/// `structured-…`, qui parle des colonnes du fichier.
+fn refusal_text(language: Language, key: &str, structured: bool) -> String {
+    match key.strip_prefix("excel-") {
+        Some(rest) if structured => radinus_core::i18n::text(language, &format!("structured-{rest}")),
+        _ => radinus_core::i18n::text(language, key),
+    }
 }
 
 #[tauri::command]
@@ -8946,6 +9504,7 @@ pub fn excel_links(state: State<'_, AppState>) -> Result<ExcelLinksDto, String> 
                 field: link.field.clone(),
             })
             .collect(),
+        structured: import.is_structured(),
     })
 }
 
@@ -8966,7 +9525,7 @@ pub fn excel_set_links(
             })
             .collect();
         excel::refusal(&import.links, &import.grid, import.capture.shape)
-            .map(|key| radinus_core::i18n::text(language, key))
+            .map(|key| refusal_text(language, key, import.is_structured()))
     })
 }
 
@@ -9082,6 +9641,8 @@ pub struct ExcelAssociationDto {
     /// cette fenêtre sert à ranger un libellé mal orthographié dans une valeur
     /// qui existe, pas à en créer.
     pub choices: Vec<ItemDto>,
+    /// Un import JSON / XML : les valeurs viennent du fichier, pas de la feuille.
+    pub structured: bool,
 }
 
 #[tauri::command]
@@ -9098,11 +9659,11 @@ pub fn excel_association(
     // (signalé par Fabrice, 30/07/2026).
     let language = window_language(&state);
     let conn = state.database()?;
-    let values = state.with_excel(|import| {
+    let (values, structured) = state.with_excel(|import| {
         let unknown = excel::unknown_values(&conn, &import.grid, &import.links, kind)
             .unwrap_or_default();
         let rule = import.policies.rule(kind);
-        unknown
+        let values = unknown
             .into_iter()
             .map(|label| {
                 let chosen_id = rule
@@ -9112,7 +9673,8 @@ pub fn excel_association(
                     .unwrap_or(0);
                 ExcelUnknownDto { label, chosen_id }
             })
-            .collect::<Vec<_>>()
+            .collect::<Vec<_>>();
+        (values, import.is_structured())
     })?;
     Ok(ExcelAssociationDto {
         kind: kind.key().to_string(),
@@ -9126,6 +9688,7 @@ pub fn excel_association(
                 label: item.label,
             })
             .collect(),
+        structured,
     })
 }
 
@@ -9188,7 +9751,7 @@ pub fn excel_run_refusal(state: State<'_, AppState>) -> Result<Option<String>, S
     let language = window_language(&state);
     state.with_excel(|import| {
         if let Some(key) = excel::refusal(&import.links, &import.grid, import.capture.shape) {
-            return Some(radinus_core::i18n::text(language, key));
+            return Some(refusal_text(language, key, import.is_structured()));
         }
         for (kind, field) in excel::SORTED {
             let linked = excel::column_of(&import.links, &import.grid, field).is_some();
@@ -9215,19 +9778,21 @@ pub fn excel_run<R: Runtime>(
     if let Some(refusal) = excel_run_refusal(state.clone())? {
         return Err(refusal);
     }
-    let (account_id, grid, links, shape, policies) = state.with_excel(|import| {
+    let (account_id, grid, links, shape, policies, reading) = state.with_excel(|import| {
         (
             import.account_id,
             import.grid.clone(),
             import.links.clone(),
             import.capture.shape,
             import.policies.clone(),
+            import.reading,
         )
     })?;
 
     let report = {
         let mut conn = state.database()?;
-        excel::run(&mut conn, account_id, &grid, &links, shape, &policies).map_err(to_ipc_error)?
+        excel::run_with(&mut conn, account_id, &grid, &links, shape, &policies, &reading)
+            .map_err(to_ipc_error)?
     };
 
     let said = radinus_core::i18n::message_of(
@@ -9282,6 +9847,208 @@ pub fn open_excel_import<R: Runtime>(
     .map_err(to_ipc_error)
 }
 
+/// **Ouvre l'étape 1/3 d'un import JSON / XML** (28/10/2026). C'est la même
+/// fenêtre que celle de l'Excel, montrée avec ses groupes JSON / XML : les
+/// étapes 2 et 3 restent ainsi ses filles, comme pour l'Excel.
+#[tauri::command]
+pub fn open_structured_import<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+    account_id: i64,
+) -> Result<(), String> {
+    let language = window_language(&state);
+    state.drop_excel()?;
+    let mut spec = crate::windows::excel_import_window(language);
+    spec.title = radinus_core::i18n::text(language, "window-structured-import-title");
+    crate::windows::open(
+        &app,
+        &spec,
+        Some(&format!("account={account_id}&kind=structured")),
+    )
+    .map_err(to_ipc_error)
+}
+
+/// Le fichier JSON ou XML désigné : son chemin, et les listes qu'il propose,
+/// déjà nommées pour la liste déroulante.
+#[derive(Serialize)]
+pub struct StructuredFileDto {
+    pub path: String,
+    pub lists: Vec<String>,
+}
+
+/// Ouvre le sélecteur, lit le fichier JSON ou XML, et rend ses listes.
+///
+/// `async` pour la raison de `excel_pick_file`. **Désigner un fichier jette le
+/// précédent** avec tous ses réglages.
+#[tauri::command]
+pub async fn structured_pick_file<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+    account_id: i64,
+) -> Result<Option<StructuredFileDto>, String> {
+    use tauri_plugin_dialog::DialogExt;
+    let language = window_language(&state);
+    let (answered, answer) = std::sync::mpsc::channel();
+    app.dialog()
+        .file()
+        .add_filter("JSON / XML", &["json", "xml", "JSON", "XML"])
+        .pick_file(move |chosen| {
+            let _ = answered.send(chosen);
+        });
+    let Some(chosen) = answer.recv().map_err(to_ipc_error)? else {
+        return Ok(None);
+    };
+    let path = chosen.into_path().map_err(to_ipc_error)?;
+    let source = radinus_core::structured_import::open(&path).map_err(|failure| {
+        radinus_core::i18n::text_with(language, failure.key, "detail", &failure.detail)
+    })?;
+    let lists = source
+        .lists
+        .iter()
+        .map(|list| {
+            radinus_core::i18n::message_of(
+                language,
+                "structured-list-entry",
+                &[("path", list.path.as_str())],
+                &[("count", list.count as i64)],
+            )
+        })
+        .collect();
+    state.set_excel(crate::state::ExcelImport {
+        account_id,
+        path: path.to_string_lossy().to_string(),
+        book: excel::Book::default(),
+        capture: excel::Capture::default(),
+        grid: excel::Grid::default(),
+        links: Vec::new(),
+        policies: excel::Policies::default(),
+        reading: radinus_core::structured_import::Reading::Declared {
+            date: radinus_core::structured_import::DateFormat::Iso,
+            amount: radinus_core::structured_import::AmountFormat::Point,
+        },
+        structured: Some(source),
+    })?;
+    Ok(Some(StructuredFileDto {
+        path: path.to_string_lossy().to_string(),
+        lists,
+    }))
+}
+
+/// Les réglages de l'étape 1 d'un JSON / XML.
+#[derive(serde::Deserialize)]
+pub struct StructuredSettingsInput {
+    pub list: usize,
+    pub date: String,
+    pub amount: String,
+    pub shape: String,
+}
+
+/// Une entrée d'un menu à exemples : sa clef, et ce qu'il montre.
+#[derive(Serialize)]
+pub struct FormatChoiceDto {
+    pub key: String,
+    pub label: String,
+}
+
+/// Les deux menus à exemples de l'étape 1 : les formats de dates, puis ceux
+/// des montants. **L'exemple vient du noyau**, celui-là même qu'un test lit —
+/// le menu et la lecture ne peuvent pas se contredire.
+#[derive(Serialize)]
+pub struct StructuredFormatsDto {
+    pub dates: Vec<FormatChoiceDto>,
+    pub amounts: Vec<FormatChoiceDto>,
+}
+
+#[tauri::command]
+pub fn structured_formats(state: State<'_, AppState>) -> StructuredFormatsDto {
+    use radinus_core::structured_import::{AmountFormat, DateFormat};
+    let language = window_language(&state);
+    let choice = |key: &str, example: &str| FormatChoiceDto {
+        key: key.to_string(),
+        label: radinus_core::i18n::text_with(
+            language,
+            &format!("structured-format-{key}"),
+            "example",
+            example,
+        ),
+    };
+    StructuredFormatsDto {
+        dates: DateFormat::ALL
+            .iter()
+            .map(|format| choice(format.key(), format.example()))
+            .collect(),
+        amounts: AmountFormat::ALL
+            .iter()
+            .map(|format| choice(format.key(), format.example()))
+            .collect(),
+    }
+}
+
+/// Les lignes que montre l'aperçu au plus : l'import, lui, prend tout.
+const STRUCTURED_PREVIEW_ROWS: usize = 200;
+
+/// « Testez les paramètres que vous avez définis aux groupes 2 et 3. » Met la
+/// liste choisie à plat, retient les formats déclarés, et rend l'aperçu.
+#[tauri::command]
+pub fn structured_test(
+    state: State<'_, AppState>,
+    settings: StructuredSettingsInput,
+) -> Result<ExcelPreviewDto, String> {
+    use radinus_core::structured_import::{grid, AmountFormat, DateFormat, Reading};
+    let language = window_language(&state);
+    state.with_excel(|import| {
+        let Some(source) = import.structured.as_ref() else {
+            return Err(radinus_core::i18n::text(language, "structured-no-file"));
+        };
+        let Some(list) = source.lists.get(settings.list) else {
+            return Err(radinus_core::i18n::text(language, "structured-no-list"));
+        };
+        let skipped = list.skipped.clone();
+        let grid = grid(source, settings.list);
+        import.links = excel::initial_links(&grid);
+        import.capture.shape = excel::AmountShape::from_key(&settings.shape);
+        import.reading = Reading::Declared {
+            date: DateFormat::from_key(&settings.date),
+            amount: AmountFormat::from_key(&settings.amount),
+        };
+        let mut said = radinus_core::i18n::message_of(
+            language,
+            "structured-tested",
+            &[],
+            &[
+                ("rows", grid.rows.len() as i64),
+                ("columns", grid.headers.len() as i64),
+                ("shown", grid.rows.len().min(STRUCTURED_PREVIEW_ROWS) as i64),
+            ],
+        );
+        // Ce qui ne se met pas à plat est nommé : on ne perd rien sans le dire.
+        if !skipped.is_empty() {
+            said.push(' ');
+            said.push_str(&radinus_core::i18n::text_with(
+                language,
+                "structured-skipped",
+                "columns",
+                &skipped.join(", "),
+            ));
+        }
+        let dto = ExcelPreviewDto {
+            headers: grid.headers.clone(),
+            rows: grid
+                .rows
+                .iter()
+                .take(STRUCTURED_PREVIEW_ROWS)
+                .map(|row| ExcelRowDto {
+                    number: row.number,
+                    cells: row.cells.iter().map(excel::Value::display).collect(),
+                })
+                .collect(),
+            said,
+        };
+        import.grid = grid;
+        Ok(dto)
+    })?
+}
+
 /// Passe à l'étape 2/3.
 #[tauri::command]
 pub fn open_excel_fields<R: Runtime>(
@@ -9289,8 +10056,11 @@ pub fn open_excel_fields<R: Runtime>(
     state: State<'_, AppState>,
 ) -> Result<(), String> {
     let language = window_language(&state);
-    crate::windows::open(&app, &crate::windows::excel_fields_window(language), None)
-        .map_err(to_ipc_error)
+    let mut spec = crate::windows::excel_fields_window(language);
+    if state.with_excel(|import| import.is_structured()).unwrap_or(false) {
+        spec.title = radinus_core::i18n::text(language, "window-structured-fields-title");
+    }
+    crate::windows::open(&app, &spec, None).map_err(to_ipc_error)
 }
 
 /// Ouvre la fenêtre d'association des données pour une nomenclature — le
@@ -9303,12 +10073,11 @@ pub fn open_excel_association<R: Runtime>(
 ) -> Result<(), String> {
     let kind = kind_of(&kind)?;
     let language = window_language(&state);
-    crate::windows::open(
-        &app,
-        &crate::windows::excel_association_window(language),
-        Some(&format!("kind={}", kind.key())),
-    )
-    .map_err(to_ipc_error)
+    let mut spec = crate::windows::excel_association_window(language);
+    if state.with_excel(|import| import.is_structured()).unwrap_or(false) {
+        spec.title = radinus_core::i18n::text(language, "window-structured-association-title");
+    }
+    crate::windows::open(&app, &spec, Some(&format!("kind={}", kind.key()))).map_err(to_ipc_error)
 }
 
 /// Quitte une des trois fenêtres de l'import Excel.
@@ -11972,6 +12741,42 @@ pub fn save_welcome_accounts(
     .map_err(to_ipc_error)
 }
 
+/// **La vision par groupe de la liste des opérations, telle qu'elle a été
+/// laissée** (Fabrice, 27/10/2026) : active ou non, repliée ou dépliée, et la
+/// colonne triée avec son sens.
+#[tauri::command]
+pub fn operations_group_view(
+    state: State<'_, AppState>,
+) -> Result<radinus_core::preferences::GroupView, String> {
+    let conn = state.database()?;
+    radinus_core::preferences::operations_group_view(&conn).map_err(to_ipc_error)
+}
+
+/// Enregistre la vision par groupe. **La fenêtre envoie tout, à chaque geste**,
+/// comme pour l'accueil. Une valeur qui ne se tient pas n'est pas écrite, et ce
+/// n'est pas une erreur à montrer.
+#[tauri::command]
+pub fn save_operations_group_view(
+    state: State<'_, AppState>,
+    active: bool,
+    folded: bool,
+    column: String,
+    ascending: bool,
+) -> Result<(), String> {
+    let conn = state.database()?;
+    radinus_core::preferences::set_operations_group_view(
+        &conn,
+        &radinus_core::preferences::GroupView {
+            active,
+            folded,
+            column,
+            ascending,
+        },
+    )
+    .map(|_| ())
+    .map_err(to_ipc_error)
+}
+
 /// **« Réinitialiser les réglages de confort »** (Fabrice, 07/10/2026 : « il
 /// faut avoir un bouton pour remettre à zéro les réglages de confort mais pas
 /// le reste »).
@@ -12079,6 +12884,86 @@ pub fn save_preferences_ofx(state: State<'_, AppState>, label: String, reference
     let root = state.data_root.clone();
     let mut config = radinus_core::location::read_config(&root).map_err(to_ipc_error)?;
     config.set_ofx_memo_options(options);
+    radinus_core::location::write_config(&root, &config).map_err(to_ipc_error)
+}
+
+/// Les préférences « Détection des doublons » (29/10/2026), chacune par son
+/// mot, comme celles des relevés OFX. Réglages du logiciel : la feuille vit
+/// sans base ouverte.
+#[derive(Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+pub struct DuplicatesPreferencesDto {
+    pub max_days: i64,
+    pub likeness: String,
+    pub compare_label: bool,
+    pub compare_reference: bool,
+    pub levels: Vec<String>,
+    pub ventilation: String,
+}
+
+impl DuplicatesPreferencesDto {
+    fn of(preferences: &radinus_core::duplicates::Preferences) -> Self {
+        DuplicatesPreferencesDto {
+            max_days: preferences.settings.max_days,
+            likeness: preferences.settings.likeness.key().to_string(),
+            compare_label: preferences.settings.compare_label,
+            compare_reference: preferences.settings.compare_reference,
+            levels: preferences.levels.iter().map(|level| level.key().to_string()).collect(),
+            ventilation: preferences.ventilation.key().to_string(),
+        }
+    }
+}
+
+/// Ce que la feuille montre, et ce que « Rétablir les valeurs par défaut »
+/// remet dans ses champs — les défauts viennent du noyau, la fenêtre ne les
+/// connaît pas d'elle-même.
+#[derive(Serialize)]
+pub struct DuplicatesPreferencesSheetDto {
+    pub value: DuplicatesPreferencesDto,
+    pub defaults: DuplicatesPreferencesDto,
+}
+
+#[tauri::command]
+pub fn preferences_duplicates(state: State<'_, AppState>) -> DuplicatesPreferencesSheetDto {
+    let preferences = radinus_core::location::read_config(&state.data_root)
+        .unwrap_or_default()
+        .duplicates_preferences();
+    DuplicatesPreferencesSheetDto {
+        value: DuplicatesPreferencesDto::of(&preferences),
+        defaults: DuplicatesPreferencesDto::of(&radinus_core::duplicates::Preferences::default()),
+    }
+}
+
+/// Enregistre les préférences des doublons. **Au moins un niveau** : une
+/// fenêtre qui ne montrerait jamais rien laisserait croire qu'il n'y a aucun
+/// doublon.
+#[tauri::command]
+pub fn save_preferences_duplicates(
+    state: State<'_, AppState>,
+    preferences: DuplicatesPreferencesDto,
+) -> Result<(), String> {
+    use radinus_core::duplicates::{Level, Likeness, Preferences, Settings, Ventilation, MAX_DAYS};
+    let levels: Vec<Level> = Level::ALL
+        .into_iter()
+        .filter(|level| preferences.levels.iter().any(|key| key == level.key()))
+        .collect();
+    if levels.is_empty() {
+        return Err(radinus_core::i18n::text(ui_language(), "preferences-duplicates-no-level"));
+    }
+    let chosen = Preferences {
+        settings: Settings {
+            max_days: preferences.max_days.clamp(0, MAX_DAYS),
+            likeness: Likeness::from_key(&preferences.likeness)
+                .ok_or_else(|| format!("Doublons : « {} » ?", preferences.likeness))?,
+            compare_label: preferences.compare_label,
+            compare_reference: preferences.compare_reference,
+        },
+        levels,
+        ventilation: Ventilation::from_key(&preferences.ventilation)
+            .ok_or_else(|| format!("Doublons : « {} » ?", preferences.ventilation))?,
+    };
+    let root = state.data_root.clone();
+    let mut config = radinus_core::location::read_config(&root).map_err(to_ipc_error)?;
+    config.set_duplicates_preferences(&chosen);
     radinus_core::location::write_config(&root, &config).map_err(to_ipc_error)
 }
 

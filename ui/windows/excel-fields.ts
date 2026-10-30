@@ -36,6 +36,7 @@ interface Links {
   headers: string[];
   fields: string[];
   links: { header: string; field: string }[];
+  structured: boolean;
 }
 
 interface Rule {
@@ -79,6 +80,16 @@ function say(message: string, alert = false): void {
 let headerChoices: string[] = [];
 let fieldChoices: string[] = [];
 let rows: LinkRow[] = [];
+/// **Un import JSON / XML ?** (Fabrice, 28/10/2026 : « tu as appelé la
+/// première colonne Entete_Excel… il s'agit d'un fichier json ou xml »). Les
+/// mots qui parlent de la feuille ont alors leur pendant qui parle du fichier.
+let structured = false;
+const TITLE = { key: "window-excel-fields-title" };
+
+/// Le mot de l'Excel, ou son pendant pour un JSON / XML.
+function word(excel: string, other: string): string {
+  return t(structured ? other : excel);
+}
 
 /// La table de concordance. **Les deux colonnes se règlent**, comme chez lui :
 /// l'en-tête Excel à gauche, la rubrique Radinus à droite, et les deux
@@ -87,7 +98,7 @@ const links = new Table<LinkRow>({
   container: element<HTMLDivElement>("links-rows"),
   columns: [
     {
-      title: () => t("excel-column-excel"),
+      title: () => word("excel-column-excel", "structured-column-file"),
       cell: (row) => row.header,
       width: "1fr",
       editor: {
@@ -125,7 +136,7 @@ const report = new Table<Refused>({
   rowHeight: 22,
   columns: [
     {
-      title: () => t("excel-column-row"),
+      title: () => word("excel-column-row", "structured-column-item"),
       cell: (row) => String(row.row),
       key: (row) => row.row,
       numeric: true,
@@ -135,7 +146,7 @@ const report = new Table<Refused>({
     { title: () => t("excel-column-reason"), cell: (row) => row.reason, width: "1fr" },
   ],
   identity: (row) => row.row,
-  emptyText: () => t("excel-nothing-refused"),
+  emptyText: () => word("excel-nothing-refused", "structured-nothing-refused"),
   filteredOutText: () => t("ui-no-match"),
   exportAs: () => ({ name: t("excel-report-title"), detail: t("excel-report-title") }),
 });
@@ -316,6 +327,12 @@ for (const page of ["links", "settings", "report"] as const) {
 async function reload(): Promise<void> {
   try {
     const state = await invoke<Links>("excel_links");
+    // Les mots suivent le fichier : rhabiller si l'import a changé de nature.
+    if (state.structured !== structured) {
+      structured = state.structured;
+      TITLE.key = structured ? "window-structured-fields-title" : "window-excel-fields-title";
+      await dress();
+    }
     headerChoices = [IGNORE, ...state.headers];
     fieldChoices = state.fields;
     rows = state.links.map((link, index) => ({
@@ -364,11 +381,14 @@ async function dress(): Promise<void> {
     ["tab-links", "excel-tab-links"],
     ["tab-settings", "excel-tab-settings"],
     ["tab-report", "excel-report-title"],
-    ["links-help", "excel-links-help"],
     ["report-title", "excel-report-title"],
   ] as const) {
     element<HTMLElement>(id).textContent = t(key);
   }
+  element<HTMLElement>("links-help").textContent = word(
+    "excel-links-help",
+    "structured-links-help",
+  );
   element<HTMLElement>("validate").title = t("excel-title-import");
   element<HTMLElement>("close").title = t("ui-title-close");
 
@@ -403,5 +423,5 @@ void (async () => {
 
   showTab("links");
   await reload();
-  onLanguageChanged(dress, { key: "window-excel-fields-title" });
+  onLanguageChanged(dress, TITLE);
 })();

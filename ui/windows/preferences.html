@@ -16,7 +16,8 @@
          droite avec la disquette et la porte : le gabarit des fiches, dans le
          sens de toutes les autres fenêtres de Radinus.
 
-         **Trois options écrivent dans la table `Preferences`** : la devise,
+         **Trois options écrivent dans la table `Preferences`** (les doublons,
+         29/10/2026, vont dans la configuration du logiciel) : la devise,
          la vérification des opérations importées (03/10/2026) et le tarif
          d'électricité (09/10/2026).
          La langue, elle, reste dans `Parametres.UtiliseLangue` où elle a
@@ -177,6 +178,68 @@
             </select>
           </div>
           <p class="pane__hint" id="qif-hint"></p>
+        </section>
+
+        <!-- La feuille « Détection des doublons », sous la branche « Comptes »
+             (Fabrice, 29/10/2026 : « quels paramètres pourrait-on mettre dans
+             les préférences pour que les choses soient le plus élastiques
+             possible ? »). Cinq réglages **du logiciel**, dans
+             `settings/radinus_config.json` comme ceux des relevés : la feuille
+             vit sans base ouverte. Chaque réglage a sa bulle ; « Rétablir les
+             valeurs par défaut » remplit les champs, la disquette enregistre. -->
+        <section class="pane" id="pane-duplicates" hidden>
+          <h2 class="pane__title" id="duplicates-title"></h2>
+          <div class="form">
+            <label class="form__label" for="duplicates-days" id="duplicates-days-label"></label>
+            <select class="form__field form__field--medium" id="duplicates-days"></select>
+
+            <label class="form__label" for="duplicates-likeness" id="duplicates-likeness-label"></label>
+            <select class="form__field form__field--medium" id="duplicates-likeness">
+              <option value="strict" id="duplicates-likeness-strict"></option>
+              <option value="normal" id="duplicates-likeness-normal"></option>
+              <option value="large" id="duplicates-likeness-large"></option>
+            </select>
+
+            <span class="form__label" id="duplicates-texts-label"></span>
+            <label class="form__check" id="duplicates-text-label-line">
+              <input id="duplicates-text-label" type="checkbox" />
+              <span id="duplicates-text-label-word"></span>
+            </label>
+            <span></span>
+            <label class="form__check" id="duplicates-text-reference-line">
+              <input id="duplicates-text-reference" type="checkbox" />
+              <span id="duplicates-text-reference-word"></span>
+            </label>
+
+            <span class="form__label" id="duplicates-levels-label"></span>
+            <label class="form__check">
+              <input id="duplicates-level-identical" type="checkbox" data-level="identical" />
+              <span id="duplicates-level-identical-word"></span>
+            </label>
+            <span></span>
+            <label class="form__check">
+              <input id="duplicates-level-probable" type="checkbox" data-level="probable" />
+              <span id="duplicates-level-probable-word"></span>
+            </label>
+            <span></span>
+            <label class="form__check">
+              <input id="duplicates-level-possible" type="checkbox" data-level="possible" />
+              <span id="duplicates-level-possible-word"></span>
+            </label>
+            <span></span>
+            <label class="form__check">
+              <input id="duplicates-level-to-verify" type="checkbox" data-level="to-verify" />
+              <span id="duplicates-level-to-verify-word"></span>
+            </label>
+
+            <label class="form__label" for="duplicates-ventilation" id="duplicates-ventilation-label"></label>
+            <select class="form__field" id="duplicates-ventilation">
+              <option value="take-over" id="duplicates-ventilation-take"></option>
+              <option value="warn" id="duplicates-ventilation-warn"></option>
+            </select>
+          </div>
+          <button class="table-layouts__reset" id="duplicates-defaults" type="button"></button>
+          <p class="pane__hint" id="duplicates-hint"></p>
         </section>
 
         <!-- La feuille « Tarif d'électricité », sous la branche « Outils »

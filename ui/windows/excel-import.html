@@ -42,7 +42,19 @@
           </div>
         </section>
 
-        <section class="band">
+        <!-- « Importation de fichier JSON / XML » (Fabrice, 28/10/2026) : la même
+             fenêtre, avec ce groupe-ci à la place des deux suivants. Un JSON
+             n'a ni cellules ni lignes à déclarer ; ce qu'il faut déclarer, ce
+             sont ses formats, dans des menus à exemples. -->
+        <section class="band" id="band-dates" hidden>
+          <h2 class="band__title" id="group-dates"></h2>
+          <div class="excel-settings">
+            <label class="excel-settings__label" for="date-format" id="date-format-label"></label>
+            <select class="excel-settings__field excel-settings__field--wide" id="date-format"></select>
+          </div>
+        </section>
+
+        <section class="band" id="band-header">
           <h2 class="band__title" id="group-header"></h2>
           <div class="excel-settings">
             <label class="excel-settings__label" for="header-row" id="header-row-label"></label>
@@ -56,7 +68,7 @@
           </div>
         </section>
 
-        <section class="band">
+        <section class="band" id="band-rows">
           <h2 class="band__title" id="group-rows"></h2>
           <div class="excel-settings">
             <label class="excel-settings__label" for="first-data-row" id="first-data-row-label"></label>
@@ -69,6 +81,10 @@
 
         <section class="band">
           <h2 class="band__title" id="group-shape"></h2>
+          <div class="excel-settings" id="amount-format-row" hidden>
+            <label class="excel-settings__label" for="amount-format" id="amount-format-label"></label>
+            <select class="excel-settings__field excel-settings__field--wide" id="amount-format"></select>
+          </div>
           <div class="excel-choice">
             <label class="excel-choice__line">
               <input type="radio" name="shape" id="shape-single" value="single" checked />

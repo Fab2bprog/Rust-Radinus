@@ -615,6 +615,21 @@ pub struct ExcelImport {
     pub grid: Grid,
     pub links: Vec<Link>,
     pub policies: Policies,
+    /// Comment lire les dates et les montants à l'étape 3 : avec tolérance
+    /// pour un classeur, selon les formats déclarés pour un JSON ou un XML.
+    pub reading: radinus_core::structured_import::Reading,
+    /// Le fichier JSON ou XML lu, avec ses listes — `None` pour un classeur
+    /// Excel (28/10/2026). Les étapes 2 et 3 ne le regardent pas : elles ne
+    /// voient que `grid`.
+    pub structured: Option<radinus_core::structured_import::Source>,
+}
+
+impl ExcelImport {
+    /// Un import JSON / XML plutôt qu'Excel — ce qui change les titres des
+    /// fenêtres des étapes 2 et 3, et rien d'autre.
+    pub fn is_structured(&self) -> bool {
+        self.structured.is_some()
+    }
 }
 
 /// Hands out the open connection while keeping the lock held. Dereferences to

@@ -120,6 +120,13 @@ pub struct SoftwareConfig {
     pub ofx_memo_in_label: Option<bool>,
     #[serde(default)]
     pub ofx_memo_in_reference: Option<bool>,
+
+    /// **Les préférences « Détection des doublons »** (Fabrice, 29/10/2026).
+    /// Gardées telles quelles, en JSON : [`crate::duplicates::Preferences`]
+    /// les lit réglage par réglage, si bien qu'une valeur abîmée ne coûte que
+    /// ce réglage-là, et jamais toute la configuration.
+    #[serde(default)]
+    pub duplicates: Option<serde_json::Value>,
 }
 
 /// Les bornes de la taille d'affichage, et le pas du curseur.
@@ -214,6 +221,16 @@ impl SoftwareConfig {
             },
         );
         MemoOptions { label, reference }
+    }
+
+    /// Les préférences de la recherche des doublons ; les valeurs par défaut
+    /// pour tout ce qui manque ou ne se lit pas.
+    pub fn duplicates_preferences(&self) -> crate::duplicates::Preferences {
+        crate::duplicates::Preferences::from_json(self.duplicates.as_ref())
+    }
+
+    pub fn set_duplicates_preferences(&mut self, preferences: &crate::duplicates::Preferences) {
+        self.duplicates = Some(preferences.to_json());
     }
 
     /// Enregistre les deux menus OFX, et oublie les deux anciennes cases.
@@ -904,6 +921,7 @@ mod tests {
             ofx_reference: Some("name-and-memo".to_string()),
             ofx_memo_in_label: Some(true),
             ofx_memo_in_reference: Some(false),
+            duplicates: Some(serde_json::json!({ "max_days": 3, "likeness": "strict" })),
         };
         write_config(&root, &config).unwrap();
 
@@ -1263,6 +1281,45 @@ mod tests {
         let edited: SoftwareConfig =
             serde_json::from_str(r#"{"ofx_label":"???","ofx_reference":"rien"}"#).unwrap();
         assert_eq!(edited.ofx_memo_options(), MemoOptions::default());
+        fs::remove_dir_all(&root).ok();
+    }
+
+    /// **Les préférences des doublons** (29/10/2026) : gardées d'un lancement
+    /// à l'autre ; rien de réglé, c'est le défaut ; une valeur abîmée ne coûte
+    /// que son propre réglage.
+    #[test]
+    fn the_duplicates_preferences_survive_and_a_bad_value_costs_only_itself() {
+        use crate::duplicates::{Level, Likeness, Preferences, Settings, Ventilation};
+        let root = scratch_dir("doublons_aller_retour");
+        ensure_tree(&root).unwrap();
+
+        assert_eq!(SoftwareConfig::default().duplicates_preferences(), Preferences::default());
+
+        let chosen = Preferences {
+            settings: Settings {
+                max_days: 2,
+                likeness: Likeness::Large,
+                compare_label: true,
+                compare_reference: false,
+            },
+            levels: vec![Level::Identical, Level::Probable],
+            ventilation: Ventilation::WarnOnly,
+        };
+        let mut config = SoftwareConfig::default();
+        config.set_duplicates_preferences(&chosen);
+        write_config(&root, &config).unwrap();
+        assert_eq!(read_config(&root).unwrap().duplicates_preferences(), chosen);
+
+        let edited: SoftwareConfig = serde_json::from_str(
+            r#"{"duplicates":{"max_days":99,"likeness":"???","compare_label":"oui","levels":[],"ventilation":"warn"}}"#,
+        )
+        .unwrap();
+        let read = edited.duplicates_preferences();
+        assert_eq!(read.settings.max_days, crate::duplicates::MAX_DAYS);
+        assert_eq!(read.settings.likeness, Likeness::Normal);
+        assert!(read.settings.compare_label);
+        assert_eq!(read.levels, Level::ALL.to_vec());
+        assert_eq!(read.ventilation, Ventilation::WarnOnly);
         fs::remove_dir_all(&root).ok();
     }
 }

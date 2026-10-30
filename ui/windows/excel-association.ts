@@ -33,6 +33,7 @@ interface Association {
   column_title: string;
   values: Unknown[];
   choices: Item[];
+  structured: boolean;
 }
 
 interface Row {
@@ -52,6 +53,13 @@ function say(message: string, alert = false): void {
 }
 
 let kind = "category";
+/// Un import JSON / XML : les valeurs viennent du fichier, pas de la feuille.
+let structured = false;
+const TITLE = { key: "window-excel-association-title" };
+
+function word(excel: string, other: string): string {
+  return t(structured ? other : excel);
+}
 let columnTitle = "";
 let choices: Item[] = [];
 let rows: Row[] = [];
@@ -60,7 +68,7 @@ const table = new Table<Row>({
   container: element<HTMLDivElement>("rows"),
   columns: [
     {
-      title: () => t("excel-column-data"),
+      title: () => word("excel-column-data", "structured-column-data"),
       cell: (row) => row.label,
       width: "1fr",
     },
@@ -83,7 +91,7 @@ const table = new Table<Row>({
     },
   ],
   identity: (row) => row.index,
-  emptyText: () => t("excel-association-none"),
+  emptyText: () => word("excel-association-none", "structured-association-none"),
   filteredOutText: () => t("ui-no-match"),
 });
 
@@ -118,6 +126,12 @@ element<HTMLButtonElement>("close").addEventListener("click", () => void leave()
 async function reload(): Promise<void> {
   try {
     const state = await invoke<Association>("excel_association", { kind });
+    structured = state.structured;
+    TITLE.key = structured ? "window-structured-association-title" : "window-excel-association-title";
+    element<HTMLElement>("help").textContent = word(
+      "excel-association-help",
+      "structured-association-help",
+    );
     columnTitle = state.column_title;
     choices = state.choices;
     rows = state.values.map((value, index) => ({
@@ -129,7 +143,11 @@ async function reload(): Promise<void> {
     // doit donc être rebâti, pas seulement rempli.
     table.buildHeader(element<HTMLElement>("header"), element<HTMLElement>("filter"));
     table.setRows(rows);
-    say(rows.length === 0 ? t("excel-association-none") : t("excel-association-help"));
+    say(
+      rows.length === 0
+        ? word("excel-association-none", "structured-association-none")
+        : word("excel-association-help", "structured-association-help"),
+    );
   } catch (error) {
     say(tError("ui-load-failed", error), true);
   }
@@ -167,7 +185,10 @@ async function dress(): Promise<void> {
     }
   }
   table.buildHeader(element<HTMLElement>("header"), element<HTMLElement>("filter"));
-  element<HTMLElement>("help").textContent = t("excel-association-help");
+  element<HTMLElement>("help").textContent = word(
+    "excel-association-help",
+    "structured-association-help",
+  );
   element<HTMLElement>("validate").title = t("ui-title-save");
   element<HTMLElement>("close").title = t("ui-title-close");
   if (rows.length > 0) {
@@ -180,5 +201,5 @@ void (async () => {
   await dress();
   readParameters(window.location.search);
   await reload();
-  onLanguageChanged(dress, { key: "window-excel-association-title" });
+  onLanguageChanged(dress, TITLE);
 })();

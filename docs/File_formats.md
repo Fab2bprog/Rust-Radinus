@@ -184,6 +184,13 @@ software settings (`radinus_config.json`: `ofx_label`, `ofx_reference`), not
 settings of a base; the two tick boxes of 19/10/2026, if set, are translated
 until the menus are first saved, then forgotten.
 
+The duplicate search keeps its preferences there too (29/10/2026, P-79), under
+`duplicates`, as one JSON object: `max_days` (0 to 15), `likeness` (`strict`,
+`normal`, `large`), `compare_label`, `compare_reference`, `levels` (some of
+`identical`, `probable`, `possible`, `to-verify`) and `ventilation`
+(`take-over` or `warn`). Each setting is read on its own: an unreadable value
+takes its default and costs nothing else.
+
 The label holds 300 characters on screen, the reference 255; the columns are
 `TEXT`, so no base is migrated. A duplicate is looked for on the composed
 label.
@@ -288,6 +295,46 @@ The three steps: the **capture zone** (which rows and columns actually hold
 data), the **field mapping** (which column is the date, which is the amount),
 and the **policies** (what to do with what is missing). Nothing is detected;
 everything is declared, and shown.
+
+### 4 bis. JSON and XML — the same wizard, a different step 1 (28/10/2026, P-78)
+
+`radinus-core/src/structured_import.rs` · window F34 shown with `kind=structured`
+
+« Importation de fichier JSON / XML » turns a JSON or XML file into the same
+grid the Excel capture produces, and steps 2 and 3 are the Excel ones. The
+file may come from any software, so nothing is guessed:
+
+- **The list.** The file is searched for **lists of objects** (JSON) or
+  **elements of the same name under one parent** (XML; at least two, or one
+  that is alone under its parent). The user picks one, shown with its path and
+  size — `transactions`, `data/items`, `/` for a JSON whose root is the list,
+  `export/operations/operation`. The search does not go inside the items of a
+  list, so operations grouped account by account never get mixed. A list of
+  lists (rows without names) is not offered.
+- **Flattening.** One item is a row, one key a column, in the order the file
+  writes them (a small ordered reader keeps it; `serde_json` alone sorts keys).
+  Nested objects become `parent.child`; XML attributes `@name` (and
+  `child@name` on a simple child); a list of plain values becomes a
+  comma-separated text; a list of objects inside a row — a split from another
+  software — is not flattened and is **named** in the preview. A missing key
+  is an empty cell; `null` too; `true`/`false` are text. XML namespace
+  prefixes are dropped.
+- **Two declared formats**, in menus whose examples all read 28 October 2026
+  and 1 250,50 (a test reads every example): dates `2026-10-28`,
+  `2026-10-28T14:30:00` (the date as written is kept), `28/10/2026`,
+  `10/28/2026`, `28.10.2026`, `28-10-2026`, `2026/10/28`, seconds or
+  milliseconds since 1970 (UTC); amounts `1250.50`, `1 250,50`, `1.250,50`,
+  `1,250.50`, in cents, in thousandths. A JSON number is always written with
+  a point: for it the format only gives the unit. A value that does not read
+  with the declared format is refused, never approached, and the report names
+  its row (the item's number in the list).
+- **The amount shape** is the Excel one: one signed column, or Debit and
+  Credit.
+- **Encodings.** JSON: UTF-8 (a BOM is tolerated). XML: what its declaration
+  says, UTF-8 or ISO-8859-1; anything else is refused by name.
+
+The preview shows at most 200 rows and gives the total; the import takes them
+all. An operation without a label is named « Transaction import JSON / XML ».
 
 ---
 

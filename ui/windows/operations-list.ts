@@ -24,7 +24,7 @@ import { askYesNo } from "./dialog";
 import { askWhereToSave, exportSheet, FORMATS, type MenuAddition } from "./export";
 import { buildPeriodMenu, currentMonth } from "./period";
 import { askForPrinter } from "./printers";
-import { Table } from "./table";
+import { Table, type GroupKey, type Grouping } from "./table";
 import { loadTexts, onLanguageChanged, t, tError } from "./texts";
 
 const PARAMETERS_EVENT = "window-parameters:operations";
@@ -314,11 +314,263 @@ function flattened(): Row[] {
       continue;
     }
     shown.push(row);
-    if (unfolded.has(row.id)) {
+    // La vision par groupe n'a que des mères : quoi qu'il arrive à `unfolded`,
+    // aucune fille n'entre dans la liste tant qu'elle est allumée.
+    if (!grouped && unfolded.has(row.id)) {
       shown.push(...(childrenOf.get(row.id) ?? []));
     }
   }
   return shown;
+}
+
+// --- La vision par groupe selon le tri (Fabrice, 27/10/2026) ----------------
+//
+// Dans le menu Divers : quand le tri porte sur une colonne qui se regroupe, le
+// tableau intercale une tête avant chaque groupe — le mot du groupe, puis ses
+// sommes Pointé, Engagé, Prévu et Total.
+//
+//   * **Elle ne montre que les opérations mères.** L'allumer replie toutes
+//     les sous-opérations d'office, l'éteindre remet celles qui étaient
+//     dépliées. Tant qu'elle est allumée, le « + » des mères n'existe pas, et
+//     « Afficher / Masquer toutes les sous-opérations » sont grisées.
+//   * **Les sommes sont celles des lignes que l'on voit**, filtres et période
+//     compris : la somme de toutes les têtes est donc le total du pied.
+//   * **Elle est mémorisée** (27/10/2026) : allumée ou non, repliée ou
+//     dépliée, et la colonne triée avec son sens — rétablis à l'ouverture.
+//   * Un achat ventilé reste entier dans le groupe de sa mère : le groupe
+//     suit la mère, et ses sous-opérations lui sont attachées.
+
+/// La vision est-elle allumée ?
+let grouped = false;
+
+/// Les colonnes dont le tri donne un regroupement qui a un sens : une date, une
+/// nomenclature, un statut. Pas un montant, pas un libellé libre — une tête par
+/// écriture ne dirait rien.
+const GROUPABLE_COLUMNS = new Set([
+  "date",
+  "status",
+  "verification",
+  "category",
+  "assignment",
+  "payment-mode",
+  "payee",
+  "project",
+]);
+
+/// À quel groupe appartient une ligne, pour la colonne triée.
+function groupOf(row: Row, column: string | undefined): GroupKey {
+  switch (column) {
+    case "date":
+      // Un jour par groupe — la clef est la date ISO, qui ne dépend pas de ce
+      // qu'on lit.
+      return { key: row.date_value, text: row.date };
+    case "status":
+      return {
+        key: String(row.status_id),
+        text: statuses.find((item) => item.id === row.status_id)?.label ?? "",
+      };
+    case "verification":
+      return {
+        key: String(row.verification_id),
+        text: verifications.find((item) => item.id === row.verification_id)?.label ?? "",
+      };
+    case "category":
+      return { key: String(row.category_id), text: row.category };
+    case "assignment":
+      return { key: String(row.assignment_id), text: row.assignment };
+    case "payment-mode":
+      return { key: String(row.payment_mode_id), text: row.payment_mode };
+    case "payee":
+      return { key: String(row.payee_id), text: row.payee };
+    default:
+      return { key: String(row.project_id), text: row.project };
+  }
+}
+
+/// Les montants déjà mis en forme par le noyau. **La fenêtre additionne mais ne
+/// compose jamais un montant** : la virgule, l'espace et la place du symbole
+/// dépendent de la langue. Un montant inconnu s'écrit « … » le temps d'un
+/// appel, puis la tête est redessinée avec lui.
+const formattedAmounts = new Map<number, string>();
+const wantedAmounts = new Set<number>();
+let askingForAmounts = false;
+
+function amountText(amount: number): string {
+  const known = formattedAmounts.get(amount);
+  if (known !== undefined) {
+    return known;
+  }
+  wantedAmounts.add(amount);
+  if (!askingForAmounts) {
+    askingForAmounts = true;
+    queueMicrotask(() => void fetchAmounts());
+  }
+  return "…";
+}
+
+async function fetchAmounts(): Promise<void> {
+  const amounts = [...wantedAmounts];
+  wantedAmounts.clear();
+  try {
+    const texts = await invoke<string[]>("format_amounts", { amounts });
+    amounts.forEach((amount, index) => formattedAmounts.set(amount, texts[index] ?? ""));
+  } catch (error) {
+    // Un montant qui ne s'écrit pas ne doit pas faire redemander sans fin.
+    amounts.forEach((amount) => formattedAmounts.set(amount, "?"));
+    say(tError("ui-read-failed", error), true);
+  }
+  askingForAmounts = false;
+  table.refresh();
+}
+
+/// La tête d'un groupe : le mot, puis les sommes. Les trois statuts y sont
+/// toujours, même à zéro, pour que toutes les têtes aient la même forme.
+/// **Des sommes séparées**, chaque opération n'étant que dans un statut — et,
+/// à côté, leur total.
+function groupLine(text: string, rows: Row[]): { title: string; sums: string } {
+  const parts: string[] = [];
+  for (const [, id] of STATUS_FILTERS) {
+    const sum = rows
+      .filter((row) => row.status_id === id)
+      .reduce((all, row) => all + row.amount, 0);
+    parts.push(`${statuses.find((item) => item.id === id)?.label ?? ""} ${amountText(sum)}`);
+  }
+  const total = rows.reduce((all, row) => all + row.amount, 0);
+  parts.push(`${t("operations-group-total")} ${amountText(total)}`);
+  return {
+    title: text === "" ? t("operations-group-empty") : text,
+    sums: parts.join("   ·   "),
+  };
+}
+
+const GROUPING: Grouping<Row> = {
+  groupable: (column) => column !== undefined && GROUPABLE_COLUMNS.has(column),
+  of: groupOf,
+  line: groupLine,
+};
+
+/// **Ce que la barre d'information dit tant que la vision est allumée**
+/// (Fabrice, 27/10/2026 : « il faut afficher systématiquement un message
+/// disant que dans ce mode les sous-opérations ne sont pas visibles »). Quand
+/// la colonne triée ne se regroupe pas, la phrase qui dit quoi cliquer suit —
+/// sans elle l'option semblerait cassée.
+///
+/// Le total d'une sélection passe devant : la barre le montre tant que des
+/// lignes sont choisies, puis le message revient. Éteinte, la vision efface
+/// son message, et seulement le sien.
+let explaining = false;
+function explainGrouping(): void {
+  if (!grouped) {
+    if (explaining) {
+      say("");
+      explaining = false;
+    }
+    return;
+  }
+  if (table.selected().length > 0) {
+    return;
+  }
+  const column = table.sortedColumn();
+  const works = column !== undefined && GROUPABLE_COLUMNS.has(column);
+  const message = t("operations-view-group-active");
+  say(works ? message : `${message} ${t("operations-view-group-pick-column")}`);
+  explaining = true;
+}
+
+/// Le dernier « Tout replier » (vrai) ou « Tout déplier » (faux) — ce que la
+/// vision mémorise, et rétablit quand la fenêtre se rouvre.
+let viewFolded = false;
+
+/// Ce que la base garde de la vision (`preferences::GroupView`).
+interface GroupView {
+  active: boolean;
+  folded: boolean;
+  column: string;
+  ascending: boolean;
+}
+
+/// **Enregistre la vision telle qu'elle est** (Fabrice, 27/10/2026 : « une
+/// préférence personnelle qui devra être mémorisée »). La colonne triée et son
+/// sens n'y sont que **tant que la vision est allumée** : la liste ordinaire ne
+/// mémorise aucun tri, comme avant.
+function saveGroupView(): void {
+  const column = grouped ? (table.sortedColumn() ?? "") : "";
+  void invoke("save_operations_group_view", {
+    active: grouped,
+    folded: viewFolded,
+    column,
+    ascending: grouped ? table.isAscending() : true,
+  }).catch(() => {
+    // Une préférence qui ne s'écrit pas ne gêne pas la lecture de la liste.
+  });
+}
+
+/// **Rétablit la vision mémorisée**, à l'ouverture de la fenêtre : la colonne
+/// et le sens du tri, puis la vision, puis le repli. Une colonne inconnue ou
+/// masquée est ignorée — la barre dit alors de cliquer un en-tête.
+async function restoreGroupView(): Promise<void> {
+  let view: GroupView;
+  try {
+    view = await invoke<GroupView>("operations_group_view");
+  } catch {
+    return;
+  }
+  if (!view.active) {
+    return;
+  }
+  viewFolded = view.folded;
+  if (view.column !== "") {
+    table.sortOn(view.column, view.ascending);
+  }
+  setGrouped(true);
+  if (viewFolded) {
+    table.foldAll();
+  }
+  explainGrouping();
+}
+
+/// Le tri vient de changer à la main. La vision le retient, et, si le dernier
+/// geste était « Tout replier », replie aussi les nouveaux groupes.
+function sortChanged(): void {
+  if (grouped) {
+    if (viewFolded) {
+      table.foldAll();
+    }
+    saveGroupView();
+  }
+  explainGrouping();
+}
+
+/// Les mères dépliées au moment où la vision s'est allumée, rendues quand elle
+/// s'éteint.
+let unfoldedBefore: number[] = [];
+
+/// Allume ou éteint la vision (Fabrice, 27/10/2026 : « lorsqu'on active la
+/// vision par groupe les sous-opérations sont d'office masquées […] lorsqu'on
+/// la désactive elles redeviennent visibles »).
+///
+/// **Allumer replie tout**, après avoir retenu les mères dépliées ; **éteindre
+/// remet l'état d'avant** — les mères qui étaient dépliées se redéplient, les
+/// autres restent repliées. Une mère disparue entre-temps est ignorée.
+function setGrouped(value: boolean): void {
+  if (value === grouped) {
+    return;
+  }
+  if (value) {
+    unfoldedBefore = [...unfolded];
+    unfolded.clear();
+  } else {
+    for (const id of unfoldedBefore) {
+      if (everything.some((row) => row.id === id && row.parent_id === 0 && row.child_count > 0)) {
+        unfolded.add(id);
+      }
+    }
+    unfoldedBefore = [];
+  }
+  grouped = value;
+  table.setRows(flattened());
+  table.setGrouping(value ? GROUPING : null);
+  explainGrouping();
 }
 
 /// Which line of its mother's ventilation a child is, so the table can
@@ -333,6 +585,10 @@ function foldingCell(row: Row, cell: HTMLElement): void {
     return;
   }
   if (row.child_count === 0) {
+    return;
+  }
+  // La vision par groupe n'a que des mères : le « + » n'a plus rien à ouvrir.
+  if (grouped) {
     return;
   }
   const button = document.createElement("button");
@@ -583,6 +839,10 @@ const table = new Table<Row>({
     },
   ],
   identity: (row) => row.id,
+  // **Une fille suit sa mère, tri compris** (Fabrice, 27/10/2026) : sans cela
+  // le tableau rangeait les sous-opérations à plat, loin de leur mère, dès
+  // qu'on triait sur une colonne où elles diffèrent d'elle — la catégorie.
+  parentOf: (row) => row.parent_id,
   rowClass: (row) => {
     if (row.parent_id === 0) {
       return null;
@@ -605,6 +865,7 @@ const table = new Table<Row>({
   emptyText: () => t("operations-none"),
   filteredOutText: () => t("ui-no-match"),
   onSelectionChange: () => showSelectionTotal(),
+  onSortChange: () => sortChanged(),
   // Double-clicking a line opens its fiche — the reflex of every list in the
   // original (04_SPECIFICATIONS_FENETRES.md, F02: « double-clic ligne =
   // ouvrir la fiche »).
@@ -617,8 +878,12 @@ function showSelectionTotal(): void {
   const rows = everything.filter((row) => selected.has(row.id));
   if (rows.length === 0) {
     say("");
+    explaining = false;
+    // La vision allumée reprend la barre dès que plus rien n'est choisi.
+    explainGrouping();
     return;
   }
+  explaining = false;
   const total = rows.reduce((sum, row) => sum + row.amount, 0);
   // The whole sentence comes from the core, amount included. Filling the hole
   // here would mean the window knowing where the hole is — and it showed the
@@ -864,8 +1129,13 @@ for (const field of [fromField, toField]) {
 
 void listen(CHANGED_EVENT, () => void reload());
 void listen<string>(PARAMETERS_EVENT, (event) => {
+  // Les sous-opérations repartent repliées à chaque ouverture. La vision,
+  // elle, reste telle qu'elle est — c'est celle que la base a mémorisée — et
+  // l'éteindre plus tard ne redépliera rien.
   unfolded.clear();
+  unfoldedBefore = [];
   table.clearSelection();
+  explainGrouping();
   readParameters(event.payload);
   void reload();
 });
@@ -886,6 +1156,7 @@ function miscMenu(entry: HTMLElement): HTMLElement {
   choices.dataset.menu = "misc";
   choices.hidden = true;
 
+  const childrenButtons: HTMLButtonElement[] = [];
   for (const [key, showing] of [
     ["operations-show-children", true],
     ["operations-hide-children", false],
@@ -895,8 +1166,14 @@ function miscMenu(entry: HTMLElement): HTMLElement {
     button.className = "window-menu__choice window-menu__choice--plain";
     button.dataset.key = key;
     button.textContent = t(key);
+    childrenButtons.push(button);
     button.addEventListener("click", () => {
       choices.hidden = true;
+      // La vision par groupe n'a que des mères : ni à déplier, ni à replier
+      // tant qu'elle est allumée (les deux entrées sont alors grisées).
+      if (grouped) {
+        return;
+      }
       unfolded.clear();
       if (showing) {
         for (const row of everything) {
@@ -909,6 +1186,97 @@ function miscMenu(entry: HTMLElement): HTMLElement {
     });
     choices.append(button);
   }
+
+  // **Vision par groupe selon le tri** (Fabrice, 27/10/2026), sous les deux
+  // actions : un sous-menu Activer / Désactiver dont l'état courant porte
+  // l'encoche — c'est un mode, contrairement aux deux actions du dessus, et un
+  // mode doit dire où l'on en est.
+  //
+  // **Activer replie tout, Désactiver remet l'état d'avant** (`setGrouped`).
+  // Tant que la vision est allumée, « Afficher / Masquer toutes les
+  // sous-opérations » sont grisées et disent pourquoi au survol. Les encoches
+  // se lisent sur `grouped` lui-même, à l'ouverture du menu, jamais sur un
+  // clic dont on se souviendrait.
+  const nest = document.createElement("div");
+  nest.className = "window-menu__nest";
+  const opener = document.createElement("button");
+  opener.type = "button";
+  opener.className = "window-menu__choice window-menu__choice--plain window-menu__choice--parent";
+  opener.dataset.key = "operations-view-by-group";
+  opener.textContent = t("operations-view-by-group");
+  opener.addEventListener("click", (event) => {
+    event.stopPropagation();
+    nest.classList.toggle("window-menu__nest--open");
+  });
+  const nested = document.createElement("div");
+  nested.className = "window-menu__submenu";
+  const turn = (key: string, on: boolean): HTMLButtonElement => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "window-menu__choice window-menu__choice--plain";
+    button.dataset.key = key;
+    button.textContent = t(key);
+    button.addEventListener("click", () => {
+      choices.hidden = true;
+      nest.classList.remove("window-menu__nest--open");
+      // Allumée à la main, la vision montre tous ses groupes dépliés.
+      if (on && !grouped) {
+        viewFolded = false;
+      }
+      setGrouped(on);
+      saveGroupView();
+      markView();
+    });
+    return button;
+  };
+  const turnOn = turn("operations-view-group-on", true);
+  const turnOff = turn("operations-view-group-off", false);
+  // Deux actions, sans coche : replier ou déplier tous les groupes d'un coup,
+  // comme « Afficher / Masquer toutes les sous-opérations » le font pour les
+  // mères. Grisées tant que la vision est éteinte.
+  const act = (key: string, run: () => void): HTMLButtonElement => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "window-menu__choice window-menu__choice--plain";
+    button.dataset.key = key;
+    button.textContent = t(key);
+    button.addEventListener("click", () => {
+      choices.hidden = true;
+      nest.classList.remove("window-menu__nest--open");
+      run();
+    });
+    return button;
+  };
+  const foldAll = act("operations-view-group-fold-all", () => {
+    viewFolded = true;
+    table.foldAll();
+    saveGroupView();
+  });
+  const unfoldAll = act("operations-view-group-unfold-all", () => {
+    viewFolded = false;
+    table.unfoldAll();
+    saveGroupView();
+  });
+  const markView = (): void => {
+    turnOn.classList.toggle("window-menu__choice--chosen", grouped);
+    turnOff.classList.toggle("window-menu__choice--chosen", !grouped);
+    opener.classList.toggle("window-menu__choice--chosen", grouped);
+    foldAll.disabled = !grouped;
+    unfoldAll.disabled = !grouped;
+    // **Grisées, et elles disent pourquoi** — dans leur libellé même, qui se
+    // lit sans survol (Fabrice, 27/10/2026).
+    for (const button of childrenButtons) {
+      button.disabled = grouped;
+      const words = t(button.dataset.key ?? "");
+      button.textContent = grouped
+        ? `${words} ${t("operations-view-group-unavailable")}`
+        : words;
+    }
+  };
+  nested.append(turnOn, turnOff, foldAll, unfoldAll);
+  nest.append(opener, nested);
+  choices.append(nest);
+  markView();
 
   // **Créer une opération périodique à partir de cette opération** (Fabrice,
   // 25/08/2026), en bas du menu et derrière son trait : les deux entrées
@@ -946,6 +1314,7 @@ function miscMenu(entry: HTMLElement): HTMLElement {
 
   entry.addEventListener("click", (event) => {
     event.stopPropagation();
+    markView();
     choices.hidden = !choices.hidden;
   });
   document.addEventListener("click", () => {
@@ -1525,14 +1894,19 @@ void (async () => {
   // parle : elle peut se relire elle-même.
   ready = true;
   await reload();
+  // La vision par groupe telle qu'elle a été laissée (27/10/2026).
+  await restoreGroupView();
   onLanguageChanged(async () => {
     // **Les deux listes fermées changent de langue avec la fenêtre** : leurs
     // mots viennent de la traduction, par leur clef. Relues avant de
     // rhabiller, puis les lignes sont redessinées avec les nouveaux mots.
     statuses = await invoke<Item[]>("list_operation_statuses");
     verifications = await invoke<Item[]>("list_operation_verifications");
+    // Les montants des têtes de groupe sont écrits dans la langue de la
+    // fenêtre : ceux d'avant ne valent plus.
+    formattedAmounts.clear();
     await dress();
-    table.render();
+    table.refresh();
   }, TITLE);
 })();
 

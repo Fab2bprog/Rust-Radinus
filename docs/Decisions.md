@@ -3125,6 +3125,231 @@ be recovered there.
    the same filter; it is a display, nothing is written, and a daughter that
    carries a reference of its own keeps it.
 
+## P-76 — F02 « Vision par groupe selon le tri » (27/10/2026)
+
+In the Divers menu of the operations list, a sub-menu **Vision par groupe
+selon le tri** with **Activer** and **Désactiver** (the current state carries
+the tick). Switched on, and the list sorted on a column that groups, a head
+line stands before each group: the group's word, then **Pointé, Engagé,
+Prévu and Total**. Reached after a long discussion (Fabrice, 26–27/10/2026);
+what was decided, and why:
+
+1. **It follows the header's sort.** No separate "group by" choice: the user
+   clicks a header, and the groups are the runs of equal values in that order.
+   Groupable: the date (one group **per day**), the status, the verification
+   and the five nomenclatures (category, assignment, payment mode, payee,
+   project). **Not** the amount, the label, the reference, the balance:
+   a head per entry would say nothing. With no sort, or an ungroupable one,
+   there is no head, and the info bar says what to click — otherwise the
+   option would look broken.
+2. **Mothers only — switching on folds them** (revised by Fabrice on
+   27/10/2026; the first rule refused the view while a mother was unfolded,
+   which hid the condition from the user). Switching the view on remembers the
+   unfolded mothers and folds them all; switching it off unfolds those same
+   mothers again (one that has gone since is ignored). While it is on, *Afficher
+   / Masquer toutes les sous-opérations* are greyed, with a tooltip, and the
+   « + » of the mothers is not drawn; `flattened()` adds no daughter whatever
+   `unfolded` holds. *Activer* is never greyed. Mothers only is what keeps the
+   view simple: the table's own sort and filters are enough. A daughter stays
+   with her mother, so a split purchase is whole in its mother's group (70 €
+   food + 30 € hygiene is one 100 € line in the mother's group) — a stated
+   limit.
+3. **Separate sums, not cumulative.** Each operation has one status, so the
+   head shows what each status adds up to, and the total of the three. The
+   footer's balances are cumulative (bank, real, final) because they are
+   account balances; a group is not. The three statuses always show, even at
+   zero, so every head has the same shape. The sums are those of the **mothers
+   on screen**, filters and period included: the heads add up to the footer's
+   total.
+4. **A head is not an operation.** It is drawn between the rows and exists
+   nowhere else: `visible()` — which selection, ⌘C, export and range-selection
+   read — never sees it. It has no `role="option"`, no identity, no click.
+   This is why the work stayed small and the shared table safe.
+5. **The window adds, the core writes the money.** Amounts are formatted by
+   `format_amounts` (one call for all the amounts a head needs, cached; a
+   head shows « … » for the instant it takes). The window composes no amount,
+   as everywhere. Words are the dictionary's (8 new keys, 18 languages).
+6. **It is remembered** (revised by Fabrice on 27/10/2026: « une préférence
+   personnelle qui devra être mémorisée — actif / pas actif, tout déplié / tout
+   replié »; the first rule had it start off at every opening). Stored in the
+   base under `operations.vision-par-groupe`, one for all accounts, like the
+   column layout: on or off, the last *Tout replier* / *Tout déplier*, and the
+   sorted column with its direction (« oui, certainement » — without them the
+   view would reopen without a single group). **The sort is kept only while the
+   view is on**: the ordinary list remembers no sort, as before. On opening,
+   the sort, then the view, then the fold are restored; a column the window
+   does not know or has hidden is ignored. Switched on by hand, the view shows
+   its groups unfolded; after *Tout replier*, a new sort folds its new groups
+   too. Sub-operations still start folded at every opening. « Réinitialiser les
+   réglages de confort » forgets it.
+7. **Folding the groups** (second delivery, 27/10/2026). Each head carries the
+   same « − / + » as a mother; *Tout replier* and *Tout déplier* sit in the
+   sub-menu (greyed while the view is off). Groups start **unfolded** — the
+   user came to see the operations. A folded group keeps its head and its
+   sums, and its rows leave the selection, the copy and the export **as a
+   filter's would**: the table exports what is read (ruling of 26/07/2026), and
+   nothing may be pointed or deleted that cannot be seen. For that, `visible()`
+   became *ordered, minus the folded groups*, and the old body is `ordered()`,
+   from which the render draws heads and sums. The folds are forgotten when the
+   sorted column changes or the view goes off — they would be other groups.
+   One consequence to know: an OFX or QIF export made with groups folded
+   contains only the unfolded ones.
+
+8. **What the view says** (Fabrice, 27/10/2026). While it is on, the info bar
+   says « Vision par groupe : les sous-opérations ne sont pas affichées dans ce
+   mode. », followed by « Cliquez sur l'en-tête… » when the sorted column does
+   not group. A selection's total takes the bar while rows are chosen; the
+   message comes back when none is. *Afficher / Masquer toutes les
+   sous-opérations*, greyed, carry « (indisponible en mode vision par
+   groupe) » in their own label — read without hovering — instead of a
+   tooltip.
+
+## P-77 — In F02's table, a sub-operation follows its mother through every sort (27/10/2026)
+
+A fault, reported by Fabrice with a screenshot: the list sorted on Catégorie,
+mothers unfolded, and their sub-operations scattered among the other lines by
+their own category, far from their mother — the « − » of an unfolded mother
+with nothing under it, and ventilations standing alone.
+
+**Cause.** The shared table sorted every row flat, mothers and daughters
+alike. The window builds the tree correctly (`flattened()`), and the table
+undid it as soon as a column was sorted. The window's own header said « a child
+follows its mother — sorting and filtering apply to mothers »; nothing
+enforced it. The fault predates the group view (3.0.0 had the same code); it
+did not show when sorting by date, since a daughter carries her mother's date
+and stayed behind her.
+
+**Fix.** `parentOf` in the table's options (F02 alone gives it). When given,
+only the mothers are sorted: a daughter is compared through her mother, sits
+right behind her, in the order the window gave. Descending reverses the order
+of the families, never the inside of one. **For a list with no daughter on
+screen the order is exactly the old one** (key, then the window's order on
+equal keys, all reversed when descending). The column filters are unchanged.
+
+Also: `flattened()` adds no daughter while the group view is on, whatever
+`unfolded` holds — the view's « mothers only » rule is kept in one place.
+
+## P-78 — « Importation de fichier JSON / XML » (28/10/2026)
+
+In the Radinus menu, under « Importation de fichier Excel ». Asked by Fabrice:
+« de la même façon, avec la même philosophie » — and « ça peut être n'importe
+quoi, c'est pour cela qu'il faut être souple », though most files will be
+exports from other software.
+
+1. **Steps 2 and 3 are the Excel ones**, untouched: field mapping, policies,
+   one transaction, report, no duplicate check (a migration). They only ever
+   saw a grid; the JSON / XML reader produces the same grid.
+2. **Step 1 is F34 itself, shown with its JSON / XML groups** (`kind=
+   structured`) rather than a new window, so steps 2 and 3 stay its children
+   — above it, closed with it — as for Excel. Groups: 1 the file and the list
+   to import (in place of the sheet), 2 the date format, 3 the amount format
+   with the two radio buttons and the note of the Excel group 4, 4 the test
+   view, compulsory before step 2. The capture zone groups do not exist for a
+   JSON.
+3. **Formats are declared, in drop-down menus full of examples** (Fabrice: « il
+   vaut mieux lui demander à l'étape 1 le format des dates, pareil pour le
+   montant ») — not checked on a chosen column, not guessed. The raw preview
+   sits right under the menus, so the user recognises his own writing. A
+   wrong column shows at the field mapping. Examples come from the core, and a
+   test reads each of them as 28/10/2026 or 1 250,50.
+4. **Nothing invented** (« il faut rien inventer de nouveau et non
+   indispensable et coller à l'importation excel »): no « type = DEBIT /
+   CREDIT » amount form, which Excel does not have.
+5. **XML too** (« si l'utilisateur choisit un fichier json, on importe du
+   json, s'il choisit de l'xml on importe du xml »), read with `roxmltree`,
+   authorized the same day.
+6. Rules of reading, flattening and encoding: `docs/File_formats.md` §4 bis.
+7. **Steps 2 and 3 speak of the file, not of the sheet** (Fabrice, 28/10/2026:
+   « tu as appelé la première colonne Entete_Excel… il s'agit d'un fichier
+   json ou xml »). During a JSON / XML import their Excel words have a
+   `structured-…` counterpart: Entete_Fichier, Données_Fichier, « Élément »
+   for the report's row number (the item's place in the list), « votre
+   fichier », « colonnes du fichier » in the three refusals — and the window
+   titles keep « JSON / XML » through a change of language. The controller
+   tells the windows which import is under way (`structured` in
+   `excel_links` and `excel_association`). Excel is unchanged.
+
+## P-79 — « Recherche des doublons » (29/10/2026)
+
+In the Comptes menu, after the quick classification. Designed with Fabrice
+before any code, step by step: « faciliter la recherche et sécuriser la
+suppression ».
+
+1. **A duplicate has the same amount to the cent, close dates and texts that
+   look alike** — the label, and the payment reference too (« la recherche des
+   doublons doit se faire sur le libellé mais aussi la référence paiement »),
+   where the OFX memo lands since P-75. Mothers only; a daughter is a part of
+   her mother's amount.
+2. **Texts are compared crosswise**: label with label, label with reference
+   both ways, the best likeness kept — the same bank text lands in one or the
+   other depending on the import setting. Dates (« 27/10/26 », « 27.10.2026 »,
+   « 27-10 », « 27_10_26 », « 271026 »), times (« 08H27 »), case, accents,
+   punctuation and spaces are cleaned off first. Removed dates still count:
+   the same one on both sides raises the level, two different ones put the
+   group « à vérifier » — two visits to the same bakery are not a duplicate.
+   The same non-empty reference raises the level; two different references
+   (or different digits) put it « à vérifier » (Fabrice). The same FitID is
+   certain.
+3. **Four levels**: identique, probable, possible, à vérifier. Groups are
+   formed from the surest down and an operation belongs to one group only, so
+   a third operation of the same amount neither weakens a sure pair nor goes
+   with it.
+4. **Five preferences, software settings** (« pour que les choses soient le
+   plus élastiques possible »): date gap 0–15 days (5), text likeness strict /
+   normal / large, texts compared, levels shown on opening, and what becomes of
+   the split of a deleted line (« c'est l'utilisateur qui décide et c'est un
+   paramètre de plus »). **Refused as dangerous**: a tolerance on the amount, a
+   list of words to ignore, a search across accounts. **Dropped**: « include
+   reconciled operations » — Radinus keeps no lasting reconciliation mark, and
+   excluding pointed lines would hide a statement imported twice.
+5. **The window shows the groups like the group view** (« tu te souviens de la
+   vision par groupe ? »): level, nature, total, amount after processing.
+6. **« Garder celle-ci » on one line or more of a group** (Fabrice: « on n'est
+   pas obligé d'avoir 100 % tort ou raison »). Kept: green. As soon as one
+   line of a group is kept, the others are red, « À supprimer », label and
+   reference struck through (`text-decoration: line-through`, the same in
+   WebView2, WebKit and WebKitGTK). All kept: nothing goes.
+7. **The foot shows the three balances before and after** — « souvent on
+   s'aperçoit qu'il y a un problème de doublons en voyant un écart sur le
+   solde ».
+8. **One validation for all groups, through a two-step assistant in the same
+   window.** Valider shows step 2, the summary: a real scrolling table of the
+   treated groups — kept and deleted lines, what each kept line takes over —
+   the warnings, and the foot with the three balances before and after. Only
+   two buttons then: Supprimer, and the door back to the table with the
+   marking intact; Supprimer asks one short last question (no undo). **Revised
+   the same day**: the first version put everything in a dialog box, capped
+   at ten lines per list, which Fabrice refused — « si un jour un utilisateur
+   supprime énormément de doublons cette fenêtre débordera de l'écran », and
+   the user « doit être obligé soit de valider son choix soit de le refuser
+   et de retourner au tableau ». A separate confirmation window was set aside:
+   Tauri has no modal window that behaves the same on Windows, macOS and
+   Linux. No backup is offered — « l'utilisateur doit prendre ses
+   responsabilités » — and Radinus remembers no decision.
+
+   **Made readable as an assistant** (30/10/2026; Fabrice: « on ne comprend
+   pas bien qu'il s'agit d'un assistant, la fenêtre change et on ne comprend
+   pas bien pourquoi »): the menu entry and the window are called «
+   Assistant de recherche des doublons », and the title says the step — «
+   (Étape 1/2) », « (Étape 2/2) ». An arrow moves forward (« Étape suivante »)
+   and one goes back without losing anything (« Étape précédente »): two
+   vector icons, `step_next.svg` and `step_previous.svg`, in the yellow of the
+   tick of Base_valid. Step 2 saves with the floppy disk (« Enregistrer »),
+   not the bin, which suggests picking a line to delete. **The door is never
+   « back »** — it would let the user believe the work is lost: at both steps
+   it closes the assistant (« Fermer l'assistant »), and asks first when a
+   marking is under way; Escape does the same.
+9. **Taking over**: when a single line is kept, it takes what it lacks from
+   the lines that go, never overwriting — nomenclatures, cheque, reference,
+   FitID (so the next OFX import does not bring the duplicate back), statement
+   number, comment, attachments (re-linked, files untouched), and the split if
+   the preference says so. Several lines kept: nothing is taken over, and the
+   question says so.
+10. **All or nothing**: taking over, deleting and the balances run in one
+    transaction (`duplicates::apply`); a line whose fiche is open is refused,
+    as is a decision the database no longer matches. The journal (P-6) tells
+    the treatment: EN COURS, one SUCCES line per deleted operation, TERMINE.
+
 ## How to add to this file
 
 One entry per ruling: an id, a date, what was decided in one sentence, and

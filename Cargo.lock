@@ -3902,7 +3902,7 @@ checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
 
 [[package]]
 name = "radinus"
-version = "3.1.0"
+version = "3.2.0"
 dependencies = [
  "radinus-core",
  "serde",
@@ -3916,12 +3916,13 @@ dependencies = [
 
 [[package]]
 name = "radinus-core"
-version = "3.1.0"
+version = "3.2.0"
 dependencies = [
  "chrono",
  "fluent",
  "fluent-bundle",
  "office-toolkit",
+ "roxmltree 0.21.1",
  "rusqlite",
  "serde",
  "serde_json",

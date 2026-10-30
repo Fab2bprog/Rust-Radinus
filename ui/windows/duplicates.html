@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Recherche des doublons</title>
+    <script type="module" src="/ui/windows/duplicates.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- « Recherche des doublons » (menu Comptes), conception arrêtée avec
+         Fabrice le 29/10/2026.
+
+         En haut, la période et les quatre niveaux ; au milieu, les groupes
+         d'opérations soupçonnées, chacun sous sa tête comme dans la vision par
+         groupe : le niveau, la nature (doublon, triplon, X4…), le total du
+         groupe et ce qui restera après traitement. Les plus sûrs d'abord, et
+         le tri d'une colonne ne range que l'intérieur d'un groupe.
+
+         **Le marquage** (Fabrice, 29/10/2026) : « Garder celle-ci » se coche
+         sur une ou plusieurs lignes d'un groupe — on n'a pas forcément tort
+         ou raison à 100 %. Gardée : fond vert. Dès qu'une ligne du groupe est
+         gardée, les autres passent en rouge, « À supprimer », libellé et
+         référence barrés. Toutes gardées : rien n'est supprimé.
+
+         Au pied, à chaque coche : les groupes traités, ce qui sera supprimé,
+         et les trois soldes avant et après — un doublon se remarque souvent
+         par un écart de solde.
+
+         **Un assistant en deux étapes** (Fabrice, 29/10/2026 : une question
+         dans un panneau « débordera de l'écran » le jour où l'on supprime
+         beaucoup de doublons). Étape 1 : la recherche et le marquage.
+         La flèche « Étape suivante » passe à l'étape 2, dans la même
+         fenêtre, dont le titre dit l'étape (1/2, 2/2) : le
+         récapitulatif, un vrai tableau qui défile, avec toutes les lignes
+         gardées et supprimées, ce que chaque gardée reprend, et les
+         avertissements ; le pied et ses trois soldes restent sous les yeux.
+         La flèche « Étape précédente » ramène au tableau, le marquage
+         intact ; la disquette pose encore une courte question — pas
+         d'annulation —, puis reprend ce qui manque et supprime, d'un seul
+         bloc ; le détail va au journal. -->
+    <div class="window window--duplicates">
+      <!-- Le menu Période, celui de la liste des opérations (Fabrice,
+           29/10/2026 : « c'est pour rendre la recherche plus rapide »). -->
+      <nav class="window-menu" id="window-menu"></nav>
+
+      <div class="period" id="period">
+        <label for="from" id="from-label"></label>
+        <input id="from" type="date" />
+        <label for="to" id="to-label"></label>
+        <input id="to" type="date" />
+        <span class="duplicates__levels" id="levels-label"></span>
+        <label class="form__check">
+          <input id="level-identical" type="checkbox" data-level="identical" />
+          <span id="level-identical-word"></span>
+        </label>
+        <label class="form__check">
+          <input id="level-probable" type="checkbox" data-level="probable" />
+          <span id="level-probable-word"></span>
+        </label>
+        <label class="form__check">
+          <input id="level-possible" type="checkbox" data-level="possible" />
+          <span id="level-possible-word"></span>
+        </label>
+        <label class="form__check">
+          <input id="level-to-verify" type="checkbox" data-level="to-verify" />
+          <span id="level-to-verify-word"></span>
+        </label>
+      </div>
+
+      <main class="window__content">
+        <section class="list" id="search">
+          <header class="list__header" id="header"></header>
+          <div class="list__filter" id="filter"></div>
+          <div class="list__rows" id="rows" role="listbox"></div>
+        </section>
+
+        <!-- Étape 2 : le récapitulatif. -->
+        <section class="duplicates__recap" id="recap" hidden>
+          <h2 class="duplicates__recap-title" id="recap-title"></h2>
+          <section class="list">
+            <header class="list__header" id="recap-header"></header>
+            <div class="list__filter" id="recap-filter"></div>
+            <div class="list__rows" id="recap-rows" role="listbox"></div>
+          </section>
+          <div class="duplicates__warnings" id="warnings" hidden>
+            <span class="duplicates__warnings-title" id="warnings-title"></span>
+            <ul id="warnings-list"></ul>
+          </div>
+        </section>
+
+        <footer class="duplicates__foot">
+          <div class="duplicates__tally">
+            <span class="totals__label" id="foot-groups-label"></span>
+            <span class="totals__value" id="foot-groups"></span>
+            <span class="totals__label" id="foot-doomed-label"></span>
+            <span class="totals__value" id="foot-doomed"></span>
+            <span class="totals__label" id="foot-amount-label"></span>
+            <span class="totals__value" id="foot-amount"></span>
+          </div>
+          <div class="duplicates__balances">
+            <span></span>
+            <span class="duplicates__heading" id="foot-before-label"></span>
+            <span class="duplicates__heading" id="foot-after-label"></span>
+            <span class="duplicates__heading" id="foot-gap-label"></span>
+            <span class="totals__label" id="foot-bank-label"></span>
+            <span class="totals__value" id="foot-bank-before"></span>
+            <span class="totals__value" id="foot-bank-after"></span>
+            <span class="totals__value" id="foot-bank-gap"></span>
+            <span class="totals__label" id="foot-real-label"></span>
+            <span class="totals__value" id="foot-real-before"></span>
+            <span class="totals__value" id="foot-real-after"></span>
+            <span class="totals__value" id="foot-real-gap"></span>
+            <span class="totals__label" id="foot-final-label"></span>
+            <span class="totals__value" id="foot-final-before"></span>
+            <span class="totals__value" id="foot-final-after"></span>
+            <span class="totals__value" id="foot-final-gap"></span>
+          </div>
+        </footer>
+      </main>
+
+      <!-- Le panneau d'un assistant (Fabrice, 30/10/2026) : une flèche pour
+           avancer, une flèche pour revenir — sans rien perdre —, la disquette
+           pour enregistrer, et la porte pour fermer l'assistant, à toutes les
+           étapes, avec une confirmation dès qu'un marquage est en cours. -->
+      <aside class="panel">
+        <!-- Étape 1 : passer au récapitulatif. -->
+        <button class="panel__button" id="next" type="button">
+          <img src="/ui/assets/icons/step_next.svg" alt="" />
+        </button>
+        <!-- Étape 2 : revenir au tableau, ou enregistrer. -->
+        <button class="panel__button" id="previous" type="button" hidden>
+          <img src="/ui/assets/icons/step_previous.svg" alt="" />
+        </button>
+        <button class="panel__button" id="save" type="button" hidden>
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

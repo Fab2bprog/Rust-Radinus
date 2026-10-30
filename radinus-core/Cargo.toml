@@ -49,5 +49,10 @@ chrono = { version = "0.4", default-features = false }
 typst = "0.15"
 typst-layout = "0.15"
 typst-pdf = "0.15"
+# Lecture des fichiers XML de « Importation de fichier JSON / XML ». Petit,
+# en Rust pur, il ne sait que lire ; il était déjà compilé dans le projet par
+# Typst, si bien qu'il n'ajoute rien au logiciel livré. Les mêmes sous Windows,
+# macOS et Linux. Autorisé par Fabrice le 28/10/2026.
+roxmltree = "0.21"
 
 [dev-dependencies]

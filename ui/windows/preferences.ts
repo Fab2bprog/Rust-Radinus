@@ -82,6 +82,9 @@ const LEAVES: [string, string, string][] = [
   ["verification", "preferences-leaf-verification", "preferences-branch-import"],
   ["ofx", "preferences-leaf-ofx", "preferences-branch-import"],
   ["qif", "preferences-leaf-qif", "preferences-branch-import"],
+  // La recherche des doublons est au menu Comptes : sa feuille aussi, sous le
+  // même mot (29/10/2026).
+  ["duplicates", "preferences-leaf-duplicates", "menu-accounts"],
   ["electricity", "preferences-leaf-electricity", "preferences-branch-tools"],
   ["comfort", "preferences-leaf-comfort", "preferences-branch-reset"],
 ];
@@ -122,6 +125,7 @@ let reserve = {
   qifLabel: "",
   ofxLabel: "",
   ofxReference: "",
+  duplicates: "",
 };
 
 /// Les deux réglages des relevés OFX (19/10/2026).
@@ -143,6 +147,7 @@ function current(): {
   qifLabel: string;
   ofxLabel: string;
   ofxReference: string;
+  duplicates: string;
 } {
   return {
     choice: currencyField.value,
@@ -157,7 +162,63 @@ function current(): {
     qifLabel: qifLabelField.value,
     ofxLabel: ofxLabelField.value,
     ofxReference: ofxReferenceField.value,
+    duplicates: JSON.stringify(duplicatesFields()),
   };
+}
+
+// --- La détection des doublons (Fabrice, 29/10/2026) ------------------------------
+
+interface DuplicatesPreferences {
+  max_days: number;
+  likeness: string;
+  compare_label: boolean;
+  compare_reference: boolean;
+  levels: string[];
+  ventilation: string;
+}
+
+/// Ce que « Rétablir les valeurs par défaut » remet : lu au noyau, qui seul
+/// sait ce que valent les défauts.
+let duplicatesDefaults: DuplicatesPreferences | null = null;
+
+const duplicatesDays = element<HTMLSelectElement>("duplicates-days");
+const duplicatesLikeness = element<HTMLSelectElement>("duplicates-likeness");
+const duplicatesVentilation = element<HTMLSelectElement>("duplicates-ventilation");
+const duplicatesLevels = (): HTMLInputElement[] => [
+  ...document.querySelectorAll<HTMLInputElement>("#pane-duplicates [data-level]"),
+];
+
+function duplicatesFields(): DuplicatesPreferences {
+  return {
+    max_days: Number(duplicatesDays.value),
+    likeness: duplicatesLikeness.value,
+    compare_label: element<HTMLInputElement>("duplicates-text-label").checked,
+    compare_reference: element<HTMLInputElement>("duplicates-text-reference").checked,
+    levels: duplicatesLevels()
+      .filter((box) => box.checked)
+      .map((box) => box.dataset.level ?? ""),
+    ventilation: duplicatesVentilation.value,
+  };
+}
+
+function placeDuplicates(preferences: DuplicatesPreferences): void {
+  if (duplicatesDays.options.length === 0) {
+    // De 0, le même jour seulement, à 15 : les bornes du noyau.
+    for (let days = 0; days <= 15; days += 1) {
+      const option = document.createElement("option");
+      option.value = String(days);
+      option.textContent = String(days);
+      duplicatesDays.append(option);
+    }
+  }
+  duplicatesDays.value = String(preferences.max_days);
+  duplicatesLikeness.value = preferences.likeness;
+  element<HTMLInputElement>("duplicates-text-label").checked = preferences.compare_label;
+  element<HTMLInputElement>("duplicates-text-reference").checked = preferences.compare_reference;
+  for (const box of duplicatesLevels()) {
+    box.checked = preferences.levels.includes(box.dataset.level ?? "");
+  }
+  duplicatesVentilation.value = preferences.ventilation;
 }
 
 // --- Le tarif d'électricité (Fabrice, 09/10/2026) ---------------------------------
@@ -226,6 +287,7 @@ function modified(): boolean {
     now.qifLabel !== reserve.qifLabel ||
     now.ofxLabel !== reserve.ofxLabel ||
     now.ofxReference !== reserve.ofxReference ||
+    now.duplicates !== reserve.duplicates ||
     // Le signe personnalisé ne compte que si c'est lui qu'on emploie : l'avoir
     // tapé puis avoir choisi « Euros » ne modifie rien.
     (now.choice === "perso" && now.custom !== reserve.custom)
@@ -460,6 +522,13 @@ async function load(): Promise<void> {
     const ofx = await invoke<{ label: string; reference: string }>("preferences_ofx");
     ofxLabelField.value = ofx.label;
     ofxReferenceField.value = ofx.reference;
+    // Les doublons : réglages du logiciel aussi.
+    const duplicates = await invoke<{
+      value: DuplicatesPreferences;
+      defaults: DuplicatesPreferences;
+    }>("preferences_duplicates");
+    duplicatesDefaults = duplicates.defaults;
+    placeDuplicates(duplicates.value);
 
     reserve = current();
     showCustomIfNeeded();
@@ -500,6 +569,17 @@ async function save(): Promise<void> {
     // configuration du logiciel.
     if (now.qifOrder !== reserve.qifOrder || now.qifLabel !== reserve.qifLabel) {
       await invoke("save_preferences_qif", { order: now.qifOrder, label: now.qifLabel });
+    }
+    // Les doublons peuvent être refusés — aucun niveau coché : on s'arrête
+    // avant que rien d'autre ne parte, et la feuille vient à l'écran.
+    if (now.duplicates !== reserve.duplicates) {
+      try {
+        await invoke("save_preferences_duplicates", { preferences: duplicatesFields() });
+      } catch (error) {
+        chooseLeaf("duplicates");
+        say(String(error), true);
+        return;
+      }
     }
     if (now.ofxLabel !== reserve.ofxLabel || now.ofxReference !== reserve.ofxReference) {
       await invoke("save_preferences_ofx", { label: now.ofxLabel, reference: now.ofxReference });
@@ -602,6 +682,13 @@ element<HTMLButtonElement>("electricity-blue").addEventListener("click", () => {
     .then(placeElectricity)
     .catch((error) => say(tError("ui-read-failed", error), true));
 });
+/// **« Rétablir les valeurs par défaut »** : remplit les champs, sans
+/// enregistrer — la disquette s'en charge, comme pour le tarif d'électricité.
+element<HTMLButtonElement>("duplicates-defaults").addEventListener("click", () => {
+  if (duplicatesDefaults !== null) {
+    placeDuplicates(duplicatesDefaults);
+  }
+});
 element<HTMLButtonElement>("save").addEventListener("click", () => void save());
 element<HTMLButtonElement>("close").addEventListener("click", () => void leave());
 
@@ -668,6 +755,25 @@ async function dress(): Promise<void> {
     ["qif-label-payee", "preferences-qif-label-payee"],
     ["qif-label-memo", "preferences-qif-label-memo"],
     ["qif-hint", "preferences-qif-hint"],
+    ["duplicates-title", "preferences-leaf-duplicates"],
+    ["duplicates-days-label", "preferences-field-duplicates-days"],
+    ["duplicates-likeness-label", "preferences-field-duplicates-likeness"],
+    ["duplicates-likeness-strict", "preferences-duplicates-likeness-strict"],
+    ["duplicates-likeness-normal", "preferences-duplicates-likeness-normal"],
+    ["duplicates-likeness-large", "preferences-duplicates-likeness-large"],
+    ["duplicates-texts-label", "preferences-field-duplicates-texts"],
+    ["duplicates-text-label-word", "preferences-duplicates-text-label"],
+    ["duplicates-text-reference-word", "preferences-duplicates-text-reference"],
+    ["duplicates-levels-label", "preferences-field-duplicates-levels"],
+    ["duplicates-level-identical-word", "duplicates-level-identical"],
+    ["duplicates-level-probable-word", "duplicates-level-probable"],
+    ["duplicates-level-possible-word", "duplicates-level-possible"],
+    ["duplicates-level-to-verify-word", "duplicates-level-to-verify"],
+    ["duplicates-ventilation-label", "preferences-field-duplicates-ventilation"],
+    ["duplicates-ventilation-take", "preferences-duplicates-ventilation-take"],
+    ["duplicates-ventilation-warn", "preferences-duplicates-ventilation-warn"],
+    ["duplicates-defaults", "preferences-duplicates-defaults"],
+    ["duplicates-hint", "preferences-duplicates-hint"],
     ["comfort-title", "preferences-leaf-comfort"],
     ["comfort-reset", "preferences-comfort-reset"],
     ["comfort-hint", "preferences-comfort-hint"],
@@ -680,6 +786,17 @@ async function dress(): Promise<void> {
     [["ofx-reference-label", "ofx-reference"], "preferences-ofx-reference-help"],
     [["qif-order-label", "qif-order"], "preferences-qif-order-help"],
     [["qif-label-label", "qif-label"], "preferences-qif-label-help"],
+    [["duplicates-days-label", "duplicates-days"], "preferences-duplicates-days-help"],
+    [["duplicates-likeness-label", "duplicates-likeness"], "preferences-duplicates-likeness-help"],
+    [
+      ["duplicates-texts-label", "duplicates-text-label-line", "duplicates-text-reference-line"],
+      "preferences-duplicates-texts-help",
+    ],
+    [["duplicates-levels-label"], "preferences-duplicates-levels-help"],
+    [
+      ["duplicates-ventilation-label", "duplicates-ventilation"],
+      "preferences-duplicates-ventilation-help",
+    ],
   ] as const) {
     for (const id of ids) {
       element<HTMLElement>(id).title = t(key);

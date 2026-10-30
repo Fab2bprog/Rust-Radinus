@@ -590,6 +590,23 @@ pub fn quick_classification_window(language: Language, account_label: &str) -> W
     }
 }
 
+/// « Assistant de recherche des doublons » (menu Comptes, 29/10/2026). **Un
+/// compte, et un seul**, choisi avant l'ouverture, et son nom dans le titre.
+pub fn duplicates_window(language: Language, account_label: &str) -> WindowSpec {
+    WindowSpec {
+        label: "duplicates".to_string(),
+        url: "ui/windows/duplicates.html".to_string(),
+        // L'assistant s'ouvre toujours à l'étape 1 ; la fenêtre redit l'étape
+        // dans son titre quand elle en change.
+        title: i18n::text_with(language, "window-duplicates-title-1", "account", account_label),
+        width: 1400.0,
+        height: 820.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
 /// F17 — « Importation de relevés de comptes bancaires ».
 ///
 /// **Un compte, et un seul**, comme F02 et F05 : on choisit le compte dans
@@ -1530,6 +1547,7 @@ pub mod tests {
             operations_window(Language::French, "CCP"),
             operation_form_window(Language::French, "CCP"),
             quick_classification_window(Language::French, "CCP"),
+            duplicates_window(Language::French, "CCP"),
             statement_import_window(Language::French, "CCP"),
             statement_form_window(Language::French),
             csv_statement_window(Language::French),

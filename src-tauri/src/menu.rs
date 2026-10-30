@@ -138,6 +138,9 @@ pub const OPERATIONS_ITEM_ID: &str = "accounts-operations";
 /// emprunte donc la même porte que la liste des opérations ; ce qui les
 /// distingue voyage avec la question, sous le nom `target`.
 pub const QUICK_CLASSIFY_ITEM_ID: &str = "accounts-quick-classify";
+/// « Recherche des doublons » (29/10/2026) : un compte d'abord, comme la
+/// classification rapide.
+pub const DUPLICATES_ITEM_ID: &str = "accounts-duplicates";
 /// « Importation de relevés bancaires » (F17) — elle aussi demande **un**
 /// compte d'abord : on importe toujours dans un compte, jamais « quelque part ».
 pub const IMPORT_ITEM_ID: &str = "file-import-statements";
@@ -145,6 +148,10 @@ pub const IMPORT_ITEM_ID: &str = "file-import-statements";
 /// le choix d'**un** compte : on importe toujours dans un compte. C'est la
 /// première étape de la marche à suivre que Fabrice a dictée le 29/07/2026.
 pub const IMPORT_EXCEL_ITEM_ID: &str = "file-import-excel";
+/// « Importation de fichier JSON / XML » (Fabrice, 28/10/2026), juste sous
+/// l'Excel : le même assistant, la même philosophie, le même choix d'un compte
+/// d'abord.
+pub const IMPORT_STRUCTURED_ITEM_ID: &str = "file-import-structured";
 /// Les six statistiques. Chacune demande d'abord sur quels comptes la
 /// calculer, par la liste des comptes dans son usage multi-comptes ; l'axe
 /// voyage avec la question, et c'est le choix des comptes qui ouvrira la bonne.
@@ -674,6 +681,13 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 usable,
                 None::<&str>,
             )?,
+            &MenuItem::with_id(
+                app,
+                IMPORT_STRUCTURED_ITEM_ID,
+                t("menu-file-import-structured"),
+                usable,
+                None::<&str>,
+            )?,
             // **Deux traits, et « Se déconnecter » seule entre les deux**
             // (Fabrice, 05/08/2026 : « ils sont trop proches »). Les deux
             // gestes se ressemblent — on s'en va — et se collent l'un à
@@ -733,6 +747,13 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 t("menu-accounts-quick-classify"),
                 usable,
                 accelerator(QUICK_CLASSIFY_ITEM_ID),
+            )?,
+            &MenuItem::with_id(
+                app,
+                DUPLICATES_ITEM_ID,
+                t("menu-accounts-duplicates"),
+                usable,
+                None::<&str>,
             )?,
             &MenuItem::with_id(
                 app,
@@ -1116,8 +1137,10 @@ pub fn on_event<R: Runtime>(app: &AppHandle<R>, event: tauri::menu::MenuEvent) {
     for (id, target) in [
         (OPERATIONS_ITEM_ID, "operations"),
         (QUICK_CLASSIFY_ITEM_ID, "quick-classify"),
+        (DUPLICATES_ITEM_ID, "duplicates"),
         (IMPORT_ITEM_ID, "statement-import"),
         (IMPORT_EXCEL_ITEM_ID, "excel-import"),
+        (IMPORT_STRUCTURED_ITEM_ID, "structured-import"),
         (BANK_DETAILS_ITEM_ID, "bank-details"),
     ] {
         if event.id() == id {

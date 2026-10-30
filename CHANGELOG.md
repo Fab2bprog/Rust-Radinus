@@ -11,6 +11,67 @@ Two version numbers live in this project and they do not move together:
   the line Radinus 1.x walked from 0 to 9 and is at 11 today. A database is
   migrated forward when it is opened, never backward.
 
+## [3.2.0] — 27/10/2026
+
+### Added
+
+- **A group view in the operations list** (Fabrice, 27/10/2026, P-76). The
+  Divers menu has a new sub-menu, *Vision par groupe selon le tri*: with it
+  switched on and the list sorted on a date, a status, a verification or a
+  nomenclature, a line before each group gives its name and what it adds up to
+  — pointed, committed, planned, and the total. It follows the filters and the
+  period, and shows the operations only, never their sub-operations: switching
+  it on hides them, switching it off shows again the ones that were unfolded.
+  Those lines are not operations: they cannot be selected, copied or
+  exported. Each group can be folded with its « + », or all at once with
+  *Tout replier* / *Tout déplier*: only the heads and their sums remain,
+  which gives a summary by category, payee or day. The view is
+  remembered — on or off, folded or not, and its sorted column — and the info
+  bar says, while it is on, that sub-operations are not shown.
+- **The payment reference in the Statistics menu** (Fabrice, 20/10/2026): the
+  detail tables of the seven statistics, of the Bilan croisé and of the
+  Analyse Évolution du solde show it after the label; a ventilation shows its
+  mother's reference. So does the quick classification window (26/10/2026).
+
+- **« Assistant de recherche des doublons »** (Fabrice, 29/10/2026, P-79),
+  in the Comptes menu. On one account and a period, it groups the operations that look like
+  the same one — same amount, close dates, a label or a payment reference
+  alike — in four levels, from « identique » to « à vérifier ». Tick « Garder
+  celle-ci » on the line or lines to keep: the others of the group turn red
+  and struck through, and the foot shows the three balances before and after.
+  Two steps, named in the title: the search, then a summary in the same
+  window — every line kept or deleted, what each kept line takes over, the
+  warnings — with an arrow to go back and the floppy disk to save; the kept line takes over what it lacked (category,
+  comment, attachments, FitID…), and the journal tells the treatment. Its five settings are in the
+  preferences, sheet « Détection des doublons ».
+- **« Importation de fichier JSON / XML »** (Fabrice, 28/10/2026, P-78), in
+  the Radinus menu under the Excel import, for files exported by other
+  software. Same wizard as Excel: step 1 offers the lists the file contains,
+  asks how it writes dates and amounts — two drop-down menus full of examples
+  (« 28/10/2026 », seconds since 1970, « 1 250,50 », cents…) — and shows the
+  flattened table; steps 2 and 3 are the Excel ones. Nested objects become
+  « parent.child » columns; nested lists that cannot be flattened are named.
+  XML in UTF-8 or ISO-8859-1.
+
+### Changed
+
+- **Two drop-down menus for the OFX memo** (Fabrice, 20/10/2026, P-75)
+  instead of the two tick boxes of 3.1.0 (« ça ne laisse pas assez de
+  liberté »): what the label receives — the name (default), the memo, or the
+  name followed by the memo — and what the payment reference receives — the
+  memo (default), the name, the name followed by the memo, or nothing. The
+  boxes already ticked are translated, then forgotten.
+
+### Fixed
+
+- **Sorting the operations list kept the sub-operations away from their
+  mother** (Fabrice, 27/10/2026, P-77). Sorted on a column where a
+  sub-operation differs from its mother — the category —, the unfolded
+  sub-operations were ranked among the other lines and the mother showed a
+  « − » with nothing under it. Only the mothers are sorted now; each
+  sub-operation stays under its own, and a descending sort reverses the
+  families, not their inside.
+
 ## [3.1.0] — 19/10/2026
 
 ### Added
@@ -29,17 +90,13 @@ Two version numbers live in this project and they do not move together:
 - **The bank's OFX memo is no longer lost** (Fabrice, 19/10/2026, P-75). Some
   banks (BNP Paribas) write a generic name — « PRLV SEPA » — and put the whole
   detail in `MEMO`, which Radinus ignored. A new page, Préférences ›
-  Importation › Relevés OFX, has two drop-down menus (20/10/2026): what the
-  label receives — the name (default), the memo, or the name followed by the
-  memo — and what the payment reference receives — the memo (default), the
-  name, the name followed by the memo, or nothing. The decision is taken
-  operation by operation: without a memo the label keeps the name, so a
-  statement from La Banque Postale comes in exactly as before. The payment reference shows as a column of the import window and
-  of the operations list (after the label, to see and filter), and as a field
-  of « Rapprocher une transaction ». A column layout the user has already
-  arranged is kept. The detail tables of the Statistics menu — the seven
-  statistics, the Bilan croisé and the Analyse Évolution du solde — show it
-  too (20/10/2026); a ventilation shows its mother's reference.
+  Importation › Relevés OFX, has two tick boxes: the memo can go into the
+  label, into the payment reference, or both. The decision is taken operation
+  by operation: without a memo the label keeps the name, so a statement from
+  La Banque Postale comes in exactly as before. The payment reference shows as
+  a column of the import window and of the operations list (after the label,
+  to see and filter), and as a field of « Rapprocher une transaction ». A
+  column layout the user has already arranged is kept.
 
 ### Changed
 

@@ -58,6 +58,7 @@
 
 use crate::domain::NaiveDate;
 use crate::nomenclatures::Nomenclature;
+use crate::structured_import::Reading;
 use crate::text::french_sort_key;
 use rusqlite::{Connection, Result};
 use std::collections::BTreeMap;
@@ -130,7 +131,7 @@ pub fn clean(text: &str) -> String {
 /// pas le fichier entre l'étape 1 et l'intégration, faute de quoi une
 /// modification du fichier en cours de route ferait entrer autre chose que ce
 /// que le rendu test a montré.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct Book {
     /// Le nom de chaque feuille, dans l'ordre du classeur.
     pub sheet_names: Vec<String>,
@@ -168,6 +169,13 @@ impl Book {
 
     /// Une feuille bâtie à la main — ce dont les tests ont besoin, et rien de
     /// plus.
+    /// Ajoute une feuille. C'est ainsi que l'importation JSON / XML range ses
+    /// listes mises à plat : une liste, une feuille (`structured_import`).
+    pub fn push_sheet(&mut self, name: String, rows: Vec<Vec<Value>>) {
+        self.sheet_names.push(name);
+        self.sheets.push(rows);
+    }
+
     pub fn with_sheet(name: &str, rows: Vec<Vec<Value>>) -> Self {
         Self {
             sheet_names: vec![name.to_string()],
@@ -799,6 +807,22 @@ pub fn run(
     shape: AmountShape,
     policies: &Policies,
 ) -> Result<Report> {
+    run_with(conn, account_id, grid, links, shape, policies, &Reading::Tolerant)
+}
+
+/// Le même import, **avec la façon de lire les dates et les montants** :
+/// tolérante pour un classeur Excel, celle que l'utilisateur a déclarée pour
+/// un JSON ou un XML (`structured_import`, 28/10/2026). Tout le reste —
+/// concordance, politiques, transaction, compte-rendu — est le même.
+pub fn run_with(
+    conn: &mut Connection,
+    account_id: i64,
+    grid: &Grid,
+    links: &[Link],
+    shape: AmountShape,
+    policies: &Policies,
+    reading: &Reading,
+) -> Result<Report> {
     let date_at = column_of(links, grid, "Date");
     let clearing_at = column_of(links, grid, "Date_Pointage");
     let label_at = column_of(links, grid, "Libelle");
@@ -849,7 +873,7 @@ pub fn run(
                 .unwrap_or(Value::Empty)
         };
 
-        let Some(date) = parse_date(&cell(date_at)) else {
+        let Some(date) = reading.date(&cell(date_at)) else {
             report.refused.push(Refused {
                 row: row.number,
                 content: summarize(row),
@@ -859,15 +883,15 @@ pub fn run(
         };
         // Sa règle : la date de pointage vaut la date de l'opération quand la
         // colonne manque ou ne porte rien de lisible.
-        let clearing = parse_date(&cell(clearing_at)).unwrap_or(date);
+        let clearing = reading.date(&cell(clearing_at)).unwrap_or(date);
 
         let read = match shape {
-            AmountShape::Single => parse_amount(&cell(single_at)).ok_or("excel-refused-amount"),
+            AmountShape::Single => reading.amount(&cell(single_at)).ok_or("excel-refused-amount"),
             AmountShape::DebitCredit => {
                 // **Le signe écrit ne compte pas** : un débit sort de l'argent,
                 // qu'il soit noté « −50 » ou « 50 ».
-                let debit = parse_amount(&cell(debit_at)).filter(|amount| *amount != 0);
-                let credit = parse_amount(&cell(credit_at)).filter(|amount| *amount != 0);
+                let debit = reading.amount(&cell(debit_at)).filter(|amount| *amount != 0);
+                let credit = reading.amount(&cell(credit_at)).filter(|amount| *amount != 0);
                 match (debit, credit) {
                     (Some(_), Some(_)) => Err("excel-refused-amount-both"),
                     (Some(debit), None) => Ok(-debit.abs()),
@@ -894,7 +918,7 @@ pub fn run(
             // Son repli, mot pour mot : une opération sans nom reste
             // retrouvable.
             label: if label.trim().is_empty() {
-                "Transaction import excel".to_string()
+                reading.fallback_label().to_string()
             } else {
                 label
             },

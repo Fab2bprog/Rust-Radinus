@@ -41,11 +41,19 @@ function say(message: string, alert = false): void {
 }
 
 let accountId = 0;
+/// **Excel ou JSON / XML** (28/10/2026) : la même fenêtre sert les deux
+/// imports. Le second cache les groupes de la zone de capture et montre à leur
+/// place les deux menus à exemples des formats.
+let kind: "excel" | "structured" = "excel";
+const TITLE = { key: "window-excel-import-title" };
 let chosen = false;
 /// A-t-on testé depuis le dernier changement de réglage ? Valider sans avoir
 /// regardé serait valider à l'aveugle — et ici, à l'aveugle, on écrit des
 /// milliers de lignes.
 let tested = false;
+/// Le rendu test a-t-il déjà été lancé sur ce fichier ? Il sépare « pas encore
+/// testé » de « testé, puis réglages changés ».
+let everTested = false;
 let preview: Table<PreviewRow> | null = null;
 
 /// Les noms de colonnes d'Excel, jusqu'à BZ — bien au-delà de ce qu'un relevé
@@ -82,6 +90,24 @@ function settings(): Record<string, number | string> {
   };
 }
 
+/// Les réglages d'un JSON / XML : la liste, les deux formats, la forme.
+function structuredSettings(): Record<string, number | string> {
+  return {
+    list: Number(element<HTMLSelectElement>("sheet").value) || 0,
+    date: element<HTMLSelectElement>("date-format").value,
+    amount: element<HTMLSelectElement>("amount-format").value,
+    shape: element<HTMLInputElement>("shape-debit-credit").checked
+      ? "debit-credit"
+      : "single",
+  };
+}
+
+/// Une clef de texte, selon l'import en cours : la sienne pour un JSON / XML
+/// quand elle existe, celle de l'Excel sinon.
+function word(excel: string, structured: string): string {
+  return t(kind === "structured" ? structured : excel);
+}
+
 /// Reconstruit l'aperçu : ses colonnes changent à chaque essai, puisqu'elles
 /// sont celles de la feuille.
 function showPreview(result: Preview): void {
@@ -97,7 +123,7 @@ function showPreview(result: Preview): void {
       width: "1fr",
     })),
     identity: (row) => row.number,
-    emptyText: () => t("excel-empty-capture"),
+    emptyText: () => word("excel-empty-capture", "structured-empty"),
     filteredOutText: () => t("ui-no-match"),
   });
   preview.buildHeader(
@@ -108,6 +134,10 @@ function showPreview(result: Preview): void {
 }
 
 async function pick(): Promise<void> {
+  if (kind === "structured") {
+    await pickStructured();
+    return;
+  }
   try {
     const file = await invoke<{ path: string; sheets: string[] } | null>(
       "excel_pick_file",
@@ -118,6 +148,7 @@ async function pick(): Promise<void> {
     }
     chosen = true;
     tested = false;
+    everTested = false;
     element<HTMLElement>("path").textContent = file.path;
     const sheets = element<HTMLSelectElement>("sheet");
     sheets.replaceChildren();
@@ -137,15 +168,56 @@ async function pick(): Promise<void> {
   }
 }
 
+/// Le fichier JSON ou XML : ses listes vont dans la liste déroulante, comme
+/// les feuilles d'un classeur.
+async function pickStructured(): Promise<void> {
+  try {
+    const file = await invoke<{ path: string; lists: string[] } | null>(
+      "structured_pick_file",
+      { accountId },
+    );
+    if (!file) {
+      return;
+    }
+    tested = false;
+    everTested = false;
+    element<HTMLElement>("path").textContent = file.path;
+    const lists = element<HTMLSelectElement>("sheet");
+    lists.replaceChildren();
+    file.lists.forEach((name, index) => {
+      const entry = document.createElement("option");
+      entry.value = String(index);
+      entry.textContent = name;
+      lists.append(entry);
+    });
+    lists.value = "0";
+    // Un fichier sans liste d'objets n'a rien à importer, et le dit.
+    chosen = file.lists.length > 0;
+    if (!chosen) {
+      say(t("structured-no-list"), true);
+      return;
+    }
+    const state = await invoke<{ path: string; said: string } | null>("excel_state");
+    say(state ? state.said : t("structured-help"));
+  } catch (error) {
+    chosen = false;
+    say(String(error), true);
+  }
+}
+
 async function test(): Promise<void> {
   if (!chosen) {
-    say(t("excel-no-file"), true);
+    say(word("excel-no-file", "structured-no-file"), true);
     return;
   }
   try {
-    const result = await invoke<Preview>("excel_test", { settings: settings() });
+    const result =
+      kind === "structured"
+        ? await invoke<Preview>("structured_test", { settings: structuredSettings() })
+        : await invoke<Preview>("excel_test", { settings: settings() });
     showPreview(result);
     tested = true;
+    everTested = true;
     say(result.said, result.rows.length === 0);
   } catch (error) {
     say(tError("ui-read-failed", error), true);
@@ -155,12 +227,23 @@ async function test(): Promise<void> {
 /// Passer à l'étape 2. **Le rendu test est obligatoire** : on ne quitte pas
 /// cette fenêtre sans avoir regardé ce que la zone attrape.
 async function next(): Promise<void> {
+  // **Un refus se dit dans une fenêtre, pas seulement en bas** (Fabrice,
+  // 28/10/2026 : « je peux ne pas comprendre pourquoi il est inerte et rester
+  // bloqué »). La barre du bas est loin du bouton qu'on vient de cliquer ; la
+  // fenêtre de message dit quoi faire là où l'on regarde.
+  let refusal = "";
   if (!chosen) {
-    say(t("excel-no-file"), true);
-    return;
+    refusal = word("excel-no-file", "structured-no-file");
+  } else if (!tested) {
+    // Jamais testé, ou testé puis réglages changés : deux situations, deux
+    // phrases — « réglages modifiés » à qui n'a rien modifié ne dit rien.
+    refusal = everTested
+      ? t("excel-not-tested")
+      : word("excel-test-first", "structured-test-first");
   }
-  if (!tested) {
-    say(t("excel-not-tested"), true);
+  if (refusal !== "") {
+    say(refusal, true);
+    await tell(refusal, t("ui-ok"));
     return;
   }
   try {
@@ -193,10 +276,12 @@ for (const id of [
   "last-data-row",
   "shape-single",
   "shape-debit-credit",
+  "date-format",
+  "amount-format",
 ]) {
   element<HTMLElement>(id).addEventListener("change", () => {
     tested = false;
-    say(t("excel-not-tested"));
+    say(everTested ? t("excel-not-tested") : word("excel-test-first", "structured-test-first"));
   });
 }
 
@@ -208,7 +293,7 @@ for (const id of [
 /// on propose le filet avant de sauter, et l'on dit pourquoi.
 async function offerBackup(): Promise<void> {
   const wanted = await askYesNo(
-    t("excel-backup-question"),
+    word("excel-backup-question", "structured-backup-question"),
     t("ui-yes"),
     t("ui-no"),
   );
@@ -233,7 +318,49 @@ async function offerBackup(): Promise<void> {
 }
 
 function readParameters(query: string): void {
-  accountId = Number(new URLSearchParams(query).get("account") ?? 0);
+  const parameters = new URLSearchParams(query);
+  accountId = Number(parameters.get("account") ?? 0);
+  kind = parameters.get("kind") === "structured" ? "structured" : "excel";
+  TITLE.key = kind === "structured" ? "window-structured-import-title" : "window-excel-import-title";
+}
+
+/// Montre les groupes de l'import en cours et cache ceux de l'autre.
+function applyKind(): void {
+  const structured = kind === "structured";
+  element<HTMLElement>("band-header").hidden = structured;
+  element<HTMLElement>("band-rows").hidden = structured;
+  element<HTMLElement>("band-dates").hidden = !structured;
+  element<HTMLElement>("amount-format-row").hidden = !structured;
+  dress();
+}
+
+/// Les deux menus à exemples. **Leurs exemples viennent du noyau** — ceux-là
+/// mêmes qu'un test lit — et leurs mots de la langue de la fenêtre ; ce qui
+/// était choisi le reste.
+async function fillFormats(): Promise<void> {
+  if (kind !== "structured") {
+    return;
+  }
+  const formats = await invoke<{
+    dates: { key: string; label: string }[];
+    amounts: { key: string; label: string }[];
+  }>("structured_formats");
+  for (const [id, choices] of [
+    ["date-format", formats.dates],
+    ["amount-format", formats.amounts],
+  ] as const) {
+    const menu = element<HTMLSelectElement>(id);
+    const kept = menu.value;
+    menu.replaceChildren(
+      ...choices.map((choice) => {
+        const entry = document.createElement("option");
+        entry.value = choice.key;
+        entry.textContent = choice.label;
+        return entry;
+      }),
+    );
+    menu.value = kept !== "" && choices.some((choice) => choice.key === kept) ? kept : choices[0].key;
+  }
 }
 
 /// Redemandée sur un autre compte : la fenêtre est bâtie une fois et jamais
@@ -241,12 +368,15 @@ function readParameters(query: string): void {
 /// écoute, elle importerait éternellement dans le premier compte choisi.
 void listen<string>("window-parameters:excel-import", (event) => {
   readParameters(event.payload);
+  applyKind();
+  void fillFormats();
   chosen = false;
   tested = false;
+  everTested = false;
   element<HTMLElement>("path").textContent = "";
   element<HTMLSelectElement>("sheet").replaceChildren();
   preview?.setRows([]);
-  say(t("excel-help"));
+  say(word("excel-help", "structured-help"));
   void offerBackup();
 });
 
@@ -261,10 +391,24 @@ void listen<string>("window-parameters:excel-import", (event) => {
 /// rendu test ne se périme pas non plus : ses colonnes sont celles de la
 /// feuille, et la feuille ne parle aucune langue.
 function dress(): void {
+  // Ce qui change d'un import à l'autre : le fichier, et la numérotation des
+  // groupes — l'Excel en a cinq, le JSON / XML quatre.
+  const structured = kind === "structured";
+  for (const [id, excel, other] of [
+    ["group-file", "excel-group-file", "structured-group-file"],
+    ["pick", "excel-pick", "structured-pick"],
+    ["sheet-label", "excel-sheet", "structured-list"],
+    ["group-shape", "excel-group-shape", "structured-group-amounts"],
+    ["group-test", "excel-group-test", "structured-group-test"],
+    ["test", "excel-test", "structured-test"],
+    ["test-note", "excel-test-note", "structured-test-note"],
+  ] as const) {
+    element<HTMLElement>(id).textContent = t(structured ? other : excel);
+  }
   for (const [id, key] of [
-    ["group-file", "excel-group-file"],
-    ["pick", "excel-pick"],
-    ["sheet-label", "excel-sheet"],
+    ["group-dates", "structured-group-dates"],
+    ["date-format-label", "structured-date-format"],
+    ["amount-format-label", "structured-amount-format"],
     ["group-header", "excel-group-header"],
     ["header-row-label", "excel-header-row"],
     ["first-column-label", "excel-first-column"],
@@ -272,13 +416,9 @@ function dress(): void {
     ["group-rows", "excel-group-rows"],
     ["first-data-row-label", "excel-first-data-row"],
     ["last-data-row-label", "excel-last-data-row"],
-    ["group-shape", "excel-group-shape"],
     ["shape-single-label", "excel-shape-single"],
     ["shape-debit-credit-label", "excel-shape-debit-credit"],
     ["shape-note", "excel-shape-note"],
-    ["group-test", "excel-group-test"],
-    ["test", "excel-test"],
-    ["test-note", "excel-test-note"],
   ] as const) {
     element<HTMLElement>(id).textContent = t(key);
   }
@@ -309,7 +449,8 @@ void (async () => {
 
   showPreview({ headers: [], rows: [], said: "" });
   readParameters(window.location.search);
-  say(t("excel-help"));
+  applyKind();
+  say(word("excel-help", "structured-help"));
 
   const failure = await invoke<string | null>("startup_error");
   if (failure) {
@@ -321,6 +462,10 @@ void (async () => {
   // **Avant la question de la sauvegarde**, qui attend une réponse : inscrire
   // l'écoute après elle laisserait la fenêtre sourde au changement de langue
   // tant que le dialogue est ouvert.
-  onLanguageChanged(dress, { key: "window-excel-import-title" });
+  await fillFormats();
+  onLanguageChanged(async () => {
+    dress();
+    await fillFormats();
+  }, TITLE);
   await offerBackup();
 })();

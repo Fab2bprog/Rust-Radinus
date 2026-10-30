@@ -1728,6 +1728,14 @@ fn l_accueil_et_les_reglages_de_confort_tiennent_par_trois_mains() {
     }
     // Et la clef de l'accueil est bien de celles que la table documente.
     assert!(read("docs/Data_models.md").contains(radinus_core::preferences::WELCOME_ACCOUNTS_KEY));
+    // De même pour la vision par groupe de la liste des opérations, que la
+    // fenêtre lit et écrit.
+    assert!(read("docs/Data_models.md").contains(radinus_core::preferences::OPERATIONS_GROUP_VIEW_KEY));
+    let operations = read("ui/windows/operations-list.ts");
+    for command in ["operations_group_view", "save_operations_group_view"] {
+        assert!(operations.contains(&format!("invoke<GroupView>(\"{command}\"")) || operations.contains(&format!("invoke(\"{command}\"")), "la liste n'appelle pas {command}");
+        assert!(registered.contains(&format!("commands::{command},")), "{command} n'est pas inscrite");
+    }
 }
 
 /// **La simulation de crédit tient par quatre mains** (Fabrice, 08/10/2026) :

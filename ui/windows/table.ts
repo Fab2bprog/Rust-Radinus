@@ -146,6 +146,39 @@ export interface TableExport {
   detail: string;
 }
 
+/// **Un groupe de lignes**, tel que le tableau le voit : ce qu'il faut pour
+/// savoir où il commence et pour écrire sa ligne de tête.
+export interface GroupKey {
+  /// Ce qui distingue ce groupe de son voisin : deux lignes consécutives de
+  /// même clef sont dans le même groupe.
+  key: string;
+  /// Le mot qui annonce le groupe — la catégorie, le jour, le tiers…
+  text: string;
+}
+
+/// **La vision par groupe selon le tri** (Fabrice, 27/10/2026). La fenêtre
+/// dit au tableau quelles colonnes se regroupent, à quel groupe appartient une
+/// ligne, et comment s'écrit la ligne de tête ; le tableau, lui, sait où les
+/// groupes commencent, parce que seul lui connaît l'ordre où les lignes sont
+/// rangées.
+export interface Grouping<Row> {
+  /// La colonne (par son `id`) sur laquelle le tri en cours donne un
+  /// regroupement qui a un sens. Un montant, un libellé libre n'en donnent
+  /// pas : une ligne de tête par écriture ne dirait rien.
+  groupable: (columnId: string | undefined) => boolean;
+  /// Le groupe d'une ligne, pour la colonne triée.
+  of: (row: Row, columnId: string | undefined) => GroupKey;
+  /// Les deux moitiés de la ligne de tête : le mot du groupe, et ses sommes.
+  line: (text: string, rows: Row[]) => { title: string; sums: string };
+}
+
+/// Ce que le tableau dessine : une ligne, ou la tête d'un groupe. **Les têtes
+/// n'existent qu'ici**, au dessin : `visible()` ne les connaît pas, et c'est
+/// donc elle que lisent la sélection, la copie et l'export.
+type Drawn<Row> =
+  | { row: Row }
+  | { group: { key: string; text: string; rows: Row[]; folded: boolean } };
+
 export interface TableOptions<Row> {
   container: HTMLElement;
   columns: Column<Row>[];
@@ -202,6 +235,25 @@ export interface TableOptions<Row> {
   /// fonction, parce que la période ou l'année changent pendant la vie de la
   /// fenêtre — elle est appelée au moment de l'export, pas avant.
   exportAs?: () => TableExport;
+  /// **La mère d'une ligne**, pour un tableau qui est un arbre (F02) : la clef
+  /// de la mère, ou 0 pour une ligne de premier niveau. Donnée, elle fait
+  /// trier **les mères seulement** : chaque fille reste sous sa mère, dans son
+  /// ordre à elle, quelle que soit la colonne triée. Sans elle, le tableau
+  /// rangeait les filles à plat parmi les autres lignes, selon leur propre
+  /// catégorie ou leur propre libellé, loin de leur mère (Fabrice, 27/10/2026,
+  /// capture à l'appui).
+  parentOf?: (row: Row) => number;
+  /// **Des groupes que le tri ne défait pas** (recherche des doublons,
+  /// 29/10/2026) : le groupe d'une ligne, par un nombre. Donné, il range les
+  /// groupes dans l'ordre où la fenêtre les a donnés, et le tri ne range les
+  /// lignes **qu'à l'intérieur** de chacun ; la vision par groupe, si la
+  /// fenêtre l'allume, dessine ses têtes quelle que soit la colonne triée, et
+  /// même sans tri. Sans lui, rien ne change.
+  groupOf?: (row: Row) => number;
+  /// Le tri vient de changer — un clic sur un en-tête, ou la colonne triée
+  /// qu'on vient de masquer. La fenêtre qui regroupe selon le tri en a besoin
+  /// pour dire si le regroupement a un sens.
+  onSortChange?: () => void;
 }
 
 /// The little magnifying glass that opens a column's search field.
@@ -247,6 +299,11 @@ export class Table<Row> {
   private anchor: number | null = null;
   private sortColumn = 0;
   private ascending = true;
+  /// La vision par groupe, quand la fenêtre l'a allumée.
+  private grouping: Grouping<Row> | null = null;
+  /// Les groupes repliés, par leur clef. **Oubliés dès que la colonne triée
+  /// change ou que la vision s'éteint** : ce ne sont plus les mêmes groupes.
+  private folded = new Set<string>();
   private filters: string[] = [];
   // Ces quatre listes sont rangées **par le rang de la colonne dans
   // `options.columns`**, celui de sa naissance, et non par sa place à l'écran :
@@ -596,6 +653,8 @@ export class Table<Row> {
       if (this.sortColumn === index) {
         this.sortColumn = 0;
         this.ascending = true;
+        this.folded.clear();
+        this.options.onSortChange?.();
       }
     }
   }
@@ -1208,9 +1267,11 @@ export class Table<Row> {
     } else {
       this.sortColumn = index;
       this.ascending = true;
+      this.folded.clear();
     }
     this.showSortMarkers();
     this.render();
+    this.options.onSortChange?.();
   }
 
   private showSortMarkers(): void {
@@ -1264,7 +1325,23 @@ export class Table<Row> {
     return column.key ? column.key(row) : column.cell(row);
   }
 
+  /// **Les lignes que l'on voit** : dans l'ordre, amputées de ce que les
+  /// entonnoirs cachent et **de ce que les groupes repliés cachent**. C'est
+  /// elle que lisent la sélection, la copie et l'export — on n'agit pas sur ce
+  /// qu'on ne voit pas.
   private visible(): Row[] {
+    const rows = this.ordered();
+    const column = this.groupedColumn();
+    const grouping = this.grouping;
+    if (grouping === null || column === undefined || this.folded.size === 0) {
+      return rows;
+    }
+    return rows.filter((row) => !this.folded.has(grouping.of(row, column).key));
+  }
+
+  /// Les lignes dans l'ordre du tri et après les filtres, **groupes repliés
+  /// compris** : c'est d'elles que le dessin tire les têtes et leurs sommes.
+  private ordered(): Row[] {
     let kept = this.rows.filter((row) =>
       this.options.columns.every((column, index) => {
         const needle = this.filters[index].trim().toLocaleLowerCase("fr");
@@ -1275,24 +1352,99 @@ export class Table<Row> {
       }),
     );
 
+    if (this.options.parentOf !== undefined) {
+      return this.inFamilies(kept, this.options.parentOf);
+    }
+    if (this.options.groupOf !== undefined) {
+      return this.inGroups(kept, this.options.groupOf);
+    }
+
     // Column 0 keeps the order the core gave — that order *is* the French
     // collation, measured on the author's archive, and re-sorting here would
     // quietly replace it with the browser's own idea of alphabetical.
     if (this.sortColumn > 0) {
-      kept = [...kept].sort((a, b) => {
-        const left = this.sortKey(a, this.sortColumn);
-        const right = this.sortKey(b, this.sortColumn);
-        if (typeof left === "number" && typeof right === "number") {
-          return left - right;
-        }
-        return String(left).localeCompare(String(right), "fr");
-      });
+      kept = [...kept].sort((a, b) => this.compareOn(a, b));
     }
     return this.ascending ? kept : kept.reverse();
   }
 
+  /// Deux lignes comparées sur la colonne triée.
+  private compareOn(a: Row, b: Row): number {
+    const left = this.sortKey(a, this.sortColumn);
+    const right = this.sortKey(b, this.sortColumn);
+    if (typeof left === "number" && typeof right === "number") {
+      return left - right;
+    }
+    return String(left).localeCompare(String(right), "fr");
+  }
+
+  /// **Le tri d'un arbre : les mères se rangent, les filles les suivent.**
+  ///
+  /// Une fille est comparée par sa mère : elle prend la place de sa mère dans
+  /// l'ordre, et se range juste derrière elle, dans l'ordre où la fenêtre les a
+  /// données. Le sens du tri ne retourne que l'ordre des familles, jamais
+  /// l'intérieur d'une famille — une fille ne passe pas au-dessus de sa mère.
+  ///
+  /// **Pour une liste sans fille dépliée, l'ordre est exactement celui d'avant**
+  /// : la clef d'abord, puis, à clef égale, l'ordre de la fenêtre, le tout
+  /// retourné quand le tri descend.
+  ///
+  /// Les filtres ne changent pas : ils gardent ou ôtent chaque ligne comme
+  /// avant. Une fille dont la mère est filtrée reste à la place de sa mère.
+  private inFamilies(kept: Row[], parentOf: (row: Row) => number): Row[] {
+    const identity = this.options.identity;
+    const position = new Map<number, number>();
+    const byKey = new Map<number, Row>();
+    this.rows.forEach((row, index) => {
+      position.set(identity(row), index);
+      byKey.set(identity(row), row);
+    });
+    const at = (row: Row): number => position.get(identity(row)) ?? 0;
+    const head = (row: Row): Row => {
+      const mother = parentOf(row);
+      return mother === 0 ? row : (byKey.get(mother) ?? row);
+    };
+    const direction = this.ascending ? 1 : -1;
+    return [...kept].sort((a, b) => {
+      const first = head(a);
+      const second = head(b);
+      if (first !== second) {
+        const compared = this.sortColumn > 0 ? this.compareOn(first, second) : 0;
+        return direction * (compared !== 0 ? compared : at(first) - at(second));
+      }
+      // La même famille : la mère d'abord, puis ses filles dans leur ordre.
+      return at(a) - at(b);
+    });
+  }
+
+  /// **Le tri dans des groupes fixés** : chaque groupe garde sa place, celle
+  /// de sa première ligne dans l'ordre de la fenêtre ; la colonne triée et son
+  /// sens ne rangent que l'intérieur d'un groupe.
+  private inGroups(kept: Row[], groupOf: (row: Row) => number): Row[] {
+    const identity = this.options.identity;
+    const position = new Map<number, number>();
+    const rank = new Map<number, number>();
+    this.rows.forEach((row, index) => {
+      position.set(identity(row), index);
+      const group = groupOf(row);
+      if (!rank.has(group)) {
+        rank.set(group, index);
+      }
+    });
+    const at = (row: Row): number => position.get(identity(row)) ?? 0;
+    const place = (row: Row): number => rank.get(groupOf(row)) ?? 0;
+    const direction = this.ascending ? 1 : -1;
+    return [...kept].sort((a, b) => {
+      if (place(a) !== place(b)) {
+        return place(a) - place(b);
+      }
+      const compared = this.sortColumn > 0 ? direction * this.compareOn(a, b) : 0;
+      return compared !== 0 ? compared : direction * (at(a) - at(b));
+    });
+  }
+
   render(): void {
-    const shown = this.visible();
+    const shown = this.ordered();
     const container = this.options.container;
 
     // **Everything is built aside and swapped in one go.** Emptying the
@@ -1315,10 +1467,21 @@ export class Table<Row> {
       return;
     }
 
+    // **Les têtes de groupe, quand la vision par groupe est allumée.** Elles
+    // s'intercalent ici, au dessin, entre les lignes : elles comptent dans la
+    // hauteur — une tête a la hauteur d'une ligne — mais `shown` ne les
+    // connaît pas, donc rien d'autre ne les voit.
+    const grouped = this.groupLines(shown);
+    const total = grouped === null ? shown.length : grouped.length;
+    const piece = (from: number, to: number): Drawn<Row>[] =>
+      grouped === null
+        ? shown.slice(from, to).map((row) => ({ row }))
+        : grouped.slice(from, to);
+
     // Only what is on screen is built, with two spacers standing in for what
     // is above and below: forty thousand rows in the document would make
     // every scroll and every keystroke crawl.
-    let slice = shown;
+    let slice: Drawn<Row>[];
     let above = 0;
     let below = 0;
     if (this.options.virtualized) {
@@ -1327,19 +1490,21 @@ export class Table<Row> {
       const first = Math.max(0, Math.floor(container.scrollTop / height) - margin);
       const count =
         Math.ceil((container.clientHeight || height * 20) / height) + margin * 2;
-      const last = Math.min(shown.length, first + count);
+      const last = Math.min(total, first + count);
 
       // Already on screen: nothing to rebuild. Replacing the very same rows
       // at every scroll event is what made the list fight the scrollbar.
-      const drawn = `${first}-${last}-${shown.length}`;
+      const drawn = `${first}-${last}-${total}`;
       if (drawn === this.drawnSlice) {
         return;
       }
       this.drawnSlice = drawn;
 
-      slice = shown.slice(first, last);
+      slice = piece(first, last);
       above = first * height;
-      below = (shown.length - last) * height;
+      below = (total - last) * height;
+    } else {
+      slice = piece(0, total);
     }
 
     if (above > 0) {
@@ -1348,7 +1513,12 @@ export class Table<Row> {
       built.append(spacer);
     }
 
-    for (const row of slice) {
+    for (const item of slice) {
+      if ("group" in item) {
+        built.append(this.groupHead(item.group));
+        continue;
+      }
+      const row = item.row;
       const id = this.options.identity(row);
       const line = document.createElement("div");
       line.className = "list__row";
@@ -1411,6 +1581,177 @@ export class Table<Row> {
     }
 
     container.replaceChildren(built);
+  }
+
+  /// **Allume ou éteint la vision par groupe** (`null` l'éteint).
+  setGrouping(grouping: Grouping<Row> | null): void {
+    this.grouping = grouping;
+    // Allumée ou éteinte, la vision repart avec tous les groupes dépliés.
+    this.folded.clear();
+    this.refresh();
+  }
+
+  /// **Replie tous les groupes** : il ne reste que les têtes, et leurs
+  /// sommes.
+  foldAll(): void {
+    const column = this.groupedColumn();
+    const grouping = this.grouping;
+    if (grouping === null || column === undefined) {
+      return;
+    }
+    const rows = this.ordered();
+    for (const row of rows) {
+      this.folded.add(grouping.of(row, column).key);
+    }
+    this.leaveTheSelection(rows);
+    this.refresh();
+  }
+
+  /// **Déplie tous les groupes.**
+  unfoldAll(): void {
+    this.folded.clear();
+    this.refresh();
+  }
+
+  /// Plie ou déplie un groupe. Les lignes d'un groupe qui se replie sortent de
+  /// la sélection : on n'efface pas, on ne pointe pas ce qu'on ne voit plus.
+  private toggleGroup(key: string, rows: Row[]): void {
+    if (this.folded.has(key)) {
+      this.folded.delete(key);
+    } else {
+      this.folded.add(key);
+      this.leaveTheSelection(rows);
+    }
+    this.refresh();
+  }
+
+  private leaveTheSelection(rows: Row[]): void {
+    const hidden = new Set(rows.map((row) => this.options.identity(row)));
+    const kept = this.selection.filter((id) => !hidden.has(id));
+    if (kept.length === this.selection.length) {
+      return;
+    }
+    this.selection = kept;
+    if (this.anchor !== null && hidden.has(this.anchor)) {
+      this.anchor = null;
+    }
+    this.options.onSelectionChange?.(this.selected());
+  }
+
+  /// Redessine tout : les têtes de groupe disent des sommes que la fenêtre
+  /// vient peut-être de mettre en forme.
+  refresh(): void {
+    this.drawnSlice = null;
+    this.render();
+  }
+
+  /// Le sens du tri en cours.
+  isAscending(): boolean {
+    return this.ascending;
+  }
+
+  /// **Trie sur une colonne nommée par son `id`**, dans le sens donné — pour
+  /// rétablir un tri mémorisé. Rend `false`, sans rien changer, pour une
+  /// colonne inconnue ou masquée. Ne prévient pas `onSortChange` : c'est la
+  /// fenêtre qui le demande, elle sait déjà.
+  sortOn(columnId: string, ascending: boolean): boolean {
+    const index = this.options.columns.findIndex((column) => column.id === columnId);
+    if (index <= 0 || this.hidden.has(index)) {
+      return false;
+    }
+    this.sortColumn = index;
+    this.ascending = ascending;
+    this.folded.clear();
+    this.showSortMarkers();
+    this.refresh();
+    return true;
+  }
+
+  /// **La colonne sur laquelle les lignes sont rangées**, par son `id` ; rien
+  /// tant que l'utilisateur n'a pas cliqué un en-tête (les lignes gardent alors
+  /// l'ordre du noyau, qui n'est le tri d'aucune colonne).
+  sortedColumn(): string | undefined {
+    return this.sortColumn > 0 ? this.options.columns[this.sortColumn].id : undefined;
+  }
+
+  /// Les lignes, avec une tête avant chaque groupe — ou `null` quand il n'y a
+  /// rien à intercaler : vision éteinte, aucun tri, ou colonne triée qui ne se
+  /// regroupe pas.
+  private groupLines(rows: Row[]): Drawn<Row>[] | null {
+    const grouping = this.grouping;
+    const column = this.groupedColumn();
+    if (grouping === null || column === undefined) {
+      return null;
+    }
+    const lines: Drawn<Row>[] = [];
+    let current: { key: string; text: string; rows: Row[]; folded: boolean } | null = null;
+    for (const row of rows) {
+      const group = grouping.of(row, column);
+      if (current === null || current.key !== group.key) {
+        current = {
+          key: group.key,
+          text: group.text,
+          rows: [],
+          folded: this.folded.has(group.key),
+        };
+        lines.push({ group: current });
+      }
+      current.rows.push(row);
+      // Un groupe replié garde sa tête, avec ses sommes, et rien dessous.
+      if (!current.folded) {
+        lines.push({ row });
+      }
+    }
+    return lines;
+  }
+
+  /// La colonne pour laquelle des têtes se dessinent : celle du tri, quand la
+  /// vision est allumée et que cette colonne se regroupe.
+  private groupedColumn(): string | undefined {
+    const column = this.sortedColumn();
+    // Des groupes fixés par la fenêtre : leurs têtes ne dépendent pas du tri.
+    if (this.grouping !== null && this.options.groupOf !== undefined) {
+      return column ?? "";
+    }
+    if (this.grouping === null || column === undefined || !this.grouping.groupable(column)) {
+      return undefined;
+    }
+    return column;
+  }
+
+  /// La tête d'un groupe : le mot qui l'annonce, puis ses sommes. **Pas une
+  /// opération** : ni `role="option"`, ni identité, ni gestionnaire de clic —
+  /// on ne la sélectionne pas, on ne la copie pas, on ne l'exporte pas.
+  private groupHead(group: {
+    key: string;
+    text: string;
+    rows: Row[];
+    folded: boolean;
+  }): HTMLElement {
+    const words = this.grouping?.line(group.text, group.rows) ?? { title: group.text, sums: "" };
+    const line = document.createElement("div");
+    line.className = "list__row list__group";
+    line.role = "presentation";
+    line.dataset.group = group.key;
+    this.holdTheWidth(line);
+    // Le « + » des mères, pour les groupes : le clic plie ou déplie, et ne
+    // fait rien d'autre.
+    const fold = document.createElement("button");
+    fold.type = "button";
+    fold.className = "list__fold";
+    fold.textContent = group.folded ? "+" : "−";
+    fold.addEventListener("click", (event) => {
+      event.stopPropagation();
+      this.toggleGroup(group.key, group.rows);
+    });
+    const title = document.createElement("span");
+    title.className = "list__group-title";
+    title.textContent = words.title;
+    const sums = document.createElement("span");
+    sums.className = "list__group-sums";
+    sums.textContent = words.sums;
+    line.append(fold, title, sums);
+    return line;
   }
 
   /// How many rows the filters and the tree leave on screen.

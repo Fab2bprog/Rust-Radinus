@@ -50,7 +50,8 @@ showing the categories.
 F05 classifies in bulk, on a draft held in memory: seven characteristics —
 five nomenclatures, the status and, since 3.0.0, the verification — each as a
 tick box and a list in the banner, and as a column with its drop-down list in
-the table. Nothing reaches the database until the diskette is clicked.
+the table. A « Référence paiement » column follows the label (26/10/2026) — to
+see and filter, whole on hover, never edited here. Nothing reaches the database until the diskette is clicked.
 
 F02 is the window everything else orbits: nineteen columns (« Référence
 paiement » joined on 19/10/2026, after the label, to see and filter only —
@@ -69,6 +70,21 @@ A layout saved before a column was born keeps the user's order, widths and
 colours: the new column takes its place after its original left neighbour
 (`readLayout`), wherever the user has moved that one.
 
+F02's Divers menu also holds the **vision par groupe selon le tri** (P-76):
+heads with the group's word and the Pointé / Engagé / Prévu / Total sums, drawn
+between the rows when the sort is on a groupable column. Switching it on folds
+every mother; switching it off unfolds again the ones that were. The window declares what groups (`Grouping` in `table.ts`:
+`groupable`, `of`, `line`); the table, which alone knows the order, places the
+heads. They live only in `render()` — never in `visible()` — so selection,
+copy and export do not see them. Amounts come from the core (`format_amounts`).
+The table knows F02's tree through `parentOf` (P-77): only the mothers are
+sorted, and every sub-operation stays under its own whatever the column.
+Each head folds and unfolds its group (« + / − », *Tout replier / Tout déplier*);
+the view is remembered in the base (`operations.vision-par-groupe`: on/off,
+folded, sorted column and direction) and restored on opening;
+a folded group's rows leave `visible()` — and so the selection, the copy and
+the export — while `ordered()` still feeds the heads and their sums.
+
 ### Accounts
 
 | F | Name | Label | Page |
@@ -78,17 +94,41 @@ colours: the new column takes its place after its original left neighbour
 | F08 | Fiche compte | `account-form` | `account-form.html` |
 | F09 | Transférer un montant | `transfer` | `transfer.html` |
 | F32 | Relevé d'identité bancaire | `rib` | `rib.html` |
+| — | Assistant de recherche des doublons | `duplicates` | `duplicates.html?account=…` |
 
 **The accounts list has three uses and three labels.** Managing accounts,
 choosing *one* account (for the operations list, the quick classification, the
-statement import, the bank details), and choosing *several* (for the six
-statistics, the dashboard, the balance curve). What one came to do travels
+duplicate search, the statement import, the bank details), and choosing
+*several* (for the six statistics, the dashboard, the balance curve). What one
+came to do travels
 with the question — without it, choosing an account would always open the same
 thing, whichever menu entry was clicked.
 
 F08 carries the **Outils** menu: setting the opening pointed balance from the
 bank's current balance, the account statistics, and deleting every operation
 of the account.
+
+**Assistant de recherche des doublons** (29/10/2026, P-79) opens on one account chosen in
+the accounts list (target `duplicates`). At the top, F02's Période menu
+(« pour rendre la recherche plus rapide »), the period (the current month by
+default) and the four levels, ticked as the preferences say. In the
+middle, the suspected groups under their head — level, nature (doublon,
+triplon, X4…), total, amount after processing — the surest first; a sort
+orders the inside of each group only (the table's `groupOf`). The first column
+is « Garder celle-ci », on one line or more of a group: kept lines turn green,
+the others of a treated group red with their label and reference struck
+through. The foot counts the treated groups and what will be deleted, and
+shows the three balances before and after, with the gap. **A two-step
+assistant**: Valider turns the same window to step 2, the summary — the Période
+menu, the dates, the levels and the boxes disappear; a second table lists the
+treated groups with what each kept line takes over, the warnings sit under it,
+the foot stays. The title says the step, « (Étape 1/2) » or « (Étape 2/2) ».
+The panel is an assistant's: step 1 has the « Étape suivante » arrow
+(`step_next.svg`); step 2 has the « Étape précédente » arrow
+(`step_previous.svg`), back to the table with the marking intact, and the
+floppy disk, « Enregistrer » (one short question, then taking over and
+deleting in one transaction, and the journal). At both steps the door closes
+the assistant, asking first when a marking is under way.
 
 ### Nomenclatures
 
@@ -137,6 +177,12 @@ them.
 | F34 | Importation Excel — la zone | `excel-import` | `excel-import.html` |
 | F35 | Importation Excel — les champs | `excel-fields` | `excel-fields.html` |
 | — | Importation Excel — la destination | `excel-association` | `excel-association.html` |
+
+« Importation de fichier JSON / XML » (P-78) opens **F34 itself** with
+`kind=structured`: the capture groups are hidden and replaced by the list, the
+date-format and the amount-format menus, so steps 2 and 3 stay its children,
+exactly as for Excel. Only their window titles change while a JSON / XML import
+is under way.
 
 The same yellow folder opens an `.ofx` **or** a `.csv`. When it is a CSV, the
 cutting window steps in first; once validated, its lines fall into the

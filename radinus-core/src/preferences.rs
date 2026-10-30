@@ -569,6 +569,87 @@ pub fn reset_welcome_accounts(conn: &Connection) -> Result<()> {
     remove(conn, WELCOME_ACCOUNTS_KEY)
 }
 
+/// La clef de la vision par groupe de la liste des opérations (F02).
+pub const OPERATIONS_GROUP_VIEW_KEY: &str = "operations.vision-par-groupe";
+
+/// **La vision par groupe selon le tri, telle que l'utilisateur l'a laissée**
+/// (Fabrice, 27/10/2026 : « une préférence personnelle qui devra être
+/// mémorisée — actif / pas actif, tout déplié / tout replié »). La colonne
+/// triée et son sens en font partie : sans eux, la vision rouvrirait sans un
+/// seul groupe (« oui, certainement »).
+///
+/// Une par base, pour tous les comptes, comme la disposition des colonnes de
+/// la liste. **La colonne n'a pas à exister** : la fenêtre ignore celle qu'elle
+/// ne connaît pas ou qu'elle a masquée, et le dit.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GroupView {
+    /// La vision est-elle allumée ?
+    pub active: bool,
+    /// Le dernier « Tout replier » (vrai) ou « Tout déplier » (faux).
+    pub folded: bool,
+    /// L'identifiant de la colonne triée (`category`, `date`…), vide si aucune.
+    pub column: String,
+    /// Le sens du tri.
+    pub ascending: bool,
+}
+
+impl Default for GroupView {
+    fn default() -> Self {
+        GroupView {
+            active: false,
+            folded: false,
+            column: String::new(),
+            ascending: true,
+        }
+    }
+}
+
+impl GroupView {
+    /// Un identifiant de colonne plausible : des minuscules et des tirets, et
+    /// pas un roman.
+    pub fn holds(&self) -> bool {
+        self.column.len() <= 64
+            && self
+                .column
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c == '-')
+    }
+}
+
+/// La vision mémorisée, ou l'état de naissance — éteinte. Une valeur illisible
+/// ou qui ne se tient pas est **ôtée**, comme la disposition d'un tableau.
+pub fn operations_group_view(conn: &Connection) -> Result<GroupView> {
+    let Some(text) = read(conn, OPERATIONS_GROUP_VIEW_KEY)? else {
+        return Ok(GroupView::default());
+    };
+    match serde_json::from_str::<GroupView>(&text) {
+        Ok(stored) if stored.holds() => Ok(stored),
+        _ => {
+            remove(conn, OPERATIONS_GROUP_VIEW_KEY)?;
+            Ok(GroupView::default())
+        }
+    }
+}
+
+/// Enregistre la vision. Rend `false`, sans rien écrire, si elle ne se tient
+/// pas.
+pub fn set_operations_group_view(conn: &Connection, view: &GroupView) -> Result<bool> {
+    if !view.holds() {
+        return Ok(false);
+    }
+    let Ok(text) = serde_json::to_string(view) else {
+        return Ok(false);
+    };
+    write(conn, OPERATIONS_GROUP_VIEW_KEY, &text)?;
+    Ok(true)
+}
+
+/// Rend à la liste des opérations sa vision de naissance : éteinte.
+pub fn reset_operations_group_view(conn: &Connection) -> Result<()> {
+    remove(conn, OPERATIONS_GROUP_VIEW_KEY)
+}
+
 /// La clef du tarif d'électricité de l'outil « Consommation d'un appareil
 /// électrique ».
 pub const ELECTRICITY_TARIFF_KEY: &str = "tarif.electricite";
@@ -618,7 +699,10 @@ pub fn set_electricity_tariff(conn: &Connection, tariff: &crate::appliance::Tari
 /// poste et non dans la base : c'est le contrôleur qui s'en charge.
 pub fn reset_comfort(conn: &Connection) -> Result<()> {
     reset_all_table_layouts(conn)?;
-    reset_welcome_accounts(conn)
+    reset_welcome_accounts(conn)?;
+    // La vision par groupe de la liste des opérations est une façon de lire
+    // un tableau, comme sa disposition : elle repart avec elle.
+    reset_operations_group_view(conn)
 }
 
 /// La valeur brute d'une clef, ou rien.
@@ -999,6 +1083,42 @@ mod tests {
         schema::migrate(&conn).expect("schéma");
         seed::seed_initial_data(&conn).expect("valeurs initiales");
         conn
+    }
+
+    /// **La vision par groupe se relit telle qu'elle a été laissée**, et une
+    /// valeur abîmée rend l'état de naissance au lieu de bloquer la fenêtre.
+    #[test]
+    fn the_group_view_is_kept_and_a_broken_one_is_dropped() {
+        let conn = database();
+        assert_eq!(operations_group_view(&conn).unwrap(), GroupView::default());
+        assert!(!GroupView::default().active && GroupView::default().ascending);
+
+        let kept = GroupView {
+            active: true,
+            folded: true,
+            column: "payment-mode".to_string(),
+            ascending: false,
+        };
+        assert!(set_operations_group_view(&conn, &kept).unwrap());
+        assert_eq!(operations_group_view(&conn).unwrap(), kept);
+
+        // Une colonne qui ne ressemble pas à un identifiant n'est pas écrite.
+        let odd = GroupView {
+            column: "Catégorie; DROP".to_string(),
+            ..kept.clone()
+        };
+        assert!(!set_operations_group_view(&conn, &odd).unwrap());
+        assert_eq!(operations_group_view(&conn).unwrap(), kept);
+
+        // Une valeur illisible est ôtée.
+        write(&conn, OPERATIONS_GROUP_VIEW_KEY, "{pas du json").unwrap();
+        assert_eq!(operations_group_view(&conn).unwrap(), GroupView::default());
+        assert!(read(&conn, OPERATIONS_GROUP_VIEW_KEY).unwrap().is_none());
+
+        // Les réglages de confort la remettent à zéro.
+        set_operations_group_view(&conn, &kept).unwrap();
+        reset_comfort(&conn).unwrap();
+        assert_eq!(operations_group_view(&conn).unwrap(), GroupView::default());
     }
 
     /// Une base neuve n'a rien écrit, et suit le système.

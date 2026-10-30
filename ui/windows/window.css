@@ -661,6 +661,35 @@ body {
   background-color: var(--radinus-row-selected-bg);
 }
 
+/* **La tête d'un groupe** (Fabrice, 27/10/2026) : le mot du groupe à gauche,
+   ses sommes à droite. Ce n'est pas une opération — elle ne se sélectionne
+   pas — et elle a la hauteur d'une ligne, car le tableau calcule ce qu'il
+   dessine sur cette hauteur-là. Elle dépasse en spécificité les teintes
+   alternées des lignes, qui compteraient les têtes dans leur alternance. */
+.list__row.list__group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 0 9px;
+  font-weight: 700;
+  background-color: var(--radinus-group-bg);
+  border-top: 1px solid var(--radinus-table-header-bg);
+  box-sizing: border-box;
+}
+
+.list__group-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list__group-sums {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .list__empty {
   padding: 14px;
   font-style: italic;
@@ -924,6 +953,132 @@ textarea.form__field {
    slate strip on the right (reported by Fabrice, 25/07/2026). */
 .window--operations .info-bar {
   grid-row: 4;
+}
+
+/* « Recherche des doublons » (29/10/2026) : le menu Période tout en haut,
+   la période et les niveaux dessous, les groupes au milieu, la barre
+   d'information en bas — la disposition de la liste des opérations. */
+.window--duplicates {
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.window--duplicates .period {
+  grid-row: 2;
+  flex-wrap: wrap;
+}
+
+.window--duplicates .window__content {
+  grid-row: 3;
+}
+
+.window--duplicates .panel {
+  grid-row: 1 / 4;
+}
+
+.window--duplicates .info-bar {
+  grid-row: 4;
+}
+
+.duplicates__levels {
+  margin-left: 18px;
+}
+
+/* Le marquage (29/10/2026) : vert pour la ligne gardée, rouge pour celles qui
+   partiront. Plus spécifiques que les teintes alternées et que la sélection,
+   qu'elles suivent dans la feuille : la décision se voit avant tout. */
+.list__row.duplicates__row--kept,
+.list__row.duplicates__row--kept[aria-selected="true"] {
+  background-color: var(--radinus-duplicate-kept-bg);
+}
+
+.list__row.duplicates__row--doomed,
+.list__row.duplicates__row--doomed[aria-selected="true"] {
+  background-color: var(--radinus-duplicate-doomed-bg);
+}
+
+/* Le libellé et la référence d'une ligne qui partira, barrés : un style du
+   texte, rendu de la même façon par WebView2, WebKit et WebKitGTK. */
+.duplicates__struck {
+  text-decoration: line-through;
+}
+
+.duplicates__keep {
+  margin: 0 6px 0 0;
+  vertical-align: middle;
+}
+
+.duplicates__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 40px;
+  align-items: flex-start;
+  padding: 8px 4px 2px;
+  font-weight: 700;
+}
+
+.duplicates__tally {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 4px 14px;
+}
+
+.duplicates__balances {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  gap: 4px 18px;
+}
+
+.duplicates__balances .totals__value {
+  text-align: right;
+}
+
+/* L'étape 2, le récapitulatif : un titre, le tableau qui défile, et les
+   avertissements dessous, qui défilent eux aussi plutôt que de pousser le
+   tableau hors de la fenêtre. */
+.duplicates__recap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.duplicates__recap[hidden],
+.window--duplicates [hidden] {
+  display: none;
+}
+
+.duplicates__recap-title {
+  margin: 0;
+  padding: 3px 8px;
+  background-color: #dcdcdc;
+  border: 1px solid #c0c0c0;
+  font-size: var(--radinus-font-size-base);
+  font-style: italic;
+  font-weight: 700;
+}
+
+.duplicates__warnings {
+  max-height: 22%;
+  overflow-y: auto;
+  padding: 4px 8px;
+  border: 1px solid #d9a441;
+  background-color: #fff6e0;
+}
+
+.duplicates__warnings-title {
+  font-weight: 700;
+}
+
+.duplicates__warnings ul {
+  margin: 4px 0 0;
+  padding-left: 20px;
+}
+
+.duplicates__heading {
+  font-weight: 600;
+  text-align: right;
+  color: #555;
 }
 
 /* F08 gagne une barre de menus (« Outils »), donc une rangée de plus que les
@@ -2874,6 +3029,13 @@ input[type="text"].form__field--locked {
   gap: 6px 14px;
   align-items: center;
   padding: 0 10px 6px;
+}
+
+/* La ligne du format des montants n'existe que pour un JSON / XML
+   (28/10/2026) : sans cette règle, la grille ci-dessus l'emporterait sur
+   l'attribut `hidden`. */
+.excel-settings[hidden] {
+  display: none;
 }
 
 .excel-settings__label {

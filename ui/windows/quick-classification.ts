@@ -39,6 +39,7 @@ interface Row {
   /// mois (défaut relevé par Fabrice le 04/08/2026).
   date_value: string;
   label: string;
+  reference: string;
   amount_text: string;
   amount: number;
   category: string;
@@ -285,6 +286,19 @@ const table = new Table<Row>({
       width: "2.4fr",
       // La colonne qu'on lit : elle a droit à la place des autres.
       minWidth: 180,
+    },
+    // La référence paiement (20/10/2026), juste après le libellé : on la voit,
+    // on la trie, on la filtre ; elle se modifie dans la fiche de l'opération.
+    // Coupée à l'écran, entière au survol.
+    {
+      title: () => t("operations-column-reference"),
+      cell: (row) => row.reference,
+      render: (row, cell) => {
+        cell.textContent = row.reference;
+        cell.title = row.reference;
+      },
+      width: "1.2fr",
+      minWidth: 100,
     },
     {
       title: () => t("quick-column-amount"),

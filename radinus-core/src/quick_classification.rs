@@ -190,6 +190,9 @@ pub struct Line {
     pub id: i64,
     pub date: Option<NaiveDate>,
     pub label: String,
+    /// La référence paiement (20/10/2026) : à voir et à filtrer dans le
+    /// tableau, jamais modifiée ici.
+    pub reference: String,
     pub amount: i64,
     /// `0` pour une opération de premier niveau, la clef de sa mère sinon.
     pub parent_id: i64,
@@ -294,7 +297,7 @@ pub fn load(conn: &Connection, account_id: i64) -> Result<Workbench> {
     let mut statement = conn.prepare(
         "SELECT IDOperation, Date, Libelle, Montant, IDOperationParent,
                 IDCategorie, IDAffectation, IDModeOperation, IDTiers,
-                IDProjets, IDStatutOperation, IDVerification
+                IDProjets, IDStatutOperation, IDVerification, ReferencePaiement
            FROM Operation
           WHERE IDCompte = ?1
           ORDER BY Date, IDOperation",
@@ -316,6 +319,7 @@ pub fn load(conn: &Connection, account_id: i64) -> Result<Workbench> {
                     .get::<_, Option<String>>(1)?
                     .and_then(|text| NaiveDate::parse_from_str(&text, "%Y-%m-%d").ok()),
                 label: row.get(2)?,
+                reference: row.get(12)?,
                 amount: row.get(3)?,
                 parent_id: row.get(4)?,
                 current: classification,

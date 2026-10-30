@@ -290,6 +290,22 @@ const UI_TEXTS = {
   "excel-backup-question":
     "Une feuille Excel est faite à la main : elle peut contenir des dates justes mais fausses. Voulez-vous sauvegarder vos données avant de commencer ?",
   "excel-group-file": "1 - Désigner le fichier Excel à importer",
+  "structured-backup-question":
+    "Un fichier JSON ou XML vient d'un autre logiciel. Voulez-vous sauvegarder vos données avant de commencer ?",
+  "structured-group-file": "1 - Désigner le fichier JSON ou XML à importer",
+  "structured-pick": "Désigner le fichier JSON ou XML",
+  "structured-list": "Liste à importer :",
+  "structured-group-dates": "2 - Définir : Comment votre fichier écrit les dates",
+  "structured-date-format": "Format des dates :",
+  "structured-group-amounts": "3 - Définir : Comment votre fichier écrit les montants",
+  "structured-amount-format": "Format des montants :",
+  "structured-group-test": "4 - Rendu Test : Visualisez le tableau obtenu",
+  "structured-test": "Testez les paramètres que vous avez définis aux étapes 2 et 3.",
+  "structured-test-note": "Indication : chaque élément de la liste devient une ligne.",
+  "structured-help": "Désignez le fichier, choisissez la liste, déclarez les formats, puis testez.",
+  "structured-no-file": "Désignez d'abord le fichier JSON ou XML à importer.",
+  "structured-no-list": "Ce fichier ne contient aucune liste d'éléments à importer.",
+  "structured-empty": "La liste choisie ne contient aucune ligne.",
   "excel-pick": "Designer le fichier Excel",
   "excel-sheet": "Feuille du classeur :",
   "excel-group-header": "2 - Définir : Coordonnées cellules pour ligne d'entête",
@@ -308,12 +324,24 @@ const UI_TEXTS = {
   "excel-test-note": "Indication : la zone de capture ne doit pas déborder.",
   "excel-help": "Descendez les cinq groupes dans l'ordre, puis testez.",
   "excel-no-file": "Désignez d'abord le fichier Excel à importer.",
-  "excel-not-tested": "Réglages modifiés : relancez le rendu test avant de valider.",
+  "excel-not-tested":
+    "Vos réglages ont changé depuis le dernier rendu test : relancez-le avant de valider.",
+  "excel-test-first":
+    "Avant de passer à l'étape 2, lancez le rendu test du groupe 5 pour vérifier ce que votre déclaration capture.",
+  "structured-test-first":
+    "Avant de passer à l'étape 2, lancez le rendu test du groupe 4 pour vérifier le tableau obtenu.",
   "excel-empty-capture": "La zone que vous avez déclarée n'attrape aucune ligne.",
   "excel-title-next": "Passer à l'étape suivante",
   "excel-tab-links": "Liens entre champs",
   "excel-tab-settings": "Parametres d'importation",
   "excel-column-excel": "Entete_Excel",
+  "structured-column-file": "Entete_Fichier",
+  "structured-column-item": "Élément",
+  "structured-nothing-refused": "Tous les éléments de votre fichier sont entrés : aucun refus.",
+  "structured-links-help": "En face de chaque colonne de votre fichier, dites quelle rubrique elle alimente.",
+  "structured-column-data": "Données_Fichier",
+  "structured-association-help": "En face de chaque valeur venue de votre fichier, choisissez celle de Radinus.",
+  "structured-association-none": "Aucune valeur inconnue : tout ce que porte votre fichier existe déjà.",
   "excel-column-radinus": "Rubrique_Radinus",
   "excel-links-help": "En face de chaque colonne, dites quelle rubrique elle alimente.",
   "excel-define-destination": "Définir destination",
@@ -830,6 +858,18 @@ const UI_TEXTS = {
   "operation-copy": "Copie à enregistrer : rien n'est encore créé.",
   "operations-show-children": "Afficher toutes les sous-opérations",
   "operations-hide-children": "Masquer toutes les sous-opérations",
+  "operations-view-by-group": "Vision par groupe selon le tri",
+  "operations-view-group-on": "Activer",
+  "operations-view-group-off": "Désactiver",
+  "operations-view-group-fold-all": "Tout replier",
+  "operations-view-group-unfold-all": "Tout déplier",
+  "operations-view-group-unavailable": "(indisponible en mode vision par groupe)",
+  "operations-view-group-active":
+    "Vision par groupe : les sous-opérations ne sont pas affichées dans ce mode.",
+  "operations-view-group-pick-column":
+    "Cliquez sur l'en-tête d'une colonne regroupable (date, catégorie, tiers…) pour grouper.",
+  "operations-group-empty": "(vide)",
+  "operations-group-total": "Total",
   "operations-recurring-from":
     "Créer une opération périodique à partir de cette opération",
   "statistics-axis-column": "NomCategorie",
@@ -1542,6 +1582,56 @@ const UI_TEXTS = {
   "preferences-leaf-comfort": "Réglages de confort",
   "preferences-comfort-reset": "Réinitialiser les réglages de confort",
   "preferences-comfort-hint": "Remet d'origine les colonnes, l'accueil et la taille.",
+  "menu-accounts": "Comptes",
+  "menu-accounts-duplicates": "Recherche des doublons",
+  "duplicates-levels": "Niveaux :",
+  "duplicates-empty": "Aucun doublon soupçonné.",
+  "duplicates-column-keep": "Garder celle-ci",
+  "duplicates-state-kept": "Gardée",
+  "duplicates-state-doomed": "À supprimer",
+  "duplicates-total": "Total :",
+  "duplicates-after": "Après traitement :",
+  "duplicates-foot-groups": "Groupes traités :",
+  "duplicates-foot-doomed": "Opérations à supprimer :",
+  "duplicates-foot-amount": "Montant à supprimer :",
+  "duplicates-foot-before": "Avant traitement",
+  "duplicates-foot-after": "Après traitement",
+  "duplicates-foot-gap": "Écart",
+  "duplicates-next": "Étape suivante",
+  "duplicates-previous": "Étape précédente",
+  "duplicates-save": "Enregistrer",
+  "duplicates-close": "Fermer l'assistant",
+  "duplicates-close-question": "Fermer l'assistant ? Le marquage sera perdu ; rien n'est supprimé.",
+  "duplicates-column-state": "État",
+  "duplicates-column-takes": "Reprend",
+  "duplicates-recap-title": "Récapitulatif avant suppression",
+  "duplicates-recap-help": "Vérifiez ce qui sera supprimé et ce qui sera gardé.",
+  "duplicates-confirm-question": "Il n'y a pas d'annulation. Confirmez-vous la suppression ?",
+  "duplicates-confirm-warnings": "Attention :",
+  "preferences-leaf-duplicates": "Détection des doublons",
+  "preferences-field-duplicates-days": "Écart de dates maximum (en jours) :",
+  "preferences-duplicates-days-help": "Deux opérations de même montant ne sont comparées que si leurs dates sont assez proches.",
+  "preferences-field-duplicates-likeness": "Ressemblance des textes :",
+  "preferences-duplicates-likeness-strict": "Stricte",
+  "preferences-duplicates-likeness-normal": "Normale",
+  "preferences-duplicates-likeness-large": "Large",
+  "preferences-duplicates-likeness-help": "À quel point deux textes doivent se ressembler.",
+  "preferences-field-duplicates-texts": "Textes comparés :",
+  "preferences-duplicates-text-label": "Le libellé",
+  "preferences-duplicates-text-reference": "La référence paiement",
+  "preferences-duplicates-texts-help": "Les deux cochés, le libellé de l'une est aussi comparé à la référence de l'autre.",
+  "preferences-field-duplicates-levels": "Niveaux montrés à l'ouverture :",
+  "duplicates-level-identical": "Identique",
+  "duplicates-level-probable": "Probable",
+  "duplicates-level-possible": "Possible",
+  "duplicates-level-to-verify": "À vérifier",
+  "preferences-duplicates-levels-help": "« Identique » : même montant, même date et même texte.",
+  "preferences-field-duplicates-ventilation": "Ventilation d'une opération supprimée :",
+  "preferences-duplicates-ventilation-take": "La reprendre sur l'opération gardée",
+  "preferences-duplicates-ventilation-warn": "Avertir seulement",
+  "preferences-duplicates-ventilation-help": "Quand l'opération supprimée porte des sous-opérations.",
+  "preferences-duplicates-defaults": "Rétablir les valeurs par défaut",
+  "preferences-duplicates-hint": "Ces réglages servent à la fenêtre « Recherche des doublons » du menu Comptes.",
   "preferences-comfort-question": "Réinitialiser les réglages de confort ?",
   "preferences-comfort-done": "Les réglages de confort ont été réinitialisés.",
   "export-all-years-excel": "Exporter toutes les années vers Excel",
@@ -1860,7 +1950,7 @@ const DELETED_TEXTS = {
 };
 
 /// Installs a stub of Tauri's bridge that records every call.
-function bridge({ startupError = null, needsConfirmation = true, plainQuestion = false, slowLoadMs = 0, refusedDeletion = false, duplicateName = null, accountRefusal = null, manyOperations = false, scatteredChildren = false, operationRefusal = null, operationIsASub = false, operationDatelessButPointed = false, operationComment = "", subIsComplement = false, missingParent = false, exportCancelled = false, exportFails = null, noYear = false, pickCancelled = false, fileAccounts = ["123456A789"], pickedIsCsv = false, pickedIsQif = false, qifAmbiguous = false, qifAccounts = ["releve.qif"], referenceTaken = false, accountGone = false, storedLayout = null, databaseOpen = true, clipboardRefuses = "nothing", manyAccounts = false, storedWelcome = null, loanUnavailable = false, databases = null, exportPlaceExists = false, exportProtected = false, baseExportRefused = null } = {}) {
+function bridge({ startupError = null, needsConfirmation = true, plainQuestion = false, slowLoadMs = 0, refusedDeletion = false, duplicateName = null, accountRefusal = null, manyOperations = false, scatteredChildren = false, operationRefusal = null, operationIsASub = false, operationDatelessButPointed = false, operationComment = "", subIsComplement = false, missingParent = false, exportCancelled = false, exportFails = null, noYear = false, pickCancelled = false, fileAccounts = ["123456A789"], pickedIsCsv = false, pickedIsQif = false, qifAmbiguous = false, qifAccounts = ["releve.qif"], referenceTaken = false, accountGone = false, storedLayout = null, databaseOpen = true, clipboardRefuses = "nothing", manyAccounts = false, storedWelcome = null, loanUnavailable = false, databases = null, exportPlaceExists = false, exportProtected = false, baseExportRefused = null, storedGroupView = null } = {}) {
   return `
     const OPERATION_JSON = ${JSON.stringify(JSON.stringify(OPERATION))};
     const SUB_OPERATION_JSON = ${JSON.stringify(JSON.stringify(SUB_OPERATION))};
@@ -2529,6 +2619,8 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
             const money = (v) => (v / 1000000).toFixed(2).replace(".", ",") + " €";
             const line = (id, iso, label, amount) => ({
               id, iso, label,
+              // La référence paiement (20/10/2026) : la ligne 12 en porte une.
+              reference: id === 12 ? "CB 0105 REF/42" : "",
               date: iso.slice(8, 10) + "/" + iso.slice(5, 7) + "/" + iso.slice(0, 4),
               date_value: iso,
               amount, amount_text: money(amount),
@@ -2677,6 +2769,71 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
             window.__ofxPreferences = { label: args.label, reference: args.reference };
             window.__ofxSaves = (window.__ofxSaves ?? 0) + 1;
             return Promise.resolve(null);
+          // Les préférences des doublons (29/10/2026) : la configuration du
+          // logiciel, tenue par la page ; le contrôleur refuse « aucun niveau ».
+          case "preferences_duplicates": {
+            const defaults = {
+              max_days: 5, likeness: "normal", compare_label: true, compare_reference: true,
+              levels: ["identical", "probable", "possible", "to-verify"], ventilation: "take-over",
+            };
+            return Promise.resolve({ value: window.__duplicatesPreferences ?? defaults, defaults });
+          }
+          case "save_preferences_duplicates":
+            if (args.preferences.levels.length === 0) {
+              return Promise.reject("Cochez au moins un niveau à montrer.");
+            }
+            window.__duplicatesPreferences = args.preferences;
+            window.__duplicatesSaves = (window.__duplicatesSaves ?? 0) + 1;
+            return Promise.resolve(null);
+          // La recherche des doublons (29/10/2026) : deux groupes, filtrés
+          // par les niveaux que la fenêtre envoie, comme le fait Rust.
+          case "duplicates_levels":
+            return Promise.resolve(window.__duplicatesLevels ?? ["identical", "probable", "possible", "to-verify"]);
+          case "duplicates_search": {
+            window.__duplicatesAsked = args;
+            const all = [
+              {
+                group: { level: "identical", title: "Identique — Doublon" },
+                rows: [
+                  { id: 1, date: "27/10/2026", date_value: "2026-10-27", label: "CARTE X2723 27/10/26 LECLERC", reference: "", debit: "-23,50 €", credit: "", amount: -23500000, status: "Pointé", status_id: 1, category: "Alimentation", payee: "", ventilated: false },
+                  { id: 2, date: "27/10/2026", date_value: "2026-10-27", label: "CARTE X2723 27/10/26 LECLERC", reference: "CB 4471", debit: "-23,50 €", credit: "", amount: -23500000, status: "Pointé", status_id: 1, category: "", payee: "", ventilated: false },
+                ],
+              },
+              {
+                group: { level: "to-verify", title: "À vérifier — Doublon" },
+                rows: [
+                  { id: 8, date: "05/10/2026", date_value: "2026-10-05", label: "TABAC", reference: "", debit: "-3,00 €", credit: "", amount: -3000000, status: "Prévu", status_id: 3, category: "", payee: "", ventilated: false },
+                  { id: 7, date: "03/10/2026", date_value: "2026-10-03", label: "CAFE DU PORT", reference: "", debit: "-3,00 €", credit: "", amount: -3000000, status: "Pointé", status_id: 1, category: "", payee: "", ventilated: false },
+                ],
+              },
+            ];
+            const kept = all.filter((one) => args.levels.includes(one.group.level));
+            const rows = [];
+            kept.forEach((one, index) => one.rows.forEach((row) => rows.push({ ...row, group: index })));
+            return Promise.resolve({
+              rows,
+              groups: kept.map((one) => one.group),
+              said: kept.length === 0 ? "Aucun doublon soupçonné sur cette période." : "Groupes soupçonnés : " + kept.length + " — opérations : " + rows.length + ".",
+              balance_bank: 1000000000, balance_real: 900000000, balance_final: 800000000,
+            });
+          }
+          case "retitle":
+            window.__retitled = args;
+            return Promise.resolve(null);
+          case "duplicates_recap":
+            window.__duplicatesRecapped = args;
+            if (args.decisions.length === 0) {
+              return Promise.resolve({ refused: true, text: "Aucune ligne n'est à supprimer.", takes: [], warnings: [] });
+            }
+            return Promise.resolve({
+              refused: false,
+              text: "",
+              takes: [{ id: 1, what: "commentaire, FitID" }],
+              warnings: ["« CARTE X2723 27/10/26 LECLERC » : sa ventilation part avec elle."],
+            });
+          case "duplicates_apply":
+            window.__duplicatesApplied = args;
+            return Promise.resolve({ refused: false, text: "Opérations supprimées : 1." });
           case "save_preferences_qif":
             window.__qifPreferences = { order: args.order, label: args.label };
             window.__qifSaves = (window.__qifSaves ?? 0) + 1;
@@ -2908,6 +3065,22 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
             return Promise.resolve("3 opérations supprimées.");
           case "operations_selection_total":
             return Promise.resolve("Montant total des opérations sélectionnées : -100,00 €");
+          case "operations_group_view":
+            return Promise.resolve(
+              ${JSON.stringify(storedGroupView)} ?? {
+                active: false, folded: false, column: "", ascending: true,
+              },
+            );
+          case "save_operations_group_view":
+            window.__savedGroupView = args;
+            return Promise.resolve();
+          case "format_amounts":
+            // Le noyau écrit les montants ; ici, deux décimales et une virgule.
+            return Promise.resolve(
+              args.amounts.map(
+                (amount) => (amount / 1000000).toFixed(2).replace(".", ",") + " €",
+              ),
+            );
           case "list_accounts":
             return Promise.resolve(JSON.parse(ACCOUNTS_JSON));
           case "accounts_total":
@@ -3729,6 +3902,7 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
                 { header: "Montant", field: "Montant" },
                 { header: "Categorie", field: "[IGNORE]" },
               ],
+              structured: window.__structuredImport === true,
             });
           case "excel_set_links":
             window.__excelLinks = args.links;
@@ -3764,6 +3938,7 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               column_title: "Categorie_Radinus",
               values: [{ label: "Alimentationss", chosen_id: 0 }],
               choices: [{ id: 1, label: "Alimentation" }, { id: 2, label: "Divers" }],
+              structured: window.__structuredImport === true,
             });
           case "excel_set_association":
             window.__excelAssociation = args;
@@ -3780,6 +3955,35 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               ],
               said: "Importation terminée : 2 opérations écrites, 1 lignes refusées, 1 valeurs de nomenclature créées.",
             });
+          // --- « Importation de fichier JSON / XML » (28/10/2026) ----------
+          case "structured_pick_file":
+            window.__structuredAccount = args;
+            return Promise.resolve({
+              path: "/tmp/export.json",
+              lists: ["transactions — éléments : 2", "categories — éléments : 2"],
+            });
+          case "structured_formats":
+            return Promise.resolve({
+              dates: [
+                { key: "iso", label: "2026-10-28 (année-mois-jour)" },
+                { key: "unix-seconds", label: "1793145600 (secondes depuis 1970)" },
+              ],
+              amounts: [
+                { key: "point", label: "1250.50 (point décimal)" },
+                { key: "cents", label: "125050 (en centimes)" },
+              ],
+            });
+          case "structured_test":
+            window.__structuredSettings = args.settings;
+            return Promise.resolve({
+              headers: ["date", "amount", "payee.name"],
+              rows: [
+                { number: 1, cells: ["1793145600", "-4250", "Boulangerie"] },
+                { number: 2, cells: ["1793232000", "150000", "Employeur"] },
+              ],
+              said: "Liste lue : 2 lignes, 3 colonnes ; l'aperçu en montre 2.",
+            });
+          case "open_structured_import":
           case "open_excel_fields":
           case "open_excel_association":
           case "open_excel_import":
@@ -4356,6 +4560,7 @@ async function openWindow(page, url, options) {
         "car-logbook.html": "",
         "sharing.html": "",
         "quick-classification.html": "?account=1",
+        "duplicates.html": "?account=1",
         "statement-import.html": "?account=1",
         "statement-form.html": "?account=1&rank=1",
         "csv-statement.html": "?account=1&path=%2Ftmp%2Freleve.csv",
@@ -7505,6 +7710,12 @@ async function openWindow(page, url, options) {
   // ⌘ et non Ctrl (10/10/2026) : sur macOS, Ctrl + clic est un clic droit,
   // qui ouvrait le menu contextuel et laissait le menu Divers fermé. Radinus
   // accepte les deux pour la sélection ; seul ⌘ se comporte pareil partout.
+  //
+  // Le menu Divers est encore ouvert, et il est plus haut depuis la vision par
+  // groupe (27/10/2026) : il recouvre la première ligne. Un clic ailleurs le
+  // referme, comme pour l'utilisateur.
+  await page.click("#info-bar");
+  await page.waitForTimeout(80);
   await page.keyboard.down("Meta");
   for (const index of [0, 1]) {
     const row = page.locator(".list__row").nth(index);
@@ -7542,6 +7753,479 @@ async function openWindow(page, url, options) {
     JSON.stringify(await page.evaluate(() => window.__openedRecurring)) ===
       JSON.stringify({ id: 1 }),
     JSON.stringify(await page.evaluate(() => window.__openedRecurring)),
+  );
+  await page.close();
+}
+
+// --- F02 : le tri garde les sous-opérations sous leur mère ----------------
+{
+  // Défaut relevé par Fabrice le 27/10/2026, capture à l'appui : triée sur une
+  // colonne où les filles diffèrent de leur mère, la liste les rangeait à plat,
+  // loin d'elle. Ici les deux filles de COURSES s'appellent « Alimentation » et
+  // « Complément » : à plat, un tri sur le libellé les mettait avant COURSES.
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/operations-list.html?account=1");
+  const order = async () =>
+    (
+      await page.evaluate(() =>
+        Array.from(document.querySelectorAll('.list__row[role="option"]')).map(
+          (row) =>
+            (row.classList.contains("list__row--sub") ? "└" : "") +
+            (row.querySelectorAll(".list__cell")[5]?.textContent ?? "?"),
+        ),
+      )
+    ).join(" | ");
+  await page.locator(".window-menu__entry", { hasText: "Divers" }).first().click();
+  await page.waitForTimeout(100);
+  await page.click('[data-menu="misc"] >> text=Afficher toutes les sous-opérations');
+  await page.waitForTimeout(150);
+  const unsorted = await order();
+  check(
+    "tri en arbre : sans tri, l'ordre du noyau, les filles sous leur mère",
+    unsorted === "COURSES | └Alimentation | └Complément | SALAIRE",
+    unsorted,
+  );
+  await page.locator(".list__title-text", { hasText: "Libelle" }).click();
+  await page.waitForTimeout(150);
+  const rising = await order();
+  check(
+    "tri en arbre : trié sur le libellé, les filles restent sous leur mère",
+    rising === "COURSES | └Alimentation | └Complément | SALAIRE",
+    rising,
+  );
+  await page.locator(".list__title-text", { hasText: "Libelle" }).click();
+  await page.waitForTimeout(150);
+  const falling = await order();
+  check(
+    "tri en arbre : en descendant, les familles s'inversent, pas leur intérieur",
+    falling === "SALAIRE | COURSES | └Alimentation | └Complément",
+    falling,
+  );
+  await page.locator(".list__title-text", { hasText: "Categorie" }).click();
+  await page.waitForTimeout(150);
+  const byCategory = await order();
+  check(
+    "tri en arbre : trié sur la catégorie, de même",
+    byCategory === "COURSES | └Alimentation | └Complément | SALAIRE",
+    byCategory,
+  );
+  // Replier la mère, triée : ses filles disparaissent avec elle, et
+  // reviennent sous elle.
+  await page.click(".list__row >> nth=0 >> .list__fold");
+  await page.waitForTimeout(150);
+  check("tri en arbre : replier une mère, triée, cache ses filles", (await order()) === "COURSES | SALAIRE");
+  await page.click(".list__row >> nth=0 >> .list__fold");
+  await page.waitForTimeout(150);
+  check(
+    "tri en arbre : la déplier, triée, les remet sous elle",
+    (await order()) === "COURSES | └Alimentation | └Complément | SALAIRE",
+  );
+  await page.close();
+}
+
+// --- F02 : la vision par groupe selon le tri ------------------------------
+{
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/operations-list.html?account=1");
+  const misc = () => page.locator(".window-menu__entry", { hasText: "Divers" }).first();
+  const heads = () => page.locator(".list__group").count();
+  const lines = () => page.locator('.list__row[role="option"]').count();
+  const view = '[data-menu="misc"] [data-key="operations-view-by-group"]';
+  const key = (name) => `[data-menu="misc"] [data-key="${name}"]`;
+  const openSubmenu = async () => {
+    await misc().click();
+    await page.waitForTimeout(100);
+    await page.click(view);
+    await page.waitForTimeout(80);
+  };
+
+  check("vision par groupe : éteinte au départ, aucune tête", (await heads()) === 0);
+  check(
+    "vision par groupe : les mères ont leur « + » au départ",
+    (await page.locator(".list__fold").count()) === 1,
+  );
+
+  await openSubmenu();
+  check(
+    "vision par groupe : le sous-menu porte l'entrée Activer et l'entrée Désactiver",
+    (await page.locator(key("operations-view-group-on")).textContent()) === "Activer" &&
+      (await page.locator(key("operations-view-group-off")).textContent()) === "Désactiver",
+  );
+  check(
+    "vision par groupe : « Désactiver » porte l'encoche tant qu'elle est éteinte",
+    (await page.locator(key("operations-view-group-off")).getAttribute("class")).includes(
+      "window-menu__choice--chosen",
+    ) &&
+      !(await page.locator(key("operations-view-group-on")).getAttribute("class")).includes(
+        "window-menu__choice--chosen",
+      ),
+  );
+  check(
+    "vision par groupe : « Activer » est offert",
+    !(await page.locator(key("operations-view-group-on")).isDisabled()),
+  );
+
+  // Allumée sans aucun tri : pas de tête, et la fenêtre dit pourquoi.
+  await page.click(key("operations-view-group-on"));
+  await page.waitForTimeout(150);
+  check("vision par groupe : sans tri, aucune tête", (await heads()) === 0);
+  check(
+    "vision par groupe : sans tri, la barre d'information dit quoi faire",
+    (await page.locator("#info-bar").textContent())?.includes("colonne regroupable"),
+  );
+  check(
+    "vision par groupe : plus de « + » sur les mères",
+    (await page.locator(".list__fold").count()) === 0,
+  );
+
+  // Triée sur la catégorie : une tête par catégorie, devant ses lignes.
+  await page.locator(".list__title-text", { hasText: "Categorie" }).click();
+  await page.waitForTimeout(250);
+  check("vision par groupe : une tête par catégorie", (await heads()) === 2);
+  check("vision par groupe : les opérations ne changent pas", (await lines()) === 2);
+  check(
+    "vision par groupe : la phrase d'aide part quand le tri convient",
+    !(await page.locator("#info-bar").textContent())?.includes("colonne regroupable"),
+  );
+  const first = (await page.locator(".list__group >> nth=0").textContent()) ?? "";
+  const second = (await page.locator(".list__group >> nth=1").textContent()) ?? "";
+  check(
+    "vision par groupe : la tête annonce la catégorie et ses quatre sommes",
+    first.includes("Alimentation") &&
+      first.includes("Pointé -100,00 €") &&
+      first.includes("Engagé 0,00 €") &&
+      first.includes("Prévu 0,00 €") &&
+      first.includes("Total -100,00 €"),
+    first,
+  );
+  check(
+    "vision par groupe : les sommes sont séparées par statut",
+    second.includes("Salaire") &&
+      second.includes("Pointé 0,00 €") &&
+      second.includes("Prévu 2216,71 €") &&
+      second.includes("Total 2216,71 €"),
+    second,
+  );
+  check(
+    "vision par groupe : la tête est la première ligne du groupe",
+    (await page.evaluate(() => {
+      const rows = Array.from(document.querySelectorAll(".list__row"));
+      return rows.map((row) => (row.classList.contains("list__group") ? "G" : "R")).join("");
+    })) === "GRGR",
+  );
+
+  // Une tête n'est pas une opération : on ne la sélectionne pas, et elle
+  // n'entre pas dans une plage.
+  await page.click(".list__group >> nth=0");
+  check(
+    "vision par groupe : cliquer une tête ne sélectionne rien",
+    (await page.locator('.list__row[aria-selected="true"]').count()) === 0,
+  );
+  await page.click('.list__row[role="option"] >> nth=0');
+  await page.click('.list__row[role="option"] >> nth=1', { modifiers: ["Shift"] });
+  check(
+    "vision par groupe : une plage saute la tête qu'elle traverse",
+    (await page.locator('.list__row[aria-selected="true"]').count()) === 2,
+  );
+
+  // Les deux modes s'excluent.
+  await openSubmenu();
+  check(
+    "vision par groupe : allumée, « Désactiver » n'a plus l'encoche et « Activer » l'a",
+    (await page.locator(key("operations-view-group-on")).getAttribute("class")).includes(
+      "window-menu__choice--chosen",
+    ),
+  );
+  check(
+    "vision par groupe : allumée, « Afficher » et « Masquer toutes les sous-opérations » sont grisées",
+    (await page.locator(key("operations-show-children")).isDisabled()) &&
+      (await page.locator(key("operations-hide-children")).isDisabled()),
+  );
+  check(
+    "vision par groupe : et elle dit pourquoi, dans son libellé",
+    (await page.locator(key("operations-show-children")).textContent()) ===
+      "Afficher toutes les sous-opérations (indisponible en mode vision par groupe)",
+  );
+
+  // Sur un libellé : pas de tête, et la phrase d'aide revient. Les deux
+  // lignes choisies plus haut sont d'abord relâchées : tant qu'une sélection
+  // existe, la barre montre son total.
+  await page.keyboard.press("Escape");
+  await page.mouse.click(5, 5);
+  for (const index of [0, 1]) {
+    await page.click(`.list__row[role="option"] >> nth=${index}`, { modifiers: ["Meta"] });
+  }
+  await page.waitForTimeout(100);
+  await page.locator(".list__title-text", { hasText: "Libelle" }).click();
+  await page.waitForTimeout(200);
+  check("vision par groupe : un libellé libre ne se regroupe pas", (await heads()) === 0);
+  check(
+    "vision par groupe : la phrase d'aide revient",
+    (await page.locator("#info-bar").textContent())?.includes("colonne regroupable"),
+  );
+  await page.locator(".list__title-text", { hasText: "Date" }).first().click();
+  await page.waitForTimeout(200);
+  check(
+    "vision par groupe : une date se regroupe par jour",
+    (await heads()) === 2,
+    String(await heads()),
+  );
+
+  // **Plier et déplier les groupes** (livraison B). Triée de nouveau sur la
+  // catégorie : deux groupes, dépliés.
+  await page.locator(".list__title-text", { hasText: "Categorie" }).click();
+  await page.waitForTimeout(200);
+  check(
+    "groupes : dépliés à l'activation, chaque tête porte un « − »",
+    (await heads()) === 2 &&
+      (await lines()) === 2 &&
+      (await page.locator(".list__group .list__fold").allTextContents()).join("") === "−−",
+  );
+  // La ligne du premier groupe est choisie, puis son groupe se replie : elle
+  // sort de la sélection.
+  await page.click('.list__row[role="option"] >> nth=0');
+  check(
+    "groupes : la ligne est choisie",
+    (await page.locator('.list__row[aria-selected="true"]').count()) === 1,
+  );
+  await page.click(".list__group >> nth=0 >> .list__fold");
+  await page.waitForTimeout(150);
+  check(
+    "groupes : replié, il ne reste que sa tête, avec ses sommes",
+    (await heads()) === 2 &&
+      (await lines()) === 1 &&
+      ((await page.locator(".list__group >> nth=0").textContent()) ?? "").includes("Total -100,00 €"),
+  );
+  check(
+    "groupes : la tête repliée porte un « + »",
+    (await page.locator(".list__group >> nth=0 >> .list__fold").textContent()) === "+",
+  );
+  check(
+    "groupes : les lignes d'un groupe replié sortent de la sélection",
+    (await page.locator('.list__row[aria-selected="true"]').count()) === 0,
+  );
+  await page.click(".list__group >> nth=0 >> .list__fold");
+  await page.waitForTimeout(150);
+  check("groupes : le « + » déplie", (await lines()) === 2);
+
+  // Tout replier, tout déplier.
+  await openSubmenu();
+  check(
+    "groupes : « Tout replier » et « Tout déplier » sont offerts quand la vision est allumée",
+    !(await page.locator(key("operations-view-group-fold-all")).isDisabled()) &&
+      !(await page.locator(key("operations-view-group-unfold-all")).isDisabled()),
+  );
+  await page.click(key("operations-view-group-fold-all"));
+  await page.waitForTimeout(150);
+  check(
+    "groupes : « Tout replier » ne laisse que les têtes",
+    (await heads()) === 2 && (await lines()) === 0,
+  );
+  await openSubmenu();
+  await page.click(key("operations-view-group-unfold-all"));
+  await page.waitForTimeout(150);
+  check("groupes : « Tout déplier » rend toutes les lignes", (await lines()) === 2);
+
+  // Un groupe replié est oublié quand la colonne triée change.
+  await page.click(".list__group >> nth=0 >> .list__fold");
+  await page.waitForTimeout(150);
+  await page.locator(".list__title-text", { hasText: "Date" }).first().click();
+  await page.waitForTimeout(200);
+  check(
+    "groupes : changer de colonne de tri oublie les groupes repliés",
+    (await lines()) === 2,
+  );
+
+  // Éteinte : tout revient, les « + » aussi.
+  await openSubmenu();
+  await page.click(key("operations-view-group-off"));
+  await page.waitForTimeout(150);
+  check("vision par groupe : éteinte, plus aucune tête", (await heads()) === 0);
+  await openSubmenu();
+  check(
+    "groupes : éteinte, « Tout replier » et « Tout déplier » sont grisées",
+    (await page.locator(key("operations-view-group-fold-all")).isDisabled()) &&
+      (await page.locator(key("operations-view-group-unfold-all")).isDisabled()),
+  );
+  await page.mouse.click(5, 5);
+  await page.click("#info-bar");
+  check(
+    "vision par groupe : éteinte, le « + » revient",
+    (await page.locator(".list__fold").count()) === 1,
+  );
+
+  check(
+    "vision par groupe : éteinte sans rien de déplié avant, rien ne se déplie",
+    (await lines()) === 2,
+  );
+
+  // **Activer replie tout, Désactiver remet l'état d'avant** (Fabrice,
+  // 27/10/2026). La mère est dépliée, puis la vision s'allume.
+  await misc().click();
+  await page.waitForTimeout(100);
+  await page.click(key("operations-show-children"));
+  await page.waitForTimeout(150);
+  check("vision par groupe : la mère est dépliée", (await lines()) === 4);
+  await openSubmenu();
+  check(
+    "vision par groupe : « Activer » reste offert avec une mère dépliée",
+    !(await page.locator(key("operations-view-group-on")).isDisabled()),
+  );
+  await page.click(key("operations-view-group-on"));
+  await page.waitForTimeout(150);
+  check(
+    "vision par groupe : allumée, les sous-opérations sont masquées d'office",
+    (await lines()) === 2 &&
+      (await page.locator(".list__row--sub").count()) === 0 &&
+      (await page.locator(".list__fold").count()) === (await heads()),
+  );
+  await openSubmenu();
+  check(
+    "vision par groupe : « Masquer toutes les sous-opérations » dit pourquoi elle est grisée",
+    (await page.locator(key("operations-hide-children")).textContent()) ===
+      "Masquer toutes les sous-opérations (indisponible en mode vision par groupe)",
+  );
+  await page.click(key("operations-view-group-off"));
+  await page.waitForTimeout(150);
+  check(
+    "vision par groupe : éteinte, la mère dépliée avant l'est de nouveau",
+    (await lines()) === 4 && (await page.locator(".list__row--sub").count()) === 2,
+  );
+  await openSubmenu();
+  check(
+    "vision par groupe : éteinte, « Afficher » et « Masquer » redeviennent offertes",
+    !(await page.locator(key("operations-show-children")).isDisabled()) &&
+      !(await page.locator(key("operations-hide-children")).isDisabled()),
+  );
+  check(
+    "vision par groupe : éteinte, leur libellé perd la mention",
+    (await page.locator(key("operations-show-children")).textContent()) ===
+      "Afficher toutes les sous-opérations",
+  );
+  check(
+    "vision par groupe : éteinte, elle efface son message de la barre",
+    !((await page.locator("#info-bar").textContent()) ?? "").includes("ne sont pas affichées"),
+  );
+  check(
+    "mémoire : éteinte, la vision est enregistrée éteinte, sans tri",
+    JSON.stringify(await page.evaluate(() => window.__savedGroupView)) ===
+      JSON.stringify({ active: false, folded: false, column: "", ascending: true }),
+    JSON.stringify(await page.evaluate(() => window.__savedGroupView)),
+  );
+  await page.close();
+}
+
+// --- F02 : la vision par groupe se mémorise ---------------------------------
+{
+  // Ce qu'elle dit et ce qu'elle enregistre, geste par geste.
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/operations-list.html?account=1");
+  const key = (name) => `[data-menu="misc"] [data-key="${name}"]`;
+  const saved = async () => JSON.stringify(await page.evaluate(() => window.__savedGroupView));
+  const openSubmenu = async () => {
+    await page.locator(".window-menu__entry", { hasText: "Divers" }).first().click();
+    await page.waitForTimeout(100);
+    await page.click(key("operations-view-by-group"));
+    await page.waitForTimeout(80);
+  };
+  check(
+    "mémoire : rien de mémorisé, la vision reste éteinte à l'ouverture",
+    (await page.locator(".list__group").count()) === 0 &&
+      !((await page.locator("#info-bar").textContent()) ?? "").includes("ne sont pas affichées"),
+  );
+  await openSubmenu();
+  await page.click(key("operations-view-group-on"));
+  await page.waitForTimeout(150);
+  check(
+    "mémoire : allumée, la barre dit que les sous-opérations ne sont pas affichées",
+    ((await page.locator("#info-bar").textContent()) ?? "").startsWith(
+      "Vision par groupe : les sous-opérations ne sont pas affichées dans ce mode.",
+    ),
+  );
+  check(
+    "mémoire : allumée, elle est enregistrée",
+    (await saved()) === JSON.stringify({ active: true, folded: false, column: "", ascending: true }),
+    await saved(),
+  );
+  await page.locator(".list__title-text", { hasText: "Categorie" }).click();
+  await page.waitForTimeout(150);
+  await page.locator(".list__title-text", { hasText: "Categorie" }).click();
+  await page.waitForTimeout(150);
+  check(
+    "mémoire : la colonne triée et son sens sont enregistrés",
+    (await saved()) ===
+      JSON.stringify({ active: true, folded: false, column: "category", ascending: false }),
+    await saved(),
+  );
+  await openSubmenu();
+  await page.click(key("operations-view-group-fold-all"));
+  await page.waitForTimeout(150);
+  check(
+    "mémoire : « Tout replier » est enregistré",
+    (await saved()) ===
+      JSON.stringify({ active: true, folded: true, column: "category", ascending: false }),
+    await saved(),
+  );
+  // Le total d'une sélection passe devant le message, qui revient ensuite.
+  await page.locator(".list__title-text", { hasText: "Date" }).first().click();
+  await page.waitForTimeout(150);
+  check(
+    "mémoire : après « Tout replier », un nouveau tri replie aussi ses groupes",
+    (await page.locator('.list__row[role="option"]').count()) === 0 &&
+      (await page.locator(".list__group").count()) === 2,
+  );
+  await openSubmenu();
+  await page.click(key("operations-view-group-unfold-all"));
+  await page.waitForTimeout(150);
+  await page.click('.list__row[role="option"] >> nth=0');
+  await page.waitForTimeout(150);
+  check(
+    "mémoire : une sélection montre son total dans la barre",
+    ((await page.locator("#info-bar").textContent()) ?? "").includes("sélectionnées"),
+  );
+  await page.click('.list__row[role="option"] >> nth=0', { modifiers: ["Meta"] });
+  await page.waitForTimeout(150);
+  check(
+    "mémoire : plus rien de choisi, le message de la vision revient",
+    ((await page.locator("#info-bar").textContent()) ?? "").startsWith("Vision par groupe"),
+  );
+  await page.close();
+}
+
+// --- F02 : la vision par groupe se rouvre telle qu'elle a été laissée --------
+{
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/operations-list.html?account=1", {
+    storedGroupView: { active: true, folded: true, column: "category", ascending: false },
+  });
+  await page.waitForTimeout(200);
+  check(
+    "rouverture : la vision est allumée, triée sur la catégorie, groupes repliés",
+    (await page.locator(".list__group").count()) === 2 &&
+      (await page.locator('.list__row[role="option"]').count()) === 0,
+  );
+  check(
+    "rouverture : le tri descend, comme il a été laissé",
+    (await page.locator(".list__group .list__group-title").allTextContents()).join(",") ===
+      "Salaire,Alimentation",
+  );
+  check(
+    "rouverture : la barre dit que les sous-opérations ne sont pas affichées",
+    ((await page.locator("#info-bar").textContent()) ?? "").startsWith("Vision par groupe"),
+  );
+  await page.close();
+}
+{
+  // Une colonne mémorisée que la fenêtre ne connaît pas est ignorée.
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/operations-list.html?account=1", {
+    storedGroupView: { active: true, folded: false, column: "inconnue", ascending: true },
+  });
+  await page.waitForTimeout(200);
+  check(
+    "rouverture : une colonne inconnue est ignorée, et la barre dit quoi cliquer",
+    (await page.locator(".list__group").count()) === 0 &&
+      ((await page.locator("#info-bar").textContent()) ?? "").includes("colonne regroupable"),
   );
   await page.close();
 }
@@ -7602,7 +8286,7 @@ async function openWindow(page, url, options) {
   check(
     "préférences : une branche « Importation » porte la feuille « Vérification »",
     (await page.locator(".tree__branch").allTextContents()).join("|") ===
-      "Affichage|Importation|Outils|Réinitialisation" &&
+      "Affichage|Importation|Comptes|Outils|Réinitialisation" &&
       (await page.locator('.tree__leaf[data-leaf="verification"]').textContent()) === "Vérification",
   );
   await page.locator('.tree__leaf[data-leaf="verification"]').click();
@@ -10304,7 +10988,7 @@ async function openWindow(page, url, options) {
     "préférences : la feuille « Colonnes des tableaux » est sous « Affichage »",
     (await page.locator(".tree > *").evaluateAll((all) =>
       all.map((piece) => piece.dataset.leaf ?? piece.textContent).join("|"),
-    )) === "Affichage|language|currency|zoom|columns|Importation|verification|ofx|qif|Outils|electricity|Réinitialisation|comfort" &&
+    )) === "Affichage|language|currency|zoom|columns|Importation|verification|ofx|qif|Comptes|duplicates|Outils|electricity|Réinitialisation|comfort" &&
       (await page.locator('.tree__leaf[data-leaf="columns"]').textContent()) === "Colonnes des tableaux",
   );
   await page.click('.tree__leaf[data-leaf="columns"]');
@@ -11894,12 +12578,12 @@ async function openWindow(page, url, options) {
   const quickTitles = await page.locator(".list__title-text").allTextContents();
   check(
     "classification : la vérification est la dernière colonne",
-    quickTitles.length === 10 && quickTitles[9] === "Vérification",
+    quickTitles.length === 11 && quickTitles[10] === "Vérification",
     JSON.stringify(quickTitles),
   );
   const shown = await page.evaluate(() => {
     const row = document.querySelectorAll(".list__row")[1];
-    const cell = row.querySelectorAll(".list__cell")[9];
+    const cell = row.querySelectorAll(".list__cell")[10];
     return {
       word: cell.textContent.trim(),
       key: cell.dataset.verification,
@@ -11910,6 +12594,16 @@ async function openWindow(page, url, options) {
     "classification : une ligne montre sa vérification, dans sa couleur",
     shown.word === "Vérifiée" && shown.key === "2" && shown.colour === "rgb(30, 107, 36)",
     JSON.stringify(shown),
+  );
+  // **La référence paiement suit le libellé** (20/10/2026) : à voir, entière
+  // au survol, rien à modifier ici.
+  const referenceCell = page.locator(".list__row >> nth=1 >> .list__cell >> nth=2");
+  check(
+    "classification : la référence paiement suit le libellé, entière au survol",
+    quickTitles[1] === "Libelle" && quickTitles[2] === "Référence paiement" &&
+      (await referenceCell.textContent()) === "CB 0105 REF/42" &&
+      (await referenceCell.getAttribute("title")) === "CB 0105 REF/42",
+    JSON.stringify(quickTitles),
   );
   const lastCombo = page.locator(".list__row[aria-selected='true'] .list__combo >> nth=6");
   check(
@@ -13800,7 +14494,12 @@ async function openWindow(page, url, options) {
 
   check(
     "excel : les cinq groupes numérotés de sa capture",
-    (await page.locator(".band__title").count()) === 5,
+    (await page.locator(".band:not([hidden]) .band__title").count()) === 5,
+  );
+  check(
+    "excel : ni le groupe des dates ni le format des montants du JSON / XML",
+    !(await page.locator("#band-dates").isVisible()) &&
+      !(await page.locator("#amount-format-row").isVisible()),
   );
   check(
     "excel : le quatrième groupe demande la forme du montant",
@@ -13825,6 +14524,15 @@ async function openWindow(page, url, options) {
     (await page.evaluate(() => window.__opened)) === undefined &&
       (await page.locator(".info-bar--alert").count()) === 1,
   );
+  // **Et la fenêtre le dit là où l'on regarde** (Fabrice, 28/10/2026 : « je
+  // peux ne pas comprendre pourquoi il est inerte ») : une fenêtre de message
+  // qui demande le rendu test, pas « réglages modifiés » à qui n'a rien touché.
+  check(
+    "excel : jamais testé, une fenêtre de message demande le rendu test du groupe 5",
+    ((await page.locator(".dialog__question").textContent()) ?? "").includes("groupe 5"),
+  );
+  await page.click(".dialog__button");
+  await page.waitForTimeout(120);
 
   await page.click("#test");
   await page.waitForTimeout(200);
@@ -13848,6 +14556,12 @@ async function openWindow(page, url, options) {
     "excel : changer un réglage périme le rendu test",
     (await page.evaluate(() => window.__opened)) === undefined,
   );
+  check(
+    "excel : testé puis réglé autrement, la fenêtre de message dit que les réglages ont changé",
+    ((await page.locator(".dialog__question").textContent()) ?? "").includes("ont changé"),
+  );
+  await page.click(".dialog__button");
+  await page.waitForTimeout(120);
 
   await page.click("#test");
   await page.waitForTimeout(150);
@@ -13862,6 +14576,169 @@ async function openWindow(page, url, options) {
     (await page.evaluate(() => window.__excelSettings?.shape)) === "single",
   );
   await page.close();
+}
+
+// --- JSON / XML : l'étape 1 de l'Excel, montrée avec ses groupes ----------
+{
+  // « Importation de fichier JSON / XML » (Fabrice, 28/10/2026) : la même
+  // fenêtre, la même philosophie — on fait déclarer, on montre, et l'on ne
+  // passe pas à l'étape 2 sans avoir regardé.
+  const page = await browser.newPage();
+  await openWindow(
+    page,
+    "http://localhost:4173/ui/windows/excel-import.html?account=1&kind=structured",
+  );
+  check(
+    "json/xml : la sauvegarde est proposée avant de commencer, pour un fichier d'un autre logiciel",
+    ((await page.locator(".dialog__question").textContent()) ?? "").includes("JSON ou XML"),
+  );
+  await page.click(".dialog__button:not(.dialog__button--primary)");
+  await page.waitForTimeout(120);
+
+  const titles = await page.locator(".band:not([hidden]) .band__title").allTextContents();
+  check(
+    "json/xml : quatre groupes — le fichier, les dates, les montants, le rendu test",
+    titles.length === 4 &&
+      titles[0] === "1 - Désigner le fichier JSON ou XML à importer" &&
+      titles[1] === "2 - Définir : Comment votre fichier écrit les dates" &&
+      titles[2] === "3 - Définir : Comment votre fichier écrit les montants" &&
+      titles[3].startsWith("4 - Rendu Test"),
+    JSON.stringify(titles),
+  );
+  check(
+    "json/xml : ni coordonnées d'en-tête ni lignes à déclarer",
+    !(await page.locator("#band-header").isVisible()) &&
+      !(await page.locator("#band-rows").isVisible()),
+  );
+  check(
+    "json/xml : la forme du montant est celle de l'Excel",
+    (await page.locator("#shape-single").isVisible()) &&
+      (await page.locator("#shape-debit-credit").isVisible()) &&
+      (await page.isChecked("#shape-single")),
+  );
+  check(
+    "json/xml : les deux menus à exemples, sur leur premier choix",
+    (await page.locator("#date-format option").count()) === 2 &&
+      (await page.inputValue("#date-format")) === "iso" &&
+      (await page.inputValue("#amount-format")) === "point" &&
+      ((await page.locator("#date-format option").nth(1).textContent()) ?? "").includes("1793145600"),
+  );
+
+  await page.click("#pick");
+  await page.waitForTimeout(150);
+  check(
+    "json/xml : le fichier désigné s'affiche et ses listes sont proposées",
+    (await page.locator("#path").textContent()) === "/tmp/export.json" &&
+      (await page.locator("#sheet option").count()) === 2 &&
+      (await page.locator("#sheet-label").textContent()) === "Liste à importer :",
+  );
+  await page.click("#validate");
+  await page.waitForTimeout(150);
+  check(
+    "json/xml : valider sans avoir testé est refusé",
+    (await page.evaluate(() => window.__opened)) === undefined &&
+      (await page.locator(".info-bar--alert").count()) === 1,
+  );
+  check(
+    "json/xml : jamais testé, une fenêtre de message demande le rendu test du groupe 4",
+    ((await page.locator(".dialog__question").textContent()) ?? "").includes("groupe 4"),
+  );
+  await page.click(".dialog__button");
+  await page.waitForTimeout(120);
+
+  await page.selectOption("#date-format", "unix-seconds");
+  await page.selectOption("#amount-format", "cents");
+  await page.click("#test");
+  await page.waitForTimeout(200);
+  check(
+    "json/xml : le rendu test montre la liste mise à plat",
+    (await page.locator(".list__title-text").allTextContents()).join(",") ===
+      "date,amount,payee.name" &&
+      (await page.locator("#preview-rows .list__row").count()) === 2,
+  );
+  check(
+    "json/xml : la liste et les formats déclarés partent avec le test",
+    JSON.stringify(await page.evaluate(() => window.__structuredSettings)) ===
+      JSON.stringify({ list: 0, date: "unix-seconds", amount: "cents", shape: "single" }),
+    JSON.stringify(await page.evaluate(() => window.__structuredSettings)),
+  );
+
+  // Changer un format périme l'essai.
+  await page.selectOption("#amount-format", "point");
+  await page.waitForTimeout(100);
+  await page.click("#validate");
+  await page.waitForTimeout(150);
+  check(
+    "json/xml : changer un format périme le rendu test",
+    (await page.evaluate(() => window.__opened)) === undefined,
+  );
+  await page.click(".dialog__button");
+  await page.waitForTimeout(120);
+  await page.click("#test");
+  await page.waitForTimeout(150);
+  await page.click("#validate");
+  await page.waitForTimeout(150);
+  check(
+    "json/xml : testé, on passe à l'étape 2 de l'Excel",
+    (await page.evaluate(() => window.__opened?.command)) === "open_excel_fields",
+  );
+  await page.close();
+}
+
+// --- JSON / XML : les étapes 2 et 3 parlent du fichier, pas de la feuille ----
+{
+  // Fabrice, 28/10/2026 : « tu as appelé la première colonne Entete_Excel…
+  // il s'agit d'un fichier json ou xml ».
+  const page = await browser.newPage();
+  await page.addInitScript(() => {
+    window.__structuredImport = true;
+  });
+  await openWindow(page, "http://localhost:4173/ui/windows/excel-fields.html");
+  await page.waitForTimeout(150);
+  check(
+    "json/xml : l'étape 2 nomme la colonne de gauche Entete_Fichier",
+    (await page.locator("#links-header .list__title-text").first().textContent()) ===
+      "Entete_Fichier",
+  );
+  check(
+    "json/xml : son aide parle du fichier",
+    ((await page.locator("#links-help").textContent()) ?? "").includes("votre fichier"),
+  );
+  check(
+    "json/xml : le compte-rendu numérote des éléments, pas des lignes Excel",
+    (await page.locator("#report-header .list__title-text").first().textContent()) === "Élément",
+  );
+  await page.close();
+
+  const association = await browser.newPage();
+  await association.addInitScript(() => {
+    window.__structuredImport = true;
+  });
+  await openWindow(
+    association,
+    "http://localhost:4173/ui/windows/excel-association.html?kind=category",
+  );
+  await association.waitForTimeout(150);
+  check(
+    "json/xml : l'association des données nomme sa colonne Données_Fichier",
+    (await association.locator(".list__title-text").first().textContent()) === "Données_Fichier",
+  );
+  check(
+    "json/xml : et son aide parle du fichier",
+    ((await association.locator("#help").textContent()) ?? "").includes("votre fichier"),
+  );
+  await association.close();
+
+  // L'Excel, lui, ne change pas.
+  const excel = await browser.newPage();
+  await openWindow(excel, "http://localhost:4173/ui/windows/excel-fields.html");
+  await excel.waitForTimeout(150);
+  check(
+    "excel : l'étape 2 garde Entete_Excel",
+    (await excel.locator("#links-header .list__title-text").first().textContent()) ===
+      "Entete_Excel",
+  );
+  await excel.close();
 }
 
 {
@@ -16834,6 +17711,473 @@ async function openWindow(page, url, options) {
     await bare.evaluate(() => window.__ofxPreferences?.label === "name-and-memo" && window.__ofxPreferences?.reference === "memo"),
   );
   await bare.close();
+}
+
+// --- Préférences : la détection des doublons (29/10/2026) ---------------
+//
+// Cinq réglages du logiciel, sous la branche « Comptes » : l'écart de dates,
+// la ressemblance des textes, les textes comparés, les niveaux montrés à
+// l'ouverture et le sort d'une ventilation. « Rétablir les valeurs par
+// défaut » remplit les champs ; la disquette enregistre.
+{
+  const page = await browser.newPage();
+  await openWindow(page, "http://localhost:4173/ui/windows/preferences.html");
+  check(
+    "préférences doublons : « Détection des doublons » sous la branche « Comptes »",
+    await page.evaluate(() => {
+      const leaf = document.querySelector('.tree__leaf[data-leaf="duplicates"]');
+      return leaf?.textContent === "Détection des doublons" && leaf.previousElementSibling?.textContent === "Comptes";
+    }),
+  );
+  await page.click('.tree__leaf[data-leaf="duplicates"]');
+  await page.waitForTimeout(100);
+  const state = () =>
+    page.evaluate(() => {
+      const box = (id) => document.getElementById(id).checked;
+      return JSON.stringify({
+        days: document.getElementById("duplicates-days").value,
+        likeness: document.getElementById("duplicates-likeness").value,
+        label: box("duplicates-text-label"),
+        reference: box("duplicates-text-reference"),
+        levels: [...document.querySelectorAll("#pane-duplicates [data-level]")]
+          .filter((b) => b.checked)
+          .map((b) => b.dataset.level),
+        ventilation: document.getElementById("duplicates-ventilation").value,
+      });
+    });
+  const byDefault = JSON.stringify({
+    days: "5", likeness: "normal", label: true, reference: true,
+    levels: ["identical", "probable", "possible", "to-verify"], ventilation: "take-over",
+  });
+  check("préférences doublons : les valeurs par défaut à la première ouverture", (await state()) === byDefault, await state());
+  check(
+    "préférences doublons : l'écart va de 0 à 15 jours",
+    (await page.locator("#duplicates-days option").count()) === 16 &&
+      (await page.locator("#duplicates-days option").first().getAttribute("value")) === "0",
+  );
+  check(
+    "préférences doublons : les mots des champs et des niveaux",
+    (await page.locator("#duplicates-days-label").textContent()) === "Écart de dates maximum (en jours) :" &&
+      (await page.locator("#duplicates-text-reference-word").textContent()) === "La référence paiement" &&
+      (await page.locator("#duplicates-level-to-verify-word").textContent()) === "À vérifier" &&
+      (await page.locator("#duplicates-ventilation-take").textContent()) === "La reprendre sur l'opération gardée" &&
+      (await page.locator("#duplicates-defaults").textContent()) === "Rétablir les valeurs par défaut",
+  );
+  check(
+    "préférences doublons : chaque réglage a sa bulle",
+    ((await page.getAttribute("#duplicates-days", "title")) ?? "").startsWith("Deux opérations") &&
+      ((await page.getAttribute("#duplicates-likeness", "title")) ?? "").startsWith("À quel point") &&
+      ((await page.getAttribute("#duplicates-text-label-line", "title")) ?? "").startsWith("Les deux cochés") &&
+      ((await page.getAttribute("#duplicates-levels-label", "title")) ?? "").startsWith("« Identique »") &&
+      ((await page.getAttribute("#duplicates-ventilation", "title")) ?? "").startsWith("Quand l'opération"),
+  );
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check("préférences doublons : rien de changé, rien d'écrit", await page.evaluate(() => (window.__duplicatesSaves ?? 0) === 0));
+
+  // Aucun niveau coché : refusé, la feuille reste à l'écran et le dit.
+  for (const level of ["identical", "probable", "possible", "to-verify"]) {
+    await page.uncheck(`#duplicates-level-${level}`);
+  }
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check(
+    "préférences doublons : aucun niveau coché, l'enregistrement est refusé",
+    (await page.evaluate(() => (window.__duplicatesSaves ?? 0) === 0)) &&
+      (await page.locator("#info-bar").textContent()) === "Cochez au moins un niveau à montrer." &&
+      (await page.locator("#pane-duplicates").isVisible()),
+  );
+
+  await page.selectOption("#duplicates-days", "2");
+  await page.selectOption("#duplicates-likeness", "large");
+  await page.uncheck("#duplicates-text-reference");
+  await page.check("#duplicates-level-identical");
+  await page.check("#duplicates-level-probable");
+  await page.selectOption("#duplicates-ventilation", "warn");
+  await page.click("#save");
+  await page.waitForTimeout(150);
+  check(
+    "préférences doublons : la disquette enregistre les cinq réglages",
+    await page.evaluate(
+      () =>
+        JSON.stringify(window.__duplicatesPreferences) ===
+          JSON.stringify({
+            max_days: 2, likeness: "large", compare_label: true, compare_reference: false,
+            levels: ["identical", "probable"], ventilation: "warn",
+          }) && window.__duplicatesSaves === 1,
+    ),
+    await page.evaluate(() => JSON.stringify(window.__duplicatesPreferences)),
+  );
+
+  // « Rétablir les valeurs par défaut » remplit les champs sans enregistrer.
+  await page.click("#duplicates-defaults");
+  await page.waitForTimeout(50);
+  check(
+    "préférences doublons : « Rétablir les valeurs par défaut » remplit les champs, sans enregistrer",
+    (await state()) === byDefault && (await page.evaluate(() => window.__duplicatesSaves === 1)),
+    await state(),
+  );
+  await page.close();
+
+  // Rouverte, sans base, la feuille vit et montre ce qui est enregistré.
+  const bare = await browser.newPage();
+  await bare.addInitScript(() => {
+    window.__duplicatesPreferences = {
+      max_days: 0, likeness: "strict", compare_label: false, compare_reference: true,
+      levels: ["to-verify"], ventilation: "warn",
+    };
+  });
+  await openWindow(bare, "http://localhost:4173/ui/windows/preferences.html", { databaseOpen: false });
+  await bare.click('.tree__leaf[data-leaf="duplicates"]');
+  await bare.waitForTimeout(100);
+  check(
+    "préférences doublons : sans base, rouverte, elle montre les choix enregistrés",
+    (await bare.inputValue("#duplicates-days")) === "0" &&
+      (await bare.inputValue("#duplicates-likeness")) === "strict" &&
+      !(await bare.isChecked("#duplicates-text-label")) &&
+      (await bare.isChecked("#duplicates-level-to-verify")) &&
+      !(await bare.isChecked("#duplicates-level-identical")),
+  );
+  await bare.close();
+}
+
+// --- La fenêtre « Recherche des doublons », en lecture seule (29/10/2026) --
+//
+// Les groupes sous leur tête, les plus sûrs d'abord ; le tri ne range que
+// l'intérieur d'un groupe ; les niveaux cochés au départ sont ceux des
+// préférences, et les décocher redemande la recherche.
+{
+  const page = await browser.newPage();
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/duplicates.html?account=1");
+  check("doublons : la fenêtre s'ouvre sans erreur", errors.length === 0, errors.join(" | "));
+  const drawn = () =>
+    page.locator("#rows > *").evaluateAll((all) =>
+      all.map((line) => (line.classList.contains("list__group") ? `[${line.querySelector(".list__group-title").textContent}]` : line.dataset.id)).join(" "),
+    );
+  check(
+    "doublons : les groupes sous leur tête, les plus sûrs d'abord, dans l'ordre du noyau",
+    (await drawn()) === "[Identique — Doublon] 1 2 [À vérifier — Doublon] 8 7",
+    await drawn(),
+  );
+  check(
+    "doublons : la tête porte le total et le montant après traitement",
+    (await page.locator(".list__group-sums").first().textContent()) === "Total : -47,00 € · Après traitement : -23,50 €",
+  );
+  check(
+    "doublons : la recherche porte sur le compte, le mois en cours et tous les niveaux",
+    await page.evaluate(
+      () =>
+        window.__duplicatesAsked?.accountId === 1 &&
+        window.__duplicatesAsked?.from ===
+          `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-01` &&
+        window.__duplicatesAsked?.levels.join(",") === "identical,probable,possible,to-verify",
+    ),
+    await page.evaluate(() => JSON.stringify(window.__duplicatesAsked)),
+  );
+  // Le menu Période de la liste des opérations (29/10/2026).
+  check(
+    "doublons : le menu Période, l'encoche sur le mois en cours",
+    (await page.locator("#window-menu .window-menu__entry").textContent()) === "Période" &&
+      (await page.locator('.window-menu__choice--chosen[data-key="period-this-month"]').count()) === 1,
+  );
+  await page.click("#window-menu .window-menu__entry");
+  await page.click('.window-menu__choice[data-key="period-today"]');
+  await page.waitForTimeout(150);
+  check(
+    "doublons : « Aujourd'hui » pose les deux dates et relance la recherche",
+    await page.evaluate(() => {
+      const d = new Date();
+      const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      return (
+        document.getElementById("from").value === today &&
+        document.getElementById("to").value === today &&
+        window.__duplicatesAsked.from === today &&
+        window.__duplicatesAsked.to === today
+      );
+    }),
+    await page.evaluate(() => JSON.stringify(window.__duplicatesAsked)),
+  );
+  check(
+    "doublons : la barre d'information compte les groupes",
+    (await page.locator("#info-bar").textContent()) === "Groupes soupçonnés : 2 — opérations : 4.",
+  );
+  check(
+    "doublons : la colonne Référence paiement suit le libellé",
+    (await page.locator("#header").evaluate((header) => header.textContent)).includes("Référence paiement"),
+  );
+
+  // Trier par date ne mélange pas les groupes.
+  await page.locator("#header .list__title-text").nth(1).click();
+  await page.waitForTimeout(100);
+  check(
+    "doublons : un tri ne range que l'intérieur des groupes",
+    (await drawn()) === "[Identique — Doublon] 1 2 [À vérifier — Doublon] 7 8",
+    await drawn(),
+  );
+
+  await page.uncheck("#level-to-verify");
+  await page.waitForTimeout(150);
+  check(
+    "doublons : décocher un niveau redemande la recherche sans lui",
+    (await drawn()) === "[Identique — Doublon] 1 2" &&
+      (await page.evaluate(() => window.__duplicatesAsked.levels.join(","))) === "identical,probable,possible",
+    await drawn(),
+  );
+  check(
+    "doublons : à l'étape 1, la flèche « Étape suivante » et la porte ; le reste est caché",
+    (await page.locator(".panel__button:visible").count()) === 2 &&
+      (await page.locator("#next").isVisible()) &&
+      !(await page.locator("#previous").isVisible()) &&
+      !(await page.locator("#save").isVisible()) &&
+      /^data:image\/svg|step_next/.test(await page.getAttribute("#next img", "src")),
+  );
+  await page.close();
+
+  // --- Le marquage (29/10/2026) : une ou plusieurs lignes gardées par groupe.
+  const marks = await browser.newPage();
+  await openWindow(marks, "http://localhost:4173/ui/windows/duplicates.html?account=1");
+  const row = (id) => marks.locator(`#rows .list__row[data-id="${id}"]`);
+  const foot = (id) => marks.locator(`#${id}`).textContent();
+  check(
+    "doublons : rien de coché, rien ne part, les soldes ne bougent pas",
+    (await foot("foot-groups")) === "0 / 2" &&
+      (await foot("foot-doomed")) === "0" &&
+      (await foot("foot-bank-before")) === "1000,00 €" &&
+      (await foot("foot-bank-after")) === "1000,00 €" &&
+      (await foot("foot-final-gap")) === "0,00 €",
+    `${await foot("foot-groups")} ${await foot("foot-bank-after")}`,
+  );
+  await row(1).locator(".duplicates__keep").check();
+  await marks.waitForTimeout(100);
+  check(
+    "doublons : la ligne gardée passe en vert, l'autre en rouge, « À supprimer »",
+    (await row(1).getAttribute("class")).includes("duplicates__row--kept") &&
+      (await row(2).getAttribute("class")).includes("duplicates__row--doomed") &&
+      (await row(1).textContent()).includes("Gardée") &&
+      (await row(2).textContent()).includes("À supprimer"),
+  );
+  check(
+    "doublons : le libellé et la référence de la ligne qui part sont barrés, eux seuls",
+    (await row(2).locator(".duplicates__struck").allTextContents()).join("|") ===
+      "CARTE X2723 27/10/26 LECLERC|CB 4471" &&
+      (await row(1).locator(".duplicates__struck").count()) === 0,
+    (await row(2).locator(".duplicates__struck").allTextContents()).join("|"),
+  );
+  check(
+    "doublons : l'autre groupe n'est pas touché",
+    !(await row(7).getAttribute("class")).includes("duplicates__row") &&
+      !(await row(8).getAttribute("class")).includes("duplicates__row"),
+  );
+  check(
+    "doublons : le pied compte le groupe traité, la ligne qui part et les trois soldes",
+    (await foot("foot-groups")) === "1 / 2" &&
+      (await foot("foot-doomed")) === "1" &&
+      (await foot("foot-amount")) === "-23,50 €" &&
+      (await foot("foot-bank-after")) === "1023,50 €" &&
+      (await foot("foot-real-after")) === "923,50 €" &&
+      (await foot("foot-final-after")) === "823,50 €" &&
+      (await foot("foot-bank-gap")) === "23,50 €",
+    `${await foot("foot-amount")} ${await foot("foot-bank-after")} ${await foot("foot-real-after")} ${await foot("foot-final-after")}`,
+  );
+
+  // Une opération prévue ne déplace que le solde final.
+  await row(7).locator(".duplicates__keep").check();
+  await marks.waitForTimeout(100);
+  check(
+    "doublons : une ligne prévue qui part ne touche que le solde final",
+    (await foot("foot-doomed")) === "2" &&
+      (await foot("foot-bank-after")) === "1023,50 €" &&
+      (await foot("foot-real-after")) === "923,50 €" &&
+      (await foot("foot-final-after")) === "826,50 €",
+    `${await foot("foot-bank-after")} ${await foot("foot-real-after")} ${await foot("foot-final-after")}`,
+  );
+
+  // Plusieurs lignes gardées dans un groupe : rien n'y part, et « après
+  // traitement » compte les lignes gardées.
+  await row(2).locator(".duplicates__keep").check();
+  await marks.waitForTimeout(100);
+  check(
+    "doublons : toutes les lignes d'un groupe gardées, aucune ne part",
+    (await row(1).getAttribute("class")).includes("duplicates__row--kept") &&
+      (await row(2).getAttribute("class")).includes("duplicates__row--kept") &&
+      (await foot("foot-doomed")) === "1" &&
+      (await marks.locator(".list__group-sums").first().textContent()) ===
+        "Total : -47,00 € · Après traitement : -47,00 €",
+    await marks.locator(".list__group-sums").first().textContent(),
+  );
+
+  // Décocher rend l'état normal.
+  for (const id of [1, 2, 7]) {
+    await row(id).locator(".duplicates__keep").uncheck();
+  }
+  await marks.waitForTimeout(100);
+  check(
+    "doublons : tout décoché, les lignes retrouvent leur fond, le pied revient à zéro",
+    (await marks.locator("#rows .duplicates__row--kept, #rows .duplicates__row--doomed").count()) === 0 &&
+      (await foot("foot-groups")) === "0 / 2" &&
+      (await marks.locator(".list__group-sums").first().textContent()) ===
+        "Total : -47,00 € · Après traitement : -23,50 €",
+  );
+
+  // --- L'assistant (29 et 30/10/2026) : « Étape suivante » passe au
+  // récapitulatif, dans la même fenêtre ; « Étape précédente » revient sans
+  // rien perdre ; la disquette enregistre ; la porte ferme l'assistant.
+  const shown = (id) => marks.locator(`#${id}`).isVisible();
+  const title = () => marks.evaluate(() => window.__retitled?.key);
+  check("doublons : le titre dit l'étape 1", (await title()) === "window-duplicates-title-1", await title());
+  await marks.click("#next");
+  await marks.waitForTimeout(150);
+  check(
+    "doublons : avancer sans rien de coché est refusé, on reste au tableau",
+    (await marks.locator("#info-bar").textContent()) === "Aucune ligne n'est à supprimer." &&
+      (await shown("search")) &&
+      !(await shown("recap")) &&
+      (await title()) === "window-duplicates-title-1" &&
+      (await marks.evaluate(() => window.__duplicatesApplied === undefined)),
+  );
+  await row(1).locator(".duplicates__keep").check();
+  await marks.click("#next");
+  await marks.waitForTimeout(150);
+  check(
+    "doublons : « Étape suivante » passe au récapitulatif, rien n'est supprimé",
+    (await shown("recap")) &&
+      !(await shown("search")) &&
+      (await marks.evaluate(() => window.__duplicatesApplied === undefined)) &&
+      (await marks.evaluate(
+        () => JSON.stringify(window.__duplicatesRecapped.decisions) === JSON.stringify([{ kept: [1], doomed: [2] }]),
+      )),
+    await marks.evaluate(() => JSON.stringify(window.__duplicatesRecapped)),
+  );
+  check(
+    "doublons : le titre dit l'étape 2, avec le compte",
+    (await title()) === "window-duplicates-title-2" &&
+      (await marks.evaluate(() => window.__retitled.argument)) !== undefined,
+    await title(),
+  );
+  check(
+    "doublons : à l'étape 2, « Étape précédente », la disquette et la porte — rien d'autre",
+    !(await shown("window-menu")) &&
+      !(await shown("period")) &&
+      !(await shown("next")) &&
+      (await shown("previous")) &&
+      (await shown("save")) &&
+      (await shown("close")) &&
+      (await marks.locator(".panel__button:visible").count()) === 3 &&
+      /^data:image\/svg|step_previous/.test(await marks.getAttribute("#previous img", "src")) &&
+      (await marks.getAttribute("#save img", "src")).includes("Base_save"),
+  );
+  const recapRow = (id) => marks.locator(`#recap-rows .list__row[data-id="${id}"]`);
+  check(
+    "doublons : le récapitulatif montre les seuls groupes traités, couleurs et texte barré compris",
+    (await marks.locator("#recap-rows .list__row:not(.list__group)").count()) === 2 &&
+      (await recapRow(1).getAttribute("class")).includes("duplicates__row--kept") &&
+      (await recapRow(2).getAttribute("class")).includes("duplicates__row--doomed") &&
+      (await recapRow(2).locator(".duplicates__struck").count()) === 2 &&
+      (await marks.locator("#recap-rows .list__group-title").textContent()) === "Identique — Doublon",
+  );
+  check(
+    "doublons : la gardée dit ce qu'elle reprend, et les avertissements sont listés",
+    (await recapRow(1).textContent()).includes("commentaire, FitID") &&
+      (await shown("warnings")) &&
+      (await marks.locator("#warnings-list li").allTextContents()).join("|") ===
+        "« CARTE X2723 27/10/26 LECLERC » : sa ventilation part avec elle.",
+  );
+  check(
+    "doublons : le pied et ses trois soldes restent sous les yeux",
+    (await shown("foot-bank-after")) && (await foot("foot-doomed")) === "1",
+  );
+
+  // « Étape précédente » ramène au tableau, le marquage intact.
+  await marks.click("#previous");
+  await marks.waitForTimeout(150);
+  check(
+    "doublons : « Étape précédente » ramène au tableau, le marquage intact",
+    (await shown("search")) &&
+      !(await shown("recap")) &&
+      (await shown("next")) &&
+      (await title()) === "window-duplicates-title-1" &&
+      (await row(1).getAttribute("class")).includes("duplicates__row--kept") &&
+      (await marks.evaluate(() => window.__duplicatesApplied === undefined)),
+  );
+
+  // La porte ferme l'assistant : avec un marquage en cours, elle le demande.
+  await marks.click("#next");
+  await marks.waitForTimeout(150);
+  await marks.click("#close");
+  await marks.waitForTimeout(100);
+  check(
+    "doublons : la porte, à l'étape 2, demande si l'on ferme l'assistant",
+    (await marks.locator(".dialog__question").textContent()) ===
+      "Fermer l'assistant ? Le marquage sera perdu ; rien n'est supprimé.",
+  );
+  await marks.locator(".dialog__button").nth(1).click();
+  await marks.waitForTimeout(100);
+  check(
+    "doublons : répondre Non garde l'assistant ouvert, à son étape",
+    (await shown("recap")) && (await marks.evaluate(() => window.__duplicatesApplied === undefined)),
+  );
+
+  // La disquette : une dernière question courte. Non : on reste au récapitulatif.
+  await marks.click("#save");
+  await marks.waitForTimeout(100);
+  check(
+    "doublons : la disquette pose une courte question",
+    (await marks.locator(".dialog__question").textContent()) ===
+      "Il n'y a pas d'annulation. Confirmez-vous la suppression ?",
+  );
+  await marks.locator(".dialog__button").nth(1).click();
+  await marks.waitForTimeout(100);
+  check(
+    "doublons : répondre Non ne supprime rien, on reste au récapitulatif",
+    (await marks.evaluate(() => window.__duplicatesApplied === undefined)) && (await shown("recap")),
+  );
+  await marks.click("#save");
+  await marks.waitForTimeout(100);
+  await marks.locator(".dialog__button--primary").click();
+  await marks.waitForTimeout(250);
+  check(
+    "doublons : répondre Oui supprime, revient à l'étape 1, efface le marquage et le dit",
+    (await marks.evaluate(
+      () => JSON.stringify(window.__duplicatesApplied?.decisions) === JSON.stringify([{ kept: [1], doomed: [2] }]),
+    )) &&
+      (await shown("search")) &&
+      !(await shown("recap")) &&
+      (await title()) === "window-duplicates-title-1" &&
+      (await marks.locator("#rows .duplicates__row--kept, #rows .duplicates__row--doomed").count()) === 0 &&
+      (await marks.locator("#info-bar").textContent()).startsWith("Opérations supprimées : 1."),
+    await marks.locator("#info-bar").textContent(),
+  );
+  check(
+    "doublons : les bulles — « Étape suivante », « Étape précédente », « Enregistrer », « Fermer l'assistant »",
+    (await marks.getAttribute("#next", "title")) === "Étape suivante" &&
+      (await marks.getAttribute("#previous", "title")) === "Étape précédente" &&
+      (await marks.getAttribute("#save", "title")) === "Enregistrer" &&
+      (await marks.getAttribute("#close", "title")) === "Fermer l'assistant",
+  );
+  check(
+    "doublons : sans marquage, la porte ferme sans rien demander",
+    await marks.evaluate(async () => {
+      document.getElementById("close").click();
+      await new Promise((done) => setTimeout(done, 100));
+      return document.querySelector(".dialog") === null;
+    }),
+  );
+  await marks.close();
+
+  // Les niveaux de départ sont ceux des préférences.
+  const chosen = await browser.newPage();
+  await chosen.addInitScript(() => {
+    window.__duplicatesLevels = ["identical", "probable"];
+  });
+  await openWindow(chosen, "http://localhost:4173/ui/windows/duplicates.html?account=1");
+  check(
+    "doublons : les niveaux cochés à l'ouverture sont ceux des préférences",
+    (await chosen.isChecked("#level-identical")) &&
+      (await chosen.isChecked("#level-probable")) &&
+      !(await chosen.isChecked("#level-possible")) &&
+      !(await chosen.isChecked("#level-to-verify")),
+  );
+  await chosen.close();
 }
 
 // --- Le menu Outils du sélecteur de bases (08/08/2026) ------------------

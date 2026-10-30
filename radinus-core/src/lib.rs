@@ -68,6 +68,10 @@ pub mod balances;
 /// a flat run of rows.
 pub mod operations;
 
+/// « Recherche des doublons » (menu Comptes, 29/10/2026) : le moteur qui
+/// range les opérations soupçonnées en groupes, chacun avec son niveau.
+pub mod duplicates;
+
 /// The "Complement" sub-operation mechanism and parent/child sync (Phase 2).
 /// Dossier reference: 02_BASE_DE_DONNEES.md §9.
 pub mod sheets;
@@ -171,6 +175,12 @@ pub mod account_export;
 /// registry, 08_ARCHITECTURE.md). Dossier reference:
 /// 06_FORMATS_SAUVEGARDE_IMPORT_EXPORT.md §2.2-2.3.
 pub mod csv_excel_import;
+
+/// « Importation de fichier JSON / XML » (28/10/2026) : l'étape 1 de
+/// l'assistant pour un JSON ou un XML — choisir la liste, déclarer les formats
+/// de dates et de montants, mettre à plat. Les étapes 2 et 3 sont celles de
+/// l'import Excel.
+pub mod structured_import;
 
 /// QIF/OFX/CSV/TSV/JSON/XML/INI/YAML/TOML/Excel export (Phase 13). Dossier
 /// reference: 06_FORMATS_SAUVEGARDE_IMPORT_EXPORT.md §3.

@@ -269,12 +269,20 @@ column. **Nothing enters it that Fabrice has not asked for, key by key**
 | `verification_import` | `1` or `2` | 3.0.0 |
 | `tableau.<name>` | the layout of a table: `{"order": […], "hidden": […], "widths": {…}, "colors": {…}}` | 3.0.0 |
 | `accueil.comptes` | the account tiles of the welcome window: `{"order": [ids…], "excluded": [ids…]}` | 3.0.0 |
+| `operations.vision-par-groupe` | the group view of the operations list (F02): `{"active": bool, "folded": bool, "column": "<column id>", "ascending": bool}` | 3.2.0 |
 | `tarif.electricite` | the electricity tariff of F42: `{"off_peak_option": bool, "base": µ, "peak": µ, "off_peak": µ, "off_peak_hours": 0–24}`, prices per kWh in micro-units | 3.0.0 |
 
 `tarif.electricite` is the contract F42 starts from, set in Préférences ›
 Outils › Tarif d'électricité (P-62). Absent, or unreadable (then removed), it
 is EDF's Tarif Bleu on 1 August 2026 (`appliance::BLUE_TARIFF`). It is not a
 comfort setting: « Réinitialiser les réglages de confort » leaves it alone.
+
+`operations.vision-par-groupe` is the « Vision par groupe selon le tri » of the
+operations list as the user left it (P-76): on or off, the last *Tout replier*
+or *Tout déplier*, and the sorted column with its direction — kept only while
+the view is on, so the ordinary list never remembers a sort. A column the window
+does not know, or has hidden, is ignored. Unreadable, it is removed and the
+view starts off. « Réinitialiser les réglages de confort » removes it.
 
 `accueil.comptes` holds the order in which the welcome window shows its
 account tiles and the accounts whose tick box is off — those stay shown but

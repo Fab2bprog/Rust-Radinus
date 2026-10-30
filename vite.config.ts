@@ -45,6 +45,7 @@ export default defineConfig(async () => ({
         "car-logbook": "ui/windows/car-logbook.html",
         sharing: "ui/windows/sharing.html",
         "quick-classification": "ui/windows/quick-classification.html",
+        duplicates: "ui/windows/duplicates.html",
         "statement-import": "ui/windows/statement-import.html",
         "statement-form": "ui/windows/statement-form.html",
         "csv-statement": "ui/windows/csv-statement.html",

@@ -294,6 +294,11 @@ async function chooseAccount(): Promise<void> {
       await invoke("open_quick_classification", { accountId: table.selected()[0] });
       return;
     }
+    // La recherche des doublons (29/10/2026) : on cherche dans un compte.
+    if (target === "duplicates") {
+      await invoke("open_duplicates", { accountId: table.selected()[0] });
+      return;
+    }
     if (target === "statement-import") {
       await invoke("open_statement_import", { accountId: table.selected()[0] });
       return;
@@ -303,6 +308,12 @@ async function chooseAccount(): Promise<void> {
     // dictée par Fabrice le 29/07/2026).
     if (target === "excel-import") {
       await invoke("open_excel_import", { accountId: table.selected()[0] });
+      return;
+    }
+    // « Importation de fichier JSON / XML » (28/10/2026) : la même fenêtre,
+    // montrée avec ses groupes JSON / XML.
+    if (target === "structured-import") {
+      await invoke("open_structured_import", { accountId: table.selected()[0] });
       return;
     }
     // F32 — le RIB porte sur un compte, et un seul : on le choisit ici avant
