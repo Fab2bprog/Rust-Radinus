@@ -566,15 +566,15 @@ fn clean(raw: &str) -> Cleaned {
     while index < chars.len() {
         let starts_number =
             chars[index].is_ascii_digit() && (index == 0 || !chars[index - 1].is_ascii_digit());
-        if starts_number {
-            if let Some((end, date)) = date_at(&chars, index) {
-                if let Some(date) = date {
-                    dates.push(date);
-                }
-                kept.push(' ');
-                index = end;
-                continue;
+        if starts_number
+            && let Some((end, date)) = date_at(&chars, index)
+        {
+            if let Some(date) = date {
+                dates.push(date);
             }
+            kept.push(' ');
+            index = end;
+            continue;
         }
         kept.push(chars[index]);
         index += 1;

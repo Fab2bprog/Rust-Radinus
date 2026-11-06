@@ -29,6 +29,12 @@ Two version numbers live in this project and they do not move together:
   (none, the frequent ones, or all). Splits become sub-operations; the Money
   opening balance can be taken as the opening cleared balance.
 
+### Changed
+
+- **Rust 2024 edition** (Fabrice, 06/11/2026, P-82): the three crates move
+  from the 2021 edition to the 2024 one; building Radinus now needs Rust 1.88
+  or newer. Nothing changes for the user.
+
 ## [3.2.1] — 30/10/2026
 
 ### Added

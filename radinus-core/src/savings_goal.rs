@@ -558,10 +558,10 @@ pub fn write(flows: &Flows, request: &Request, answer: &Answer, today: NaiveDate
             tiles.push(Tile { label: label("goal-tile-date"), value: month_text(months) });
             tiles.push(Tile { label: label("goal-tile-projected"), value: amount(values[1]) });
             tiles.push(Tile { label: label("goal-tile-saved"), value: signed(values[1] - flows.balance, language) });
-            if request.rate > 0.0 {
-                if let Some(&(_, _, interest)) = probable(months).last() {
-                    tiles.push(Tile { label: label("goal-tile-interest"), value: amount(interest) });
-                }
+            if request.rate > 0.0
+                && let Some(&(_, _, interest)) = probable(months).last()
+            {
+                tiles.push(Tile { label: label("goal-tile-interest"), value: amount(interest) });
             }
             let headline = i18n::message_of(
                 language,

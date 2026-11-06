@@ -222,10 +222,9 @@ pub fn list(conn: &Connection, operation_id: i64) -> SqlResult<Vec<Attachment>> 
           WHERE IDOperation = ?1
           ORDER BY IDPiecesJointes"
     ))?;
-    let found = statement
+    statement
         .query_map([operation_id], read_row)?
-        .collect::<SqlResult<_>>();
-    found
+        .collect::<SqlResult<_>>()
 }
 
 /// Une pièce jointe par sa clef.
@@ -445,10 +444,9 @@ pub fn remove(conn: &Connection, id: i64, folder: &Path) -> SqlResult<Option<Pat
 pub fn all_files(conn: &Connection) -> SqlResult<Vec<String>> {
     let mut statement =
         conn.prepare("SELECT NomFichierGUID FROM PiecesJointes ORDER BY IDPiecesJointes")?;
-    let found = statement
+    statement
         .query_map([], |row| row.get::<_, String>(0))?
-        .collect::<SqlResult<_>>();
-    found
+        .collect::<SqlResult<_>>()
 }
 
 /// Écrit `bytes` dans le dossier des pièces jointes sous `guid_name` — ce que

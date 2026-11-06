@@ -331,10 +331,11 @@ pub fn delete(conn: &mut Connection, ids: &[i64]) -> Result<usize> {
             "SELECT IDOperationParent FROM Operation WHERE IDOperation = ?1",
             [id],
             |row| row.get::<_, i64>(0),
-        ) {
-            if parent != 0 && !ids.contains(&parent) && !mothers.contains(&parent) {
-                mothers.push(parent);
-            }
+        ) && parent != 0
+            && !ids.contains(&parent)
+            && !mothers.contains(&parent)
+        {
+            mothers.push(parent);
         }
     }
 
@@ -457,15 +458,14 @@ pub fn set_nomenclature(
 pub fn statuses(conn: &Connection) -> Result<Vec<NamedItem>> {
     let mut statement =
         conn.prepare("SELECT IDStatutOperation, Libelle FROM StatutOperation ORDER BY IDStatutOperation")?;
-    let items = statement
+    statement
         .query_map([], |row| {
             Ok(NamedItem {
                 id: row.get(0)?,
                 label: row.get(1)?,
             })
         })?
-        .collect();
-    items
+        .collect()
 }
 
 /// **Le même statut à plusieurs opérations d'un coup** — le menu du clic droit
@@ -511,15 +511,14 @@ pub fn set_status_many(conn: &mut Connection, ids: &[i64], status_id: i64) -> Re
 pub fn verifications(conn: &Connection) -> Result<Vec<NamedItem>> {
     let mut statement =
         conn.prepare("SELECT IDVerification, Libelle FROM Verification ORDER BY IDVerification")?;
-    let items = statement
+    statement
         .query_map([], |row| {
             Ok(NamedItem {
                 id: row.get(0)?,
                 label: row.get(1)?,
             })
         })?
-        .collect();
-    items
+        .collect()
 }
 
 /// Rend `wanted` s'il nomme une ligne de `Verification`, et `None` sinon.

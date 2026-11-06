@@ -1307,12 +1307,11 @@ fn chaque_entree_de_menu_qui_porte_un_identifiant_est_ecoutee() {
     let mut names: Vec<String> = Vec::new();
     for line in source.lines() {
         let line = line.trim();
-        if let Some(rest) = line.strip_prefix("pub const ") {
-            if let Some((name, _)) = rest.split_once(':') {
-                if name.ends_with("_ITEM_ID") {
-                    names.push(name.to_string());
-                }
-            }
+        if let Some(rest) = line.strip_prefix("pub const ")
+            && let Some((name, _)) = rest.split_once(':')
+            && name.ends_with("_ITEM_ID")
+        {
+            names.push(name.to_string());
         }
     }
     assert!(

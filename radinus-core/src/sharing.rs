@@ -365,10 +365,10 @@ pub fn read(input: &Input, language: Language) -> Result<Plan, Refusal> {
         let cap = money_of(&typed.cap, "cap")?;
         let fixed = money_of(&typed.fixed, "fixed")?;
         let alone = money_of(&typed.alone, "alone")?.unwrap_or(0);
-        if let (Some(floor), Some(cap), None) = (floor, cap, fixed) {
-            if floor > cap {
-                return Err(refuse(field("floor"), "sharing-floor-above-cap"));
-            }
+        if let (Some(floor), Some(cap), None) = (floor, cap, fixed)
+            && floor > cap
+        {
+            return Err(refuse(field("floor"), "sharing-floor-above-cap"));
         }
         people.push(Person {
             id: typed.id,
@@ -602,14 +602,13 @@ fn check(plan: &Plan, language: Language) -> Result<(), Refusal> {
                 ));
             }
         }
-        if rule == Rule::Income {
-            if let Some(&rank) = takers
+        if rule == Rule::Income
+            && let Some(&rank) = takers
                 .iter()
                 .find(|&&rank| plan.people[rank].fixed.is_none() && plan.people[rank].income.is_none())
-            {
-                let person = &plan.people[rank];
-                return Err(refuse(format!("income-{}", person.id), "sharing-income-missing", &[("name", &person.name)]));
-            }
+        {
+            let person = &plan.people[rank];
+            return Err(refuse(format!("income-{}", person.id), "sharing-income-missing", &[("name", &person.name)]));
         }
     }
     Ok(())
@@ -941,11 +940,11 @@ pub fn share(plan: &Plan, language: Language) -> Result<Shares, Refusal> {
                 left -= euro;
             }
         }
-        if left > 0 {
-            if let Some(&first) = order.first() {
-                after[first] += left;
-                keeper = Some(first);
-            }
+        if left > 0
+            && let Some(&first) = order.first()
+        {
+            after[first] += left;
+            keeper = Some(first);
         }
         for &rank in &free {
             rounding[rank] = after[rank] - before[rank];

@@ -23,9 +23,10 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 Windows: download `rustup-init.exe` from <https://rustup.rs>.
 
 - **Channel:** stable.
-- **Minimum version: 1.87.** The code uses inline `const` blocks in array
-  repetition (`[const { OnceLock::new() }; N]`, stable since 1.79) and
-  `is_multiple_of` on integers (stable since 1.87). An older compiler will
+- **Minimum version: 1.88.** The workspace is in the **2024 edition**
+  (P-82, stable since 1.85) and uses its `if let … && …` chains (stable since
+  1.88), `as_chunks` on slices (1.88), `is_multiple_of` on integers (1.87) and
+  inline `const` blocks in array repetition (1.79). An older compiler will
   refuse to build.
 - Nothing pins the version in the repository — there is no `rust-toolchain`
   file. A recent stable is expected, and CI runs on the latest one.
@@ -41,7 +42,7 @@ rustup component add rustfmt  # formatting
 Check:
 
 ```bash
-rustc --version    # 1.87.0 or newer
+rustc --version    # 1.88.0 or newer
 cargo --version
 cargo clippy --version
 ```
@@ -200,7 +201,7 @@ anyway.
 
 | What | Minimum | Used by the author and by CI |
 |---|---|---|
-| Rust (stable, via rustup) | 1.87 | latest stable |
+| Rust (stable, via rustup) | 1.88 | latest stable |
 | Node.js | 20 LTS | 22 |
 | macOS | 10.15 | current, with Xcode CLT |
 | Disk for `target/` | ~3 GB | ~5 GB |

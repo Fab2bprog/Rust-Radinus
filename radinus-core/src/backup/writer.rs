@@ -651,10 +651,10 @@ fn table_json(conn: &Connection, spec: &TableSpec) -> Result<(String, usize), Ba
             };
             object.push_str(&value);
 
-            if let Ordering::Label(label_column) = spec.ordering {
-                if *name == label_column {
-                    collation_key = crate::text::french_sort_key(&row.get::<_, String>(index)?);
-                }
+            if let Ordering::Label(label_column) = spec.ordering
+                && *name == label_column
+            {
+                collation_key = crate::text::french_sort_key(&row.get::<_, String>(index)?);
             }
         }
         object.push_str(" }");

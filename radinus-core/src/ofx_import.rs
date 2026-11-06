@@ -576,10 +576,10 @@ pub fn accounts_in(source: &str) -> Vec<String> {
     let source = cleaned(source);
     let mut found: Vec<String> = Vec::new();
     for block in statements(&source) {
-        if let Some(number) = account_of(block) {
-            if !found.contains(&number) {
-                found.push(number);
-            }
+        if let Some(number) = account_of(block)
+            && !found.contains(&number)
+        {
+            found.push(number);
         }
     }
     found

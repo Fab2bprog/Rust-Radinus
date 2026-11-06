@@ -865,10 +865,11 @@ impl<'a> Plan<'a> {
 
     fn value(&self, source: Source, line: &Line) -> Option<String> {
         let value = source.value(line, self.language)?;
-        if source == Source::SubCategory && self.ambiguous.contains(&same_name_key(&value)) {
-            if let Some(category) = &line.category {
-                return Some(format!("{category} : {value}"));
-            }
+        if source == Source::SubCategory
+            && self.ambiguous.contains(&same_name_key(&value))
+            && let Some(category) = &line.category
+        {
+            return Some(format!("{category} : {value}"));
         }
         Some(value)
     }

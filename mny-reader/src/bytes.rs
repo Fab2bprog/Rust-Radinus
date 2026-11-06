@@ -42,9 +42,7 @@ pub(crate) fn f64_at(buf: &[u8], off: usize) -> Result<f64> {
 
 /// Décode de l'UTF-16LE ; un octet final orphelin est ignoré, les surrogates isolés deviennent U+FFFD.
 pub(crate) fn utf16le(bytes: &[u8]) -> String {
-    let units: Vec<u16> = bytes
-        .chunks_exact(2)
-        .map(|c| u16::from_le_bytes([c[0], c[1]]))
-        .collect();
+    let (pairs, _) = bytes.as_chunks::<2>();
+    let units: Vec<u16> = pairs.iter().map(|pair| u16::from_le_bytes(*pair)).collect();
     String::from_utf16_lossy(&units)
 }

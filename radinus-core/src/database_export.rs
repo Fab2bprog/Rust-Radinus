@@ -458,15 +458,15 @@ pub fn read(conn: &Connection, info: &Info) -> rusqlite::Result<Extract> {
             }
             // Une date qu'on ne sait pas lire part telle quelle, et se signale.
             for (index, column) in spec.columns.iter().enumerate() {
-                if column.kind == Kind::Date || column.kind == Kind::Money {
-                    if let Value::Text(raw) = &values[index] {
-                        anomalies.push(Anomaly {
-                            table: spec.name.to_string(),
-                            column: column.name.to_string(),
-                            key: plain(&values[0]),
-                            raw: raw.clone(),
-                        });
-                    }
+                if (column.kind == Kind::Date || column.kind == Kind::Money)
+                    && let Value::Text(raw) = &values[index]
+                {
+                    anomalies.push(Anomaly {
+                        table: spec.name.to_string(),
+                        column: column.name.to_string(),
+                        key: plain(&values[0]),
+                        raw: raw.clone(),
+                    });
                 }
             }
             read_rows.push(values);

@@ -350,12 +350,12 @@ pub fn printers() -> Vec<Printer> {
             let trimmed = line.trim();
             // « Description: » en anglais, « Description : » en français : le
             // mot est le même, seule la ponctuation bouge.
-            if let (Some(index), Some((head, rest))) = (current, trimmed.split_once(':')) {
-                if head.trim().eq_ignore_ascii_case("description") {
-                    let description = rest.trim();
-                    if !description.is_empty() {
-                        found[index].label = description.to_string();
-                    }
+            if let (Some(index), Some((head, rest))) = (current, trimmed.split_once(':'))
+                && head.trim().eq_ignore_ascii_case("description")
+            {
+                let description = rest.trim();
+                if !description.is_empty() {
+                    found[index].label = description.to_string();
                 }
             }
         }

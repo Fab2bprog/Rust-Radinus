@@ -623,17 +623,15 @@ pub fn plan_deletion(
     // record that no longer exists, and saving it would fail for a reason the
     // user never asked for. The fiche is closed first — and the refusal names
     // the element, so it is clear which one is in the way.
-    if let Some(open) = state.form_record(kind) {
-        if ids.contains(&open) {
-            if let Some(label) =
-                nomenclatures::label_of(&conn, kind, open).map_err(to_ipc_error)?
-            {
-                plan.refused = true;
-                plan.refusal =
-                    radinus_core::i18n::nomenclature_delete_form_open(ui_language(), &label);
-                return Ok(plan);
-            }
-        }
+    if let Some(open) = state.form_record(kind)
+        && ids.contains(&open)
+        && let Some(label) =
+            nomenclatures::label_of(&conn, kind, open).map_err(to_ipc_error)?
+    {
+        plan.refused = true;
+        plan.refusal =
+            radinus_core::i18n::nomenclature_delete_form_open(ui_language(), &label);
+        return Ok(plan);
     }
 
     let mut labels = Vec::new();
@@ -11674,11 +11672,11 @@ pub fn create_database(
     // rien — elle l'est déjà — mais elle garde alors la devise par défaut, et
     // la fenêtre le dit.
     let chosen = radinus_core::preferences::Currency::from_parts(&currency, &custom);
-    if matches!(chosen, radinus_core::preferences::Currency::Custom(_)) {
-        if let Some(refusal) = radinus_core::preferences::sign_refusal(&custom, language) {
-            drop(connection);
-            return Err(refusal);
-        }
+    if matches!(chosen, radinus_core::preferences::Currency::Custom(_))
+        && let Some(refusal) = radinus_core::preferences::sign_refusal(&custom, language)
+    {
+        drop(connection);
+        return Err(refusal);
     }
     // **La base peut naître pleine** (Fabrice, 04/08/2026). L'archive est
     // remontée dans la base qui vient d'être créée, avant qu'elle ne soit
@@ -12518,10 +12516,10 @@ pub fn save_preferences_currency<R: Runtime>(
     // empêche d'écrire dans la base un signe qui casserait les saisies : un
     // signe qui ressemble à un morceau de nombre est ôté par `money::parse`,
     // et « 120 » deviendrait « 12 » sans un mot.
-    if matches!(chosen, radinus_core::preferences::Currency::Custom(_)) {
-        if let Some(refusal) = radinus_core::preferences::sign_refusal(&custom, ui_language()) {
-            return Err(refusal);
-        }
+    if matches!(chosen, radinus_core::preferences::Currency::Custom(_))
+        && let Some(refusal) = radinus_core::preferences::sign_refusal(&custom, ui_language())
+    {
+        return Err(refusal);
     }
     radinus_core::preferences::set_currency(&conn, &chosen).map_err(to_ipc_error)?;
     let language = ui_language();
@@ -14240,10 +14238,10 @@ pub fn mny_import<R: Runtime>(
             operations_changed(&app);
             let mut kinds: Vec<Nomenclature> = Vec::new();
             for created in &outcome.created {
-                if let Some(kind) = created.destination.nomenclature() {
-                    if !kinds.contains(&kind) {
-                        kinds.push(kind);
-                    }
+                if let Some(kind) = created.destination.nomenclature()
+                    && !kinds.contains(&kind)
+                {
+                    kinds.push(kind);
                 }
             }
             for kind in kinds {

@@ -507,10 +507,10 @@ impl Logbook {
     /// **Ajoute une ligne, ou remplace celle qui porte la même clef.** Rend
     /// sa clef. Une pièce nouvelle rejoint la liste de la voiture.
     pub fn put(&mut self, id: Option<u32>, mut entry: Entry) -> u32 {
-        if let Some(Piece::Custom(name)) = &entry.part {
-            if !self.car.parts.contains(name) {
-                self.car.parts.push(name.clone());
-            }
+        if let Some(Piece::Custom(name)) = &entry.part
+            && !self.car.parts.contains(name)
+        {
+            self.car.parts.push(name.clone());
         }
         let id = match id.filter(|id| self.entry(*id).is_some()) {
             Some(id) => {
@@ -645,10 +645,10 @@ pub fn read_car(fields: &CarFields, today: NaiveDate) -> Result<Car, Refusal> {
     };
     let registered = optional_day(&fields.registered, "registered")?;
     let acquired = optional_day(&fields.acquired, "acquired")?;
-    if let (Some(registered), Some(acquired)) = (registered, acquired) {
-        if acquired < registered {
-            return refused("acquired", "car-invalid-acquired");
-        }
+    if let (Some(registered), Some(acquired)) = (registered, acquired)
+        && acquired < registered
+    {
+        return refused("acquired", "car-invalid-acquired");
     }
     let acquired_km = kilometres(&fields.acquired_km, "acquired-km")?;
     let service_months = if fields.service_months.trim().is_empty() {
@@ -905,18 +905,18 @@ fn alternating(entries: &[&Entry], energy: Energy) -> (Option<f64>, Option<f64>)
         if before.energy != Some(energy) {
             continue;
         }
-        if let (Some(a), Some(b), Some(q)) = (before.km, after.km, after.quantity) {
-            if b > a {
-                span += f64::from(b - a);
-                quantity += q;
-                // Ce qu'a coûté le carburant brûlé : la quantité au prix du
-                // plein d'avant.
-                let price = match before.quantity {
-                    Some(bought) if bought > 0.0 => before.amount as f64 / bought,
-                    _ => 0.0,
-                };
-                amount += (q * price).round() as i64;
-            }
+        if let (Some(a), Some(b), Some(q)) = (before.km, after.km, after.quantity)
+            && b > a
+        {
+            span += f64::from(b - a);
+            quantity += q;
+            // Ce qu'a coûté le carburant brûlé : la quantité au prix du
+            // plein d'avant.
+            let price = match before.quantity {
+                Some(bought) if bought > 0.0 => before.amount as f64 / bought,
+                _ => 0.0,
+            };
+            amount += (q * price).round() as i64;
         }
     }
     if span <= 0.0 {
@@ -972,10 +972,10 @@ fn life_of(name: String, changes: &[&Entry], first_hand: bool) -> Option<Life> {
     let last = changes.last()?;
     let counted: Vec<u32> = changes.iter().filter_map(|entry| entry.km).collect();
     let mut lives: Vec<u32> = counted.windows(2).filter(|pair| pair[1] > pair[0]).map(|pair| pair[1] - pair[0]).collect();
-    if first_hand {
-        if let Some(first) = counted.first().filter(|km| **km > 0) {
-            lives.insert(0, *first);
-        }
+    if first_hand
+        && let Some(first) = counted.first().filter(|km| **km > 0)
+    {
+        lives.insert(0, *first);
     }
     let life = (!lives.is_empty()).then(|| (lives.iter().map(|km| u64::from(*km)).sum::<u64>() / lives.len() as u64) as u32);
     Some(Life {

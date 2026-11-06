@@ -415,10 +415,10 @@ fn write_ods(sheets: &[Sheet], path: &Path) -> std::io::Result<()> {
         if bold {
             style.set_font_bold();
         }
-        if let Some(colour) = fill {
-            if let Some(rgb) = as_rgb(colour) {
-                style.set_background_color(Rgb::new(rgb.0, rgb.1, rgb.2));
-            }
+        if let Some(colour) = fill
+            && let Some(rgb) = as_rgb(colour)
+        {
+            style.set_background_color(Rgb::new(rgb.0, rgb.1, rgb.2));
         }
         let made = book.add_cellstyle(style);
         styles.insert(key, made.clone());

@@ -398,17 +398,16 @@ fn is_enabled<R: Runtime>(app: &AppHandle<R>, id: &str) -> bool {
 /// que « trouvée et grisée », et c'est pourquoi ce n'est pas un `bool`.
 fn enabled_among<R: Runtime>(items: &[tauri::menu::MenuItemKind<R>], id: &str) -> Option<bool> {
     for kind in items {
-        if let Some(item) = kind.as_menuitem() {
-            if item.id() == id {
-                return Some(item.is_enabled().unwrap_or(false));
-            }
+        if let Some(item) = kind.as_menuitem()
+            && item.id() == id
+        {
+            return Some(item.is_enabled().unwrap_or(false));
         }
-        if let Some(submenu) = kind.as_submenu() {
-            if let Ok(children) = submenu.items() {
-                if let Some(found) = enabled_among(&children, id) {
-                    return Some(found);
-                }
-            }
+        if let Some(submenu) = kind.as_submenu()
+            && let Ok(children) = submenu.items()
+            && let Some(found) = enabled_among(&children, id)
+        {
+            return Some(found);
         }
     }
     None
@@ -639,14 +638,14 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     // annoncée. Une base illisible répond « aucun compte » : la barre montre
     // alors la sortie plutôt que de tout allumer sur une base muette.
     let mut has_accounts = false;
-    if opened {
-        if let Some(state) = state.as_ref() {
-            if let Ok(conn) = state.database() {
-                has_accounts = radinus_core::accounts::any(&conn).unwrap_or(false);
-            }
-            // Le verrou repart ici, avant qu'une seule entrée ne soit bâtie.
-        }
+    if opened
+        && let Some(state) = state.as_ref()
+        && let Ok(conn) = state.database()
+    {
+        has_accounts = radinus_core::accounts::any(&conn).unwrap_or(false);
     }
+    // Le verrou repart ici, à la fin du `if`, avant qu'une seule entrée ne
+    // soit bâtie.
 
     // Tout ce qui demande un compte : la base est ouverte **et** elle en porte
     // au moins un.
@@ -1442,10 +1441,10 @@ pub fn on_event<R: Runtime>(app: &AppHandle<R>, event: tauri::menu::MenuEvent) {
                 let _ = window.hide();
             }
         }
-        if let Some(state) = app.try_state::<crate::state::AppState>() {
-            if let Err(error) = state.detach() {
-                eprintln!("[radinus] Could not detach the database: {error}");
-            }
+        if let Some(state) = app.try_state::<crate::state::AppState>()
+            && let Err(error) = state.detach()
+        {
+            eprintln!("[radinus] Could not detach the database: {error}");
         }
         let selector = crate::windows::database_selector_window(language);
         if let Err(error) = crate::windows::open(app, &selector, None) {

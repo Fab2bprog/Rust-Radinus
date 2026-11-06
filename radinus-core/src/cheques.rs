@@ -140,15 +140,14 @@ pub fn formatted_number(number: i64) -> String {
 pub fn statuses(conn: &Connection) -> Result<Vec<NamedItem>> {
     let mut statement =
         conn.prepare("SELECT IDStatutCheque, Libelle FROM StatutCheque ORDER BY IDStatutCheque")?;
-    let items = statement
+    statement
         .query_map([], |row| {
             Ok(NamedItem {
                 id: row.get(0)?,
                 label: row.get(1)?,
             })
         })?
-        .collect();
-    items
+        .collect()
 }
 
 /// Les chèques d'un carnet, dans l'ordre de leur numéro.
@@ -162,7 +161,7 @@ pub fn list_for_chequebook(conn: &Connection, chequebook_id: i64) -> Result<Vec<
          WHERE q.IDChequier = ?1
          ORDER BY q.NumChq",
     )?;
-    let rows = statement
+    statement
         .query_map([chequebook_id], |row| {
             Ok(ChequeRow {
                 id: row.get(0)?,
@@ -179,8 +178,7 @@ pub fn list_for_chequebook(conn: &Connection, chequebook_id: i64) -> Result<Vec<
                 operations: row.get(9)?,
             })
         })?
-        .collect();
-    rows
+        .collect()
 }
 
 /// Lit un chèque, ou `None` s'il n'existe plus.
@@ -306,8 +304,7 @@ pub fn linked(conn: &Connection, cheque_id: i64) -> Result<Vec<LinkableOperation
     let mut statement = conn.prepare(&format!(
         "{OPERATION_SELECT} AND o.IDCheque = ?1 ORDER BY o.Date, o.IDOperation"
     ))?;
-    let rows = statement.query_map([cheque_id], read_operation)?.collect();
-    rows
+    statement.query_map([cheque_id], read_operation)?.collect()
 }
 
 /// Les opérations que l'on peut associer — le `gChequeAsso = 0` de son
@@ -332,8 +329,7 @@ pub fn candidates(conn: &Connection, account_id: i64) -> Result<Vec<LinkableOper
     let mut statement = conn.prepare(&format!(
         "{OPERATION_SELECT} AND o.IDCompte = ?1 ORDER BY o.Date, o.IDOperation"
     ))?;
-    let rows = statement.query_map([account_id], read_operation)?.collect();
-    rows
+    statement.query_map([account_id], read_operation)?.collect()
 }
 
 /// Accroche une opération à un chèque. **Écrase sans rien dire** le chèque

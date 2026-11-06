@@ -232,10 +232,10 @@ fn sections(text: &str) -> Vec<Section> {
     let mut record = Record::default();
 
     fn close(current: &mut Option<Section>, found: &mut Vec<Section>) {
-        if let Some(section) = current.take() {
-            if !section.records.is_empty() {
-                found.push(section);
-            }
+        if let Some(section) = current.take()
+            && !section.records.is_empty()
+        {
+            found.push(section);
         }
     }
 

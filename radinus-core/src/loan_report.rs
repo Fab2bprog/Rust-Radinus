@@ -664,13 +664,13 @@ fn write_analysis(simulation: &Simulation, analysis: &Analysis, language: Langua
             ));
         }
     }
-    if let Some(day) = judgement.first_below {
-        if let Some(rank) = judgement.projection.iter().position(|(other, _)| *other == day) {
-            marks.push((
-                rank + 1,
-                label(if judgement.floor > 0 { "loan-mark-floor" } else { "loan-mark-negative" }),
-            ));
-        }
+    if let Some(day) = judgement.first_below
+        && let Some(rank) = judgement.projection.iter().position(|(other, _)| *other == day)
+    {
+        marks.push((
+            rank + 1,
+            label(if judgement.floor > 0 { "loan-mark-floor" } else { "loan-mark-negative" }),
+        ));
     }
     marks.sort_by_key(|(rank, _)| *rank);
     marks.truncate(3);

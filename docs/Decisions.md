@@ -3488,6 +3488,29 @@ specification of the `.mny` format, and the `mny-reader` library).
    was imported and what was created, with one « OK » button, then the window
    closes. It used to start again at step 1, which was confusing.
 
+## P-82 — The 2024 edition of Rust (06/11/2026)
+
+Asked by Fabrice (« Passons en 2024 »), the day his Mac and the assistant's
+workspace both moved to Rust 1.99.
+
+1. **The three crates move from the 2021 edition to the 2024 one**
+   (`edition` and `resolver = "3"` in the workspace `Cargo.toml`). The
+   edition is the set of language rules, not the compiler: 2024 has been
+   stable since Rust 1.85, and 2021 would have kept working.
+2. **`cargo fix --edition` changed nothing.** The code uses none of what the
+   edition makes `unsafe` (`set_var`, `no_mangle`, `extern` blocks). It
+   flagged eleven tail expressions whose temporaries are now dropped earlier
+   — a `Result` or an `Option` before a local such as a database lock —
+   which only releases things sooner; none holds a lock itself.
+3. **Clippy 1.99 then asked for the 2024 forms**, and they were taken:
+   nested `if let` collapsed into `if let … && …` chains (the conditions and
+   their order are unchanged, so is what they guard), and the `let x = …; x`
+   that 2021 needed to return a query's rows written as the expression
+   itself — in 2021 the temporaries of a tail expression outlived the
+   statement they borrow from; in 2024 they do not.
+4. The minimum Rust becomes **1.88** (`docs/Prerequisites.md`): let chains
+   and `as_chunks` are stable since then.
+
 ## How to add to this file
 
 One entry per ruling: an id, a date, what was decided in one sentence, and

@@ -400,14 +400,12 @@ pub fn beside_the_application(exe_path: &Path) -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("."));
 
     // macOS bundle: .../Radinus.app/Contents/MacOS/radinus
-    if dir.file_name().and_then(|n| n.to_str()) == Some("MacOS") {
-        if let Some(contents_dir) = dir.parent() {
-            if contents_dir.file_name().and_then(|n| n.to_str()) == Some("Contents") {
-                if let Some(app_parent) = contents_dir.parent().and_then(Path::parent) {
-                    dir = app_parent.to_path_buf();
-                }
-            }
-        }
+    if dir.file_name().and_then(|n| n.to_str()) == Some("MacOS")
+        && let Some(contents_dir) = dir.parent()
+        && contents_dir.file_name().and_then(|n| n.to_str()) == Some("Contents")
+        && let Some(app_parent) = contents_dir.parent().and_then(Path::parent)
+    {
+        dir = app_parent.to_path_buf();
     }
 
     dir
@@ -534,12 +532,11 @@ pub fn create_next_database_slot(root: &Path) -> io::Result<PathBuf> {
         if !entry.file_type()?.is_dir() {
             continue;
         }
-        if let Some(name) = entry.file_name().to_str() {
-            if let Some(digits) = name.strip_prefix("Radinus_") {
-                if let Ok(n) = digits.parse::<u32>() {
-                    max_n = max_n.max(n);
-                }
-            }
+        if let Some(name) = entry.file_name().to_str()
+            && let Some(digits) = name.strip_prefix("Radinus_")
+            && let Ok(n) = digits.parse::<u32>()
+        {
+            max_n = max_n.max(n);
         }
     }
 

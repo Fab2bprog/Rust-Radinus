@@ -258,10 +258,10 @@ pub fn parse(text: &str) -> Result<i64, NotAnAmount> {
         micros += (c as i64 - '0' as i64) * scale;
         scale /= 10;
     }
-    if let Some(next) = rest.next() {
-        if next >= '5' {
-            micros += 1;
-        }
+    if let Some(next) = rest.next()
+        && next >= '5'
+    {
+        micros += 1;
     }
 
     let total = units

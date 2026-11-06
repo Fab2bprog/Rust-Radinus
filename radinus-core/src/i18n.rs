@@ -892,10 +892,10 @@ mod tests {
         fn keys(source: &str) -> std::collections::BTreeSet<String> {
             let mut found = std::collections::BTreeSet::new();
             for line in source.lines() {
-                if line.starts_with(|c: char| c.is_ascii_alphabetic()) {
-                    if let Some((key, _)) = line.split_once('=') {
-                        found.insert(key.trim().to_string());
-                    }
+                if line.starts_with(|c: char| c.is_ascii_alphabetic())
+                    && let Some((key, _)) = line.split_once('=')
+                {
+                    found.insert(key.trim().to_string());
                 }
             }
             found
