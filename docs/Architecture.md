@@ -48,7 +48,7 @@ second face — a command line, a web server — without rewriting its heart.
 
 ```
 Radinus-2/
-├── Cargo.toml               workspace: radinus-core + src-tauri
+├── Cargo.toml               workspace: radinus-core + src-tauri + mny-reader
 ├── package.json             frontend deps, npm scripts
 ├── vite.config.ts           one entry per window page
 ├── tsconfig.json
@@ -59,6 +59,8 @@ Radinus-2/
 │   ├── i18n/                fr.ftl, en.ftl, es.ftl — every sentence
 │   ├── src/                 38 modules, no framework
 │   └── tests/               integration tests (5 files)
+│
+├── mny-reader/              reads a Microsoft Money file (.mny), nothing else
 │
 ├── src-tauri/               ── THE CONTROLLER ──
 │   ├── Cargo.toml
@@ -82,6 +84,8 @@ Radinus-2/
 Three folders never enter the repository, and `.gitignore` keeps them out:
 `target/`, `node_modules/`, `dist/`, and — this one matters —
 `radinus-core/tests/fixtures/`, which holds the author's real financial data.
+No Microsoft Money file (`*.mny`) enters either: the tests of `mny-reader`
+read Fabrice's examples where they are, outside the repository.
 
 ---
 

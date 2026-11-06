@@ -37,6 +37,7 @@ export default defineConfig(async () => ({
         "balance-curves": "ui/windows/balance-curves.html",
         "balance-analysis": "ui/windows/balance-analysis.html",
         "loan-simulation": "ui/windows/loan-simulation.html",
+        "mny-import": "ui/windows/mny-import.html",
         "appliance-cost": "ui/windows/appliance-cost.html",
         "safety-cushion": "ui/windows/safety-cushion.html",
         "savings-goal": "ui/windows/savings-goal.html",

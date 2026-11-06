@@ -1,0 +1,19 @@
+[package]
+name = "mny-reader"
+version = "0.1.0"
+edition.workspace = true
+authors.workspace = true
+# La licence de la bibliothèque telle qu'elle est arrivée (Analyse/mnyimport,
+# 05/11/2026) ; compatible avec la GPL de Radinus.
+license = "MIT OR Apache-2.0"
+description = "Lecture des fichiers Microsoft Money (.mny) : déchiffrement MSISAM et lecture des tables Jet 4."
+
+[dependencies]
+# Le déchiffrement des pages 1 à 14 : la clé d'un fichier Money Plus est
+# dérivée en MD5 ou en SHA-1 (docs/01). `sha1` est déjà compilée dans Radinus
+# en 0.11 ; `md-5` vient de la même famille (RustCrypto), même version.
+# Autorisées par Fabrice le 05/11/2026.
+md-5 = "0.11"
+sha1 = "0.11"
+chrono = { version = "0.4", default-features = false, features = ["std"] }
+thiserror = "1"

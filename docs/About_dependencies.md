@@ -117,6 +117,35 @@ Linux »).
 
 ---
 
+## The Money reader — `mny-reader`
+
+A small library of its own in the workspace (05/11/2026): it reads a
+Microsoft Money file (`.mny`), from Money 2001 to Money Plus, for
+« Importation de fichier Money (MNY) ». A `.mny` is an Access (Jet 4)
+database whose first pages are RC4-encrypted; the library decrypts them and
+reads the tables, with no Microsoft software and no `unsafe`. It arrived
+written in Fabrice's `Analyse/mnyimport` folder, licence MIT or Apache-2.0.
+
+### `md-5` and `sha1`
+
+The key that decrypts a Money Plus file is derived from its header, and from
+the password if it has one, with MD5 or SHA-1 depending on the version. Both
+come from the RustCrypto project, pure Rust. `sha1` was already built into
+Radinus (0.11) and the library was aligned on that version rather than bring a
+second one; `md-5` is the only new crate, same family, same version. Neither
+protects anything of Radinus: they only reproduce what Money did when it
+wrote the file. Authorized by Fabrice on 05/11/2026 (« tu télécharges les
+dépendances dont tu as besoin »).
+
+### `chrono` and `thiserror`
+
+Money stores its dates as Access does (days since 30/12/1899), turned into
+calendar dates by `chrono`, already in the core. `thiserror` names the
+library's errors (wrong password, not a Money file, missing table); it was
+already built into Radinus, same version.
+
+---
+
 ## The controller — `src-tauri`
 
 The bridge between the windows and the core, deliberately thin: no business

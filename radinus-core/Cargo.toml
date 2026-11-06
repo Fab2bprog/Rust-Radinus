@@ -54,5 +54,9 @@ typst-pdf = "0.15"
 # Typst, si bien qu'il n'ajoute rien au logiciel livré. Les mêmes sous Windows,
 # macOS et Linux. Autorisé par Fabrice le 28/10/2026.
 roxmltree = "0.21"
+# La lecture des fichiers Microsoft Money de « Importation de fichier Money
+# (MNY) » : la bibliothèque du dossier `mny-reader`, dans le même dépôt.
+# Elle n'apporte que `md-5`, autorisée par Fabrice le 05/11/2026.
+mny-reader = { path = "../mny-reader" }
 
 [dev-dependencies]

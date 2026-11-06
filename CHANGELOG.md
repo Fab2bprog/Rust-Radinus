@@ -11,6 +11,24 @@ Two version numbers live in this project and they do not move together:
   the line Radinus 1.x walked from 0 to 9 and is at 11 today. A database is
   migrated forward when it is opened, never backward.
 
+## [3.3.0] — 05/11/2026
+
+### Added
+
+- **« Importation de fichier Money (MNY) »** (Fabrice, 05/11/2026, P-81), in
+  the Fichier menu under the JSON / XML import: Radinus reads a Microsoft
+  Money file itself, from Money 2001 to Money Plus, password included —
+  neither Money nor Windows is needed any more to leave Money. On one
+  account, a four-step assistant: the file and its Money account with a
+  preview; a table facing each piece of Money data, with an example from
+  the file, and where Radinus puts it, every menu set on a proposal, then
+  four questions (label, statuses, scheduled bills); which Radinus element
+  receives each Money value, the one of the same name or « À créer »; the
+  summary, then the floppy disk, a closing message, and the assistant
+  closes. The Money payee gives the label; payees are created only if asked
+  (none, the frequent ones, or all). Splits become sub-operations; the Money
+  opening balance can be taken as the opening cleared balance.
+
 ## [3.2.1] — 30/10/2026
 
 ### Added

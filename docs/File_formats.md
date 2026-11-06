@@ -278,6 +278,41 @@ setting.
 
 ---
 
+## 3 ter. Microsoft Money files (`.mny`) — read, never written
+
+`mny-reader/` (the format) · `radinus-core/src/mny_import.rs` (the meaning)
+· P-81, 05/11/2026
+
+A `.mny` is a Microsoft Jet 4 (Access) database whose pages 1 to 14 are RC4
+encrypted, the key derived from the header and, for a protected file, from
+the password. `mny-reader` decrypts and reads the tables; its reference is
+Fabrice's specification (`Analyse/mnyimport/docs`). Every column is found
+**by its name** — the schema changes with Money's version and language — and
+a missing table or column reads as empty.
+
+What is taken:
+
+| Money | Table | What Radinus does with it |
+|---|---|---|
+| Accounts | `ACCT` | offered in the assistant, except investment accounts (`at = 5`); `amtOpen` is the opening balance |
+| Transactions | `TRN` | date `dt`, amount `amt` (ten-thousandths, ×100 into micro-units), payee `lHpay`, category `hcat`, payment method `payt`, classifications `lHcls1`/`lHcls2`, reference `szId`, memo `mMemo`, clearing `cs` and `dtCleared` |
+| Categories | `CAT` | a tree under a root (« DÉPENSES »), never data itself: level 1 is the category, level 2 the subcategory; classifications live in `CAT` too |
+| Payees | `PAY` | by name; a payee gives the operation's **label**, and a Radinus payee only if asked — none (the proposal), those of at least 3 lines, or all (P-81) |
+| Splits | `TRN_SPLIT` | the lines are transactions of `TRN` naming their mother; they become sub-operations |
+| Transfers | `TRN.hacctLink` | imported as an ordinary operation of the account, labelled « Virement vers / de … » when it has no payee |
+
+Set aside, and counted: lines carrying a security (`hsec`), scheduled bills
+(`frq ≠ -1`) unless asked for as « Prévu », lines without a readable date.
+Money writes « none » as NULL, `-1` or `0` in a handle, and the year 10000 in
+a date: all read as nothing.
+
+Uncertain until a richer file shows them: `cs` (0 not cleared; 1 and 2
+cleared and reconciled — both go into the same menu, so nothing hangs on it)
+and the meaning of the `payt` codes, which are named « Mode de paiement Money
+n° N » until then. Money's own budget, investments and settings are not read.
+
+---
+
 ## 4. Excel import — three steps, for a migration
 
 `radinus-core/src/csv_excel_import.rs` · windows F34, F35

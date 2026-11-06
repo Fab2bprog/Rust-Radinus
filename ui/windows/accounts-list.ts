@@ -316,6 +316,12 @@ async function chooseAccount(): Promise<void> {
       await invoke("open_structured_import", { accountId: table.selected()[0] });
       return;
     }
+    // « Importation de fichier Money (MNY) » (05/11/2026) : on importe dans
+    // un compte, comme les autres.
+    if (target === "mny-import") {
+      await invoke("open_mny_import", { accountId: table.selected()[0] });
+      return;
+    }
     // F32 — le RIB porte sur un compte, et un seul : on le choisit ici avant
     // que la fenêtre d'impression ne s'ouvre (Fabrice, 01/08/2026).
     if (target === "bank-details") {

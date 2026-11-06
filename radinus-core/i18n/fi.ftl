@@ -1367,6 +1367,142 @@ structured-format-comma-thousands = { $example } (pilkku tuhaterottimena, desima
 structured-format-cents = { $example } (sentteinä)
 structured-format-thousandths = { $example } (tuhannesosina)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Siirto tilille { $account }
+mny-transfer-from = Siirto tililtä { $account }
+mny-payment-mode = Money-maksutapa nro { $code }
+mny-no-label = Money-tapahtuma
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Tuo Money-tiedosto (MNY)
+window-mny-import-title-1 = Money-tuonnin ohjattu toiminto: { $account } (Vaihe 1/4)
+window-mny-import-title-2 = Money-tuonnin ohjattu toiminto: { $account } (Vaihe 2/4)
+window-mny-import-title-3 = Money-tuonnin ohjattu toiminto: { $account } (Vaihe 3/4)
+window-mny-import-title-4 = Money-tuonnin ohjattu toiminto: { $account } (Vaihe 4/4)
+mny-field-file = Money-tiedosto:
+mny-pick = Valitse tiedosto…
+mny-field-password = Salasana:
+mny-unlock = Avaa
+mny-field-account = Money-tili:
+mny-field-label = Minkä selitteen tapahtumat saavat?
+mny-field-cleared = Mitä Moneyssa kuitatuille tapahtumille tehdään?
+mny-field-not-cleared = Mitä kuittaamattomille tapahtumille tehdään?
+mny-field-scheduled = Mitä tulevilla ajoitetuilla maksuilla tehdään?
+mny-recap-title = Mitä tuonti tekee
+mny-close = Sulje ohjattu toiminto
+mny-close-question = Suljetaanko ohjattu toiminto? Luettu tiedosto ja valintasi menetetään; mitään ei ole tuotu.
+mny-help-1 = Valitse Money-tiedosto ja sitten tuotava tili: esikatselu näyttää sen tapahtumat.
+mny-help-2 = Tarkista, minne Radinus sijoittaa kunkin Money-tiedon, ja vastaa kysymyksiin: esikatselu seuraa jokaista muutosta.
+mny-help-3 = Valitse kullekin Money-arvolle Radinuksen kohde, joka ottaa sen vastaan, tai jätä ”Luodaan”.
+mny-help-4 = Tarkista, mitä tuonti tekee, ja tallenna sitten levykkeellä.
+mny-need-account = Valitse ensin Money-tiedosto ja yksi sen tileistä.
+mny-empty-no-file = Money-tiedostoa ei ole valittu.
+mny-empty = Tällä Money-tilillä ei ole tuotavia tapahtumia.
+mny-values-empty = Ei vastaavuuksia valittavana.
+mny-column-others = Muut
+mny-column-destination = Radinus-kenttä
+mny-column-value = Money-arvo
+mny-column-uses = Rivejä
+mny-column-choice = Radinuksessa
+mny-choice-create = Luodaan
+mny-choice-unspecified = Ei määritetty
+mny-source-category = Luokka
+mny-source-sub-category = Alaluokka
+mny-source-payee = Saaja
+mny-source-payment-mode = Maksutapa
+mny-source-classification-1 = Luokitus 1
+mny-source-classification-2 = Luokitus 2
+mny-source-reference = Shekin nro / viite
+mny-source-memo = Muistiinpano
+mny-destination-ignore = Älä tuo
+mny-destination-budget-line = Budjettierä
+mny-destination-category = Luokka
+mny-destination-payee = Vastapuoli
+mny-destination-payment-mode = Maksutapa
+mny-destination-assignment = Kohdistus
+mny-destination-project = Projekti
+mny-destination-reference = Maksuviite
+mny-destination-comment = Kommentti
+mny-label-payee = Saaja
+mny-label-memo = Muistiinpano
+mny-label-payee-and-memo = Saaja ja sen perään muistiinpano
+mny-status-pointed = Kuitattu
+mny-status-committed = Sidottu
+mny-status-planned = Suunniteltu
+mny-scheduled-skip = Älä tuo
+mny-scheduled-planned = Tuo tilaan ”Suunniteltu”
+mny-payees-none = Ei, ei vastapuolia
+mny-payees-frequent = Vain usein toistuvat saajat (vähintään 3 tapahtumaa)
+mny-payees-all = Kyllä, vastapuoli jokaiselle saajalle
+mny-payee-hint = Se toimii myös tapahtuman selitteenä (katso alla).
+mny-routes-intro = Vasemmalla se, mitä Money-tiedostosi sisältää, esimerkin kera. Oikealla se, minne Radinus sen sijoittaa. Valinnat on jo tehty puolestasi; muuta niitä vain, jos haluat.
+mny-column-money = Money-tiedostossasi
+mny-column-example = Esimerkki tiedostosta
+mny-settings-title = Miten tapahtumat tuodaan
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } rivi
+   *[other] { $count } riviä
+})
+mny-sample-absent = ei tässä tiedostossa
+mny-sample-payees = Eri saajia: { $count }, joista { $frequent } esiintyy vähintään { $min } kertaa
+mny-sample-operations = { $count ->
+    [one] { $count } tapahtuma
+   *[other] { $count } tapahtumaa
+}
+mny-account-detail = Alkusaldo: { $opening } — { $count ->
+    [one] { $count } tapahtuma
+   *[other] { $count } tapahtumaa
+}
+mny-problem-password = Tämä Money-tiedosto on suojattu salasanalla: kirjoita se ja paina ”Avaa”.
+mny-problem-wrong-password = Tämä salasana ei avaa Money-tiedostoa.
+mny-problem-not-money = Tämä tiedosto ei ole Microsoft Money -tiedosto.
+mny-problem-unreadable = Money-tiedostoa ei voi lukea: { $detail }
+mny-refusal-same = ”{ $first }” ja ”{ $second }” menevät molemmat kenttään ”{ $destination }”: Radinus-kenttä ottaa vastaan vain yhden tiedon.
+mny-refusal-not-offered = ”{ $source }” ei voi mennä kenttään ”{ $destination }”.
+mny-refusal-budget-line = Budjettierä tarvitsee luokan: Radinuksessa tapahtuma saa budjettieränsä luokastaan.
+mny-note-split = Jaettu ({ $count })
+mny-note-transfer = Siirto
+mny-preview-summary = { $count ->
+    [one] { $count } tuotava tapahtuma
+   *[other] { $count } tuotavaa tapahtumaa
+}, summa { $sum }
+mny-preview-limited = esikatselu näyttää ensimmäiset { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } ajoitettu maksu jätetty pois
+   *[other] { $count } ajoitettua maksua jätetty pois
+}
+mny-recap-operations = { $count ->
+    [one] { $count } tapahtuma tuodaan
+   *[other] { $count } tapahtumaa tuodaan
+}, yhteensä { $sum }{ $splits ->
+    [0] {""}
+   *[other] , joista { $splits } jaettuja
+}.
+mny-recap-balance = Tilin loppusaldo: { $before } ennen, { $after } jälkeen.
+mny-recap-created = { $destination }: { $count ->
+    [one] { $count } kohde luodaan
+   *[other] { $count } kohdetta luodaan
+}.
+mny-recap-overlap = Huomio: tällä tilillä on jo { $count ->
+    [one] { $count } tapahtuma
+   *[other] { $count } tapahtumaa
+} välillä { $from } – { $to }. Kaksoiskappaleet ovat mahdollisia.
+mny-recap-opening = Käytä Money-alkusaldoa ({ $amount }) tilin kuitattuna alkusaldona
+mny-save = Tallenna tuonti
+mny-save-question = Tuodaanko nämä tapahtumat tilille? ”Luodaan”-kohteet luodaan.
+mny-done = { $count ->
+    [one] { $count } tapahtuma tuotu
+   *[other] { $count } tapahtumaa tuotu
+} tilille ”{ $account }”, yhteensä { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] { $count } kohde luotu
+   *[other] { $count } kohdetta luotu
+}.
+journal-step-mny-begin = Money-tuonnin alku
+journal-step-mny-create = Kohteen luonti
+journal-step-mny-end = Money-tuonnin loppu
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Valitse tuotava Excel-tiedosto
 excel-pick = Valitse Excel-tiedosto
 excel-sheet = Työkirjan taulukko:

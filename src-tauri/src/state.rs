@@ -85,6 +85,10 @@ pub struct AppState {
     /// entrer autre chose que ce que le rendu test a montré, si le fichier a
     /// changé entre-temps.
     excel: Mutex<Option<ExcelImport>>,
+    /// **Le fichier Money en cours d'importation** (05/11/2026), lu une seule
+    /// fois, comme le classeur Excel : ce qui sera écrit est ce que l'aperçu a
+    /// montré, même si le fichier change sur le disque entre-temps.
+    mny: Mutex<Option<MnyImport>>,
     /// **Le calendrier proposé** (F16, phase 16) : les échéances que les règles
     /// choisies produiraient.
     ///
@@ -301,6 +305,7 @@ impl AppState {
             workbench: Mutex::new(None),
             import: Mutex::new(None),
             excel: Mutex::new(None),
+            mny: Mutex::new(None),
             calendar: Mutex::new(None),
             journal: Mutex::new(Vec::new()),
             data_root,
@@ -323,6 +328,7 @@ impl AppState {
             workbench: Mutex::new(None),
             import: Mutex::new(None),
             excel: Mutex::new(None),
+            mny: Mutex::new(None),
             calendar: Mutex::new(None),
             journal: Mutex::new(Vec::new()),
             data_root,
@@ -525,6 +531,29 @@ impl AppState {
         Ok(())
     }
 
+    /// **Remplace** l'import Money en cours : désigner un autre fichier jette
+    /// le précédent.
+    pub fn set_mny(&self, mny: MnyImport) -> Result<(), String> {
+        *self.mny.lock().map_err(to_ipc_error)? = Some(mny);
+        Ok(())
+    }
+
+    /// Fait quelque chose de l'import Money en cours, et refuse quand aucun
+    /// fichier n'est désigné.
+    pub fn with_mny<T>(&self, act: impl FnOnce(&mut MnyImport) -> T) -> Result<T, String> {
+        let mut guard = self.mny.lock().map_err(to_ipc_error)?;
+        let Some(mny) = guard.as_mut() else {
+            return Err("Aucun fichier Money n'est ouvert.".to_string());
+        };
+        Ok(act(mny))
+    }
+
+    /// Jette l'import Money. Fermer l'assistant ne laisse rien derrière.
+    pub fn drop_mny(&self) -> Result<(), String> {
+        *self.mny.lock().map_err(to_ipc_error)? = None;
+        Ok(())
+    }
+
     /// **Remplace** le calendrier proposé. Redemander une proposition jette la
     /// précédente : on n'empile pas deux calendriers.
     pub fn set_calendar(&self, proposed: Vec<Occurrence>) -> Result<(), String> {
@@ -630,6 +659,15 @@ impl ExcelImport {
     pub fn is_structured(&self) -> bool {
         self.structured.is_some()
     }
+}
+
+/// Le fichier Money en cours d'importation (05/11/2026).
+pub struct MnyImport {
+    /// Le compte Radinus dans lequel on importe, choisi avant l'assistant.
+    pub account_id: i64,
+    pub path: String,
+    /// Le fichier lu ; `None` tant qu'il attend son mot de passe.
+    pub book: Option<radinus_core::mny_import::Book>,
 }
 
 /// Hands out the open connection while keeping the lock held. Dereferences to

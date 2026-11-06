@@ -1396,6 +1396,142 @@ structured-format-comma-thousands = { $example } (virgulă pentru mii, punct zec
 structured-format-cents = { $example } (în cenți)
 structured-format-thousandths = { $example } (în miimi)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Transfer către { $account }
+mny-transfer-from = Transfer de la { $account }
+mny-payment-mode = Mod de plată Money nr. { $code }
+mny-no-label = Operațiune Money
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Importul unui fișier Money (MNY)
+window-mny-import-title-1 = Asistent de import Money: { $account } (Pasul 1/4)
+window-mny-import-title-2 = Asistent de import Money: { $account } (Pasul 2/4)
+window-mny-import-title-3 = Asistent de import Money: { $account } (Pasul 3/4)
+window-mny-import-title-4 = Asistent de import Money: { $account } (Pasul 4/4)
+mny-field-file = Fișier Money:
+mny-pick = Alegeți fișierul…
+mny-field-password = Parolă:
+mny-unlock = Deschide
+mny-field-account = Cont Money:
+mny-field-label = Ce descriere primesc operațiunile?
+mny-field-cleared = Ce devin operațiunile bifate în Money?
+mny-field-not-cleared = Ce devin operațiunile nebifate?
+mny-field-scheduled = Ce faceți cu scadențele viitoare?
+mny-recap-title = Ce va face importul
+mny-close = Închideți asistentul
+mny-close-question = Închideți asistentul? Fișierul citit și alegerile dumneavoastră se vor pierde; nu s-a importat nimic.
+mny-help-1 = Alegeți fișierul Money, apoi contul de importat: previzualizarea arată operațiunile lui.
+mny-help-2 = Verificați unde așază Radinus fiecare dată din Money și răspundeți la întrebări: previzualizarea urmează fiecare schimbare.
+mny-help-3 = Pentru fiecare valoare din Money, alegeți elementul Radinus care o va primi sau lăsați „De creat”.
+mny-help-4 = Verificați ce va face importul, apoi salvați cu discheta.
+mny-need-account = Alegeți mai întâi un fișier Money și unul dintre conturile lui.
+mny-empty-no-file = Nu este ales niciun fișier Money.
+mny-empty = Acest cont Money nu are nicio operațiune de importat.
+mny-values-empty = Nicio valoare de pus în corespondență.
+mny-column-others = Altele
+mny-column-destination = Câmp Radinus
+mny-column-value = Valoare Money
+mny-column-uses = Linii
+mny-column-choice = În Radinus
+mny-choice-create = De creat
+mny-choice-unspecified = Neprecizat
+mny-source-category = Categorie
+mny-source-sub-category = Subcategorie
+mny-source-payee = Beneficiar
+mny-source-payment-mode = Mod de plată
+mny-source-classification-1 = Clasificare 1
+mny-source-classification-2 = Clasificare 2
+mny-source-reference = Nr. cec / referință
+mny-source-memo = Notă
+mny-destination-ignore = Nu importați
+mny-destination-budget-line = Post bugetar
+mny-destination-category = Categorie
+mny-destination-payee = Terț
+mny-destination-payment-mode = Mod de plată
+mny-destination-assignment = Alocare
+mny-destination-project = Proiect
+mny-destination-reference = Referință de plată
+mny-destination-comment = Comentariu
+mny-label-payee = Beneficiarul
+mny-label-memo = Nota
+mny-label-payee-and-memo = Beneficiarul urmat de notă
+mny-status-pointed = Bifată
+mny-status-committed = Angajată
+mny-status-planned = Prevăzută
+mny-scheduled-skip = Nu importați
+mny-scheduled-planned = Importați ca „Prevăzută”
+mny-payees-none = Nu, niciun terț
+mny-payees-frequent = Doar beneficiarii care revin des (cel puțin 3 operațiuni)
+mny-payees-all = Da, un terț pentru fiecare beneficiar
+mny-payee-hint = Servește și ca descriere a operațiunii (vezi mai jos).
+mny-routes-intro = În stânga, ce conține fișierul dvs. Money, cu un exemplu. În dreapta, unde îl așază Radinus. Alegerile sunt deja făcute pentru dvs.; schimbați-le doar dacă doriți.
+mny-column-money = În fișierul dvs. Money
+mny-column-example = Exemplu din fișier
+mny-settings-title = Cum se importă operațiunile
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } linie
+   *[other] { $count } linii
+})
+mny-sample-absent = nimic în acest fișier
+mny-sample-payees = Beneficiari diferiți: { $count }, dintre care { $frequent } prezenți de cel puțin { $min } ori
+mny-sample-operations = { $count ->
+    [one] { $count } operațiune
+   *[other] { $count } operațiuni
+}
+mny-account-detail = Sold inițial: { $opening } — { $count ->
+    [one] { $count } operațiune
+   *[other] { $count } operațiuni
+}
+mny-problem-password = Acest fișier Money este protejat prin parolă: introduceți-o, apoi apăsați „Deschide”.
+mny-problem-wrong-password = Această parolă nu deschide fișierul Money.
+mny-problem-not-money = Acest fișier nu este un fișier Microsoft Money.
+mny-problem-unreadable = Fișierul Money nu poate fi citit: { $detail }
+mny-refusal-same = „{ $first }” și „{ $second }” merg amândouă în „{ $destination }”: un câmp Radinus primește o singură dată.
+mny-refusal-not-offered = „{ $source }” nu poate merge în „{ $destination }”.
+mny-refusal-budget-line = Un post bugetar are nevoie de o categorie: în Radinus, o operațiune își primește postul de la categoria sa.
+mny-note-split = Defalcată ({ $count })
+mny-note-transfer = Transfer
+mny-preview-summary = { $count ->
+    [one] { $count } operațiune de importat
+   *[other] { $count } operațiuni de importat
+}, sumă { $sum }
+mny-preview-limited = previzualizarea arată primele { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } scadență lăsată deoparte
+   *[other] { $count } scadențe lăsate deoparte
+}
+mny-recap-operations = { $count ->
+    [one] va fi importată { $count } operațiune
+   *[other] vor fi importate { $count } operațiuni
+}, în valoare de { $sum }{ $splits ->
+    [0] {""}
+   *[other] , dintre care { $splits } defalcate
+}.
+mny-recap-balance = Soldul final al contului: { $before } înainte, { $after } după.
+mny-recap-created = { $destination }: { $count ->
+    [one] va fi creat { $count } element
+   *[other] vor fi create { $count } elemente
+}.
+mny-recap-overlap = Atenție: acest cont are deja { $count ->
+    [one] { $count } operațiune
+   *[other] { $count } operațiuni
+} între { $from } și { $to }. Sunt posibile dubluri.
+mny-recap-opening = Preluați soldul inițial din Money ({ $amount }) ca sold inițial bifat al contului
+mny-save = Salvați importul
+mny-save-question = Importați aceste operațiuni în cont? Elementele „De creat” vor fi create.
+mny-done = { $count ->
+    [one] { $count } operațiune importată
+   *[other] { $count } operațiuni importate
+} în „{ $account }”, în valoare de { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] a fost creat { $count } element
+   *[other] au fost create { $count } elemente
+}.
+journal-step-mny-begin = Începutul importului Money
+journal-step-mny-create = Crearea unui element
+journal-step-mny-end = Sfârșitul importului Money
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Desemnarea fișierului Excel de importat
 excel-pick = Desemnare fișier Excel
 excel-sheet = Foaia din registru:

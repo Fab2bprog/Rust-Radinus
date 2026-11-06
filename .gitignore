@@ -73,3 +73,8 @@ npm-debug.log*
 # et un fichier .env est l'endroit où on finit par les écrire.
 .env
 .env.*
+
+# **Aucun fichier Microsoft Money dans le dépôt** (Fabrice, 05/11/2026). Les
+# tests de `mny-reader` lisent les exemples là où ils sont, hors du dépôt.
+*.mny
+*.MNY

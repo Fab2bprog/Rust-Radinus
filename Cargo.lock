@@ -2969,6 +2969,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "md-5"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "69b6441f590336821bb897fb28fc622898ccceb1d6cea3fde5ea86b090c4de98"
+dependencies = [
+ "cfg-if",
+ "digest 0.11.3",
+]
+
+[[package]]
 name = "memchr"
 version = "2.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3023,6 +3033,16 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "mny-reader"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "md-5",
+ "sha1",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -3902,7 +3922,7 @@ checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
 
 [[package]]
 name = "radinus"
-version = "3.2.1"
+version = "3.3.0"
 dependencies = [
  "radinus-core",
  "serde",
@@ -3916,11 +3936,12 @@ dependencies = [
 
 [[package]]
 name = "radinus-core"
-version = "3.2.1"
+version = "3.3.0"
 dependencies = [
  "chrono",
  "fluent",
  "fluent-bundle",
+ "mny-reader",
  "office-toolkit",
  "roxmltree 0.21.1",
  "rusqlite",

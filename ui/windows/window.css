@@ -1081,6 +1081,202 @@ textarea.form__field {
   color: var(--radinus-fg-555555);
 }
 
+/* « Importation de fichier Money (MNY) » (05/11/2026) : les réglages de
+   l'étape en haut, l'aperçu ou les correspondances au milieu, qui défilent,
+   la phrase du compte dessous. */
+.window--mny [hidden] {
+  display: none;
+}
+
+.window--mny .window__content {
+  gap: 6px;
+}
+
+.mny__form {
+  max-width: 760px;
+  padding: 10px;
+}
+
+.mny__line {
+  display: flex;
+  gap: 8px;
+}
+
+.mny__button {
+  flex: none;
+  font: inherit;
+  padding: 3px 12px;
+}
+
+.mny__detail {
+  margin: 0 10px 6px;
+}
+
+/* L'étape 2 : une phrase, puis le tableau des données à gauche et les
+   quatre questions à droite, dans leur cadre. */
+.mny__intro {
+  margin: 4px 8px 2px;
+  line-height: 1.5;
+}
+
+.mny__routes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  align-items: flex-start;
+  padding: 4px 8px;
+}
+
+/* Le tableau : quatre colonnes, « Dans votre fichier Money », « Exemple tiré
+   du fichier », la flèche, « Dans Radinus ». */
+.mny__table {
+  flex: 2 1 640px;
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(220px, 1.6fr) auto minmax(200px, 1.2fr);
+  border: 1px solid var(--radinus-line-9aa8b2);
+  background-color: var(--radinus-bg-ffffff);
+}
+
+.mny__cell {
+  padding: 4px 8px;
+  border-top: 1px solid var(--radinus-line-d8dee3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mny__cell--head {
+  border-top: none;
+  background-color: var(--radinus-table-header-bg);
+  color: var(--radinus-table-header-fg);
+  font-weight: 700;
+}
+
+.mny__cell--name {
+  font-weight: 700;
+}
+
+.mny__cell--arrow {
+  color: var(--radinus-fg-6a6a6a);
+  align-items: center;
+}
+
+.mny__cell select {
+  width: 100%;
+  font: inherit;
+}
+
+.mny__hint {
+  color: var(--radinus-fg-6a6a6a);
+  font-size: 0.92em;
+}
+
+/* Une donnée absente du fichier : grisée, son menu reste là. */
+.mny__cell--absent {
+  color: var(--radinus-fg-9a9a9a);
+}
+
+.mny__cell--absent.mny__cell--example {
+  font-style: italic;
+}
+
+/* Deux données dans la même rubrique : leurs deux lignes en rouge. */
+.mny__cell--conflict {
+  background-color: var(--radinus-bg-fdeceb);
+  color: var(--radinus-fg-c00000);
+}
+
+/* Les quatre questions, dans leur cadre. */
+.mny__settings {
+  flex: 1 1 340px;
+  max-width: 520px;
+  margin: 0;
+  padding: 6px 12px 10px;
+  border: 1px solid var(--radinus-line-9aa8b2);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mny__settings-title {
+  padding: 0 4px;
+  font-weight: 700;
+}
+
+.mny__question {
+  margin-top: 6px;
+}
+
+.mny__question--absent,
+.mny__question--absent + .mny__answer .mny__count {
+  color: var(--radinus-fg-9a9a9a);
+}
+
+.mny__answer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mny__answer .form__field {
+  flex: 1;
+}
+
+.mny__count {
+  flex: none;
+  color: var(--radinus-fg-6a6a6a);
+}
+
+.mny__summary {
+  margin: 0;
+  padding: 2px 4px;
+  font-weight: 700;
+}
+
+.mny__choice {
+  width: 100%;
+  font: inherit;
+}
+
+/* L'étape 4 : un titre, des phrases, et l'avertissement à part. */
+.mny__recap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mny__recap-title {
+  margin: 0;
+  padding: 3px 8px;
+  background-color: var(--radinus-bg-dcdcdc);
+  border: 1px solid var(--radinus-line-c0c0c0);
+  font-size: var(--radinus-font-size-base);
+  font-style: italic;
+  font-weight: 700;
+}
+
+.mny__recap-lines {
+  margin: 0;
+  padding-left: 22px;
+  line-height: 1.7;
+}
+
+.mny__opening {
+  padding: 4px 2px;
+}
+
+.mny__warning {
+  margin: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--radinus-line-d9a441);
+  background-color: var(--radinus-bg-fff6e0);
+}
+
 /* F08 gagne une barre de menus (« Outils »), donc une rangée de plus que les
    autres fiches : le menu tout en haut sur la largeur entière, les deux
    bandes ardoise et le contenu dessous, la ligne bleue en bas. */

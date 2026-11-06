@@ -3421,6 +3421,73 @@ cependant je me demande s'il serait possible de faire un dark mode ? », then
    colours, differs from before only by the preferences leaf, the comfort
    sentence, and the dates of the day (the run crossed midnight).
 
+## P-81 — Importing a Microsoft Money file (05/11/2026)
+
+Asked by Fabrice, who wrote the reader himself (`Analyse/mnyimport`: a
+specification of the `.mny` format, and the `mny-reader` library).
+
+1. **Radinus reads the `.mny` itself.** Leaving Money used to take a Windows
+   PC, Money installed, and a QIF export account by account, which loses the
+   categories' tree, the splits and the classifications. `mny-reader` joins
+   the workspace as a library of its own (one new dependency, `md-5`).
+2. **An account first, then an assistant in four steps** in one window —
+   the shape of the Excel wizard, but its own code: the Excel wizard knows
+   eight fields on purpose, and a Money file brings payees, projects,
+   statuses, references and splits.
+3. **Nothing is imposed** (« tu feras des menus déroulants avec une
+   proposition par défaut, car il faut que l'utilisateur puisse choisir, on
+   ne doit pas tout automatiser en forçant des choix »). The proposals:
+   category → budget line, subcategory → category, payee → payee, payment
+   method → payment mode, classification 1 → assignment, classification 2 →
+   project, cheque number → payment reference, memo → comment; the label from
+   the payee; cleared or reconciled → Pointé, not cleared → Engagé; scheduled
+   bills left out. « Ne pas importer » is always offered; two pieces of data
+   in one field are refused; a budget line without a category is refused —
+   an operation gets its budget line from its category.
+4. **Names.** A category alone (« Impôts ») becomes a category of the
+   budget line's name; a subcategory whose name is under two categories
+   (« Divers ») takes its full name, « Auto : Divers », since Radinus refuses
+   two elements of one name. Each Money value is proposed to the Radinus
+   element of the same name — spaces, case and accents ignored —, otherwise
+   « À créer »; « À créer » never doubles a name that exists.
+5. **One transaction**: the elements, the operations at their statuses with
+   the verification the preferences give imports, a pointed operation dated
+   by its Money clearing date, the splits as sub-operations (no complement is
+   born: they add up), the Money opening balance only on an account that has
+   none and only when ticked, the three balances. Then the journal. No
+   duplicate check, as for Excel: it is a migration; the summary warns when
+   the account already has operations over the period.
+6. **No `.mny` file in the repository** (`.gitignore`). Fabrice's examples
+   are read where they are by the tests, which pass saying so without them.
+   **Still to confirm on a richer file**: the values of the clearing state
+   and of the payment method, uncertain in the specification and absent from
+   the examples; until then a payment method is named « Mode de paiement
+   Money n° N ».
+7. **The payee is the label, not a payee** (Fabrice, 05/11/2026, after
+   trying the assistant: « on ne vas pas créer un tiers pour chaque
+   libellé »). Money has no label field: what is typed in « Bénéficiaire »
+   stands for one — « Carottes », « Taxe habitation ». So the payee no
+   longer has a drop-down menu among the data: it always gives the label,
+   and a question of its own decides whether it **also** gives payees —
+   « Non, aucun tiers » (the proposal), « Seulement les bénéficiaires qui
+   reviennent souvent (au moins 3 opérations) », « Oui, un tiers par
+   bénéficiaire ». No other piece of data can be sent to the payees.
+8. **Step 2 is for someone who has never opened a database** (« un
+   utilisateur lambda sera perdu »). One sentence first; then a table that
+   faces what the Money file holds — with an example taken from the file and
+   its number of lines, « Alimentation (3 lignes) » — with the Radinus field
+   that receives it; a piece of data absent from the file is greyed, « rien
+   dans ce fichier »; two pieces sent to one field turn red, both. The four
+   settings sit apart, in a frame titled « Comment importer les
+   opérations », worded as questions, each saying how many operations it
+   touches. The preview keeps the readable columns — date, label, amount,
+   budget line, category, payee — and puts the rest in « Autres »; a column
+   empty from top to bottom is hidden.
+9. **The assistant closes when the import is done** (« si elle veut
+   importer un autre compte elle réouvre l'assistant »): a message says what
+   was imported and what was created, with one « OK » button, then the window
+   closes. It used to start again at step 1, which was confusing.
+
 ## How to add to this file
 
 One entry per ruling: an id, a date, what was decided in one sentence, and

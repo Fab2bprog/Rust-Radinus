@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ui/windows/window.css" />
+    <title>Importation de fichier Money</title>
+    <script type="module" src="/ui/windows/mny-import.ts" defer></script>
+  </head>
+
+  <body>
+    <!-- « Importation de fichier Money (MNY) » (Fabrice, 05/11/2026).
+
+         Un compte Radinus d'abord, puis un assistant en quatre étapes dans la
+         même fenêtre, dont le titre dit l'étape :
+
+           1. le fichier .mny — et son mot de passe s'il en a un —, le compte
+              Money à importer, et l'aperçu des opérations ;
+           2. où va chaque donnée Money : un tableau qui montre, pour chacune,
+              un exemple tiré du fichier et un menu déroulant réglé sur la
+              proposition ; les tiers par leur propre question ; les quatre
+              réglages en questions ; l'aperçu qui suit chaque changement ;
+           3. les correspondances : chaque valeur Money, et l'élément de
+              Radinus qui la recevra — le même nom s'il existe, sinon « à
+              créer » ;
+           4. le récapitulatif, et la disquette qui importe d'un seul bloc ;
+              un message dit ce qui a été fait, et l'assistant se ferme
+              (Fabrice : « si elle veut importer un autre compte elle
+              réouvre l'assistant »).
+
+         « On ne doit pas tout automatiser en forçant des choix » : tout est
+         proposé, rien n'est imposé. Les flèches avancent et reviennent sans
+         rien perdre ; la porte ferme l'assistant à toutes les étapes, avec une
+         question dès qu'un fichier est lu. -->
+    <div class="window window--mny">
+      <main class="window__content">
+        <!-- Étape 1 : le fichier et son compte. -->
+        <section class="mny__step" id="step-1">
+          <div class="form mny__form">
+            <span class="form__label" id="file-label"></span>
+            <div class="mny__line">
+              <input class="form__field" id="file" type="text" readonly />
+              <button class="mny__button" id="pick" type="button"></button>
+            </div>
+            <label class="form__label" for="password" id="password-label" hidden></label>
+            <div class="mny__line" id="password-line" hidden>
+              <input class="form__field" id="password" type="password" autocomplete="off" />
+              <button class="mny__button" id="unlock" type="button"></button>
+            </div>
+            <label class="form__label" for="money-account" id="money-account-label"></label>
+            <select class="form__field" id="money-account"></select>
+          </div>
+          <p class="pane__hint mny__detail" id="money-account-detail"></p>
+        </section>
+
+        <!-- Étape 2 (Fabrice, 05/11/2026 : « un utilisateur lambda sera
+             perdu »). Une phrase d'abord ; puis, à gauche, un tableau qui met
+             en face ce que le fichier Money contient — avec un exemple tiré
+             du fichier et son nombre de lignes — et la rubrique de Radinus
+             qui le reçoit ; à droite, les quatre réglages, posés en
+             questions. Une donnée absente du fichier est grisée ; deux
+             données envoyées dans la même rubrique passent en rouge. -->
+        <section class="mny__step" id="step-2" hidden>
+          <p class="mny__intro" id="routes-intro"></p>
+          <div class="mny__routes">
+            <div class="mny__table" id="routes" role="table"></div>
+            <fieldset class="mny__settings" id="settings">
+              <legend class="mny__settings-title" id="settings-title"></legend>
+              <label class="mny__question" for="label-from" id="label-from-label"></label>
+              <select class="form__field" id="label-from"></select>
+              <label class="mny__question" for="cleared" id="cleared-label"></label>
+              <div class="mny__answer">
+                <select class="form__field" id="cleared"></select>
+                <span class="mny__count" id="cleared-count"></span>
+              </div>
+              <label class="mny__question" for="not-cleared" id="not-cleared-label"></label>
+              <div class="mny__answer">
+                <select class="form__field" id="not-cleared"></select>
+                <span class="mny__count" id="not-cleared-count"></span>
+              </div>
+              <label class="mny__question" for="scheduled" id="scheduled-label"></label>
+              <div class="mny__answer">
+                <select class="form__field" id="scheduled"></select>
+                <span class="mny__count" id="scheduled-count"></span>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <!-- L'aperçu, aux étapes 1 et 2. -->
+        <section class="list" id="preview">
+          <header class="list__header" id="preview-header"></header>
+          <div class="list__filter" id="preview-filter"></div>
+          <div class="list__rows" id="preview-rows" role="listbox"></div>
+        </section>
+        <p class="mny__summary" id="summary"></p>
+
+        <!-- Étape 3 : les correspondances. -->
+        <section class="list" id="values" hidden>
+          <header class="list__header" id="values-header"></header>
+          <div class="list__filter" id="values-filter"></div>
+          <div class="list__rows" id="values-rows" role="listbox"></div>
+        </section>
+
+        <!-- Étape 4 : le récapitulatif. -->
+        <section class="mny__recap" id="recap" hidden>
+          <h2 class="mny__recap-title" id="recap-title"></h2>
+          <ul class="mny__recap-lines" id="recap-lines"></ul>
+          <p class="mny__warning" id="recap-warning" hidden></p>
+          <!-- Le solde d'ouverture Money, proposé seulement à un compte qui
+               n'a pas encore de solde initial pointé ; coché, puisque c'est
+               une proposition, et décochable. -->
+          <label class="form__check mny__opening" id="opening-line" hidden>
+            <input id="opening" type="checkbox" checked />
+            <span id="opening-text"></span>
+          </label>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <button class="panel__button" id="previous" type="button" hidden>
+          <img src="/ui/assets/icons/step_previous.svg" alt="" />
+        </button>
+        <button class="panel__button" id="next" type="button">
+          <img src="/ui/assets/icons/step_next.svg" alt="" />
+        </button>
+        <!-- Étape 4 : enregistrer l'importation. -->
+        <button class="panel__button" id="save" type="button" hidden>
+          <img src="/ui/assets/icons/Base_save.png" alt="" />
+        </button>
+        <span class="panel__spacer"></span>
+        <button class="panel__button" id="close" type="button">
+          <img src="/ui/assets/icons/zone_exit.png" alt="" />
+        </button>
+      </aside>
+
+      <footer class="info-bar" id="info-bar"></footer>
+    </div>
+  </body>
+</html>

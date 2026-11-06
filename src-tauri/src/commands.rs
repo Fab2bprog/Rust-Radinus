@@ -13342,3 +13342,921 @@ pub fn welcome(
         earning: shown.earning.iter().map(slice).collect(),
     })
 }
+
+// --- « Importation de fichier Money (MNY) » (Fabrice, 05/11/2026) ----------
+//
+// Un compte Radinus d'abord, puis un assistant en quatre étapes dans la même
+// fenêtre : le fichier et son compte Money, où va chaque donnée, les
+// correspondances de valeurs, le récapitulatif. **Le fichier est choisi et lu
+// par Rust**, une seule fois, et vit dans l'état de l'application : la fenêtre
+// n'en détient aucune copie. Tout le savoir est dans
+// `radinus_core::mny_import` ; ici, on traduit pour la fenêtre.
+
+use radinus_core::mny_import as mny;
+
+/// Ouvre l'assistant sur un compte. Un import Money laissé en route est jeté :
+/// on repart toujours de l'étape 1.
+#[tauri::command]
+pub fn open_mny_import<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+    account_id: i64,
+) -> Result<(), String> {
+    state.drop_mny()?;
+    let conn = state.database()?;
+    let language = ui_language();
+    let label = radinus_core::accounts::get(&conn, account_id)
+        .map_err(to_ipc_error)?
+        .map(|account| account.label)
+        .unwrap_or_default();
+    drop(conn);
+    crate::windows::open(
+        &app,
+        &crate::windows::mny_import_window(language, &label),
+        Some(&format!("account={account_id}")),
+    )
+    .map_err(to_ipc_error)
+}
+
+/// La porte : la fenêtre se cache, et le fichier lu est oublié.
+#[tauri::command]
+pub fn close_mny_import<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+) -> Result<(), String> {
+    state.drop_mny()?;
+    if let Some(window) = app.get_webview_window("mny-import") {
+        window.hide().map_err(to_ipc_error)?;
+    }
+    Ok(())
+}
+
+/// Ouvre le sélecteur du système sur les fichiers Money. Rend le chemin
+/// choisi, ou rien si l'on a renoncé. Le fichier n'est pas encore lu : il
+/// peut demander un mot de passe.
+///
+/// `async` pour la raison de `excel_pick_file` : le sélecteur ne doit pas
+/// bloquer le fil principal.
+#[tauri::command]
+pub async fn mny_pick_file<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+    account_id: i64,
+) -> Result<Option<String>, String> {
+    use tauri_plugin_dialog::DialogExt;
+    let (answered, answer) = std::sync::mpsc::channel();
+    app.dialog()
+        .file()
+        .add_filter("Microsoft Money", &["mny", "MNY"])
+        .pick_file(move |chosen| {
+            let _ = answered.send(chosen);
+        });
+    let Some(chosen) = answer.recv().map_err(to_ipc_error)? else {
+        return Ok(None);
+    };
+    let path = chosen.into_path().map_err(to_ipc_error)?;
+    let path = path.to_string_lossy().to_string();
+    state.set_mny(crate::state::MnyImport {
+        account_id,
+        path: path.clone(),
+        book: None,
+    })?;
+    Ok(Some(path))
+}
+
+/// Un compte du fichier Money, pour la liste déroulante de l'étape 1.
+#[derive(Serialize)]
+pub struct MnyAccountDto {
+    pub handle: i32,
+    pub label: String,
+    /// « Solde d'ouverture : 999 900,00 € — 4 opérations ».
+    pub detail: String,
+}
+
+/// Ce que la lecture du fichier rend à l'étape 1.
+#[derive(Serialize)]
+pub struct MnyBookDto {
+    /// Le fichier est protégé : la fenêtre montre le champ du mot de passe.
+    pub needs_password: bool,
+    /// Pourquoi il ne se lit pas, dans la langue de l'interface.
+    pub problem: Option<String>,
+    pub accounts: Vec<MnyAccountDto>,
+}
+
+/// Lit le fichier désigné, avec son mot de passe s'il en a un.
+#[tauri::command]
+pub fn mny_read(state: State<'_, AppState>, password: Option<String>) -> Result<MnyBookDto, String> {
+    let language = window_language(&state);
+    let path = state.with_mny(|mny| mny.path.clone())?;
+    let password = password.filter(|word| !word.is_empty());
+    match mny::Book::open(std::path::Path::new(&path), password.as_deref()) {
+        Ok(book) => {
+            let accounts = book
+                .accounts
+                .iter()
+                .map(|account| MnyAccountDto {
+                    handle: account.handle,
+                    label: account.name.clone(),
+                    detail: radinus_core::i18n::message_of(
+                        language,
+                        "mny-account-detail",
+                        &[(
+                            "opening",
+                            radinus_core::money::format(account.opening, language).as_str(),
+                        )],
+                        &[("count", account.operations as i64)],
+                    ),
+                })
+                .collect();
+            state.with_mny(|mny| mny.book = Some(book))?;
+            Ok(MnyBookDto {
+                needs_password: false,
+                problem: None,
+                accounts,
+            })
+        }
+        Err(problem) => {
+            state.with_mny(|mny| mny.book = None)?;
+            let (needs_password, text) = match problem {
+                mny::Problem::Password if password.is_none() => {
+                    (true, radinus_core::i18n::text(language, "mny-problem-password"))
+                }
+                mny::Problem::Password => {
+                    (true, radinus_core::i18n::text(language, "mny-problem-wrong-password"))
+                }
+                mny::Problem::NotMoney => {
+                    (false, radinus_core::i18n::text(language, "mny-problem-not-money"))
+                }
+                mny::Problem::Unreadable(detail) => (
+                    false,
+                    radinus_core::i18n::text_with(language, "mny-problem-unreadable", "detail", &detail),
+                ),
+            };
+            Ok(MnyBookDto {
+                needs_password,
+                problem: Some(text),
+                accounts: Vec::new(),
+            })
+        }
+    }
+}
+
+/// Une donnée Money et les cases que son menu propose, par leurs clefs ; la
+/// fenêtre les dit dans sa langue (`mny-source-…`, `mny-destination-…`).
+#[derive(Serialize)]
+pub struct MnySourceDto {
+    pub key: String,
+    pub default: String,
+    pub destinations: Vec<String>,
+}
+
+/// Tous les menus de l'étape 2, et leurs propositions.
+#[derive(Serialize)]
+pub struct MnyChoicesDto {
+    pub sources: Vec<MnySourceDto>,
+    pub labels: Vec<String>,
+    pub label: String,
+    pub statuses: Vec<String>,
+    pub cleared: String,
+    pub not_cleared: String,
+    pub scheduled: Vec<String>,
+    pub scheduled_default: String,
+    /// Les trois réponses à « créer aussi des tiers ? », et la proposition.
+    pub payees: Vec<String>,
+    pub payees_default: String,
+    /// « Au moins 3 opérations » : le seuil des bénéficiaires fréquents.
+    pub frequent: usize,
+}
+
+/// Les menus de l'étape 2 : **le noyau dit ce que chaque menu propose et ce
+/// qui est proposé par défaut** ; la fenêtre ne décide de rien.
+#[tauri::command]
+pub fn mny_choices() -> MnyChoicesDto {
+    let defaults = mny::Mapping::default();
+    MnyChoicesDto {
+        sources: mny::SOURCES
+            .iter()
+            .map(|source| MnySourceDto {
+                key: source.key().to_string(),
+                default: source.default_destination().key().to_string(),
+                destinations: source
+                    .destinations()
+                    .iter()
+                    .map(|destination| destination.key().to_string())
+                    .collect(),
+            })
+            .collect(),
+        labels: mny::LabelFrom::ALL.iter().map(|one| one.key().to_string()).collect(),
+        label: defaults.label.key().to_string(),
+        statuses: mny::Status::ALL.iter().map(|one| one.key().to_string()).collect(),
+        cleared: defaults.cleared.key().to_string(),
+        not_cleared: defaults.not_cleared.key().to_string(),
+        scheduled: mny::Scheduled::ALL.iter().map(|one| one.key().to_string()).collect(),
+        scheduled_default: defaults.scheduled.key().to_string(),
+        payees: mny::Payees::ALL.iter().map(|one| one.key().to_string()).collect(),
+        payees_default: defaults.payees.key().to_string(),
+        frequent: mny::FREQUENT,
+    }
+}
+
+/// Les choix de l'étape 2, tels que la fenêtre les envoie.
+#[derive(serde::Deserialize)]
+pub struct MnyMappingInput {
+    /// La case de chaque donnée : clef de la donnée → clef de la case.
+    pub routes: std::collections::HashMap<String, String>,
+    /// Les bénéficiaires qui deviennent des tiers.
+    pub payees: String,
+    pub label: String,
+    pub cleared: String,
+    pub not_cleared: String,
+    pub scheduled: String,
+}
+
+/// Les choix de la fenêtre en choix du noyau. Une clef inconnue est une
+/// erreur, jamais un défaut silencieux : on importerait autre chose que ce
+/// que l'utilisateur a choisi.
+pub(crate) fn mny_mapping(input: &MnyMappingInput) -> Result<mny::Mapping, String> {
+    let unknown = |what: &str| format!("Choix inconnu : « {what} »");
+    let mut mapping = mny::Mapping {
+        payees: mny::Payees::from_key(&input.payees).ok_or_else(|| unknown(&input.payees))?,
+        label: mny::LabelFrom::from_key(&input.label).ok_or_else(|| unknown(&input.label))?,
+        cleared: mny::Status::from_key(&input.cleared).ok_or_else(|| unknown(&input.cleared))?,
+        not_cleared: mny::Status::from_key(&input.not_cleared)
+            .ok_or_else(|| unknown(&input.not_cleared))?,
+        scheduled: mny::Scheduled::from_key(&input.scheduled)
+            .ok_or_else(|| unknown(&input.scheduled))?,
+        ..mny::Mapping::default()
+    };
+    for (source, destination) in &input.routes {
+        let source = mny::Source::from_key(source).ok_or_else(|| unknown(source))?;
+        let destination =
+            mny::Destination::from_key(destination).ok_or_else(|| unknown(destination))?;
+        mapping.set(source, destination);
+    }
+    Ok(mapping)
+}
+
+/// Pourquoi des choix ne passent pas, dans la langue de l'interface.
+pub(crate) fn mny_refusal_text(language: Language, refusal: &mny::Refusal) -> String {
+    let source = |one: mny::Source| radinus_core::i18n::text(language, &format!("mny-source-{}", one.key()));
+    let destination = |one: mny::Destination| {
+        radinus_core::i18n::text(language, &format!("mny-destination-{}", one.key()))
+    };
+    match refusal {
+        mny::Refusal::SameDestination {
+            first,
+            second,
+            destination: case,
+        } => radinus_core::i18n::text_with_all(
+            language,
+            "mny-refusal-same",
+            &[
+                ("first", source(*first).as_str()),
+                ("second", source(*second).as_str()),
+                ("destination", destination(*case).as_str()),
+            ],
+        ),
+        mny::Refusal::NotOffered {
+            source: from,
+            destination: case,
+        } => radinus_core::i18n::text_with_all(
+            language,
+            "mny-refusal-not-offered",
+            &[
+                ("source", source(*from).as_str()),
+                ("destination", destination(*case).as_str()),
+            ],
+        ),
+        mny::Refusal::BudgetLineWithoutCategory => {
+            radinus_core::i18n::text(language, "mny-refusal-budget-line")
+        }
+    }
+}
+
+/// Une opération de l'aperçu, déjà écrite pour l'écran.
+#[derive(Serialize)]
+pub struct MnyRowDto {
+    pub id: usize,
+    pub date: String,
+    pub date_value: String,
+    pub label: String,
+    /// Le montant signé, écrit pour l'écran.
+    pub amount_text: String,
+    pub amount: i64,
+    pub status: String,
+    pub budget_line: String,
+    pub category: String,
+    pub payee: String,
+    /// Tout le reste sur une ligne, séparé par « · » : mode de règlement,
+    /// affectation, projet, référence, commentaire, et « Ventilée (3) » ou
+    /// « Virement » (Fabrice, 05/11/2026 : un aperçu lisible, pas quatorze
+    /// colonnes).
+    pub others: String,
+}
+
+#[derive(Serialize)]
+pub struct MnyPreviewDto {
+    /// Les choix ne passent pas : la phrase dit pourquoi, et l'aperçu est vide.
+    pub refusal: Option<String>,
+    /// Les données envoyées dans une même case : leurs lignes passent en rouge.
+    pub conflicts: Vec<String>,
+    pub rows: Vec<MnyRowDto>,
+    /// « 4 opérations, somme 2 100,00 € — 1 échéance laissée de côté ».
+    pub summary: String,
+}
+
+/// L'aperçu d'un compte Money avec les choix en cours — à l'étape 1 avec les
+/// propositions, à l'étape 2 à chaque menu changé.
+#[tauri::command]
+pub fn mny_preview(
+    state: State<'_, AppState>,
+    handle: i32,
+    mapping: MnyMappingInput,
+) -> Result<MnyPreviewDto, String> {
+    let language = window_language(&state);
+    let mapping = mny_mapping(&mapping)?;
+    let conflicts: Vec<String> = mapping
+        .conflicts()
+        .into_iter()
+        .map(|source| source.key().to_string())
+        .collect();
+    if let Err(refusal) = mapping.check() {
+        return Ok(MnyPreviewDto {
+            refusal: Some(mny_refusal_text(language, &refusal)),
+            conflicts,
+            rows: Vec::new(),
+            summary: String::new(),
+        });
+    }
+    state.with_mny(|import| {
+        let Some(book) = &import.book else {
+            return Err("Le fichier Money n'est pas lu.".to_string());
+        };
+        let preview = mny::preview(book, handle, &mapping, language, mny::PREVIEW_LIMIT);
+        let text = |value: &Option<String>| value.clone().unwrap_or_default();
+        let rows = preview
+            .rows
+            .iter()
+            .enumerate()
+            .map(|(id, row)| MnyRowDto {
+                id,
+                date: row.date.format("%d/%m/%Y").to_string(),
+                date_value: row.date.to_string(),
+                label: row.label.clone(),
+                amount_text: radinus_core::money::format(row.amount, language),
+                amount: row.amount,
+                status: radinus_core::i18n::status_label(language, row.status.id())
+                    .unwrap_or_default(),
+                budget_line: text(&row.routed.budget_line),
+                category: text(&row.routed.category),
+                payee: text(&row.routed.payee),
+                others: [
+                    row.routed.payment_mode.clone(),
+                    row.routed.assignment.clone(),
+                    row.routed.project.clone(),
+                    row.routed.reference.clone(),
+                    row.routed.comment.clone(),
+                    if row.splits > 0 {
+                        Some(radinus_core::i18n::message_of(
+                            language,
+                            "mny-note-split",
+                            &[],
+                            &[("count", row.splits as i64)],
+                        ))
+                    } else {
+                        row.transfer
+                            .then(|| radinus_core::i18n::text(language, "mny-note-transfer"))
+                    },
+                ]
+                .into_iter()
+                .flatten()
+                .filter(|part| !part.is_empty())
+                .collect::<Vec<_>>()
+                .join(" · "),
+            })
+            .collect();
+        let mut summary = radinus_core::i18n::message_of(
+            language,
+            "mny-preview-summary",
+            &[("sum", radinus_core::money::format(preview.sum, language).as_str())],
+            &[("count", preview.total as i64)],
+        );
+        if preview.total > preview.rows.len() {
+            summary.push_str(" — ");
+            summary.push_str(&radinus_core::i18n::message_of(
+                language,
+                "mny-preview-limited",
+                &[],
+                &[("shown", preview.rows.len() as i64)],
+            ));
+        }
+        if preview.scheduled_skipped > 0 {
+            summary.push_str(" — ");
+            summary.push_str(&radinus_core::i18n::message_of(
+                language,
+                "mny-preview-scheduled",
+                &[],
+                &[("count", preview.scheduled_skipped as i64)],
+            ));
+        }
+        Ok(MnyPreviewDto {
+            refusal: None,
+            conflicts,
+            rows,
+            summary,
+        })
+    })?
+}
+
+/// Ce que le fichier contient d'une donnée, pour la colonne « Exemple tiré
+/// du fichier » de l'étape 2.
+#[derive(Serialize)]
+pub struct MnySampleDto {
+    pub key: String,
+    /// « Alimentation (3 lignes), Épicerie (2 lignes) », ou « rien dans ce
+    /// fichier ».
+    pub example: String,
+    /// La donnée est absente du fichier : sa ligne est grisée.
+    pub absent: bool,
+}
+
+#[derive(Serialize)]
+pub struct MnySamplesDto {
+    /// Une par donnée, dans l'ordre des menus.
+    pub sources: Vec<MnySampleDto>,
+    /// Le bénéficiaire, qui a sa propre question.
+    pub payee: MnySampleDto,
+    /// « Bénéficiaires différents : 312, dont 18 présents au moins 3 fois ».
+    pub payees: String,
+    /// Le nombre d'opérations que touche chaque question des réglages ;
+    /// « rien dans ce fichier » grise la question.
+    pub cleared: MnySampleDto,
+    pub not_cleared: MnySampleDto,
+    pub scheduled: MnySampleDto,
+}
+
+/// Les exemples de l'étape 2, pour le compte Money choisi.
+#[tauri::command]
+pub fn mny_samples(state: State<'_, AppState>, handle: i32) -> Result<MnySamplesDto, String> {
+    let language = window_language(&state);
+    let absent = || radinus_core::i18n::text(language, "mny-sample-absent");
+    let sample = |key: &str, sample: &mny::Sample| MnySampleDto {
+        key: key.to_string(),
+        example: if sample.lines == 0 {
+            absent()
+        } else {
+            sample
+                .examples
+                .iter()
+                .take(2)
+                .map(|(value, count)| {
+                    radinus_core::i18n::message_of(
+                        language,
+                        "mny-sample-value",
+                        &[("value", value.as_str())],
+                        &[("count", *count as i64)],
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join(", ")
+        },
+        absent: sample.lines == 0,
+    };
+    let operations = |key: &str, count: usize| MnySampleDto {
+        key: key.to_string(),
+        example: if count == 0 {
+            absent()
+        } else {
+            radinus_core::i18n::message_of(language, "mny-sample-operations", &[], &[("count", count as i64)])
+        },
+        absent: count == 0,
+    };
+    state.with_mny(|import| {
+        let Some(book) = &import.book else {
+            return Err("Le fichier Money n'est pas lu.".to_string());
+        };
+        let samples = mny::samples(book, handle, language);
+        Ok(MnySamplesDto {
+            sources: samples
+                .sources
+                .iter()
+                .map(|(source, one)| sample(source.key(), one))
+                .collect(),
+            payee: sample("payee", &samples.payees),
+            payees: radinus_core::i18n::message_of(
+                language,
+                "mny-sample-payees",
+                &[],
+                &[
+                    ("count", samples.payees.distinct as i64),
+                    ("frequent", samples.frequent_payees as i64),
+                    ("min", mny::FREQUENT as i64),
+                ],
+            ),
+            cleared: operations("cleared", samples.cleared),
+            not_cleared: operations("not-cleared", samples.not_cleared),
+            scheduled: operations("scheduled", samples.scheduled),
+        })
+    })?
+}
+
+/// Une valeur Money à faire correspondre, à l'étape 3.
+#[derive(Serialize)]
+pub struct MnyValueDto {
+    pub id: usize,
+    pub destination: String,
+    pub label: String,
+    pub budget_line: String,
+    pub uses: usize,
+    /// « create », « unspecified », ou l'identifiant de l'élément proposé.
+    pub proposal: String,
+}
+
+/// Les éléments d'une nomenclature, pour les menus d'une case.
+#[derive(Serialize)]
+pub struct MnyOptionsDto {
+    pub destination: String,
+    pub items: Vec<ItemDto>,
+}
+
+#[derive(Serialize)]
+pub struct MnyValuesDto {
+    pub rows: Vec<MnyValueDto>,
+    pub options: Vec<MnyOptionsDto>,
+}
+
+/// Le nom d'une proposition, tel que les menus de l'étape 3 le portent.
+fn mny_choice_key(choice: mny::Choice) -> String {
+    match choice {
+        mny::Choice::Existing(id) => id.to_string(),
+        mny::Choice::Create => "create".to_string(),
+        mny::Choice::Unspecified => "unspecified".to_string(),
+    }
+}
+
+/// Les valeurs Money à faire correspondre, et les éléments de la base qui
+/// peuvent les recevoir.
+#[tauri::command]
+pub fn mny_values(
+    state: State<'_, AppState>,
+    handle: i32,
+    mapping: MnyMappingInput,
+) -> Result<MnyValuesDto, String> {
+    let language = window_language(&state);
+    let mapping = mny_mapping(&mapping)?;
+    mapping
+        .check()
+        .map_err(|refusal| mny_refusal_text(language, &refusal))?;
+    let existing = {
+        let conn = state.database()?;
+        mny::Existing::read(&conn).map_err(to_ipc_error)?
+    };
+    state.with_mny(|import| {
+        let Some(book) = &import.book else {
+            return Err("Le fichier Money n'est pas lu.".to_string());
+        };
+        let operations = mny::selected(book, handle, &mapping);
+        let plan = mny::Plan::new(&operations, &mapping, language);
+        let rows = mny::values(&operations, &plan, &existing)
+            .into_iter()
+            .enumerate()
+            .map(|(id, row)| MnyValueDto {
+                id,
+                destination: row.destination.key().to_string(),
+                label: row.label,
+                budget_line: row.budget_line.unwrap_or_default(),
+                uses: row.uses,
+                proposal: mny_choice_key(row.proposal),
+            })
+            .collect();
+        let options = [
+            mny::Destination::BudgetLine,
+            mny::Destination::Category,
+            mny::Destination::Payee,
+            mny::Destination::PaymentMode,
+            mny::Destination::Assignment,
+            mny::Destination::Project,
+        ]
+        .into_iter()
+        .map(|destination| MnyOptionsDto {
+            destination: destination.key().to_string(),
+            items: existing
+                .of(destination)
+                .iter()
+                .map(|item| ItemDto {
+                    id: item.id,
+                    label: item.label.clone(),
+                })
+                .collect(),
+        })
+        .collect();
+        Ok(MnyValuesDto { rows, options })
+    })?
+}
+
+/// Le récapitulatif de l'étape 4 : des phrases, et un avertissement.
+#[derive(Serialize)]
+pub struct MnyRecapDto {
+    pub lines: Vec<String>,
+    /// Le compte Radinus a déjà des opérations sur la période importée.
+    pub warning: Option<String>,
+    /// La case « reprendre le solde d'ouverture Money » : seulement quand le
+    /// compte Radinus n'a pas de solde initial pointé et que Money en a un.
+    pub opening: Option<String>,
+}
+
+/// Ce que l'import fera, sans rien écrire.
+#[tauri::command]
+pub fn mny_recap(
+    state: State<'_, AppState>,
+    handle: i32,
+    mapping: MnyMappingInput,
+    choices: Vec<String>,
+) -> Result<MnyRecapDto, String> {
+    let language = window_language(&state);
+    let mapping = mny_mapping(&mapping)?;
+    mapping
+        .check()
+        .map_err(|refusal| mny_refusal_text(language, &refusal))?;
+    // Le compte est celui qu'on a choisi avant l'assistant, tenu par Rust.
+    let account_id = state.with_mny(|import| import.account_id)?;
+    let conn = state.database()?;
+    let existing = mny::Existing::read(&conn).map_err(to_ipc_error)?;
+    let account = radinus_core::accounts::get(&conn, account_id)
+        .map_err(to_ipc_error)?
+        .ok_or_else(|| "Le compte n'existe plus.".to_string())?;
+    let (operations_count, splits, sum, first, last, values, money_opening) = state.with_mny(|import| {
+        let Some(book) = &import.book else {
+            return Err("Le fichier Money n'est pas lu.".to_string());
+        };
+        let operations = mny::selected(book, handle, &mapping);
+        let plan = mny::Plan::new(&operations, &mapping, language);
+        Ok((
+            operations.len(),
+            operations.iter().filter(|operation| !operation.splits.is_empty()).count(),
+            operations.iter().map(|operation| operation.line.amount).sum::<i64>(),
+            operations.iter().map(|operation| operation.date).min(),
+            operations.iter().map(|operation| operation.date).max(),
+            mny::values(&operations, &plan, &existing),
+            book.accounts
+                .iter()
+                .find(|money| money.handle == handle)
+                .map_or(0, |money| money.opening),
+        ))
+    })??;
+
+    let mut lines = vec![radinus_core::i18n::message_of(
+        language,
+        "mny-recap-operations",
+        &[("sum", radinus_core::money::format(sum, language).as_str())],
+        &[("count", operations_count as i64), ("splits", splits as i64)],
+    )];
+    lines.push(radinus_core::i18n::text_with_all(
+        language,
+        "mny-recap-balance",
+        &[
+            ("before", radinus_core::money::format(account.balance_final, language).as_str()),
+            (
+                "after",
+                radinus_core::money::format(account.balance_final + sum, language).as_str(),
+            ),
+        ],
+    ));
+    // Ce qui sera créé, case par case : les choix de l'étape 3 décident.
+    for destination in [
+        mny::Destination::BudgetLine,
+        mny::Destination::Category,
+        mny::Destination::Payee,
+        mny::Destination::PaymentMode,
+        mny::Destination::Assignment,
+        mny::Destination::Project,
+    ] {
+        let created = values
+            .iter()
+            .enumerate()
+            .filter(|(index, row)| {
+                row.destination == destination
+                    && choices
+                        .get(*index)
+                        .map_or(row.proposal == mny::Choice::Create, |choice| choice == "create")
+            })
+            .count();
+        if created > 0 {
+            lines.push(radinus_core::i18n::message_of(
+                language,
+                "mny-recap-created",
+                &[(
+                    "destination",
+                    radinus_core::i18n::text(language, &format!("mny-destination-{}", destination.key()))
+                        .as_str(),
+                )],
+                &[("count", created as i64)],
+            ));
+        }
+    }
+    let warning = match (first, last) {
+        (Some(first), Some(last)) => {
+            let already =
+                radinus_core::operations::list_for_account(&conn, account_id, first, last, None, None)
+                    .map_err(to_ipc_error)?
+                    .len();
+            (already > 0).then(|| {
+                radinus_core::i18n::message_of(
+                    language,
+                    "mny-recap-overlap",
+                    &[
+                        ("from", first.format("%d/%m/%Y").to_string().as_str()),
+                        ("to", last.format("%d/%m/%Y").to_string().as_str()),
+                    ],
+                    &[("count", already as i64)],
+                )
+            })
+        }
+        _ => None,
+    };
+    let opening = (account.opening_balance_pointed == 0 && money_opening != 0).then(|| {
+        radinus_core::i18n::text_with(
+            language,
+            "mny-recap-opening",
+            "amount",
+            &radinus_core::money::format(money_opening, language),
+        )
+    });
+    Ok(MnyRecapDto {
+        lines,
+        warning,
+        opening,
+    })
+}
+
+/// Ce que l'enregistrement rend à la fenêtre : le message de fin, une ligne
+/// pour les opérations, puis une par rubrique où des éléments ont été créés.
+#[derive(Serialize)]
+pub struct MnyDoneDto {
+    pub text: String,
+}
+
+/// Le choix de l'étape 3 tel que la fenêtre l'envoie.
+fn mny_choice(key: &str) -> Result<mny::Choice, String> {
+    match key {
+        "create" => Ok(mny::Choice::Create),
+        "unspecified" => Ok(mny::Choice::Unspecified),
+        other => other
+            .parse::<i64>()
+            .map(mny::Choice::Existing)
+            .map_err(|_| format!("Choix inconnu : « {other} »")),
+    }
+}
+
+/// **La disquette de l'étape 4** : l'import, d'un seul bloc, et son journal.
+/// Le fichier lu est ensuite oublié — l'assistant repart de l'étape 1.
+#[tauri::command]
+pub fn mny_import<R: Runtime>(
+    app: AppHandle<R>,
+    state: State<'_, AppState>,
+    handle: i32,
+    mapping: MnyMappingInput,
+    choices: Vec<String>,
+    opening: bool,
+) -> Result<MnyDoneDto, String> {
+    use radinus_core::journal::{Journal, Status};
+    let language = window_language(&state);
+    let mapping = mny_mapping(&mapping)?;
+    mapping
+        .check()
+        .map_err(|refusal| mny_refusal_text(language, &refusal))?;
+    let choices = choices
+        .iter()
+        .map(|key| mny_choice(key))
+        .collect::<Result<Vec<_>, _>>()?;
+    let account_id = state.with_mny(|import| import.account_id)?;
+    let mut conn = state.database()?;
+    let existing = mny::Existing::read(&conn).map_err(to_ipc_error)?;
+    let account_label = radinus_core::accounts::get(&conn, account_id)
+        .map_err(to_ipc_error)?
+        .map(|account| account.label)
+        .unwrap_or_default();
+
+    let mut journal = Journal::new(language);
+    let outcome = state.with_mny(|import| {
+        let Some(book) = &import.book else {
+            return Err("Le fichier Money n'est pas lu.".to_string());
+        };
+        let money = book.accounts.iter().find(|money| money.handle == handle);
+        let file = std::path::Path::new(&import.path)
+            .file_name()
+            .map(|name| name.to_string_lossy().to_string())
+            .unwrap_or_default();
+        journal.add(
+            "journal-step-mny-begin",
+            "",
+            Status::Started,
+            "",
+            &format!(
+                "{account_label} ← {file} — {}",
+                money.map(|one| one.name.as_str()).unwrap_or_default()
+            ),
+        );
+        let operations = mny::selected(book, handle, &mapping);
+        let plan = mny::Plan::new(&operations, &mapping, language);
+        let values = mny::values(&operations, &plan, &existing);
+        let opening = if opening { money.map(|one| one.opening) } else { None };
+        Ok(mny::import(&mut conn, account_id, &operations, &plan, &values, &choices, opening))
+    })??;
+    drop(conn);
+
+    match outcome {
+        Ok(outcome) => {
+            for created in &outcome.created {
+                journal.add(
+                    "journal-step-mny-create",
+                    created
+                        .destination
+                        .nomenclature()
+                        .map(Nomenclature::table)
+                        .unwrap_or_default(),
+                    Status::Success,
+                    "",
+                    &radinus_core::i18n::text_with_all(
+                        language,
+                        "mny-journal-created",
+                        &[
+                            (
+                                "destination",
+                                radinus_core::i18n::text(
+                                    language,
+                                    &format!("mny-destination-{}", created.destination.key()),
+                                )
+                                .as_str(),
+                            ),
+                            ("label", created.label.as_str()),
+                        ],
+                    ),
+                );
+            }
+            let text = radinus_core::i18n::message_of(
+                language,
+                "mny-done",
+                &[
+                    ("account", account_label.as_str()),
+                    ("sum", radinus_core::money::format(outcome.sum, language).as_str()),
+                ],
+                &[("count", outcome.operations as i64)],
+            );
+            journal.add("journal-step-mny-end", "Operation", Status::Finished, "", &text);
+            state.set_journal(journal.into_entries());
+            state.drop_mny()?;
+            // Le message de fin dit aussi ce qui a été créé, rubrique par
+            // rubrique : une ligne chacune.
+            let mut text = text;
+            for destination in [
+                mny::Destination::BudgetLine,
+                mny::Destination::Category,
+                mny::Destination::Payee,
+                mny::Destination::PaymentMode,
+                mny::Destination::Assignment,
+                mny::Destination::Project,
+            ] {
+                let count = outcome
+                    .created
+                    .iter()
+                    .filter(|one| one.destination == destination)
+                    .count();
+                if count > 0 {
+                    text.push('\n');
+                    text.push_str(&radinus_core::i18n::message_of(
+                        language,
+                        "mny-done-created",
+                        &[(
+                            "destination",
+                            radinus_core::i18n::text(language, &format!("mny-destination-{}", destination.key()))
+                                .as_str(),
+                        )],
+                        &[("count", count as i64)],
+                    ));
+                }
+            }
+            let _ = app.emit("data-changed:journal", ());
+            operations_changed(&app);
+            let mut kinds: Vec<Nomenclature> = Vec::new();
+            for created in &outcome.created {
+                if let Some(kind) = created.destination.nomenclature() {
+                    if !kinds.contains(&kind) {
+                        kinds.push(kind);
+                    }
+                }
+            }
+            for kind in kinds {
+                let _ = app.emit(NOMENCLATURES_CHANGED, kind.key());
+            }
+            Ok(MnyDoneDto { text })
+        }
+        Err(error) => {
+            // Rien n'a été écrit : la transaction est défaite.
+            journal.add("journal-step-mny-end", "Operation", Status::Failure, &error.to_string(), "");
+            state.set_journal(journal.into_entries());
+            let _ = app.emit("data-changed:journal", ());
+            Err(to_ipc_error(error))
+        }
+    }
+}

@@ -152,6 +152,9 @@ pub const IMPORT_EXCEL_ITEM_ID: &str = "file-import-excel";
 /// l'Excel : le même assistant, la même philosophie, le même choix d'un compte
 /// d'abord.
 pub const IMPORT_STRUCTURED_ITEM_ID: &str = "file-import-structured";
+/// « Importation de fichier Money (MNY) » (Fabrice, 05/11/2026), juste sous le
+/// JSON / XML : un compte d'abord, comme les autres imports.
+pub const IMPORT_MNY_ITEM_ID: &str = "file-import-mny";
 /// Les six statistiques. Chacune demande d'abord sur quels comptes la
 /// calculer, par la liste des comptes dans son usage multi-comptes ; l'axe
 /// voyage avec la question, et c'est le choix des comptes qui ouvrira la bonne.
@@ -688,6 +691,13 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 usable,
                 None::<&str>,
             )?,
+            &MenuItem::with_id(
+                app,
+                IMPORT_MNY_ITEM_ID,
+                t("menu-file-import-mny"),
+                usable,
+                None::<&str>,
+            )?,
             // **Deux traits, et « Se déconnecter » seule entre les deux**
             // (Fabrice, 05/08/2026 : « ils sont trop proches »). Les deux
             // gestes se ressemblent — on s'en va — et se collent l'un à
@@ -1141,6 +1151,7 @@ pub fn on_event<R: Runtime>(app: &AppHandle<R>, event: tauri::menu::MenuEvent) {
         (IMPORT_ITEM_ID, "statement-import"),
         (IMPORT_EXCEL_ITEM_ID, "excel-import"),
         (IMPORT_STRUCTURED_ITEM_ID, "structured-import"),
+        (IMPORT_MNY_ITEM_ID, "mny-import"),
         (BANK_DETAILS_ITEM_ID, "bank-details"),
     ] {
         if event.id() == id {

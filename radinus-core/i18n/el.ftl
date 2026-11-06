@@ -1377,6 +1377,142 @@ structured-format-comma-thousands = { $example } (κόμμα για τις χι�
 structured-format-cents = { $example } (σε λεπτά)
 structured-format-thousandths = { $example } (σε χιλιοστά)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Μεταφορά προς { $account }
+mny-transfer-from = Μεταφορά από { $account }
+mny-payment-mode = Τρόπος πληρωμής Money αρ. { $code }
+mny-no-label = Κίνηση Money
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Εισαγωγή αρχείου Money (MNY)
+window-mny-import-title-1 = Οδηγός εισαγωγής Money: { $account } (Βήμα 1/4)
+window-mny-import-title-2 = Οδηγός εισαγωγής Money: { $account } (Βήμα 2/4)
+window-mny-import-title-3 = Οδηγός εισαγωγής Money: { $account } (Βήμα 3/4)
+window-mny-import-title-4 = Οδηγός εισαγωγής Money: { $account } (Βήμα 4/4)
+mny-field-file = Αρχείο Money:
+mny-pick = Επιλογή αρχείου…
+mny-field-password = Κωδικός:
+mny-unlock = Άνοιγμα
+mny-field-account = Λογαριασμός Money:
+mny-field-label = Ποια περιγραφή θα πάρουν οι κινήσεις;
+mny-field-cleared = Τι γίνονται οι κινήσεις που είναι τσεκαρισμένες στο Money;
+mny-field-not-cleared = Τι γίνονται οι μη τσεκαρισμένες κινήσεις;
+mny-field-scheduled = Τι να γίνει με τις επερχόμενες προγραμματισμένες πληρωμές;
+mny-recap-title = Τι θα κάνει η εισαγωγή
+mny-close = Κλείσιμο οδηγού
+mny-close-question = Κλείσιμο του οδηγού; Το αρχείο που διαβάστηκε και οι επιλογές σας θα χαθούν· δεν έχει εισαχθεί τίποτα.
+mny-help-1 = Επιλέξτε το αρχείο Money και μετά τον λογαριασμό προς εισαγωγή: η προεπισκόπηση δείχνει τις κινήσεις του.
+mny-help-2 = Ελέγξτε πού τοποθετεί το Radinus κάθε στοιχείο του Money και απαντήστε στις ερωτήσεις: η προεπισκόπηση ακολουθεί κάθε αλλαγή.
+mny-help-3 = Για κάθε τιμή του Money, επιλέξτε το στοιχείο του Radinus που θα τη δεχτεί, ή αφήστε «Προς δημιουργία».
+mny-help-4 = Ελέγξτε τι θα κάνει η εισαγωγή και μετά αποθηκεύστε με τη δισκέτα.
+mny-need-account = Επιλέξτε πρώτα ένα αρχείο Money και έναν από τους λογαριασμούς του.
+mny-empty-no-file = Δεν έχει επιλεγεί αρχείο Money.
+mny-empty = Αυτός ο λογαριασμός Money δεν έχει κινήσεις προς εισαγωγή.
+mny-values-empty = Καμία τιμή προς αντιστοίχιση.
+mny-column-others = Άλλα
+mny-column-destination = Πεδίο Radinus
+mny-column-value = Τιμή Money
+mny-column-uses = Γραμμές
+mny-column-choice = Στο Radinus
+mny-choice-create = Προς δημιουργία
+mny-choice-unspecified = Χωρίς προσδιορισμό
+mny-source-category = Κατηγορία
+mny-source-sub-category = Υποκατηγορία
+mny-source-payee = Δικαιούχος
+mny-source-payment-mode = Τρόπος πληρωμής
+mny-source-classification-1 = Ταξινόμηση 1
+mny-source-classification-2 = Ταξινόμηση 2
+mny-source-reference = Αρ. επιταγής / αναφορά
+mny-source-memo = Σημείωση
+mny-destination-ignore = Να μην εισαχθεί
+mny-destination-budget-line = Κονδύλι προϋπολογισμού
+mny-destination-category = Κατηγορία
+mny-destination-payee = Αντισυμβαλλόμενος
+mny-destination-payment-mode = Τρόπος πληρωμής
+mny-destination-assignment = Διάθεση
+mny-destination-project = Έργο
+mny-destination-reference = Αναφορά πληρωμής
+mny-destination-comment = Σχόλιο
+mny-label-payee = Ο δικαιούχος
+mny-label-memo = Η σημείωση
+mny-label-payee-and-memo = Ο δικαιούχος και μετά η σημείωση
+mny-status-pointed = Τσεκαρισμένη
+mny-status-committed = Δεσμευμένη
+mny-status-planned = Προγραμματισμένη
+mny-scheduled-skip = Να μην εισαχθούν
+mny-scheduled-planned = Εισαγωγή ως «Προγραμματισμένη»
+mny-payees-none = Όχι, κανένας αντισυμβαλλόμενος
+mny-payees-frequent = Μόνο οι δικαιούχοι που επανέρχονται συχνά (τουλάχιστον 3 κινήσεις)
+mny-payees-all = Ναι, ένας αντισυμβαλλόμενος ανά δικαιούχο
+mny-payee-hint = Χρησιμεύει επίσης ως περιγραφή της κίνησης (βλ. παρακάτω).
+mny-routes-intro = Αριστερά, τι περιέχει το αρχείο σας Money, με ένα παράδειγμα. Δεξιά, πού το τοποθετεί το Radinus. Οι επιλογές έχουν ήδη γίνει για εσάς· αλλάξτε τες μόνο αν το θέλετε.
+mny-column-money = Στο αρχείο σας Money
+mny-column-example = Παράδειγμα από το αρχείο
+mny-settings-title = Πώς εισάγονται οι κινήσεις
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } γραμμή
+   *[other] { $count } γραμμές
+})
+mny-sample-absent = τίποτα σε αυτό το αρχείο
+mny-sample-payees = Διαφορετικοί δικαιούχοι: { $count }, από τους οποίους { $frequent } εμφανίζονται τουλάχιστον { $min } φορές
+mny-sample-operations = { $count ->
+    [one] { $count } κίνηση
+   *[other] { $count } κινήσεις
+}
+mny-account-detail = Αρχικό υπόλοιπο: { $opening } — { $count ->
+    [one] { $count } κίνηση
+   *[other] { $count } κινήσεις
+}
+mny-problem-password = Αυτό το αρχείο Money προστατεύεται με κωδικό: πληκτρολογήστε τον και πατήστε «Άνοιγμα».
+mny-problem-wrong-password = Αυτός ο κωδικός δεν ανοίγει το αρχείο Money.
+mny-problem-not-money = Αυτό το αρχείο δεν είναι αρχείο Microsoft Money.
+mny-problem-unreadable = Το αρχείο Money δεν διαβάζεται: { $detail }
+mny-refusal-same = Το «{ $first }» και το «{ $second }» πηγαίνουν και τα δύο στο «{ $destination }»: ένα πεδίο του Radinus δέχεται μόνο ένα στοιχείο.
+mny-refusal-not-offered = Το «{ $source }» δεν μπορεί να πάει στο «{ $destination }».
+mny-refusal-budget-line = Ένα κονδύλι προϋπολογισμού χρειάζεται κατηγορία: στο Radinus μια κίνηση παίρνει το κονδύλι από την κατηγορία της.
+mny-note-split = Επιμερισμένη ({ $count })
+mny-note-transfer = Μεταφορά
+mny-preview-summary = { $count ->
+    [one] { $count } κίνηση προς εισαγωγή
+   *[other] { $count } κινήσεις προς εισαγωγή
+}, άθροισμα { $sum }
+mny-preview-limited = η προεπισκόπηση δείχνει τις πρώτες { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } προγραμματισμένη πληρωμή παραλείφθηκε
+   *[other] { $count } προγραμματισμένες πληρωμές παραλείφθηκαν
+}
+mny-recap-operations = { $count ->
+    [one] θα εισαχθεί { $count } κίνηση
+   *[other] θα εισαχθούν { $count } κινήσεις
+}, συνολικά { $sum }{ $splits ->
+    [0] {""}
+   *[other] , από τις οποίες { $splits } επιμερισμένες
+}.
+mny-recap-balance = Τελικό υπόλοιπο λογαριασμού: { $before } πριν, { $after } μετά.
+mny-recap-created = { $destination }: { $count ->
+    [one] θα δημιουργηθεί { $count } στοιχείο
+   *[other] θα δημιουργηθούν { $count } στοιχεία
+}.
+mny-recap-overlap = Προσοχή: αυτός ο λογαριασμός έχει ήδη { $count ->
+    [one] { $count } κίνηση
+   *[other] { $count } κινήσεις
+} μεταξύ { $from } και { $to }. Πιθανές διπλοεγγραφές.
+mny-recap-opening = Χρήση του αρχικού υπολοίπου του Money ({ $amount }) ως τσεκαρισμένου αρχικού υπολοίπου του λογαριασμού
+mny-save = Αποθήκευση της εισαγωγής
+mny-save-question = Εισαγωγή αυτών των κινήσεων στον λογαριασμό; Τα στοιχεία «Προς δημιουργία» θα δημιουργηθούν.
+mny-done = { $count ->
+    [one] Εισήχθη { $count } κίνηση
+   *[other] Εισήχθησαν { $count } κινήσεις
+} στο «{ $account }», συνολικά { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] δημιουργήθηκε { $count } στοιχείο
+   *[other] δημιουργήθηκαν { $count } στοιχεία
+}.
+journal-step-mny-begin = Έναρξη της εισαγωγής Money
+journal-step-mny-create = Δημιουργία στοιχείου
+journal-step-mny-end = Τέλος της εισαγωγής Money
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Υπόδειξη του αρχείου Excel προς εισαγωγή
 excel-pick = Υπόδειξη του αρχείου Excel
 excel-sheet = Φύλλο του βιβλίου εργασίας:

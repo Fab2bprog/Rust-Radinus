@@ -1222,6 +1222,142 @@ structured-format-comma-thousands = { $example } (vírgula dos milhares, ponto d
 structured-format-cents = { $example } (em cêntimos)
 structured-format-thousandths = { $example } (em milésimos)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Transferência para { $account }
+mny-transfer-from = Transferência de { $account }
+mny-payment-mode = Modo de pagamento Money n.º { $code }
+mny-no-label = Operação Money
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Importar um ficheiro Money (MNY)
+window-mny-import-title-1 = Assistente de importação Money: { $account } (Passo 1/4)
+window-mny-import-title-2 = Assistente de importação Money: { $account } (Passo 2/4)
+window-mny-import-title-3 = Assistente de importação Money: { $account } (Passo 3/4)
+window-mny-import-title-4 = Assistente de importação Money: { $account } (Passo 4/4)
+mny-field-file = Ficheiro Money:
+mny-pick = Escolher o ficheiro…
+mny-field-password = Palavra-passe:
+mny-unlock = Abrir
+mny-field-account = Conta Money:
+mny-field-label = Que descrição dar às operações?
+mny-field-cleared = O que acontece às operações conferidas no Money?
+mny-field-not-cleared = O que acontece às operações não conferidas?
+mny-field-scheduled = O que fazer com os vencimentos futuros?
+mny-recap-title = O que a importação vai fazer
+mny-close = Fechar o assistente
+mny-close-question = Fechar o assistente? O ficheiro lido e as suas escolhas serão perdidos; nada foi importado.
+mny-help-1 = Escolha o ficheiro Money e depois a conta a importar: a pré-visualização mostra as suas operações.
+mny-help-2 = Verifique onde o Radinus coloca cada dado do Money e responda às perguntas: a pré-visualização acompanha cada alteração.
+mny-help-3 = Para cada valor do Money, escolha o elemento do Radinus que o receberá, ou deixe «A criar».
+mny-help-4 = Verifique o que a importação vai fazer e depois guarde com a disquete.
+mny-need-account = Escolha primeiro um ficheiro Money e uma das suas contas.
+mny-empty-no-file = Nenhum ficheiro Money foi escolhido.
+mny-empty = Esta conta Money não tem nenhuma operação a importar.
+mny-values-empty = Nenhum valor a fazer corresponder.
+mny-column-others = Outros
+mny-column-destination = Campo do Radinus
+mny-column-value = Valor Money
+mny-column-uses = Linhas
+mny-column-choice = No Radinus
+mny-choice-create = A criar
+mny-choice-unspecified = Não especificado
+mny-source-category = Categoria
+mny-source-sub-category = Subcategoria
+mny-source-payee = Beneficiário
+mny-source-payment-mode = Modo de pagamento
+mny-source-classification-1 = Classificação 1
+mny-source-classification-2 = Classificação 2
+mny-source-reference = N.º de cheque / referência
+mny-source-memo = Nota
+mny-destination-ignore = Não importar
+mny-destination-budget-line = Rubrica orçamental
+mny-destination-category = Categoria
+mny-destination-payee = Terceiro
+mny-destination-payment-mode = Modo de pagamento
+mny-destination-assignment = Afetação
+mny-destination-project = Projeto
+mny-destination-reference = Referência de pagamento
+mny-destination-comment = Comentário
+mny-label-payee = O beneficiário
+mny-label-memo = A nota
+mny-label-payee-and-memo = O beneficiário seguido da nota
+mny-status-pointed = Conferida
+mny-status-committed = Comprometida
+mny-status-planned = Prevista
+mny-scheduled-skip = Não importar
+mny-scheduled-planned = Importar como «Prevista»
+mny-payees-none = Não, nenhum terceiro
+mny-payees-frequent = Só os beneficiários que aparecem muitas vezes (pelo menos 3 operações)
+mny-payees-all = Sim, um terceiro por beneficiário
+mny-payee-hint = Serve também de descrição da operação (ver abaixo).
+mny-routes-intro = À esquerda, o que o seu ficheiro Money contém, com um exemplo. À direita, onde o Radinus o coloca. As escolhas já estão feitas para si; altere-as só se quiser.
+mny-column-money = No seu ficheiro Money
+mny-column-example = Exemplo tirado do ficheiro
+mny-settings-title = Como importar as operações
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } linha
+   *[other] { $count } linhas
+})
+mny-sample-absent = nada neste ficheiro
+mny-sample-payees = Beneficiários diferentes: { $count }, dos quais { $frequent } presentes pelo menos { $min } vezes
+mny-sample-operations = { $count ->
+    [one] { $count } operação
+   *[other] { $count } operações
+}
+mny-account-detail = Saldo inicial: { $opening } — { $count ->
+    [one] { $count } operação
+   *[other] { $count } operações
+}
+mny-problem-password = Este ficheiro Money está protegido por uma palavra-passe: introduza-a e prima «Abrir».
+mny-problem-wrong-password = Esta palavra-passe não abre o ficheiro Money.
+mny-problem-not-money = Este ficheiro não é um ficheiro Microsoft Money.
+mny-problem-unreadable = O ficheiro Money não se lê: { $detail }
+mny-refusal-same = «{ $first }» e «{ $second }» vão ambos para «{ $destination }»: um campo do Radinus recebe apenas um dado.
+mny-refusal-not-offered = «{ $source }» não pode ir para «{ $destination }».
+mny-refusal-budget-line = Uma rubrica orçamental precisa de uma categoria: no Radinus, uma operação recebe a rubrica da sua categoria.
+mny-note-split = Repartida ({ $count })
+mny-note-transfer = Transferência
+mny-preview-summary = { $count ->
+    [one] { $count } operação a importar
+   *[other] { $count } operações a importar
+}, soma { $sum }
+mny-preview-limited = a pré-visualização mostra as { $shown } primeiras
+mny-preview-scheduled = { $count ->
+    [one] { $count } vencimento posto de parte
+   *[other] { $count } vencimentos postos de parte
+}
+mny-recap-operations = { $count ->
+    [one] será importada { $count } operação
+   *[other] serão importadas { $count } operações
+}, numa soma de { $sum }{ $splits ->
+    [0] {""}
+   *[other] , das quais { $splits } repartidas
+}.
+mny-recap-balance = Saldo final da conta: { $before } antes, { $after } depois.
+mny-recap-created = { $destination }: { $count ->
+    [one] será criado { $count } elemento
+   *[other] serão criados { $count } elementos
+}.
+mny-recap-overlap = Atenção: esta conta já tem { $count ->
+    [one] { $count } operação
+   *[other] { $count } operações
+} entre { $from } e { $to }. São possíveis duplicados.
+mny-recap-opening = Retomar o saldo inicial do Money ({ $amount }) como saldo inicial conferido da conta
+mny-save = Guardar a importação
+mny-save-question = Importar estas operações para a conta? Os elementos «A criar» serão criados.
+mny-done = { $count ->
+    [one] { $count } operação importada
+   *[other] { $count } operações importadas
+} para «{ $account }», numa soma de { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] { $count } elemento criado
+   *[other] { $count } elementos criados
+}.
+journal-step-mny-begin = Início da importação Money
+journal-step-mny-create = Criação de um elemento
+journal-step-mny-end = Fim da importação Money
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Designar o ficheiro Excel a importar
 excel-pick = Designar o ficheiro Excel
 excel-sheet = Folha do livro:

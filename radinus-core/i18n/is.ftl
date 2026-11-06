@@ -1363,6 +1363,142 @@ structured-format-comma-thousands = { $example } (komma fyrir þúsundir, tugabr
 structured-format-cents = { $example } (í sentum)
 structured-format-thousandths = { $example } (í þúsundustu hlutum)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Millifærsla á { $account }
+mny-transfer-from = Millifærsla af { $account }
+mny-payment-mode = Greiðslumáti Money nr. { $code }
+mny-no-label = Money-færsla
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Flytja inn Money-skrá (MNY)
+window-mny-import-title-1 = Innflutningsleiðsögn Money: { $account } (Skref 1/4)
+window-mny-import-title-2 = Innflutningsleiðsögn Money: { $account } (Skref 2/4)
+window-mny-import-title-3 = Innflutningsleiðsögn Money: { $account } (Skref 3/4)
+window-mny-import-title-4 = Innflutningsleiðsögn Money: { $account } (Skref 4/4)
+mny-field-file = Money-skrá:
+mny-pick = Velja skrána…
+mny-field-password = Lykilorð:
+mny-unlock = Opna
+mny-field-account = Money-reikningur:
+mny-field-label = Hvaða lýsingu eiga færslurnar að fá?
+mny-field-cleared = Hvað verður um færslur sem eru merktar í Money?
+mny-field-not-cleared = Hvað verður um ómerktar færslur?
+mny-field-scheduled = Hvað á að gera við væntanlegar áætlaðar greiðslur?
+mny-recap-title = Hvað innflutningurinn mun gera
+mny-close = Loka leiðsögninni
+mny-close-question = Loka leiðsögninni? Lesna skráin og val þitt glatast; ekkert hefur verið flutt inn.
+mny-help-1 = Veldu Money-skrána og síðan reikninginn sem á að flytja inn: forskoðunin sýnir færslur hans.
+mny-help-2 = Athugaðu hvert Radinus setur hverja Money-upplýsingu og svaraðu spurningunum: forskoðunin fylgir hverri breytingu.
+mny-help-3 = Veldu fyrir hvert Money-gildi það Radinus-atriði sem tekur við því, eða láttu „Stofna“ standa.
+mny-help-4 = Athugaðu hvað innflutningurinn mun gera og vistaðu síðan með disklingnum.
+mny-need-account = Veldu fyrst Money-skrá og einn af reikningum hennar.
+mny-empty-no-file = Engin Money-skrá er valin.
+mny-empty = Þessi Money-reikningur hefur engar færslur til að flytja inn.
+mny-values-empty = Engin gildi til að para.
+mny-column-others = Annað
+mny-column-destination = Radinus-svið
+mny-column-value = Money-gildi
+mny-column-uses = Línur
+mny-column-choice = Í Radinus
+mny-choice-create = Stofna
+mny-choice-unspecified = Ótilgreint
+mny-source-category = Flokkur
+mny-source-sub-category = Undirflokkur
+mny-source-payee = Viðtakandi
+mny-source-payment-mode = Greiðslumáti
+mny-source-classification-1 = Flokkun 1
+mny-source-classification-2 = Flokkun 2
+mny-source-reference = Ávísananr. / tilvísun
+mny-source-memo = Minnisatriði
+mny-destination-ignore = Ekki flytja inn
+mny-destination-budget-line = Fjárhagsliður
+mny-destination-category = Flokkur
+mny-destination-payee = Mótaðili
+mny-destination-payment-mode = Greiðslumáti
+mny-destination-assignment = Ráðstöfun
+mny-destination-project = Verkefni
+mny-destination-reference = Greiðslutilvísun
+mny-destination-comment = Athugasemd
+mny-label-payee = Viðtakandinn
+mny-label-memo = Minnisatriðið
+mny-label-payee-and-memo = Viðtakandinn og síðan minnisatriðið
+mny-status-pointed = Merkt
+mny-status-committed = Skuldbundið
+mny-status-planned = Áætlað
+mny-scheduled-skip = Ekki flytja inn
+mny-scheduled-planned = Flytja inn sem „Áætlað“
+mny-payees-none = Nei, enga mótaðila
+mny-payees-frequent = Aðeins viðtakendur sem koma oft fyrir (minnst 3 færslur)
+mny-payees-all = Já, einn mótaðila fyrir hvern viðtakanda
+mny-payee-hint = Hann er einnig notaður sem lýsing færslunnar (sjá neðar).
+mny-routes-intro = Vinstra megin, það sem Money-skráin þín inniheldur, með dæmi. Hægra megin, hvar Radinus setur það. Valið hefur þegar verið gert fyrir þig; breyttu því aðeins ef þú vilt.
+mny-column-money = Í Money-skránni þinni
+mny-column-example = Dæmi úr skránni
+mny-settings-title = Hvernig færslurnar eru fluttar inn
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } lína
+   *[other] { $count } línur
+})
+mny-sample-absent = ekkert í þessari skrá
+mny-sample-payees = Ólíkir viðtakendur: { $count }, þar af { $frequent } sem koma fyrir minnst { $min } sinnum
+mny-sample-operations = { $count ->
+    [one] { $count } færsla
+   *[other] { $count } færslur
+}
+mny-account-detail = Upphafsstaða: { $opening } — { $count ->
+    [one] { $count } færsla
+   *[other] { $count } færslur
+}
+mny-problem-password = Þessi Money-skrá er varin með lykilorði: sláðu það inn og ýttu á „Opna“.
+mny-problem-wrong-password = Þetta lykilorð opnar ekki Money-skrána.
+mny-problem-not-money = Þessi skrá er ekki Microsoft Money-skrá.
+mny-problem-unreadable = Ekki er hægt að lesa Money-skrána: { $detail }
+mny-refusal-same = „{ $first }“ og „{ $second }“ fara bæði í „{ $destination }“: Radinus-svið tekur aðeins við einni upplýsingu.
+mny-refusal-not-offered = „{ $source }“ getur ekki farið í „{ $destination }“.
+mny-refusal-budget-line = Fjárhagsliður þarf flokk: í Radinus fær færsla fjárhagslið sinn frá flokknum.
+mny-note-split = Skipt ({ $count })
+mny-note-transfer = Millifærsla
+mny-preview-summary = { $count ->
+    [one] { $count } færsla til innflutnings
+   *[other] { $count } færslur til innflutnings
+}, samtals { $sum }
+mny-preview-limited = forskoðunin sýnir fyrstu { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } áætluð greiðsla skilin eftir
+   *[other] { $count } áætlaðar greiðslur skildar eftir
+}
+mny-recap-operations = { $count ->
+    [one] { $count } færsla verður flutt inn
+   *[other] { $count } færslur verða fluttar inn
+}, samtals { $sum }{ $splits ->
+    [0] {""}
+   *[other] , þar af { $splits } skiptar
+}.
+mny-recap-balance = Lokastaða reikningsins: { $before } fyrir, { $after } eftir.
+mny-recap-created = { $destination }: { $count ->
+    [one] { $count } atriði verður stofnað
+   *[other] { $count } atriði verða stofnuð
+}.
+mny-recap-overlap = Athugið: þessi reikningur hefur þegar { $count ->
+    [one] { $count } færsla
+   *[other] { $count } færslur
+} á milli { $from } og { $to }. Tvítekningar eru mögulegar.
+mny-recap-opening = Nota upphafsstöðu Money ({ $amount }) sem merkta upphafsstöðu reikningsins
+mny-save = Vista innflutninginn
+mny-save-question = Flytja þessar færslur inn á reikninginn? Atriðin „Stofna“ verða stofnuð.
+mny-done = { $count ->
+    [one] { $count } færsla flutt inn
+   *[other] { $count } færslur fluttar inn
+} á „{ $account }“, samtals { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] { $count } atriði stofnað
+   *[other] { $count } atriði stofnuð
+}.
+journal-step-mny-begin = Upphaf Money-innflutnings
+journal-step-mny-create = Stofnun atriðis
+journal-step-mny-end = Lok Money-innflutnings
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Veldu Excel-skrána sem á að flytja inn
 excel-pick = Velja Excel-skrána
 excel-sheet = Blað í vinnubókinni:

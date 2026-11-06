@@ -98,7 +98,7 @@ the export — while `ordered()` still feeds the heads and their sums.
 
 **The accounts list has three uses and three labels.** Managing accounts,
 choosing *one* account (for the operations list, the quick classification, the
-duplicate search, the statement import, the bank details), and choosing
+duplicate search, the statement import, the Money import, the bank details), and choosing
 *several* (for the six statistics, the dashboard, the balance curve). What one
 came to do travels
 with the question — without it, choosing an account would always open the same
@@ -177,12 +177,41 @@ them.
 | F34 | Importation Excel — la zone | `excel-import` | `excel-import.html` |
 | F35 | Importation Excel — les champs | `excel-fields` | `excel-fields.html` |
 | — | Importation Excel — la destination | `excel-association` | `excel-association.html` |
+| — | Assistant d'importation Money | `mny-import` | `mny-import.html?account=…` |
 
 « Importation de fichier JSON / XML » (P-78) opens **F34 itself** with
 `kind=structured`: the capture groups are hidden and replaced by the list, the
 date-format and the amount-format menus, so steps 2 and 3 stay its children,
 exactly as for Excel. Only their window titles change while a JSON / XML import
 is under way.
+
+**Assistant d'importation Money** (05/11/2026) opens on one account chosen in
+the accounts list (target `mny-import`), and does all its work in one window,
+its title saying the step, « (Étape 1/4) » to « (Étape 4/4) ». Step 1: the
+`.mny` file, chosen and read by Rust (its password asked only if it has one),
+the Money account in a drop-down menu with its opening balance, and the
+preview. Step 2: one sentence, then a table — « Dans votre fichier Money »,
+« Exemple tiré du fichier », an arrow, « Dans Radinus » — with one row per
+piece of Money data (category, subcategory, payee, payment method,
+classifications 1 and 2, reference, memo), its example values with their line
+counts and its drop-down menu set on the proposal; a piece absent from the
+file is greyed, two pieces sent to the same field turn red and are refused
+there and then. The payee's row asks whether it also gives payees (« Non,
+aucun tiers » proposed; it always gives the label). Beside the table, the
+framed « Comment importer les opérations »: four questions — the label, the
+status of a cleared and of an uncleared transaction, the scheduled bills —
+each with the number of operations it touches. The preview (date, label,
+amount, budget line, category, payee, « Autres »; an empty column hidden)
+follows each change. Step 3: every Money value with its drop-down menu — « À créer », « Non
+précisé », then the elements of its nomenclature —, set on the element of the
+same name when there is one. Step 4: the summary, and a warning when the
+account already has operations over the period. The arrows go forward and
+back without losing anything; the door closes the assistant at every step,
+asking first once a file is read. Step 4 has the floppy disk, « Enregistrer l'importation »: one short question,
+then the import in one transaction (P-81), the journal, a message with one
+« OK » button saying what was imported and created, and the assistant
+closes: another account, another opening. When the account has no
+opening cleared balance and Money has one, step 4 offers to take it, ticked.
 
 The same yellow folder opens an `.ofx` **or** a `.csv`. When it is a CSV, the
 cutting window steps in first; once validated, its lines fall into the

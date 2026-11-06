@@ -1223,6 +1223,143 @@ structured-format-comma-thousands = { $example } (comma for thousands, decimal p
 structured-format-cents = { $example } (in cents)
 structured-format-thousandths = { $example } (in thousandths)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Transfer to { $account }
+mny-transfer-from = Transfer from { $account }
+mny-payment-mode = Money payment method no. { $code }
+mny-no-label = Money transaction
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Import a Money file (MNY)
+window-mny-import-title-1 = Money import wizard: { $account } (Step 1/4)
+window-mny-import-title-2 = Money import wizard: { $account } (Step 2/4)
+window-mny-import-title-3 = Money import wizard: { $account } (Step 3/4)
+window-mny-import-title-4 = Money import wizard: { $account } (Step 4/4)
+mny-field-file = Money file:
+mny-pick = Choose the file…
+mny-field-password = Password:
+mny-unlock = Open
+mny-field-account = Money account:
+mny-field-label = What label should the transactions get?
+mny-field-cleared = What becomes of the transactions cleared in Money?
+mny-field-not-cleared = What becomes of the uncleared transactions?
+mny-field-scheduled = What to do with the upcoming scheduled payments?
+mny-recap-title = What the import will do
+mny-close = Close the wizard
+mny-close-question = Close the wizard? The file read and your choices will be lost; nothing has been imported.
+mny-help-1 = Choose the Money file, then the account to import: the preview shows its transactions.
+mny-help-2 = Check where Radinus puts each piece of Money data, and answer the questions: the preview follows every change.
+mny-help-3 = For each Money value, choose the Radinus element that will receive it, or leave “To create”.
+mny-help-4 = Check what the import will do, then save with the floppy disk.
+mny-need-account = First choose a Money file and one of its accounts.
+mny-empty-no-file = No Money file is chosen.
+mny-empty = This Money account has no transaction to import.
+mny-values-empty = No value to match.
+mny-column-others = Other
+mny-column-destination = Radinus field
+mny-column-value = Money value
+mny-column-uses = Lines
+mny-column-choice = In Radinus
+mny-choice-create = To create
+mny-choice-unspecified = Not specified
+mny-source-category = Category
+mny-source-sub-category = Subcategory
+mny-source-payee = Payee
+mny-source-payment-mode = Payment method
+mny-source-classification-1 = Classification 1
+mny-source-classification-2 = Classification 2
+mny-source-reference = Cheque no. / reference
+mny-source-memo = Memo
+mny-destination-ignore = Do not import
+mny-destination-budget-line = Budget line
+mny-destination-category = Category
+mny-destination-payee = Payee
+mny-destination-payment-mode = Payment method
+mny-destination-assignment = Assignment
+mny-destination-project = Project
+mny-destination-reference = Payment reference
+mny-destination-comment = Comment
+mny-label-payee = The payee
+mny-label-memo = The memo
+mny-label-payee-and-memo = The payee followed by the memo
+mny-status-pointed = Cleared
+mny-status-committed = Committed
+mny-status-planned = Planned
+mny-scheduled-skip = Do not import
+mny-scheduled-planned = Import as “Planned”
+mny-payees-none = No, no payees
+mny-payees-frequent = Only the payees that come up often (at least 3 transactions)
+mny-payees-all = Yes, one payee for each
+mny-payee-hint = It also serves as the transaction label (see below).
+mny-routes-intro = On the left, what your Money file contains, with an example. On the right, where Radinus puts it. The choices are already made for you; change them only if you wish.
+mny-column-money = In your Money file
+mny-column-example = Example from the file
+mny-settings-title = How to import the transactions
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } line
+   *[other] { $count } lines
+})
+mny-sample-absent = nothing in this file
+mny-sample-payees = Different payees: { $count }, of which { $frequent } appear at least { $min } times
+mny-sample-operations = { $count ->
+    [one] { $count } transaction
+   *[other] { $count } transactions
+}
+mny-account-detail = Opening balance: { $opening } — { $count ->
+    [one] { $count } transaction
+   *[other] { $count } transactions
+}
+mny-problem-password = This Money file is protected by a password: type it, then press “Open”.
+mny-problem-wrong-password = This password does not open the Money file.
+mny-problem-not-money = This file is not a Microsoft Money file.
+mny-problem-unreadable = The Money file cannot be read: { $detail }
+mny-refusal-same = “{ $first }” and “{ $second }” both go into “{ $destination }”: a Radinus field takes only one piece of data.
+mny-refusal-not-offered = “{ $source }” cannot go into “{ $destination }”.
+mny-refusal-budget-line = A budget line needs a category: in Radinus, a transaction gets its budget line from its category.
+mny-note-split = Split ({ $count })
+mny-note-transfer = Transfer
+mny-preview-summary = { $count ->
+    [one] { $count } transaction to import
+   *[other] { $count } transactions to import
+}, total { $sum }
+mny-preview-limited = the preview shows the first { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } scheduled bill left aside
+   *[other] { $count } scheduled bills left aside
+}
+mny-recap-operations = { $count ->
+    [one] { $count } transaction will be imported
+   *[other] { $count } transactions will be imported
+}, for a total of { $sum }{ $splits ->
+    [0] {""}
+    [one] , { $splits } of them split
+   *[other] , { $splits } of them split
+}.
+mny-recap-balance = Final balance of the account: { $before } before, { $after } after.
+mny-recap-created = { $destination }: { $count ->
+    [one] { $count } element will be created
+   *[other] { $count } elements will be created
+}.
+mny-recap-overlap = Warning: this account already has { $count ->
+    [one] { $count } transaction
+   *[other] { $count } transactions
+} between { $from } and { $to }. Duplicates are possible.
+mny-recap-opening = Take the Money opening balance ({ $amount }) as the account's opening cleared balance
+mny-save = Save the import
+mny-save-question = Import these transactions into the account? The elements “To create” will be created.
+mny-done = { $count ->
+    [one] { $count } transaction imported
+   *[other] { $count } transactions imported
+} into “{ $account }”, for a total of { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] { $count } element created
+   *[other] { $count } elements created
+}.
+journal-step-mny-begin = Start of the Money import
+journal-step-mny-create = Creation of an element
+journal-step-mny-end = End of the Money import
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Choose the Excel file to import
 excel-pick = Choose the Excel file
 excel-sheet = Workbook sheet:

@@ -1415,6 +1415,142 @@ structured-format-comma-thousands = { $example } (запятая для тыся
 structured-format-cents = { $example } (в копейках)
 structured-format-thousandths = { $example } (в тысячных)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Перевод на { $account }
+mny-transfer-from = Перевод с { $account }
+mny-payment-mode = Способ оплаты Money № { $code }
+mny-no-label = Операция Money
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Импорт файла Money (MNY)
+window-mny-import-title-1 = Мастер импорта Money: { $account } (Шаг 1/4)
+window-mny-import-title-2 = Мастер импорта Money: { $account } (Шаг 2/4)
+window-mny-import-title-3 = Мастер импорта Money: { $account } (Шаг 3/4)
+window-mny-import-title-4 = Мастер импорта Money: { $account } (Шаг 4/4)
+mny-field-file = Файл Money:
+mny-pick = Выбрать файл…
+mny-field-password = Пароль:
+mny-unlock = Открыть
+mny-field-account = Счёт Money:
+mny-field-label = Какое описание дать операциям?
+mny-field-cleared = Что становится с операциями, отмеченными в Money?
+mny-field-not-cleared = Что становится с неотмеченными операциями?
+mny-field-scheduled = Что делать с предстоящими запланированными платежами?
+mny-recap-title = Что сделает импорт
+mny-close = Закрыть мастер
+mny-close-question = Закрыть мастер? Прочитанный файл и ваш выбор будут потеряны; ничего не импортировано.
+mny-help-1 = Выберите файл Money, затем счёт для импорта: предпросмотр показывает его операции.
+mny-help-2 = Проверьте, куда Radinus помещает каждое поле Money, и ответьте на вопросы: предпросмотр следует за каждым изменением.
+mny-help-3 = Для каждого значения Money выберите элемент Radinus, который его примет, или оставьте «Создать».
+mny-help-4 = Проверьте, что сделает импорт, затем сохраните дискетой.
+mny-need-account = Сначала выберите файл Money и один из его счетов.
+mny-empty-no-file = Файл Money не выбран.
+mny-empty = На этом счёте Money нет операций для импорта.
+mny-values-empty = Нет значений для сопоставления.
+mny-column-others = Прочее
+mny-column-destination = Поле Radinus
+mny-column-value = Значение Money
+mny-column-uses = Строки
+mny-column-choice = В Radinus
+mny-choice-create = Создать
+mny-choice-unspecified = Не указано
+mny-source-category = Категория
+mny-source-sub-category = Подкатегория
+mny-source-payee = Получатель
+mny-source-payment-mode = Способ оплаты
+mny-source-classification-1 = Классификация 1
+mny-source-classification-2 = Классификация 2
+mny-source-reference = № чека / ссылка
+mny-source-memo = Заметка
+mny-destination-ignore = Не импортировать
+mny-destination-budget-line = Статья бюджета
+mny-destination-category = Категория
+mny-destination-payee = Контрагент
+mny-destination-payment-mode = Способ оплаты
+mny-destination-assignment = Назначение
+mny-destination-project = Проект
+mny-destination-reference = Ссылка платежа
+mny-destination-comment = Комментарий
+mny-label-payee = Получатель
+mny-label-memo = Заметка
+mny-label-payee-and-memo = Получатель, затем заметка
+mny-status-pointed = Отмечена
+mny-status-committed = Обязательство
+mny-status-planned = Запланирована
+mny-scheduled-skip = Не импортировать
+mny-scheduled-planned = Импортировать как «Запланирована»
+mny-payees-none = Нет, без контрагентов
+mny-payees-frequent = Только часто встречающиеся получатели (не менее 3 операций)
+mny-payees-all = Да, контрагент для каждого получателя
+mny-payee-hint = Он также служит описанием операции (см. ниже).
+mny-routes-intro = Слева — что содержит ваш файл Money, с примером. Справа — куда Radinus это помещает. Выбор уже сделан за вас; меняйте его, только если хотите.
+mny-column-money = В вашем файле Money
+mny-column-example = Пример из файла
+mny-settings-title = Как импортировать операции
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } строка
+   *[other] строк: { $count }
+})
+mny-sample-absent = нет в этом файле
+mny-sample-payees = Разных получателей: { $count }, из них встречаются не менее { $min } раз: { $frequent }
+mny-sample-operations = { $count ->
+    [one] { $count } операция
+   *[other] операций: { $count }
+}
+mny-account-detail = Начальный остаток: { $opening } — { $count ->
+    [one] { $count } операция
+   *[other] операций: { $count }
+}
+mny-problem-password = Этот файл Money защищён паролем: введите его и нажмите «Открыть».
+mny-problem-wrong-password = Этот пароль не открывает файл Money.
+mny-problem-not-money = Этот файл не является файлом Microsoft Money.
+mny-problem-unreadable = Файл Money не читается: { $detail }
+mny-refusal-same = «{ $first }» и «{ $second }» оба идут в «{ $destination }»: поле Radinus принимает только одно значение.
+mny-refusal-not-offered = «{ $source }» не может идти в «{ $destination }».
+mny-refusal-budget-line = Статье бюджета нужна категория: в Radinus операция получает статью от своей категории.
+mny-note-split = Разделена ({ $count })
+mny-note-transfer = Перевод
+mny-preview-summary = { $count ->
+    [one] { $count } операция к импорту
+   *[other] операций к импорту: { $count }
+}, сумма { $sum }
+mny-preview-limited = предпросмотр показывает первые { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } запланированный платёж пропущен
+   *[other] пропущено запланированных платежей: { $count }
+}
+mny-recap-operations = { $count ->
+    [one] будет импортирована { $count } операция
+   *[other] будет импортировано операций: { $count }
+}, на сумму { $sum }{ $splits ->
+    [0] {""}
+   *[other] , из них разделённых: { $splits }
+}.
+mny-recap-balance = Итоговый остаток счёта: { $before } до, { $after } после.
+mny-recap-created = { $destination }: { $count ->
+    [one] будет создан { $count } элемент
+   *[other] будет создано элементов: { $count }
+}.
+mny-recap-overlap = Внимание: на этом счёте уже есть { $count ->
+    [one] { $count } операция
+   *[other] операций: { $count }
+} между { $from } и { $to }. Возможны дубликаты.
+mny-recap-opening = Взять начальный остаток Money ({ $amount }) как отмеченный начальный остаток счёта
+mny-save = Сохранить импорт
+mny-save-question = Импортировать эти операции на счёт? Элементы «Создать» будут созданы.
+mny-done = { $count ->
+    [one] Импортирована { $count } операция
+   *[other] Импортировано операций: { $count }
+} на «{ $account }», на сумму { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] создан { $count } элемент
+   *[other] создано элементов: { $count }
+}.
+journal-step-mny-begin = Начало импорта Money
+journal-step-mny-create = Создание элемента
+journal-step-mny-end = Конец импорта Money
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Указать файл Excel для импорта
 excel-pick = Указать файл Excel
 excel-sheet = Лист книги:

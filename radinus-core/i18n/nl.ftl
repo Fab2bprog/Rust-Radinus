@@ -1376,6 +1376,142 @@ structured-format-comma-thousands = { $example } (komma voor duizendtallen, deci
 structured-format-cents = { $example } (in centen)
 structured-format-thousandths = { $example } (in duizendsten)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Overboeking naar { $account }
+mny-transfer-from = Overboeking van { $account }
+mny-payment-mode = Money-betaalwijze nr. { $code }
+mny-no-label = Money-boeking
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Money-bestand importeren (MNY)
+window-mny-import-title-1 = Money-importassistent: { $account } (Stap 1/4)
+window-mny-import-title-2 = Money-importassistent: { $account } (Stap 2/4)
+window-mny-import-title-3 = Money-importassistent: { $account } (Stap 3/4)
+window-mny-import-title-4 = Money-importassistent: { $account } (Stap 4/4)
+mny-field-file = Money-bestand:
+mny-pick = Bestand kiezen…
+mny-field-password = Wachtwoord:
+mny-unlock = Openen
+mny-field-account = Money-rekening:
+mny-field-label = Welke omschrijving krijgen de boekingen?
+mny-field-cleared = Wat wordt er van de in Money afgevinkte boekingen?
+mny-field-not-cleared = Wat wordt er van de niet afgevinkte boekingen?
+mny-field-scheduled = Wat te doen met de komende geplande betalingen?
+mny-recap-title = Wat de import zal doen
+mny-close = Assistent sluiten
+mny-close-question = Assistent sluiten? Het gelezen bestand en uw keuzes gaan verloren; er is niets geïmporteerd.
+mny-help-1 = Kies het Money-bestand en daarna de te importeren rekening: het voorbeeld toont de boekingen.
+mny-help-2 = Controleer waar Radinus elk Money-gegeven onderbrengt en beantwoord de vragen: het voorbeeld volgt elke wijziging.
+mny-help-3 = Kies voor elke Money-waarde het Radinus-element dat haar ontvangt, of laat „Aanmaken” staan.
+mny-help-4 = Controleer wat de import zal doen en sla dan op met de diskette.
+mny-need-account = Kies eerst een Money-bestand en een van zijn rekeningen.
+mny-empty-no-file = Er is geen Money-bestand gekozen.
+mny-empty = Deze Money-rekening heeft geen boekingen om te importeren.
+mny-values-empty = Geen waarden om te koppelen.
+mny-column-others = Overige
+mny-column-destination = Radinus-veld
+mny-column-value = Money-waarde
+mny-column-uses = Regels
+mny-column-choice = In Radinus
+mny-choice-create = Aanmaken
+mny-choice-unspecified = Niet opgegeven
+mny-source-category = Categorie
+mny-source-sub-category = Subcategorie
+mny-source-payee = Begunstigde
+mny-source-payment-mode = Betaalwijze
+mny-source-classification-1 = Classificatie 1
+mny-source-classification-2 = Classificatie 2
+mny-source-reference = Chequenr. / referentie
+mny-source-memo = Notitie
+mny-destination-ignore = Niet importeren
+mny-destination-budget-line = Budgetpost
+mny-destination-category = Categorie
+mny-destination-payee = Derde
+mny-destination-payment-mode = Betaalwijze
+mny-destination-assignment = Toewijzing
+mny-destination-project = Project
+mny-destination-reference = Betalingsreferentie
+mny-destination-comment = Opmerking
+mny-label-payee = De begunstigde
+mny-label-memo = De notitie
+mny-label-payee-and-memo = De begunstigde gevolgd door de notitie
+mny-status-pointed = Afgevinkt
+mny-status-committed = Vastgelegd
+mny-status-planned = Gepland
+mny-scheduled-skip = Niet importeren
+mny-scheduled-planned = Importeren als „Gepland”
+mny-payees-none = Nee, geen derden
+mny-payees-frequent = Alleen begunstigden die vaak terugkomen (minstens 3 boekingen)
+mny-payees-all = Ja, een derde per begunstigde
+mny-payee-hint = Hij dient ook als omschrijving van de boeking (zie hieronder).
+mny-routes-intro = Links staat wat uw Money-bestand bevat, met een voorbeeld. Rechts waar Radinus het onderbrengt. De keuzes zijn al voor u gemaakt; wijzig ze alleen als u dat wilt.
+mny-column-money = In uw Money-bestand
+mny-column-example = Voorbeeld uit het bestand
+mny-settings-title = Hoe de boekingen importeren
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } regel
+   *[other] { $count } regels
+})
+mny-sample-absent = niets in dit bestand
+mny-sample-payees = Verschillende begunstigden: { $count }, waarvan { $frequent } minstens { $min } keer
+mny-sample-operations = { $count ->
+    [one] { $count } boeking
+   *[other] { $count } boekingen
+}
+mny-account-detail = Beginsaldo: { $opening } — { $count ->
+    [one] { $count } boeking
+   *[other] { $count } boekingen
+}
+mny-problem-password = Dit Money-bestand is met een wachtwoord beveiligd: typ het en druk op „Openen”.
+mny-problem-wrong-password = Dit wachtwoord opent het Money-bestand niet.
+mny-problem-not-money = Dit bestand is geen Microsoft Money-bestand.
+mny-problem-unreadable = Het Money-bestand is niet leesbaar: { $detail }
+mny-refusal-same = „{ $first }” en „{ $second }” gaan allebei naar „{ $destination }”: een Radinus-veld krijgt maar één gegeven.
+mny-refusal-not-offered = „{ $source }” kan niet naar „{ $destination }”.
+mny-refusal-budget-line = Een budgetpost heeft een categorie nodig: in Radinus krijgt een boeking haar post via haar categorie.
+mny-note-split = Gesplitst ({ $count })
+mny-note-transfer = Overboeking
+mny-preview-summary = { $count ->
+    [one] { $count } boeking te importeren
+   *[other] { $count } boekingen te importeren
+}, totaal { $sum }
+mny-preview-limited = het voorbeeld toont de eerste { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } geplande betaling overgeslagen
+   *[other] { $count } geplande betalingen overgeslagen
+}
+mny-recap-operations = { $count ->
+    [one] { $count } boeking wordt geïmporteerd
+   *[other] { $count } boekingen worden geïmporteerd
+}, voor een totaal van { $sum }{ $splits ->
+    [0] {""}
+   *[other] , waarvan { $splits } gesplitst
+}.
+mny-recap-balance = Eindsaldo van de rekening: { $before } vooraf, { $after } achteraf.
+mny-recap-created = { $destination }: { $count ->
+    [one] { $count } element wordt aangemaakt
+   *[other] { $count } elementen worden aangemaakt
+}.
+mny-recap-overlap = Let op: deze rekening heeft al { $count ->
+    [one] { $count } boeking
+   *[other] { $count } boekingen
+} tussen { $from } en { $to }. Dubbele boekingen zijn mogelijk.
+mny-recap-opening = Het Money-beginsaldo ({ $amount }) overnemen als afgevinkt beginsaldo van de rekening
+mny-save = Import opslaan
+mny-save-question = Deze boekingen in de rekening importeren? De elementen „Aanmaken” worden aangemaakt.
+mny-done = { $count ->
+    [one] { $count } boeking geïmporteerd
+   *[other] { $count } boekingen geïmporteerd
+} in „{ $account }”, voor een totaal van { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] { $count } element aangemaakt
+   *[other] { $count } elementen aangemaakt
+}.
+journal-step-mny-begin = Begin van de Money-import
+journal-step-mny-create = Aanmaken van een element
+journal-step-mny-end = Einde van de Money-import
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Het te importeren Excel-bestand aanwijzen
 excel-pick = Het Excel-bestand aanwijzen
 excel-sheet = Blad van de werkmap:

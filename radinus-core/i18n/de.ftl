@@ -1371,6 +1371,142 @@ structured-format-comma-thousands = { $example } (Komma als Tausendertrennzeiche
 structured-format-cents = { $example } (in Cent)
 structured-format-thousandths = { $example } (in Tausendsteln)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Überweisung an { $account }
+mny-transfer-from = Überweisung von { $account }
+mny-payment-mode = Money-Zahlungsart Nr. { $code }
+mny-no-label = Money-Buchung
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Money-Datei importieren (MNY)
+window-mny-import-title-1 = Money-Importassistent: { $account } (Schritt 1/4)
+window-mny-import-title-2 = Money-Importassistent: { $account } (Schritt 2/4)
+window-mny-import-title-3 = Money-Importassistent: { $account } (Schritt 3/4)
+window-mny-import-title-4 = Money-Importassistent: { $account } (Schritt 4/4)
+mny-field-file = Money-Datei:
+mny-pick = Datei wählen…
+mny-field-password = Passwort:
+mny-unlock = Öffnen
+mny-field-account = Money-Konto:
+mny-field-label = Welchen Buchungstext sollen die Buchungen erhalten?
+mny-field-cleared = Was wird aus den in Money abgehakten Buchungen?
+mny-field-not-cleared = Was wird aus den nicht abgehakten Buchungen?
+mny-field-scheduled = Was tun mit den anstehenden geplanten Zahlungen?
+mny-recap-title = Was der Import tun wird
+mny-close = Assistent schließen
+mny-close-question = Assistent schließen? Die gelesene Datei und Ihre Auswahl gehen verloren; es wurde nichts importiert.
+mny-help-1 = Wählen Sie die Money-Datei und dann das zu importierende Konto: Die Vorschau zeigt seine Buchungen.
+mny-help-2 = Prüfen Sie, wohin Radinus jede Money-Angabe legt, und beantworten Sie die Fragen: Die Vorschau folgt jeder Änderung.
+mny-help-3 = Wählen Sie für jeden Money-Wert das Radinus-Element, das ihn aufnimmt, oder lassen Sie „Anlegen“.
+mny-help-4 = Prüfen Sie, was der Import tun wird, und speichern Sie dann mit der Diskette.
+mny-need-account = Wählen Sie zuerst eine Money-Datei und eines ihrer Konten.
+mny-empty-no-file = Es ist keine Money-Datei gewählt.
+mny-empty = Dieses Money-Konto hat keine Buchung zum Importieren.
+mny-values-empty = Kein Wert zuzuordnen.
+mny-column-others = Weitere
+mny-column-destination = Radinus-Feld
+mny-column-value = Money-Wert
+mny-column-uses = Zeilen
+mny-column-choice = In Radinus
+mny-choice-create = Anlegen
+mny-choice-unspecified = Nicht angegeben
+mny-source-category = Kategorie
+mny-source-sub-category = Unterkategorie
+mny-source-payee = Empfänger
+mny-source-payment-mode = Zahlungsart
+mny-source-classification-1 = Klassifizierung 1
+mny-source-classification-2 = Klassifizierung 2
+mny-source-reference = Schecknr. / Referenz
+mny-source-memo = Notiz
+mny-destination-ignore = Nicht importieren
+mny-destination-budget-line = Budgetposten
+mny-destination-category = Kategorie
+mny-destination-payee = Empfänger
+mny-destination-payment-mode = Zahlungsart
+mny-destination-assignment = Zuordnung
+mny-destination-project = Projekt
+mny-destination-reference = Zahlungsreferenz
+mny-destination-comment = Kommentar
+mny-label-payee = Der Empfänger
+mny-label-memo = Die Notiz
+mny-label-payee-and-memo = Der Empfänger, gefolgt von der Notiz
+mny-status-pointed = Abgehakt
+mny-status-committed = Gebunden
+mny-status-planned = Geplant
+mny-scheduled-skip = Nicht importieren
+mny-scheduled-planned = Als „Geplant“ importieren
+mny-payees-none = Nein, keine Empfänger
+mny-payees-frequent = Nur Empfänger, die häufig vorkommen (mindestens 3 Buchungen)
+mny-payees-all = Ja, ein Empfänger für jeden
+mny-payee-hint = Er dient auch als Buchungstext (siehe unten).
+mny-routes-intro = Links steht, was Ihre Money-Datei enthält, mit einem Beispiel. Rechts, wo Radinus es ablegt. Die Auswahl ist bereits für Sie getroffen; ändern Sie sie nur, wenn Sie möchten.
+mny-column-money = In Ihrer Money-Datei
+mny-column-example = Beispiel aus der Datei
+mny-settings-title = Wie die Buchungen importiert werden
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } Zeile
+   *[other] { $count } Zeilen
+})
+mny-sample-absent = nicht in dieser Datei
+mny-sample-payees = Verschiedene Empfänger: { $count }, davon { $frequent } mindestens { $min }-mal
+mny-sample-operations = { $count ->
+    [one] { $count } Buchung
+   *[other] { $count } Buchungen
+}
+mny-account-detail = Anfangssaldo: { $opening } — { $count ->
+    [one] { $count } Buchung
+   *[other] { $count } Buchungen
+}
+mny-problem-password = Diese Money-Datei ist mit einem Passwort geschützt: Geben Sie es ein und drücken Sie „Öffnen“.
+mny-problem-wrong-password = Dieses Passwort öffnet die Money-Datei nicht.
+mny-problem-not-money = Diese Datei ist keine Microsoft-Money-Datei.
+mny-problem-unreadable = Die Money-Datei lässt sich nicht lesen: { $detail }
+mny-refusal-same = „{ $first }“ und „{ $second }“ gehen beide in „{ $destination }“: Ein Radinus-Feld nimmt nur eine Angabe auf.
+mny-refusal-not-offered = „{ $source }“ kann nicht in „{ $destination }“ gehen.
+mny-refusal-budget-line = Ein Budgetposten braucht eine Kategorie: In Radinus erhält eine Buchung ihren Posten über ihre Kategorie.
+mny-note-split = Aufgeteilt ({ $count })
+mny-note-transfer = Überweisung
+mny-preview-summary = { $count ->
+    [one] { $count } Buchung zu importieren
+   *[other] { $count } Buchungen zu importieren
+}, Summe { $sum }
+mny-preview-limited = die Vorschau zeigt die ersten { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } geplante Zahlung beiseitegelassen
+   *[other] { $count } geplante Zahlungen beiseitegelassen
+}
+mny-recap-operations = { $count ->
+    [one] { $count } Buchung wird importiert
+   *[other] { $count } Buchungen werden importiert
+}, Summe { $sum }{ $splits ->
+    [0] {""}
+   *[other] , davon { $splits } aufgeteilt
+}.
+mny-recap-balance = Endsaldo des Kontos: { $before } vorher, { $after } nachher.
+mny-recap-created = { $destination }: { $count ->
+    [one] { $count } Element wird angelegt
+   *[other] { $count } Elemente werden angelegt
+}.
+mny-recap-overlap = Achtung: Dieses Konto hat bereits { $count ->
+    [one] { $count } Buchung
+   *[other] { $count } Buchungen
+} zwischen dem { $from } und dem { $to }. Doppelte Buchungen sind möglich.
+mny-recap-opening = Den Money-Anfangssaldo ({ $amount }) als abgehakten Anfangssaldo des Kontos übernehmen
+mny-save = Import speichern
+mny-save-question = Diese Buchungen in das Konto importieren? Die Elemente „Anlegen“ werden angelegt.
+mny-done = { $count ->
+    [one] { $count } Buchung importiert
+   *[other] { $count } Buchungen importiert
+} in „{ $account }“, Summe { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] { $count } Element angelegt
+   *[other] { $count } Elemente angelegt
+}.
+journal-step-mny-begin = Beginn des Money-Imports
+journal-step-mny-create = Anlegen eines Elements
+journal-step-mny-end = Ende des Money-Imports
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Die zu importierende Excel-Datei bestimmen
 excel-pick = Die Excel-Datei bestimmen
 excel-sheet = Blatt der Arbeitsmappe:

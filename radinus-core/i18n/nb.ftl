@@ -1362,6 +1362,142 @@ structured-format-comma-thousands = { $example } (komma for tusener, desimalpunk
 structured-format-cents = { $example } (i øre)
 structured-format-thousandths = { $example } (i tusendeler)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = Overføring til { $account }
+mny-transfer-from = Overføring fra { $account }
+mny-payment-mode = Money-betalingsmåte nr. { $code }
+mny-no-label = Money-transaksjon
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = Importer en Money-fil (MNY)
+window-mny-import-title-1 = Money-importveiviser: { $account } (Trinn 1/4)
+window-mny-import-title-2 = Money-importveiviser: { $account } (Trinn 2/4)
+window-mny-import-title-3 = Money-importveiviser: { $account } (Trinn 3/4)
+window-mny-import-title-4 = Money-importveiviser: { $account } (Trinn 4/4)
+mny-field-file = Money-fil:
+mny-pick = Velg filen…
+mny-field-password = Passord:
+mny-unlock = Åpne
+mny-field-account = Money-konto:
+mny-field-label = Hvilken tekst skal transaksjonene få?
+mny-field-cleared = Hva blir det av transaksjonene som er avmerket i Money?
+mny-field-not-cleared = Hva blir det av de ikke avmerkede transaksjonene?
+mny-field-scheduled = Hva skal gjøres med kommende planlagte betalinger?
+mny-recap-title = Hva importen vil gjøre
+mny-close = Lukk veiviseren
+mny-close-question = Lukke veiviseren? Den leste filen og valgene dine går tapt; ingenting er importert.
+mny-help-1 = Velg Money-filen og deretter kontoen som skal importeres: forhåndsvisningen viser transaksjonene.
+mny-help-2 = Kontroller hvor Radinus legger hver Money-opplysning, og svar på spørsmålene: forhåndsvisningen følger hver endring.
+mny-help-3 = Velg for hver Money-verdi Radinus-elementet som skal motta den, eller la «Opprett» stå.
+mny-help-4 = Kontroller hva importen vil gjøre, og lagre deretter med disketten.
+mny-need-account = Velg først en Money-fil og en av kontoene i den.
+mny-empty-no-file = Ingen Money-fil er valgt.
+mny-empty = Denne Money-kontoen har ingen transaksjoner å importere.
+mny-values-empty = Ingen verdier å koble.
+mny-column-others = Annet
+mny-column-destination = Radinus-felt
+mny-column-value = Money-verdi
+mny-column-uses = Linjer
+mny-column-choice = I Radinus
+mny-choice-create = Opprett
+mny-choice-unspecified = Ikke angitt
+mny-source-category = Kategori
+mny-source-sub-category = Underkategori
+mny-source-payee = Mottaker
+mny-source-payment-mode = Betalingsmåte
+mny-source-classification-1 = Klassifisering 1
+mny-source-classification-2 = Klassifisering 2
+mny-source-reference = Sjekknr. / referanse
+mny-source-memo = Notat
+mny-destination-ignore = Ikke importer
+mny-destination-budget-line = Budsjettpost
+mny-destination-category = Kategori
+mny-destination-payee = Motpart
+mny-destination-payment-mode = Betalingsmåte
+mny-destination-assignment = Tilordning
+mny-destination-project = Prosjekt
+mny-destination-reference = Betalingsreferanse
+mny-destination-comment = Kommentar
+mny-label-payee = Mottakeren
+mny-label-memo = Notatet
+mny-label-payee-and-memo = Mottakeren etterfulgt av notatet
+mny-status-pointed = Avmerket
+mny-status-committed = Bundet
+mny-status-planned = Planlagt
+mny-scheduled-skip = Ikke importer
+mny-scheduled-planned = Importer som «Planlagt»
+mny-payees-none = Nei, ingen motparter
+mny-payees-frequent = Bare mottakere som går igjen ofte (minst 3 transaksjoner)
+mny-payees-all = Ja, én motpart per mottaker
+mny-payee-hint = Den brukes også som transaksjonstekst (se nedenfor).
+mny-routes-intro = Til venstre, hva Money-filen din inneholder, med et eksempel. Til høyre, hvor Radinus legger det. Valgene er allerede gjort for deg; endre dem bare hvis du ønsker det.
+mny-column-money = I Money-filen din
+mny-column-example = Eksempel fra filen
+mny-settings-title = Hvordan transaksjonene importeres
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } linje
+   *[other] { $count } linjer
+})
+mny-sample-absent = ingenting i denne filen
+mny-sample-payees = Ulike mottakere: { $count }, hvorav { $frequent } forekommer minst { $min } ganger
+mny-sample-operations = { $count ->
+    [one] { $count } transaksjon
+   *[other] { $count } transaksjoner
+}
+mny-account-detail = Inngående saldo: { $opening } — { $count ->
+    [one] { $count } transaksjon
+   *[other] { $count } transaksjoner
+}
+mny-problem-password = Denne Money-filen er beskyttet med passord: skriv det inn og trykk «Åpne».
+mny-problem-wrong-password = Dette passordet åpner ikke Money-filen.
+mny-problem-not-money = Denne filen er ikke en Microsoft Money-fil.
+mny-problem-unreadable = Money-filen kan ikke leses: { $detail }
+mny-refusal-same = «{ $first }» og «{ $second }» går begge til «{ $destination }»: et Radinus-felt tar bare imot én opplysning.
+mny-refusal-not-offered = «{ $source }» kan ikke gå til «{ $destination }».
+mny-refusal-budget-line = En budsjettpost trenger en kategori: i Radinus får en transaksjon posten sin fra kategorien.
+mny-note-split = Delt ({ $count })
+mny-note-transfer = Overføring
+mny-preview-summary = { $count ->
+    [one] { $count } transaksjon å importere
+   *[other] { $count } transaksjoner å importere
+}, sum { $sum }
+mny-preview-limited = forhåndsvisningen viser de første { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } planlagt betaling holdt utenfor
+   *[other] { $count } planlagte betalinger holdt utenfor
+}
+mny-recap-operations = { $count ->
+    [one] { $count } transaksjon importeres
+   *[other] { $count } transaksjoner importeres
+}, for en sum på { $sum }{ $splits ->
+    [0] {""}
+   *[other] , hvorav { $splits } delt
+}.
+mny-recap-balance = Kontoens sluttsaldo: { $before } før, { $after } etter.
+mny-recap-created = { $destination }: { $count ->
+    [one] { $count } element opprettes
+   *[other] { $count } elementer opprettes
+}.
+mny-recap-overlap = Obs: denne kontoen har allerede { $count ->
+    [one] { $count } transaksjon
+   *[other] { $count } transaksjoner
+} mellom { $from } og { $to }. Duplikater er mulig.
+mny-recap-opening = Bruk Money-inngående saldo ({ $amount }) som kontoens avmerkede inngående saldo
+mny-save = Lagre importen
+mny-save-question = Importere disse transaksjonene til kontoen? Elementene «Opprett» blir opprettet.
+mny-done = { $count ->
+    [one] { $count } transaksjon importert
+   *[other] { $count } transaksjoner importert
+} til «{ $account }», for en sum på { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] { $count } element opprettet
+   *[other] { $count } elementer opprettet
+}.
+journal-step-mny-begin = Start på Money-importen
+journal-step-mny-create = Oppretting av et element
+journal-step-mny-end = Slutt på Money-importen
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - Velg Excel-filen som skal importeres
 excel-pick = Velg Excel-filen
 excel-sheet = Ark i arbeidsboken:

@@ -200,6 +200,7 @@ const UI_TEXTS = {
   "ui-label-required": "Le libellé est obligatoire.",
   "ui-discard-question": "Abandonner les modifications ?",
   "ui-yes": "Oui",
+  "ui-ok": "OK",
   "ui-no": "Non",
   "ui-select-record": "Veuillez sélectionner un enregistrement",
   // Phase 17 bis — la fenêtre d'accueil (F01).
@@ -1760,6 +1761,68 @@ const UI_TEXTS = {
   "quick-leave-stay": "Rester",
   "quick-title-apply": "Appliquer aux lignes sélectionnées ( en mémoire )",
   "quick-title-save": "Enregistrer sur le disque",
+  "mny-field-file": "Fichier Money :",
+  "mny-pick": "Choisir le fichier…",
+  "mny-field-password": "Mot de passe :",
+  "mny-unlock": "Ouvrir",
+  "mny-field-account": "Compte Money :",
+  "mny-field-label": "Quel libellé donner aux opérations ?",
+  "mny-field-cleared": "Que deviennent les opérations pointées dans Money ?",
+  "mny-field-not-cleared": "Que deviennent les opérations non pointées ?",
+  "mny-field-scheduled": "Que faire des échéances à venir ?",
+  "mny-recap-title": "Ce que l'importation va faire",
+  "mny-close": "Fermer l'assistant",
+  "mny-close-question": "Fermer l'assistant ? Le fichier lu et vos choix seront perdus ; rien n'a été importé.",
+  "mny-help-1": "Choisissez le fichier Money, puis le compte à importer : l'aperçu montre ses opérations.",
+  "mny-help-2": "Vérifiez où Radinus range chaque donnée Money, et répondez aux questions : l'aperçu suit chaque changement.",
+  "mny-help-3": "Pour chaque valeur Money, choisissez l'élément de Radinus qui la recevra, ou laissez « À créer ».",
+  "mny-help-4": "Vérifiez ce que l'importation va faire, puis enregistrez avec la disquette.",
+  "mny-save": "Enregistrer l'importation",
+  "mny-save-question": "Importer ces opérations dans le compte ? Les éléments « À créer » seront créés.",
+  "mny-need-account": "Choisissez d'abord un fichier Money et l'un de ses comptes.",
+  "mny-empty-no-file": "Aucun fichier Money n'est choisi.",
+  "mny-empty": "Ce compte Money n'a aucune opération à importer.",
+  "mny-values-empty": "Aucune valeur à faire correspondre.",
+  "mny-column-others": "Autres",
+  "mny-column-destination": "Rubrique Radinus",
+  "mny-column-value": "Valeur Money",
+  "mny-column-uses": "Lignes",
+  "mny-column-choice": "Dans Radinus",
+  "mny-choice-create": "À créer",
+  "mny-choice-unspecified": "Non précisé",
+  "mny-source-category": "Catégorie",
+  "mny-source-sub-category": "Sous-catégorie",
+  "mny-source-payee": "Bénéficiaire",
+  "mny-source-payment-mode": "Mode de paiement",
+  "mny-source-classification-1": "Classification 1",
+  "mny-source-classification-2": "Classification 2",
+  "mny-source-reference": "N° de chèque / référence",
+  "mny-source-memo": "Note",
+  "mny-destination-ignore": "Ne pas importer",
+  "mny-destination-budget-line": "Poste budgétaire",
+  "mny-destination-category": "Catégorie",
+  "mny-destination-payee": "Tiers",
+  "mny-destination-payment-mode": "Mode de règlement",
+  "mny-destination-assignment": "Affectation",
+  "mny-destination-project": "Projet",
+  "mny-destination-reference": "Référence paiement",
+  "mny-destination-comment": "Commentaire",
+  "mny-label-payee": "Le bénéficiaire",
+  "mny-label-memo": "La note",
+  "mny-label-payee-and-memo": "Le bénéficiaire suivi de la note",
+  "mny-status-pointed": "Pointé",
+  "mny-status-committed": "Engagé",
+  "mny-status-planned": "Prévu",
+  "mny-scheduled-skip": "Ne pas importer",
+  "mny-scheduled-planned": "Importer en « Prévu »",
+  "mny-payees-none": "Non, aucun tiers",
+  "mny-payees-frequent": "Seulement les bénéficiaires qui reviennent souvent (au moins 3 opérations)",
+  "mny-payees-all": "Oui, un tiers par bénéficiaire",
+  "mny-payee-hint": "Il sert aussi de libellé à l'opération (voir plus bas).",
+  "mny-routes-intro": "À gauche, ce que contient votre fichier Money, avec un exemple. À droite, où Radinus le range. Les choix sont déjà faits pour vous ; changez-les seulement si vous le souhaitez.",
+  "mny-column-money": "Dans votre fichier Money",
+  "mny-column-example": "Exemple tiré du fichier",
+  "mny-settings-title": "Comment importer les opérations",
 };
 
 /// La matrice que le noyau rend à F20 : deux catégories qui portent quelque
@@ -4005,6 +4068,130 @@ function bridge({ startupError = null, needsConfirmation = true, plainQuestion =
               ],
               said: "Liste lue : 2 lignes, 3 colonnes ; l'aperçu en montre 2.",
             });
+          // L'assistant d'importation Money (05/11/2026) : le fichier lu,
+          // ses comptes, l'aperçu qui suit les choix, les correspondances.
+          case "open_mny_import":
+            window.__opened = { command, args };
+            return Promise.resolve();
+          case "close_mny_import":
+            window.__mnyClosed = (window.__mnyClosed ?? 0) + 1;
+            return Promise.resolve(null);
+          case "mny_pick_file":
+            return Promise.resolve(window.__mnyPicked === undefined ? "/Users/test/Archivage.mny" : window.__mnyPicked);
+          case "mny_read":
+            if (window.__mnyProtected && args.password !== "secret") {
+              return Promise.resolve({
+                needs_password: true,
+                problem: args.password ? "Ce mot de passe n'ouvre pas le fichier Money." : "Ce fichier Money est protégé par un mot de passe.",
+                accounts: [],
+              });
+            }
+            return Promise.resolve({
+              needs_password: false,
+              problem: null,
+              accounts: [
+                { handle: 2, label: "Compte courant", detail: "Solde d'ouverture : 999 900,00 € — 4 opérations" },
+                { handle: 3, label: "LivretA", detail: "Solde d'ouverture : 5 000,00 € — 2 opérations" },
+              ],
+            });
+          case "mny_choices": {
+            const classing = ["ignore", "budget-line", "category", "payment-mode", "assignment", "project", "comment"];
+            const texts = ["ignore", "reference", "comment"];
+            return Promise.resolve({
+              sources: [
+                { key: "category", default: "budget-line", destinations: classing },
+                { key: "sub-category", default: "category", destinations: classing },
+                { key: "payment-mode", default: "payment-mode", destinations: classing },
+                { key: "classification-1", default: "assignment", destinations: classing },
+                { key: "classification-2", default: "project", destinations: classing },
+                { key: "reference", default: "reference", destinations: texts },
+                { key: "memo", default: "comment", destinations: texts },
+              ],
+              labels: ["payee", "memo", "payee-and-memo"],
+              label: "payee",
+              statuses: ["pointed", "committed", "planned"],
+              cleared: "pointed",
+              not_cleared: "committed",
+              scheduled: ["skip", "planned"],
+              scheduled_default: "skip",
+              payees: ["none", "frequent", "all"],
+              payees_default: "none",
+              frequent: 3,
+            });
+          }
+          case "mny_samples": {
+            const some = (key, example) => ({ key, example, absent: false });
+            const none = (key) => ({ key, example: "rien dans ce fichier", absent: true });
+            return Promise.resolve({
+              sources: [
+                some("category", "Alimentation (3 lignes), Salaire net (1 ligne)"),
+                some("sub-category", "Épicerie (2 lignes)"),
+                some("payment-mode", "Mode de paiement Money n° 2 (1 ligne)"),
+                none("classification-1"),
+                none("classification-2"),
+                none("reference"),
+                some("memo", "Lave-auto (1 ligne)"),
+              ],
+              payee: some("payee", "Carottes (2 lignes), Salaire (1 ligne)"),
+              payees: "Bénéficiaires différents : 2, dont 0 présents au moins 3 fois",
+              cleared: some("cleared", "1 opération"),
+              not_cleared: some("not-cleared", "3 opérations"),
+              scheduled: none("scheduled"),
+            });
+          }
+          case "mny_preview": {
+            window.__mnyPreviews = (window.__mnyPreviews ?? []).concat([args]);
+            const routes = Object.entries(args.mapping.routes).filter(([, one]) => one !== "ignore");
+            const conflicts = routes
+              .filter(([key, one]) => routes.some(([other, two]) => other !== key && two === one))
+              .map(([key]) => key);
+            if (conflicts.length > 0) {
+              return Promise.resolve({
+                refusal: "Deux données Money vont dans la même rubrique.",
+                conflicts,
+                rows: [],
+                summary: "",
+              });
+            }
+            const tiers = args.mapping.payees !== "none";
+            const rows = args.handle === 3
+              ? [{ id: 0, date: "01/11/2026", date_value: "2026-11-01", label: "Epargne Interet", amount_text: "500,00 €", amount: 500000000, status: "Engagé", budget_line: "Placements", category: "Intérêts", payee: tiers ? "Epargne Interet" : "", others: "" }]
+              : [
+                  { id: 0, date: "04/11/2026", date_value: "2026-11-04", label: "Carottes", amount_text: "-10,00 €", amount: -10000000, status: "Engagé", budget_line: "Alimentation", category: "Épicerie", payee: tiers ? "Carottes" : "", others: "" },
+                  { id: 1, date: "04/11/2026", date_value: "2026-11-04", label: "Salaire", amount_text: "2 200,00 €", amount: 2200000000, status: "Engagé", budget_line: "Traitements et salaires", category: "Salaire net", payee: tiers ? "Salaire" : "", others: "Ventilée (2)" },
+                ];
+            return Promise.resolve({ refusal: null, conflicts: [], rows, summary: rows.length + " opérations à importer, somme 2 190,00 €" });
+          }
+          case "mny_values":
+            window.__mnyValuesAsked = args;
+            return Promise.resolve({
+              rows: [
+                { id: 0, destination: "budget-line", label: "Alimentation", budget_line: "", uses: 1, proposal: "create" },
+                { id: 1, destination: "category", label: "Épicerie", budget_line: "Alimentation", uses: 1, proposal: "7" },
+                { id: 2, destination: "payee", label: "Carottes", budget_line: "", uses: 1, proposal: "create" },
+              ],
+              options: [
+                { destination: "budget-line", items: [{ id: 4, label: "Vie courante" }] },
+                { destination: "category", items: [{ id: 7, label: "Épicerie" }] },
+                { destination: "payee", items: [{ id: 3, label: "Salaire" }] },
+                { destination: "payment-mode", items: [] },
+                { destination: "assignment", items: [] },
+                { destination: "project", items: [] },
+              ],
+            });
+          case "mny_recap":
+            window.__mnyRecap = args;
+            return Promise.resolve({
+              lines: [
+                "2 opérations seront importées, pour une somme de 2 190,00 €.",
+                "Solde final du compte : 1 549,81 € avant, 3 739,81 € après.",
+              ],
+              warning: window.__mnyOverlap ? "Attention : ce compte a déjà 3 opérations entre le 04/11/2026 et le 04/11/2026." : null,
+              opening: window.__mnyOpening ? "Reprendre le solde d'ouverture Money (999 900,00 €) comme solde initial pointé du compte" : null,
+            });
+          case "mny_import":
+            window.__mnyImported = (window.__mnyImported ?? []).concat([args]);
+            return Promise.resolve({ text: "2 opérations importées dans « CCP », pour une somme de 2 190,00 €." });
           case "open_structured_import":
           case "open_excel_fields":
           case "open_excel_association":
@@ -4583,6 +4770,7 @@ async function openWindow(page, url, options) {
         "sharing.html": "",
         "quick-classification.html": "?account=1",
         "duplicates.html": "?account=1",
+        "mny-import.html": "?account=1",
         "statement-import.html": "?account=1",
         "statement-form.html": "?account=1&rank=1",
         "csv-statement.html": "?account=1&path=%2Ftmp%2Freleve.csv",
@@ -15896,6 +16084,366 @@ async function openWindow(page, url, options) {
     JSON.stringify(fills),
   );
   await tool.close();
+}
+
+// --- L'assistant d'importation Money (05/11/2026) --------------------------
+{
+  // Fabrice, 05/11/2026 : un compte d'abord, puis un assistant ; « tu feras
+  // des menus déroulants avec une proposition par défaut, car il faut que
+  // l'utilisateur puisse choisir ».
+  const page = await browser.newPage();
+  const errors = await openWindow(page, "http://localhost:4173/ui/windows/mny-import.html?account=1");
+  await page.waitForTimeout(150);
+  const visible = (id) => page.locator("#" + id).isVisible();
+  const calls = (name) => page.evaluate((wanted) => window.__calls.filter(([c]) => c === wanted), name);
+  const titles = async () => (await calls("retitle")).map(([, args]) => args.key);
+  check("money : aucune erreur de script", errors.length === 0, errors.join(" | "));
+  check(
+    "money : la fenêtre s'ouvre à l'étape 1, sur le compte choisi",
+    (await titles()).at(-1) === "window-mny-import-title-1" &&
+      (await visible("step-1")) && !(await visible("step-2")) && !(await visible("values")) &&
+      !(await visible("previous")) && (await visible("next")),
+    JSON.stringify(await titles()),
+  );
+  check(
+    "money : sans fichier, l'aperçu le dit",
+    (await page.textContent("#preview-rows")).includes("Aucun fichier Money n'est choisi."),
+  );
+  await page.click("#next");
+  await page.waitForTimeout(100);
+  check(
+    "money : pas d'étape 2 sans fichier ni compte",
+    (await page.textContent("#info-bar")) === "Choisissez d'abord un fichier Money et l'un de ses comptes." &&
+      (await page.locator("#info-bar.info-bar--alert").count()) === 1 &&
+      (await visible("step-1")),
+  );
+
+  // Le fichier : Rust ouvre le sélecteur et le lit.
+  await page.click("#pick");
+  await page.waitForTimeout(200);
+  check(
+    "money : le fichier lu propose ses comptes, avec leur solde d'ouverture",
+    (await page.inputValue("#file")) === "/Users/test/Archivage.mny" &&
+      (await page.locator("#money-account option").allTextContents()).join("|") === "Compte courant|LivretA" &&
+      (await page.textContent("#money-account-detail")) === "Solde d'ouverture : 999 900,00 € — 4 opérations" &&
+      !(await visible("password-line")),
+  );
+  const firstPreview = (await page.evaluate(() => window.__mnyPreviews))[0];
+  check(
+    "money : l'aperçu part des propositions",
+    firstPreview.handle === 2 &&
+      JSON.stringify(firstPreview.mapping) ===
+        JSON.stringify({
+          routes: {
+            category: "budget-line",
+            "sub-category": "category",
+            "payment-mode": "payment-mode",
+            "classification-1": "assignment",
+            "classification-2": "project",
+            reference: "reference",
+            memo: "comment",
+          },
+          payees: "none",
+          label: "payee",
+          cleared: "pointed",
+          not_cleared: "committed",
+          scheduled: "skip",
+        }),
+    JSON.stringify(firstPreview),
+  );
+  check(
+    "money : l'aperçu montre les opérations rangées et leur somme",
+    (await page.locator("#preview-rows .list__row").count()) === 2 &&
+      (await page.textContent("#preview-rows")).includes("Épicerie") &&
+      (await page.textContent("#preview-rows")).includes("Ventilée (2)") &&
+      (await page.textContent("#summary")) === "2 opérations à importer, somme 2 190,00 €",
+  );
+  check(
+    "money : l'aperçu est lisible : sept colonnes au plus, et une colonne vide est masquée",
+    (await page.innerText("#preview-header")).includes("Autres") &&
+      (await page.innerText("#preview-header")).includes("Poste budgétaire") &&
+      !(await page.innerText("#preview-header")).includes("Tiers"),
+    await page.innerText("#preview-header"),
+  );
+  await page.selectOption("#money-account", "3");
+  await page.waitForTimeout(150);
+  check(
+    "money : changer de compte Money change l'aperçu",
+    (await page.locator("#preview-rows .list__row").count()) === 1 &&
+      (await page.textContent("#money-account-detail")).startsWith("Solde d'ouverture : 5 000,00 €"),
+  );
+  await page.selectOption("#money-account", "2");
+  await page.waitForTimeout(150);
+
+  // L'étape 2 (Fabrice, 05/11/2026 : « un utilisateur lambda sera perdu ») :
+  // une phrase, un tableau qui met en face le fichier Money et Radinus, avec
+  // un exemple ; les tiers par leur propre question ; les réglages en
+  // questions, dans leur cadre.
+  await page.click("#next");
+  await page.waitForTimeout(150);
+  const cellText = (kind, source) =>
+    page.locator(`#routes .mny__cell--${kind}[data-source='${source}']`).textContent();
+  check(
+    "money : l'étape 2 montre la phrase, le tableau et ses huit menus sur leur proposition, et l'aperçu",
+    (await titles()).at(-1) === "window-mny-import-title-2" &&
+      (await visible("step-2")) && (await visible("preview")) && (await visible("previous")) &&
+      (await page.textContent("#routes-intro")).startsWith("À gauche, ce que contient votre fichier Money") &&
+      (await page.locator("#routes .mny__cell--head").allTextContents()).join("|") ===
+        "Dans votre fichier Money|Exemple tiré du fichier||Dans Radinus" &&
+      (await page.locator("#routes select").count()) === 8 &&
+      (await page.inputValue("#route-category")) === "budget-line" &&
+      (await page.inputValue("#route-sub-category")) === "category" &&
+      (await page.inputValue("#route-memo")) === "comment",
+  );
+  check(
+    "money : chaque donnée montre un exemple tiré du fichier, avec son nombre de lignes",
+    (await cellText("name", "category")) === "Catégorie" &&
+      (await cellText("example", "category")) === "Alimentation (3 lignes), Salaire net (1 ligne)" &&
+      (await cellText("arrow", "category")) === "→",
+  );
+  check(
+    "money : une donnée absente du fichier est grisée et le dit",
+    (await page.locator("#routes .mny__cell--absent[data-source='classification-1']").count()) === 4 &&
+      (await cellText("example", "classification-1")) === "rien dans ce fichier" &&
+      (await page.locator("#routes .mny__cell--absent[data-source='category']").count()) === 0,
+  );
+  check(
+    "money : le bénéficiaire a sa ligne : ses chiffres, et « aucun tiers » proposé",
+    (await cellText("name", "payee")) === "Bénéficiaire" &&
+      (await cellText("example", "payee")).includes("Bénéficiaires différents : 2") &&
+      (await page.inputValue("#payees")) === "none" &&
+      (await page.locator("#payees option").allTextContents()).join("|") ===
+        "Non, aucun tiers|Seulement les bénéficiaires qui reviennent souvent (au moins 3 opérations)|Oui, un tiers par bénéficiaire" &&
+      (await cellText("choice", "payee")).includes("Il sert aussi de libellé"),
+  );
+  check(
+    "money : aucun menu de donnée ne propose « Tiers »",
+    !(await page.locator("#routes select:not(#payees) option[value='payee']").count()),
+  );
+  check(
+    "money : un texte libre ne propose pas les classements",
+    (await page.locator("#route-memo option").allTextContents()).join("|") ===
+      "Ne pas importer|Référence paiement|Commentaire",
+  );
+  check(
+    "money : les quatre réglages sont des questions, dans leur cadre, sur leur proposition",
+    (await page.textContent("#settings-title")) === "Comment importer les opérations" &&
+      (await page.textContent("#label-from-label")) === "Quel libellé donner aux opérations ?" &&
+      (await page.inputValue("#label-from")) === "payee" &&
+      (await page.inputValue("#cleared")) === "pointed" &&
+      (await page.inputValue("#not-cleared")) === "committed" &&
+      (await page.inputValue("#scheduled")) === "skip" &&
+      (await page.locator("#scheduled option").allTextContents()).join("|") === "Ne pas importer|Importer en « Prévu »",
+  );
+  check(
+    "money : chaque question dit combien d'opérations elle touche ; aucune, elle est grisée",
+    (await page.textContent("#not-cleared-count")) === "3 opérations" &&
+      (await page.textContent("#scheduled-count")) === "rien dans ce fichier" &&
+      (await page.locator("#scheduled-label.mny__question--absent").count()) === 1 &&
+      (await page.locator("#cleared-label.mny__question--absent").count()) === 0,
+  );
+  await page.selectOption("#payees", "all");
+  await page.waitForTimeout(150);
+  check(
+    "money : « un tiers par bénéficiaire » : l'aperçu suit, et sa colonne Tiers apparaît",
+    (await page.evaluate(() => window.__mnyPreviews.at(-1).mapping.payees)) === "all" &&
+      (await page.innerText("#preview-header")).includes("Tiers"),
+  );
+  await page.selectOption("#payees", "none");
+  await page.waitForTimeout(150);
+  await page.selectOption("#route-classification-1", "category");
+  await page.waitForTimeout(150);
+  check(
+    "money : deux données dans la même rubrique : refusé, dit, et leurs deux lignes en rouge",
+    (await page.textContent("#info-bar")) === "Deux données Money vont dans la même rubrique." &&
+      (await page.locator("#preview-rows .list__row").count()) === 0 &&
+      (await page.textContent("#preview-rows")).includes("Deux données Money vont dans la même rubrique.") &&
+      (await page.locator("#routes .mny__cell--conflict[data-source='classification-1']").count()) === 4 &&
+      (await page.locator("#routes .mny__cell--conflict[data-source='sub-category']").count()) === 4 &&
+      (await page.locator("#routes .mny__cell--conflict").count()) === 8,
+  );
+  await page.click("#next");
+  await page.waitForTimeout(150);
+  check("money : on ne passe pas à l'étape 3 avec un refus", (await visible("step-2")) && !(await visible("values")));
+  await page.selectOption("#route-classification-1", "assignment");
+  await page.waitForTimeout(150);
+  check(
+    "money : le refus levé, le rouge s'en va",
+    (await page.locator("#routes .mny__cell--conflict").count()) === 0,
+  );
+
+  // L'étape 3 : les correspondances.
+  await page.click("#next");
+  await page.waitForTimeout(200);
+  check(
+    "money : l'étape 3 montre chaque valeur et son menu, sur la proposition",
+    (await titles()).at(-1) === "window-mny-import-title-3" &&
+      (await visible("values")) && !(await visible("preview")) &&
+      (await page.locator("#values-rows select").count()) === 3 &&
+      (await page.locator("#values-rows select").nth(0).inputValue()) === "create" &&
+      (await page.locator("#values-rows select").nth(1).inputValue()) === "7",
+  );
+  check(
+    "money : un menu propose « À créer », « Non précisé », puis les éléments de sa rubrique",
+    (await page.locator("#values-rows select").nth(0).locator("option").allTextContents()).join("|") ===
+      "À créer|Non précisé|Vie courante",
+  );
+  await page.locator("#values-rows select").nth(0).selectOption("4");
+  await page.click("#next");
+  await page.waitForTimeout(200);
+  check(
+    "money : le récapitulatif reçoit les choix de l'étape 3",
+    JSON.stringify((await page.evaluate(() => window.__mnyRecap)).choices) === JSON.stringify(["4", "7", "create"]) &&
+      (await titles()).at(-1) === "window-mny-import-title-4" &&
+      (await page.locator("#recap-lines li").count()) === 2 &&
+      !(await visible("recap-warning")) && !(await visible("next")),
+  );
+  await page.click("#previous");
+  await page.waitForTimeout(150);
+  check(
+    "money : revenir à l'étape 3 garde le choix fait",
+    (await page.locator("#values-rows select").nth(0).inputValue()) === "4",
+  );
+  await page.evaluate(() => {
+    window.__mnyOverlap = true;
+  });
+  await page.click("#next");
+  await page.waitForTimeout(200);
+  check(
+    "money : un compte qui a déjà des opérations sur la période est signalé",
+    (await visible("recap-warning")) && (await page.textContent("#recap-warning")).startsWith("Attention"),
+  );
+
+  // La porte : une question, puisqu'un fichier est lu.
+  await page.click("#close");
+  await page.waitForTimeout(100);
+  check(
+    "money : la porte demande avant de fermer",
+    (await page.locator(".dialog__question").textContent()) ===
+      "Fermer l'assistant ? Le fichier lu et vos choix seront perdus ; rien n'a été importé." &&
+      (await page.evaluate(() => window.__mnyClosed ?? 0)) === 0,
+  );
+  await page.click(".dialog__button:not(.dialog__button--primary)");
+  await page.waitForTimeout(100);
+  check("money : « Non » garde l'assistant", (await page.evaluate(() => window.__mnyClosed ?? 0)) === 0 && (await visible("recap")));
+  await page.click("#close");
+  await page.waitForTimeout(100);
+  await page.click(".dialog__button--primary");
+  await page.waitForTimeout(150);
+  check(
+    "money : « Oui » ferme, et l'assistant repart de l'étape 1 sans fichier",
+    (await page.evaluate(() => window.__mnyClosed)) === 1 &&
+      (await visible("step-1")) && (await page.inputValue("#file")) === "",
+  );
+  await page.close();
+
+  // La disquette de l'étape 4 : une question, l'import, un message avec
+  // « OK », et l'assistant se ferme.
+  const saver = await browser.newPage();
+  await saver.addInitScript(() => {
+    window.__mnyOpening = true;
+  });
+  await openWindow(saver, "http://localhost:4173/ui/windows/mny-import.html?account=1");
+  await saver.click("#pick");
+  await saver.waitForTimeout(200);
+  for (let step = 1; step <= 3; step += 1) {
+    await saver.click("#next");
+    await saver.waitForTimeout(200);
+  }
+  check(
+    "money : la disquette n'est qu'à l'étape 4, avec la case du solde d'ouverture, cochée",
+    (await saver.locator("#save").isVisible()) &&
+      (await saver.locator("#opening-line").isVisible()) &&
+      (await saver.isChecked("#opening")) &&
+      (await saver.textContent("#opening-text")).startsWith("Reprendre le solde d'ouverture Money"),
+  );
+  await saver.click("#save");
+  await saver.waitForTimeout(100);
+  check(
+    "money : la disquette demande avant d'importer",
+    (await saver.locator(".dialog__question").textContent()) ===
+      "Importer ces opérations dans le compte ? Les éléments « À créer » seront créés." &&
+      (await saver.evaluate(() => window.__mnyImported === undefined)),
+  );
+  await saver.click(".dialog__button:not(.dialog__button--primary)");
+  await saver.waitForTimeout(100);
+  check("money : « Non » n'importe rien", await saver.evaluate(() => window.__mnyImported === undefined));
+  await saver.uncheck("#opening");
+  await saver.click("#save");
+  await saver.waitForTimeout(100);
+  await saver.click(".dialog__button--primary");
+  await saver.waitForTimeout(200);
+  const sent = await saver.evaluate(() => window.__mnyImported);
+  check(
+    "money : « Oui » importe avec les choix des trois étapes, le solde d'ouverture décoché",
+    sent.length === 1 &&
+      sent[0].handle === 2 &&
+      sent[0].mapping.payees === "none" &&
+      JSON.stringify(sent[0].choices) === JSON.stringify(["create", "7", "create"]) &&
+      sent[0].opening === false,
+    JSON.stringify(sent),
+  );
+  check(
+    "money : après l'import, un message dit ce qui est fait, avec un seul bouton « OK »",
+    (await saver.locator(".dialog__question").textContent()) ===
+      "2 opérations importées dans « CCP », pour une somme de 2 190,00 €." &&
+      (await saver.locator(".dialog__button").count()) === 1 &&
+      (await saver.locator(".dialog__button").textContent()) === "OK" &&
+      (await saver.evaluate(() => window.__mnyClosed ?? 0)) === 0,
+  );
+  await saver.click(".dialog__button");
+  await saver.waitForTimeout(150);
+  check(
+    "money : « OK » ferme l'assistant, qui ne repart pas de lui-même",
+    (await saver.evaluate(() => window.__mnyClosed)) === 1 &&
+      (await saver.locator(".dialog__question").count()) === 0 &&
+      (await saver.inputValue("#file")) === "",
+  );
+  await saver.close();
+
+  // Un fichier protégé : le mot de passe n'est demandé que pour lui.
+  const locked = await browser.newPage();
+  await locked.addInitScript(() => {
+    window.__mnyProtected = true;
+  });
+  await openWindow(locked, "http://localhost:4173/ui/windows/mny-import.html?account=1");
+  await locked.click("#pick");
+  await locked.waitForTimeout(200);
+  check(
+    "money : un fichier protégé montre le champ du mot de passe et le dit",
+    (await locked.locator("#password-line").isVisible()) &&
+      (await locked.textContent("#info-bar")) === "Ce fichier Money est protégé par un mot de passe." &&
+      (await locked.locator("#money-account option").count()) === 0,
+  );
+  await locked.fill("#password", "faux");
+  await locked.click("#unlock");
+  await locked.waitForTimeout(150);
+  check(
+    "money : un mauvais mot de passe est dit",
+    (await locked.textContent("#info-bar")) === "Ce mot de passe n'ouvre pas le fichier Money.",
+  );
+  await locked.fill("#password", "secret");
+  await locked.press("#password", "Enter");
+  await locked.waitForTimeout(200);
+  check(
+    "money : le bon mot de passe ouvre le fichier, et le champ s'en va",
+    !(await locked.locator("#password-line").isVisible()) &&
+      (await locked.locator("#money-account option").count()) === 2,
+  );
+  await locked.close();
+
+  // La liste des comptes ouvre l'assistant sur le compte choisi.
+  const chooser = await browser.newPage();
+  await openWindow(chooser, "http://localhost:4173/ui/windows/accounts-list.html?mode=SEL&target=mny-import");
+  await chooser.waitForTimeout(150);
+  await chooser.locator(".list__row").first().dblclick();
+  await chooser.waitForTimeout(150);
+  check(
+    "money : choisir un compte ouvre l'assistant sur lui",
+    await chooser.evaluate(() => window.__opened && window.__opened.command === "open_mny_import" && window.__opened.args.accountId > 0),
+    JSON.stringify(await chooser.evaluate(() => window.__opened)),
+  );
+  await chooser.close();
 }
 
 // --- F41 : la simulation de crédit (08/10/2026) ---------------------------

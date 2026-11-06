@@ -1383,6 +1383,142 @@ structured-format-comma-thousands = { $example } (פסיק לאלפים, נקו�
 structured-format-cents = { $example } (באגורות)
 structured-format-thousandths = { $example } (באלפיות)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = העברה אל { $account }
+mny-transfer-from = העברה מ־{ $account }
+mny-payment-mode = אמצעי תשלום Money מס׳ { $code }
+mny-no-label = תנועת Money
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = ייבוא קובץ Money (MNY)
+window-mny-import-title-1 = אשף ייבוא Money: { $account } (שלב 1/4)
+window-mny-import-title-2 = אשף ייבוא Money: { $account } (שלב 2/4)
+window-mny-import-title-3 = אשף ייבוא Money: { $account } (שלב 3/4)
+window-mny-import-title-4 = אשף ייבוא Money: { $account } (שלב 4/4)
+mny-field-file = קובץ Money:
+mny-pick = בחירת הקובץ…
+mny-field-password = סיסמה:
+mny-unlock = פתיחה
+mny-field-account = חשבון Money:
+mny-field-label = איזה תיאור לתת לתנועות?
+mny-field-cleared = מה קורה לתנועות שסומנו ב־Money?
+mny-field-not-cleared = מה קורה לתנועות שלא סומנו?
+mny-field-scheduled = מה לעשות בתשלומים המתוזמנים הקרובים?
+mny-recap-title = מה הייבוא יעשה
+mny-close = סגירת האשף
+mny-close-question = לסגור את האשף? הקובץ שנקרא והבחירות שלך יאבדו; שום דבר לא יובא.
+mny-help-1 = בחר את קובץ ה־Money ואז את החשבון לייבוא: התצוגה המקדימה מציגה את התנועות שלו.
+mny-help-2 = בדוק היכן Radinus מניח כל נתון של Money, וענה על השאלות: התצוגה המקדימה עוקבת אחר כל שינוי.
+mny-help-3 = לכל ערך של Money, בחר את הפריט ב־Radinus שיקבל אותו, או השאר „ליצירה”.
+mny-help-4 = בדוק מה הייבוא יעשה, ואז שמור בעזרת התקליטון.
+mny-need-account = בחר תחילה קובץ Money ואחד מהחשבונות שלו.
+mny-empty-no-file = לא נבחר קובץ Money.
+mny-empty = בחשבון Money זה אין תנועות לייבוא.
+mny-values-empty = אין ערכים להתאמה.
+mny-column-others = אחר
+mny-column-destination = שדה Radinus
+mny-column-value = ערך Money
+mny-column-uses = שורות
+mny-column-choice = ב־Radinus
+mny-choice-create = ליצירה
+mny-choice-unspecified = לא צוין
+mny-source-category = קטגוריה
+mny-source-sub-category = תת־קטגוריה
+mny-source-payee = מוטב
+mny-source-payment-mode = אמצעי תשלום
+mny-source-classification-1 = סיווג 1
+mny-source-classification-2 = סיווג 2
+mny-source-reference = מס׳ המחאה / אסמכתה
+mny-source-memo = הערה
+mny-destination-ignore = לא לייבא
+mny-destination-budget-line = סעיף תקציב
+mny-destination-category = קטגוריה
+mny-destination-payee = צד שלישי
+mny-destination-payment-mode = אמצעי תשלום
+mny-destination-assignment = הקצאה
+mny-destination-project = פרויקט
+mny-destination-reference = אסמכתת תשלום
+mny-destination-comment = הערה
+mny-label-payee = המוטב
+mny-label-memo = ההערה
+mny-label-payee-and-memo = המוטב ואחריו ההערה
+mny-status-pointed = מסומנת
+mny-status-committed = מחויבת
+mny-status-planned = מתוכננת
+mny-scheduled-skip = לא לייבא
+mny-scheduled-planned = לייבא כ„מתוכננת”
+mny-payees-none = לא, ללא צדדים שלישיים
+mny-payees-frequent = רק מוטבים שחוזרים לעיתים קרובות (לפחות 3 תנועות)
+mny-payees-all = כן, צד שלישי לכל מוטב
+mny-payee-hint = הוא משמש גם כתיאור התנועה (ראה בהמשך).
+mny-routes-intro = מימין, מה שמכיל קובץ ה־Money שלך, עם דוגמה. משמאל, היכן Radinus מניח אותו. הבחירות כבר נעשו עבורך; שנה אותן רק אם תרצה.
+mny-column-money = בקובץ ה־Money שלך
+mny-column-example = דוגמה מהקובץ
+mny-settings-title = כיצד לייבא את התנועות
+mny-sample-value = { $value } ({ $count ->
+    [one] שורה אחת
+   *[other] { $count } שורות
+})
+mny-sample-absent = אין בקובץ זה
+mny-sample-payees = מוטבים שונים: { $count }, מהם { $frequent } מופיעים לפחות { $min } פעמים
+mny-sample-operations = { $count ->
+    [one] תנועה אחת
+   *[other] { $count } תנועות
+}
+mny-account-detail = יתרת פתיחה: { $opening } — { $count ->
+    [one] תנועה אחת
+   *[other] { $count } תנועות
+}
+mny-problem-password = קובץ Money זה מוגן בסיסמה: הקלד אותה ולחץ „פתיחה”.
+mny-problem-wrong-password = סיסמה זו אינה פותחת את קובץ ה־Money.
+mny-problem-not-money = קובץ זה אינו קובץ Microsoft Money.
+mny-problem-unreadable = לא ניתן לקרוא את קובץ ה־Money: { $detail }
+mny-refusal-same = „{ $first }” ו„{ $second }” הולכים שניהם אל „{ $destination }”: שדה ב־Radinus מקבל נתון אחד בלבד.
+mny-refusal-not-offered = „{ $source }” אינו יכול ללכת אל „{ $destination }”.
+mny-refusal-budget-line = סעיף תקציב זקוק לקטגוריה: ב־Radinus תנועה מקבלת את הסעיף שלה מהקטגוריה.
+mny-note-split = מפוצלת ({ $count })
+mny-note-transfer = העברה
+mny-preview-summary = { $count ->
+    [one] תנועה אחת לייבוא
+   *[other] { $count } תנועות לייבוא
+}, סכום { $sum }
+mny-preview-limited = התצוגה המקדימה מציגה את { $shown } הראשונות
+mny-preview-scheduled = { $count ->
+    [one] תשלום מתוזמן אחד הושאר בצד
+   *[other] { $count } תשלומים מתוזמנים הושארו בצד
+}
+mny-recap-operations = { $count ->
+    [one] תיובא תנועה אחת
+   *[other] ייובאו { $count } תנועות
+}, בסכום של { $sum }{ $splits ->
+    [0] {""}
+   *[other] , מתוכן { $splits } מפוצלות
+}.
+mny-recap-balance = היתרה הסופית של החשבון: { $before } לפני, { $after } אחרי.
+mny-recap-created = { $destination }: { $count ->
+    [one] ייווצר פריט אחד
+   *[other] ייווצרו { $count } פריטים
+}.
+mny-recap-overlap = שים לב: בחשבון זה כבר יש { $count ->
+    [one] תנועה אחת
+   *[other] { $count } תנועות
+} בין { $from } ל־{ $to }. ייתכנו כפילויות.
+mny-recap-opening = להשתמש ביתרת הפתיחה של Money ({ $amount }) כיתרת הפתיחה המסומנת של החשבון
+mny-save = שמירת הייבוא
+mny-save-question = לייבא תנועות אלה לחשבון? הפריטים „ליצירה” ייווצרו.
+mny-done = { $count ->
+    [one] יובאה תנועה אחת
+   *[other] יובאו { $count } תנועות
+} אל „{ $account }”, בסכום של { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] נוצר פריט אחד
+   *[other] נוצרו { $count } פריטים
+}.
+journal-step-mny-begin = תחילת ייבוא Money
+journal-step-mny-create = יצירת פריט
+journal-step-mny-end = סוף ייבוא Money
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - ציון קובץ ה-Excel לייבוא
 excel-pick = ציון קובץ ה-Excel
 excel-sheet = גיליון בחוברת:

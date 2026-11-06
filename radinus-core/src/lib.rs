@@ -182,6 +182,11 @@ pub mod csv_excel_import;
 /// l'import Excel.
 pub mod structured_import;
 
+/// « Importation de fichier Money (MNY) » (05/11/2026) : un fichier Microsoft
+/// Money lu par `mny-reader`, ses comptes et leurs opérations, les choix « où
+/// va chaque donnée » et les correspondances de valeurs. N'écrit rien.
+pub mod mny_import;
+
 /// QIF/OFX/CSV/TSV/JSON/XML/INI/YAML/TOML/Excel export (Phase 13). Dossier
 /// reference: 06_FORMATS_SAUVEGARDE_IMPORT_EXPORT.md §3.
 pub mod exports;

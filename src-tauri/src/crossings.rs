@@ -2227,3 +2227,92 @@ fn toute_clef_qu_une_fenetre_demande_est_une_clef_que_le_dictionnaire_sert() {
          clef elle-même, en toutes lettres, sur son étiquette : {unserved:#?}"
     );
 }
+
+/// **L'assistant Money (05/11/2026) : la fenêtre et le noyau parlent des mêmes
+/// clefs.** Les menus de l'étape 2 sont bâtis d'après `mny_choices` et
+/// renvoyés tels quels : chaque clef qu'un menu propose doit se relire en
+/// choix du noyau, les propositions redonner exactement les propositions du
+/// noyau, et chaque clef avoir son mot dans toutes les langues — la page les
+/// dit par `mny-source-…`, `mny-destination-…`, `mny-label-…`, `mny-status-…`,
+/// `mny-scheduled-…` et `mny-payees-…`.
+#[test]
+fn l_assistant_money_et_le_noyau_parlent_des_memes_clefs() {
+    use crate::commands::{mny_choices, mny_mapping, mny_refusal_text, MnyMappingInput};
+    use radinus_core::i18n::{self, Language};
+    use radinus_core::mny_import as mny;
+
+    let choices = mny_choices();
+    let proposed = || MnyMappingInput {
+        routes: choices
+            .sources
+            .iter()
+            .map(|source| (source.key.clone(), source.default.clone()))
+            .collect(),
+        payees: choices.payees_default.clone(),
+        label: choices.label.clone(),
+        cleared: choices.cleared.clone(),
+        not_cleared: choices.not_cleared.clone(),
+        scheduled: choices.scheduled_default.clone(),
+    };
+    assert_eq!(mny_mapping(&proposed()), Ok(mny::Mapping::default()));
+    for source in &choices.sources {
+        for destination in &source.destinations {
+            let mut input = proposed();
+            input.routes.insert(source.key.clone(), destination.clone());
+            assert!(mny_mapping(&input).is_ok(), "{} → {destination}", source.key);
+        }
+    }
+    let mut unknown = proposed();
+    unknown.label = "n-importe-quoi".to_string();
+    assert!(mny_mapping(&unknown).is_err(), "une clef inconnue n'est pas un défaut silencieux");
+    for payees in &choices.payees {
+        let mut input = proposed();
+        input.payees = payees.clone();
+        assert!(mny_mapping(&input).is_ok(), "{payees}");
+    }
+    // « Au moins 3 opérations » : le texte dit le seuil du noyau, en chiffres,
+    // dans toutes les langues.
+    for language in Language::all() {
+        let text = i18n::text(language, "mny-payees-frequent");
+        assert!(text.contains(&choices.frequent.to_string()), "{language:?} : {text}");
+    }
+    // Le bénéficiaire n'a pas de menu : il a sa propre question.
+    assert!(choices.sources.iter().all(|source| source.key != "payee"));
+    assert!(choices
+        .sources
+        .iter()
+        .all(|source| !source.destinations.iter().any(|one| one == "payee")));
+
+    let mut words: Vec<String> = Vec::new();
+    for source in &choices.sources {
+        words.push(format!("mny-source-{}", source.key));
+        words.extend(source.destinations.iter().map(|one| format!("mny-destination-{one}")));
+    }
+    words.extend(choices.labels.iter().map(|one| format!("mny-label-{one}")));
+    words.extend(choices.statuses.iter().map(|one| format!("mny-status-{one}")));
+    words.extend(choices.scheduled.iter().map(|one| format!("mny-scheduled-{one}")));
+    words.extend(choices.payees.iter().map(|one| format!("mny-payees-{one}")));
+    words.push("mny-source-payee".to_string());
+    let served = read("src-tauri/src/texts.rs");
+    for word in &words {
+        assert!(served.contains(&format!("\"{word}\"")), "{word} n'est pas servi aux fenêtres");
+        for language in Language::all() {
+            let text = i18n::text(language, word);
+            assert!(!text.is_empty() && text != *word, "{word} n'est pas dit en {language:?}");
+        }
+    }
+
+    // Un refus nomme les données et la rubrique dans la langue de l'interface.
+    let said = mny_refusal_text(
+        Language::French,
+        &mny::Refusal::SameDestination {
+            first: mny::Source::Classification1,
+            second: mny::Source::Classification2,
+            destination: mny::Destination::Assignment,
+        },
+    );
+    assert_eq!(
+        said,
+        "« Classification 1 » et « Classification 2 » vont tous les deux dans « Affectation » : une rubrique de Radinus ne reçoit qu'une donnée."
+    );
+}

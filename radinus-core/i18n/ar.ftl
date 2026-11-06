@@ -1444,6 +1444,142 @@ structured-format-comma-thousands = { $example } (فاصلة للآلاف، نق
 structured-format-cents = { $example } (بالسنتات)
 structured-format-thousandths = { $example } (بأجزاء الألف)
 
+# Microsoft Money import (05/11/2026): names given to imported data.
+mny-transfer-to = تحويل إلى { $account }
+mny-transfer-from = تحويل من { $account }
+mny-payment-mode = طريقة دفع Money رقم { $code }
+mny-no-label = عملية Money
+
+# The Money import wizard (05/11/2026).
+menu-file-import-mny = استيراد ملف Money (MNY)
+window-mny-import-title-1 = معالج استيراد Money: { $account } (الخطوة 1/4)
+window-mny-import-title-2 = معالج استيراد Money: { $account } (الخطوة 2/4)
+window-mny-import-title-3 = معالج استيراد Money: { $account } (الخطوة 3/4)
+window-mny-import-title-4 = معالج استيراد Money: { $account } (الخطوة 4/4)
+mny-field-file = ملف Money:
+mny-pick = اختيار الملف…
+mny-field-password = كلمة المرور:
+mny-unlock = فتح
+mny-field-account = حساب Money:
+mny-field-label = أي وصف تُعطى العمليات؟
+mny-field-cleared = ماذا يحدث للعمليات المؤشَّر عليها في Money؟
+mny-field-not-cleared = ماذا يحدث للعمليات غير المؤشَّر عليها؟
+mny-field-scheduled = ماذا نفعل بالدفعات المجدولة القادمة؟
+mny-recap-title = ما سيفعله الاستيراد
+mny-close = إغلاق المعالج
+mny-close-question = إغلاق المعالج؟ سيضيع الملف المقروء واختياراتك؛ لم يُستورد شيء.
+mny-help-1 = اختر ملف Money ثم الحساب المراد استيراده: تعرض المعاينة عملياته.
+mny-help-2 = تحقّق من المكان الذي يضع فيه Radinus كل بيانات Money، وأجب عن الأسئلة: تتبع المعاينة كل تغيير.
+mny-help-3 = لكل قيمة من Money، اختر عنصر Radinus الذي سيستقبلها، أو اترك «للإنشاء».
+mny-help-4 = تحقّق مما سيفعله الاستيراد، ثم احفظ بالقرص المرن.
+mny-need-account = اختر أولاً ملف Money وأحد حساباته.
+mny-empty-no-file = لم يُختر أي ملف Money.
+mny-empty = لا توجد في حساب Money هذا أي عملية للاستيراد.
+mny-values-empty = لا توجد قيم للمطابقة.
+mny-column-others = أخرى
+mny-column-destination = حقل Radinus
+mny-column-value = قيمة Money
+mny-column-uses = الأسطر
+mny-column-choice = في Radinus
+mny-choice-create = للإنشاء
+mny-choice-unspecified = غير محدد
+mny-source-category = الفئة
+mny-source-sub-category = الفئة الفرعية
+mny-source-payee = المستفيد
+mny-source-payment-mode = طريقة الدفع
+mny-source-classification-1 = التصنيف 1
+mny-source-classification-2 = التصنيف 2
+mny-source-reference = رقم الشيك / المرجع
+mny-source-memo = الملاحظة
+mny-destination-ignore = عدم الاستيراد
+mny-destination-budget-line = بند الميزانية
+mny-destination-category = الفئة
+mny-destination-payee = الطرف الآخر
+mny-destination-payment-mode = طريقة الدفع
+mny-destination-assignment = التخصيص
+mny-destination-project = المشروع
+mny-destination-reference = مرجع الدفع
+mny-destination-comment = تعليق
+mny-label-payee = المستفيد
+mny-label-memo = الملاحظة
+mny-label-payee-and-memo = المستفيد متبوعاً بالملاحظة
+mny-status-pointed = مؤشَّر عليها
+mny-status-committed = ملتزم بها
+mny-status-planned = متوقعة
+mny-scheduled-skip = عدم الاستيراد
+mny-scheduled-planned = الاستيراد كـ«متوقعة»
+mny-payees-none = لا، بلا أطراف أخرى
+mny-payees-frequent = فقط المستفيدون المتكررون كثيراً (3 عمليات على الأقل)
+mny-payees-all = نعم، طرف آخر لكل مستفيد
+mny-payee-hint = ويُستخدم أيضاً وصفاً للعملية (انظر أدناه).
+mny-routes-intro = على اليمين ما يحتويه ملف Money الخاص بك مع مثال، وعلى اليسار أين يضعه Radinus. الاختيارات جاهزة لك؛ غيّرها فقط إن رغبت.
+mny-column-money = في ملف Money الخاص بك
+mny-column-example = مثال من الملف
+mny-settings-title = كيف تُستورد العمليات
+mny-sample-value = { $value } ({ $count ->
+    [one] { $count } سطر
+   *[other] { $count } أسطر
+})
+mny-sample-absent = لا شيء في هذا الملف
+mny-sample-payees = المستفيدون المختلفون: { $count }، منهم { $frequent } يظهرون { $min } مرات على الأقل
+mny-sample-operations = { $count ->
+    [one] { $count } عملية
+   *[other] { $count } عمليات
+}
+mny-account-detail = الرصيد الافتتاحي: { $opening } — { $count ->
+    [one] { $count } عملية
+   *[other] { $count } عمليات
+}
+mny-problem-password = ملف Money هذا محمي بكلمة مرور: اكتبها ثم اضغط «فتح».
+mny-problem-wrong-password = كلمة المرور هذه لا تفتح ملف Money.
+mny-problem-not-money = هذا الملف ليس ملف Microsoft Money.
+mny-problem-unreadable = تعذّرت قراءة ملف Money: { $detail }
+mny-refusal-same = «{ $first }» و«{ $second }» يذهبان كلاهما إلى «{ $destination }»: حقل Radinus لا يستقبل إلا بياناً واحداً.
+mny-refusal-not-offered = لا يمكن أن يذهب «{ $source }» إلى «{ $destination }».
+mny-refusal-budget-line = بند الميزانية يحتاج إلى فئة: في Radinus تأخذ العملية بندها من فئتها.
+mny-note-split = مقسّمة ({ $count })
+mny-note-transfer = تحويل
+mny-preview-summary = { $count ->
+    [one] { $count } عملية للاستيراد
+   *[other] { $count } عمليات للاستيراد
+}، المجموع { $sum }
+mny-preview-limited = تعرض المعاينة أول { $shown }
+mny-preview-scheduled = { $count ->
+    [one] { $count } دفعة مجدولة تُركت جانباً
+   *[other] { $count } دفعات مجدولة تُركت جانباً
+}
+mny-recap-operations = { $count ->
+    [one] ستُستورد { $count } عملية
+   *[other] ستُستورد { $count } عمليات
+}، بمجموع { $sum }{ $splits ->
+    [0] {""}
+   *[other] ، منها { $splits } مقسّمة
+}.
+mny-recap-balance = الرصيد النهائي للحساب: { $before } قبل، { $after } بعد.
+mny-recap-created = { $destination }: { $count ->
+    [one] سيُنشأ { $count } عنصر
+   *[other] ستُنشأ { $count } عناصر
+}.
+mny-recap-overlap = تنبيه: لهذا الحساب بالفعل { $count ->
+    [one] { $count } عملية
+   *[other] { $count } عمليات
+} بين { $from } و{ $to }. قد توجد تكرارات.
+mny-recap-opening = اعتماد الرصيد الافتتاحي في Money ({ $amount }) رصيداً افتتاحياً مؤشَّراً عليه للحساب
+mny-save = حفظ الاستيراد
+mny-save-question = استيراد هذه العمليات إلى الحساب؟ ستُنشأ العناصر «للإنشاء».
+mny-done = { $count ->
+    [one] استُوردت { $count } عملية
+   *[other] استُوردت { $count } عمليات
+} إلى «{ $account }»، بمجموع { $sum }.
+mny-done-created = { $destination }: { $count ->
+    [one] أُنشئ { $count } عنصر
+   *[other] أُنشئت { $count } عناصر
+}.
+journal-step-mny-begin = بداية استيراد Money
+journal-step-mny-create = إنشاء عنصر
+journal-step-mny-end = نهاية استيراد Money
+mny-journal-created = { $destination }: { $label }
+
 excel-group-file = 1 - تحديد ملف Excel المراد استيراده
 excel-pick = تحديد ملف Excel
 excel-sheet = ورقة المصنف:

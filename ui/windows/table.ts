@@ -503,6 +503,28 @@ export class Table<Row> {
     return sound;
   }
 
+  /// **Masque des colonnes de lui-même**, par leur `id`, sans rien
+  /// enregistrer : pour une fenêtre qui sait qu'une colonne est vide d'un bout
+  /// à l'autre — l'aperçu de l'assistant Money (Fabrice, 05/11/2026). Une
+  /// liste vide les remontre toutes. À la différence d'une disposition, cela
+  /// vaut aussi pour un tableau sans `layoutName`.
+  hideColumns(ids: string[]): void {
+    const hidden = new Set(
+      ids
+        .map((id) => this.options.columns.findIndex((column) => column.id === id))
+        .filter((index) => index >= 0),
+    );
+    if (hidden.size >= this.options.columns.length) {
+      return;
+    }
+    if (hidden.size === this.hidden.size && [...hidden].every((index) => this.hidden.has(index))) {
+      return;
+    }
+    this.hidden = hidden;
+    this.forgetWhatIsHidden();
+    this.redress();
+  }
+
   /// Lit une disposition contre les colonnes de ce tableau. `null` si elle ne
   /// se tient pas.
   private readLayout(

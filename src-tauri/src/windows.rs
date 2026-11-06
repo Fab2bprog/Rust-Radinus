@@ -607,6 +607,21 @@ pub fn duplicates_window(language: Language, account_label: &str) -> WindowSpec 
     }
 }
 
+/// « Assistant d'importation Money » (05/11/2026) : un compte d'abord, puis
+/// quatre étapes dans la même fenêtre, dont le titre dit l'étape.
+pub fn mny_import_window(language: Language, account_label: &str) -> WindowSpec {
+    WindowSpec {
+        label: "mny-import".to_string(),
+        url: "ui/windows/mny-import.html".to_string(),
+        title: i18n::text_with(language, "window-mny-import-title-1", "account", account_label),
+        width: 1400.0,
+        height: 880.0,
+        closable: false,
+        resizable_chrome: true,
+        parent: None,
+    }
+}
+
 /// F17 — « Importation de relevés de comptes bancaires ».
 ///
 /// **Un compte, et un seul**, comme F02 et F05 : on choisit le compte dans
